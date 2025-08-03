@@ -29,7 +29,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.level.GameType;
-import org.lwjgl.opengl.NVVertexArrayRange;
 
 public class MainScreen extends Screen {
 

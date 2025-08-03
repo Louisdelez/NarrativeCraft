@@ -24,7 +24,6 @@ public class CreditsScreen extends WinScreen {
 
     public static final SimpleSoundInstance MUSIC_INSTANCE = SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(MUSIC), 1, 1);
 
-
     public CreditsScreen(boolean fromMainMenu, boolean showFinishScreen) {
         super(false, () -> {
             MainScreen mainScreen;

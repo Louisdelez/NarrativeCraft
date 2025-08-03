@@ -70,7 +70,7 @@ public class DialogData {
                 3,
                 4,
                 0.8f,
-                0.1f,
+                0,
                 10,
                 90,
                 false,

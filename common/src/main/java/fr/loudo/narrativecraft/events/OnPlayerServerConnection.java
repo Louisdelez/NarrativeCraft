@@ -8,6 +8,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scenes.KeyframeControllerBase;
 import fr.loudo.narrativecraft.narrative.recordings.Recording;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.screens.mainScreen.MainScreen;
 import fr.loudo.narrativecraft.utils.ConstantsLink;
 import fr.loudo.narrativecraft.utils.FakePlayer;
@@ -51,8 +52,11 @@ public class OnPlayerServerConnection {
             ));
         } else {
             if(!NarrativeCraftFile.getStoryFile().exists()) return;
-            MainScreen mainScreen = new MainScreen(false, false);
-            Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(mainScreen));
+            NarrativeWorldOption worldOption = NarrativeCraftMod.getInstance().getNarrativeWorldOption();
+            if(worldOption.showMainScreen) {
+                MainScreen mainScreen = new MainScreen(false, false);
+                Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(mainScreen));
+            }
         }
     }
 

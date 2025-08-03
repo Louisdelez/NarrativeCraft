@@ -580,12 +580,14 @@ public class StoryHandler {
         if (!isDebugMode) {
             NarrativeWorldOption option = NarrativeCraftMod.getInstance().getNarrativeWorldOption();
             boolean isFirstCompletion = option.finishedStory;
-            CreditsScreen creditsScreen = new CreditsScreen(false, isFirstCompletion);
 
             option.finishedStory = true;
             NarrativeCraftFile.updateWorldOptions(option);
 
-            Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(creditsScreen));
+            if(option.showCreditsScreen) {
+                CreditsScreen creditsScreen = new CreditsScreen(false, isFirstCompletion);
+                Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(creditsScreen));
+            }
         }
     }
 

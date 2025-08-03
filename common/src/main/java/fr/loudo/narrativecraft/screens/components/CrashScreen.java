@@ -1,5 +1,7 @@
 package fr.loudo.narrativecraft.screens.components;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.screens.mainScreen.MainScreen;
 import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.CrashReport;
@@ -33,8 +35,11 @@ public class CrashScreen extends Screen {
 
     @Override
     public void onClose() {
-        MainScreen mainScreen = new MainScreen(false, false);
-        minecraft.setScreen(mainScreen);
+        NarrativeWorldOption worldOption = NarrativeCraftMod.getInstance().getNarrativeWorldOption();
+        if(worldOption.showMainScreen) {
+            MainScreen mainScreen = new MainScreen(false, false);
+            minecraft.setScreen(mainScreen);
+        }
     }
 
     @Override

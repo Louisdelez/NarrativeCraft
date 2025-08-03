@@ -6,6 +6,7 @@ import fr.loudo.narrativecraft.narrative.recordings.playback.Playback;
 import fr.loudo.narrativecraft.narrative.story.MainScreenController;
 import fr.loudo.narrativecraft.screens.components.DialogCustomScreen;
 import fr.loudo.narrativecraft.screens.components.StoryElementList;
+import fr.loudo.narrativecraft.screens.options.WorldOptionsScreen;
 import fr.loudo.narrativecraft.screens.storyManager.StoryElementScreen;
 import fr.loudo.narrativecraft.utils.ImageFontConstants;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -59,6 +60,13 @@ public class StoryOptionsScreen extends StoryElementScreen {
                 Button.builder(Translation.message("screen.story_options.dialog"), button -> {
                     DialogCustomScreen dialogCustomScreen = new DialogCustomScreen(this);
                     minecraft.setScreen(dialogCustomScreen);
+                }).build()
+        ));
+
+        entries.add(new StoryElementList.StoryEntryData(
+                Button.builder(Translation.message("screen.story_options.world_options"), button -> {
+                    WorldOptionsScreen screen = new WorldOptionsScreen(this);
+                    minecraft.setScreen(screen);
                 }).build()
         ));
 
