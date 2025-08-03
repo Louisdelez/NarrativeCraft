@@ -8,6 +8,8 @@ import fr.loudo.narrativecraft.narrative.recordings.RecordingHandler;
 import fr.loudo.narrativecraft.narrative.recordings.playback.PlaybackHandler;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.options.NarrativeClientOption;
+import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.screens.mainScreen.NarrativeCraftLogoRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
@@ -33,7 +35,8 @@ public class NarrativeCraftMod {
     private final PlaybackHandler playbackHandler;
     private final PlayerSession playerSession;
     private final NarrativeCraftLogoRenderer narrativeCraftLogoRenderer;
-    private NarrativeUserOptions narrativeUserOptions;
+    private NarrativeClientOption narrativeClientOptions;
+    private NarrativeWorldOption narrativeWorldOption;
     private Dialog testDialog;
     private Dialog2d testDialog2d;
 
@@ -44,7 +47,6 @@ public class NarrativeCraftMod {
         playbackHandler = new PlaybackHandler();
         playerSession = new PlayerSession();
         narrativeCraftLogoRenderer = new NarrativeCraftLogoRenderer(ResourceLocation.withDefaultNamespace("textures/narrativecraft_logo.png"));
-        narrativeUserOptions = new NarrativeUserOptions();
     }
 
     public static NarrativeCraftMod getInstance() {
@@ -95,12 +97,20 @@ public class NarrativeCraftMod {
         return playerSession;
     }
 
-    public NarrativeUserOptions getNarrativeUserOptions() {
-        return narrativeUserOptions;
+    public NarrativeClientOption getNarrativeClientOptions() {
+        return narrativeClientOptions;
     }
 
-    public void setNarrativeUserOptions(NarrativeUserOptions narrativeUserOptions) {
-        this.narrativeUserOptions = narrativeUserOptions;
+    public void setNarrativeClientOptions(NarrativeClientOption narrativeClientOptions) {
+        this.narrativeClientOptions = narrativeClientOptions;
+    }
+
+    public NarrativeWorldOption getNarrativeWorldOption() {
+        return narrativeWorldOption;
+    }
+
+    public void setNarrativeWorldOption(NarrativeWorldOption narrativeWorldOption) {
+        this.narrativeWorldOption = narrativeWorldOption;
     }
 
     public NarrativeCraftLogoRenderer getNarrativeCraftLogoRenderer() {

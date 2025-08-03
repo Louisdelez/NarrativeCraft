@@ -1,9 +1,9 @@
 package fr.loudo.narrativecraft.screens.mainScreen.options;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.NarrativeUserOptions;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.options.NarrativeClientOption;
 import fr.loudo.narrativecraft.screens.credits.CreditsScreen;
 import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.Minecraft;
@@ -20,33 +20,34 @@ import java.util.Locale;
 
 public class MainScreenOptionsScreen extends OptionsSubScreen {
 
-    private final NarrativeUserOptions narrativeUserOptions = NarrativeCraftMod.getInstance().getNarrativeUserOptions();
+    private final NarrativeClientOption option = NarrativeCraftMod.getInstance().getNarrativeClientOptions();
     private long textSpeed;
     private Checkbox autoSkipCheck;
 
     public MainScreenOptionsScreen(Screen lastScreen) {
         super(lastScreen, Minecraft.getInstance().options, Component.literal(""));
-        textSpeed = narrativeUserOptions.TEXT_SPEED;
+        textSpeed = option.textSpeed;
     }
 
     @Override
     public void onClose() {
         super.onClose();
-        narrativeUserOptions.TEXT_SPEED = textSpeed;
-        narrativeUserOptions.AUTO_SKIP = autoSkipCheck.selected();
-        NarrativeCraftFile.updateUserOptions();
+        option.textSpeed = textSpeed;
+        option.autoSkip = autoSkipCheck.selected();
+        NarrativeCraftFile.updateUserOptions(option);
     }
 
     @Override
     protected void addContents() {
+        NarrativeClientOption clientOption = NarrativeCraftMod.getInstance().getNarrativeClientOptions();
         LinearLayout linearlayout = this.layout.addToContents(LinearLayout.vertical()).spacing(8);
         AbstractSliderButton abstractSliderButton = new AbstractSliderButton(
                 50,
                 20,
                 200,
                 20,
-                Translation.message("screen.main_screen.options.dialog_speed", String.format(Locale.US, "%.2f", narrativeUserOptions.TEXT_SPEED / 1000.0)),
-                (400.0 - narrativeUserOptions.TEXT_SPEED) / 400.0
+                Translation.message("screen.main_screen.options.dialog_speed", String.format(Locale.US, "%.2f", clientOption.textSpeed / 1000.0)),
+                (400.0 - clientOption.textSpeed) / 400.0
         ) {
             @Override
             protected void updateMessage() {
@@ -62,7 +63,7 @@ public class MainScreenOptionsScreen extends OptionsSubScreen {
             }
         };
         linearlayout.addChild(abstractSliderButton);
-        autoSkipCheck = Checkbox.builder(Translation.message("screen.main_screen.options.auto_skip"), minecraft.font).selected(narrativeUserOptions.AUTO_SKIP).build();
+        autoSkipCheck = Checkbox.builder(Translation.message("screen.main_screen.options.auto_skip"), minecraft.font).selected(clientOption.autoSkip).build();
         linearlayout.addChild(autoSkipCheck);
 
         linearlayout.addChild(Button.builder(Translation.message("screen.main_screen.minecraft_options"), button -> {

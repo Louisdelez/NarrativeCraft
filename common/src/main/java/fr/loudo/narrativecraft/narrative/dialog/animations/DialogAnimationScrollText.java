@@ -207,7 +207,7 @@ public class DialogAnimationScrollText {
     private void playScrollSound() {
         long now = System.currentTimeMillis();
         Minecraft client = Minecraft.getInstance();
-        if (currentLetter < totalLetters && now - lastTimeChar >= NarrativeCraftMod.getInstance().getNarrativeUserOptions().TEXT_SPEED && !client.isPaused()) {
+        if (currentLetter < totalLetters && now - lastTimeChar >= NarrativeCraftMod.getInstance().getNarrativeClientOptions().textSpeed && !client.isPaused()) {
             char nextChar = getCharAtIndex(currentLetter);
             if (nextChar != ' ') {
                 ResourceLocation soundRes = ResourceLocation.withDefaultNamespace("sfx.dialog_sound");

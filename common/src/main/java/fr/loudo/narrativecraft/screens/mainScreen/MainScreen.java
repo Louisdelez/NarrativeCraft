@@ -9,6 +9,7 @@ import fr.loudo.narrativecraft.narrative.recordings.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.MainScreenController;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.screens.choices.ChoicesScreen;
 import fr.loudo.narrativecraft.screens.mainScreen.options.MainScreenOptionsScreen;
 import fr.loudo.narrativecraft.screens.mainScreen.sceneSelection.ChapterSelectorScreen;
@@ -28,6 +29,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.level.GameType;
+import org.lwjgl.opengl.NVVertexArrayRange;
 
 public class MainScreen extends Screen {
 
@@ -91,7 +93,7 @@ public class MainScreen extends Screen {
 
     @Override
     protected void init() {
-        boolean storyFinished = NarrativeCraftMod.getInstance().getNarrativeUserOptions().FINISHED_STORY;
+        boolean storyFinished = NarrativeCraftMod.getInstance().getNarrativeWorldOption().finishedStory;
         showDevBtnCount = 0;
         boolean firstGame = NarrativeCraftFile.getSave() == null;
         PlayerSession playerSession = NarrativeCraftMod.getInstance().getPlayerSession();
@@ -143,9 +145,10 @@ public class MainScreen extends Screen {
             Button startNewGame = Button.builder(Translation.message("screen.main_screen.new_game"), button -> {
                 ConfirmScreen confirmScreen = new ConfirmScreen(b -> {
                     if(b) {
+                        NarrativeWorldOption option = NarrativeCraftMod.getInstance().getNarrativeWorldOption();
                         NarrativeCraftFile.removeSave();
-                        NarrativeCraftMod.getInstance().getNarrativeUserOptions().FINISHED_STORY = false;
-                        NarrativeCraftFile.updateUserOptions();
+                        option.finishedStory = false;
+                        NarrativeCraftFile.updateWorldOptions(option);
                         playStory();
                     } else {
                         minecraft.setScreen(this);

@@ -3,7 +3,6 @@ package fr.loudo.narrativecraft.narrative.story;
 import com.bladecoder.ink.runtime.Story;
 import com.bladecoder.ink.runtime.StoryException;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.NarrativeUserOptions;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.mixin.fields.PlayerListFields;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
@@ -19,6 +18,8 @@ import fr.loudo.narrativecraft.narrative.story.inkAction.InkAction;
 import fr.loudo.narrativecraft.narrative.story.inkAction.SongSfxInkAction;
 import fr.loudo.narrativecraft.narrative.story.inkAction.enums.InkTagType;
 import fr.loudo.narrativecraft.narrative.story.inkAction.validation.ErrorLine;
+import fr.loudo.narrativecraft.options.NarrativeClientOption;
+import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.screens.choices.ChoicesScreen;
 import fr.loudo.narrativecraft.screens.components.CrashScreen;
@@ -49,7 +50,6 @@ public class StoryHandler {
     private static final long AUTO_SKIP_MULTIPLIER = 80L;
     private static final int FIRST_CHAPTER_INDEX = 1;
 
-    private final NarrativeUserOptions narrativeUserOptions;
     private final PlayerSession playerSession;
     private final InkTagTranslators inkTagTranslators;
 
@@ -72,7 +72,6 @@ public class StoryHandler {
     private boolean isSaving;
 
     public StoryHandler() {
-        this.narrativeUserOptions = NarrativeCraftMod.getInstance().getNarrativeUserOptions();
         this.playerSession = NarrativeCraftMod.getInstance().getPlayerSession();
         this.currentCharacters = new ArrayList<>();
         this.inkTagTranslators = new InkTagTranslators(this);
@@ -579,11 +578,12 @@ public class StoryHandler {
 
     private void showCreditsScreen() {
         if (!isDebugMode) {
-            boolean isFirstCompletion = !narrativeUserOptions.FINISHED_STORY;
+            NarrativeWorldOption option = NarrativeCraftMod.getInstance().getNarrativeWorldOption();
+            boolean isFirstCompletion = option.finishedStory;
             CreditsScreen creditsScreen = new CreditsScreen(false, isFirstCompletion);
 
-            narrativeUserOptions.FINISHED_STORY = true;
-            NarrativeCraftFile.updateUserOptions();
+            option.finishedStory = true;
+            NarrativeCraftFile.updateWorldOptions(option);
 
             Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(creditsScreen));
         }
@@ -672,7 +672,7 @@ public class StoryHandler {
 
     private boolean shouldEndCurrentDialog() {
         return currentDialogBox != null &&
-                (!currentDialogBox.isDialogAutoSkipped() || narrativeUserOptions.AUTO_SKIP);
+                (!currentDialogBox.isDialogAutoSkipped() || NarrativeCraftMod.getInstance().getNarrativeClientOptions().autoSkip);
     }
 
     private void createNewDialog(ParsedDialog parsed) {
@@ -744,7 +744,7 @@ public class StoryHandler {
     }
 
     private void configureAutoSkip() {
-        if (globalDialogValue.getEndForceEndTime() == 0 && narrativeUserOptions.AUTO_SKIP) {
+        if (globalDialogValue.getEndForceEndTime() == 0 && NarrativeCraftMod.getInstance().getNarrativeClientOptions().autoSkip) {
             long autoSkipTime = currentDialog.replaceAll("\\s+", "").length() * AUTO_SKIP_MULTIPLIER;
             currentDialogBox.setForcedEndTime(autoSkipTime);
         }

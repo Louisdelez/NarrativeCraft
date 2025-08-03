@@ -1,7 +1,6 @@
 package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.NarrativeUserOptions;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.items.CutsceneEditItems;
 import fr.loudo.narrativecraft.keys.ModKeys;
@@ -27,13 +26,8 @@ public class OnPlayerServerConnection {
     public static void playerJoin(ServerPlayer player) {
         if(player instanceof FakePlayer) return;
         CutsceneEditItems.init(player.registryAccess());
-        NarrativeUserOptions narrativeUserOptions = NarrativeCraftFile.loadUserOptions();
-        if(narrativeUserOptions != null) {
-            NarrativeCraftMod.getInstance().setNarrativeUserOptions(narrativeUserOptions);
-        } else {
-            NarrativeCraftMod.getInstance().setNarrativeUserOptions(new NarrativeUserOptions());
-            NarrativeCraftFile.updateUserOptions();
-        }
+        NarrativeCraftMod.getInstance().setNarrativeWorldOption(NarrativeCraftFile.loadWorldOptions());
+        NarrativeCraftMod.getInstance().setNarrativeClientOptions(NarrativeCraftFile.loadUserOptions());
         if(NarrativeCraftMod.firstTime) {
             MutableComponent inkyLink = Component.literal("Inky").withStyle(style ->
                     style.withColor(ChatFormatting.YELLOW)
@@ -77,8 +71,7 @@ public class OnPlayerServerConnection {
         if(storyHandler != null) {
             storyHandler.stop(true);
         }
-
-
+        NarrativeCraftFile.updateWorldOptions(NarrativeCraftMod.getInstance().getNarrativeWorldOption());
     }
 
 }
