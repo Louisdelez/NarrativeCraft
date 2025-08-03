@@ -1,7 +1,6 @@
 plugins {
     id 'multiloader-loader'
     id 'fabric-loom'
-    id 'com.hypherionmc.modutils.modpublisher'
 }
 
 repositories {
@@ -51,29 +50,4 @@ loom {
             runDir('runs/server')
         }
     }
-}
-
-publisher {
-    apiKeys {
-        modrinth System.getenv("MODRINTH_TOKEN")
-        curseforge System.getenv("CURSE_TOKEN")
-    }
-
-    setCurseID(curse_forge_id)
-    setModrinthID(modrinth_id)
-
-    setVersionType(version_type)
-    setChangelog(System.getenv("CHANGELOG_TEXT"))
-    setVersion("${project.version}-fabric-${minecraft_version}")
-    setDisplayName("${mod_name} - Fabric - ${project.version}")
-    setGameVersions(minecraft_version)
-    setCurseEnvironment(curse_environment)
-
-    setLoaders("fabric")
-    setArtifact("build/libs/${mod_id}-fabric-${minecraft_version}-${project.version}.jar")
-
-    setJavaVersions("Java 21", "Java 21")
-    setDisableMalwareScanner(true)
-    setDisableEmptyJarCheck(true)
-
 }
