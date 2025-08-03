@@ -20,6 +20,7 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.FormattedCharSequence;
 import org.joml.Matrix3x2fStack;
 import org.joml.Random;
@@ -273,7 +274,7 @@ public class DialogAnimationScrollText {
                 character,
                 x,
                 y,
-                color,
+                ARGB.color(255, color),
                 false,
                 poseStack.last().pose(),
                 bufferSource,
@@ -291,7 +292,7 @@ public class DialogAnimationScrollText {
                 client.font,
                 x,
                 y,
-                color,
+                ARGB.color(255, color),
                 false
         );
     }

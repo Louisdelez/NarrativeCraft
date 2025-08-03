@@ -1,4 +1,4 @@
-package fr.loudo.narrativecraft.screens.components;
+package fr.loudo.narrativecraft.screens.options;
 
 import com.mojang.authlib.GameProfile;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
@@ -22,6 +22,7 @@ import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
@@ -205,7 +206,7 @@ public class DialogCustomScreen extends Screen {
                 currentY,
                 ScreenUtils.Align.HORIZONTAL
         );
-        bcColorBox.getEditBox().setValue(Integer.toHexString(dialogData.getBackgroundColor()));
+        bcColorBox.getEditBox().setValue(Integer.toHexString(ARGB.color(0, dialogData.getBackgroundColor())));
         this.addRenderableWidget(bcColorBox.getStringWidget());
         this.addRenderableWidget(bcColorBox.getEditBox());
         currentY += bcColorBox.getEditBox().getHeight() + gap;
@@ -219,7 +220,7 @@ public class DialogCustomScreen extends Screen {
                 currentY,
                 ScreenUtils.Align.HORIZONTAL
         );
-        textColorBox.getEditBox().setValue(Integer.toHexString(dialogData.getTextColor()));
+        textColorBox.getEditBox().setValue(Integer.toHexString(ARGB.color(0, dialogData.getTextColor())));
         this.addRenderableWidget(textColorBox.getStringWidget());
         this.addRenderableWidget(textColorBox.getEditBox());
         currentY += textColorBox.getEditBox().getHeight() + gap;

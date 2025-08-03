@@ -66,7 +66,7 @@ public class DialogData {
                 null,
                 new Vec2(0, 0.8f),
                 -1,
-                0xFF000000,
+                0,
                 3,
                 4,
                 0.8f,

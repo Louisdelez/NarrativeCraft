@@ -4,7 +4,7 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.cameraAngle.CameraAngleGroup;
 import fr.loudo.narrativecraft.narrative.recordings.playback.Playback;
 import fr.loudo.narrativecraft.narrative.story.MainScreenController;
-import fr.loudo.narrativecraft.screens.components.DialogCustomScreen;
+import fr.loudo.narrativecraft.screens.options.DialogCustomScreen;
 import fr.loudo.narrativecraft.screens.components.StoryElementList;
 import fr.loudo.narrativecraft.screens.options.WorldOptionsScreen;
 import fr.loudo.narrativecraft.screens.storyManager.StoryElementScreen;
