@@ -17,7 +17,6 @@ import fr.loudo.narrativecraft.narrative.story.inkAction.InkAction;
 import fr.loudo.narrativecraft.narrative.story.inkAction.SubscenePlayInkAction;
 import fr.loudo.narrativecraft.screens.cutscenes.CutsceneControllerScreen;
 import fr.loudo.narrativecraft.utils.Translation;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
