@@ -82,17 +82,7 @@ public class CutsceneControllerScreen extends Screen {
         createKeyframeGroup.setTooltip(Tooltip.create(Translation.message("screen.cutscene_controller.tooltip.keyframe_group")));
 
         Button addKeyframe = Button.builder(ImageFontConstants.ADD_KEYFRAME, button -> {
-            if (cutsceneController.addKeyframe()) {
-                client.player.displayClientMessage(
-                        Translation.message("cutscene.keyframe.added", cutsceneController.getSelectedKeyframeGroup().getId()),
-                        false
-                );
-            } else {
-                client.player.displayClientMessage(
-                        Translation.message("cutscene.keyframe.added.fail"),
-                        false
-                );
-            }
+            cutsceneController.addKeyframe();
         }).bounds(startX + btnWidth + gap, initialY, btnWidth, BUTTON_HEIGHT).build();
         addKeyframe.setTooltip(Tooltip.create(Translation.message("screen.cutscene_controller.tooltip.keyframe")));
 

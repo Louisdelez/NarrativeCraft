@@ -24,6 +24,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.protocol.game.ClientboundHurtAnimationPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
@@ -229,8 +230,23 @@ public class CutsceneController extends KeyframeControllerBase {
         }
     }
 
-    public boolean addKeyframe() {
-        if(selectedKeyframeGroup == null) return false;
+    public void addKeyframe() {
+        if(selectedKeyframeGroup == null) {
+            player.sendSystemMessage(
+                    Translation.message("cutscene.keyframe.added.fail")
+            );
+            return;
+        }
+        Keyframe lastKeyframeGroup = getLastKeyframeLastGroup();
+        if(currentTick <= lastKeyframeGroup.getTick()) {
+            player.sendSystemMessage(
+                    Translation.message("screen.cutscene_controller.cant_add_keyframe",
+                            currentTick,
+                            lastKeyframeGroup.getTick()
+                    )
+            );
+            return;
+        }
         int newId = keyframeCounter.incrementAndGet();
         Vec3 playerPos = player.position();
         KeyframeCoordinate keyframeCoordinate = new KeyframeCoordinate(playerPos.x(), playerPos.y() + player.getEyeHeight(), playerPos.z(), player.getXRot(), player.getYRot(), Minecraft.getInstance().options.fov().get());
@@ -249,7 +265,6 @@ public class CutsceneController extends KeyframeControllerBase {
         }
         selectedKeyframeGroup.getKeyframeList().add(keyframe);
         selectedKeyframeGroup.showGlow(player);
-        return true;
     }
 
     public void addKeyframeTrigger(String commands, int tick) {
@@ -276,7 +291,7 @@ public class CutsceneController extends KeyframeControllerBase {
         return null;
     }
 
-    public boolean removeKeyframe(Keyframe keyframe) {
+    public void removeKeyframe(Keyframe keyframe) {
         for(KeyframeGroup keyframeGroup : cutscene.getKeyframeGroupList()) {
             for(Keyframe keyframeFromGroup : keyframeGroup.getKeyframeList()) {
                 if(keyframe.getId() == keyframeFromGroup.getId()) {
@@ -300,11 +315,9 @@ public class CutsceneController extends KeyframeControllerBase {
                             setSelectedKeyframeGroup(cutscene.getKeyframeGroupList().getLast());
                         }
                     }
-                    return true;
                 }
             }
         }
-        return false;
     }
 
     @Override
@@ -318,7 +331,7 @@ public class CutsceneController extends KeyframeControllerBase {
                 infoText,
                 width / 2 - font.width(infoText) / 2,
                 10,
-                ChatFormatting.WHITE.getColor()
+                ARGB.colorFromFloat(1, 1, 1, 1)
         );
         String tickInfo = "Tick: " + currentTick + "/" + totalTick;
         guiGraphics.drawString(
@@ -326,7 +339,7 @@ public class CutsceneController extends KeyframeControllerBase {
                 tickInfo,
                 width / 2 - font.width(tickInfo) / 2,
                 25,
-                ChatFormatting.WHITE.getColor()
+                ARGB.colorFromFloat(1, 1, 1, 1)
         );
     }
 

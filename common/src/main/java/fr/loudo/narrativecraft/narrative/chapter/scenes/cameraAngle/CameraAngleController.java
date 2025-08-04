@@ -23,6 +23,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.GameType;
 
@@ -123,9 +124,7 @@ public class CameraAngleController extends KeyframeControllerBase {
     }
 
     @Override
-    public boolean addKeyframe() {
-        return false;
-    }
+    public void addKeyframe() {}
 
     public void addKeyframe(String name) {
         KeyframeCoordinate keyframeCoordinate = new KeyframeCoordinate(
@@ -185,10 +184,9 @@ public class CameraAngleController extends KeyframeControllerBase {
     }
 
     @Override
-    public boolean removeKeyframe(Keyframe keyframe) {
+    public void removeKeyframe(Keyframe keyframe) {
         cameraAngleGroup.getCameraAngleList().remove((CameraAngle) keyframe);
         keyframe.removeKeyframeFromClient(player);
-        return true;
     }
 
     @Override
@@ -202,7 +200,7 @@ public class CameraAngleController extends KeyframeControllerBase {
                 infoText,
                 width / 2 - font.width(infoText) / 2,
                 10,
-                ChatFormatting.WHITE.getColor()
+                ARGB.colorFromFloat(1, 1, 1, 1)
         );
     }
 

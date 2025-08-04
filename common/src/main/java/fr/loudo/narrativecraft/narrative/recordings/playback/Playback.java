@@ -328,6 +328,7 @@ public class Playback {
         isPlaying = false;
         hasEnded = true;
         for(PlaybackData playbackData : entityPlaybacks) {
+            if(playbackData.entity == null) continue;
             playbackData.actionsData.reset(playbackData.entity);
             playbackData.killEntity();
         }

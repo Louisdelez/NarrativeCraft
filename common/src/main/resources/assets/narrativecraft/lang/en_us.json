@@ -64,6 +64,7 @@
   "narrativecraft.screen.cutscene_controller.tooltip.keyframe_group": "Add Keyframe Group",
   "narrativecraft.screen.cutscene_controller.tooltip.keyframe": "Add Keyframe to current group",
   "narrativecraft.screen.cutscene_controller.tooltip.keyframe_trigger": "Add Keyframe Trigger",
+  "narrativecraft.screen.cutscene_controller.cant_add_keyframe": "§cYou can't add a keyframe to tick %s, because last keyframe of last group tick is %s.",
 
   "narrativecraft.screen.camera_angle_controller.tooltip.keyframe_group": "Add Keyframe Angle",
   "narrativecraft.screen.camera_angle_controller.tooltip.character": "Add Character",

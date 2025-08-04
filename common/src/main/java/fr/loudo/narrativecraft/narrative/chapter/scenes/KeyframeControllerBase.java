@@ -33,11 +33,15 @@ public abstract class KeyframeControllerBase {
         this.playbackType = playbackType;
     }
 
+    protected Keyframe getLastKeyframeLastGroup() {
+        return keyframeGroups.getLast().getKeyframeList().getLast();
+    }
+
     protected abstract void initOldData();
     public abstract void startSession();
     public abstract void stopSession(boolean save);
-    public abstract boolean addKeyframe();
-    public abstract boolean removeKeyframe(Keyframe keyframe);
+    public abstract void addKeyframe();
+    public abstract void removeKeyframe(Keyframe keyframe);
     public abstract void renderHUDInfo(GuiGraphics guiGraphics);
 
     protected abstract void hideKeyframes();

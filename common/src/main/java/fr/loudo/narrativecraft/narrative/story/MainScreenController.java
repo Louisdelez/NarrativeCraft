@@ -18,6 +18,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
@@ -133,7 +134,7 @@ public class MainScreenController extends CameraAngleController {
                 infoText,
                 width / 2 - font.width(infoText) / 2,
                 10,
-                ChatFormatting.WHITE.getColor()
+                ARGB.colorFromFloat(1, 1, 1, 1)
         );
     }
 
