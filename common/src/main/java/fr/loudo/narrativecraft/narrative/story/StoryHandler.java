@@ -860,7 +860,7 @@ public class StoryHandler {
         String characterName = "";
         String dialogContent = rawText;
 
-        String[] splitText = rawText.split(":");
+        String[] splitText = rawText.split(":", 2);
         if(splitText.length == 2) {
             characterName = splitText[0].trim();
             dialogContent = splitText[1].trim();
