@@ -34,6 +34,8 @@ public abstract class KeyframeControllerBase {
     }
 
     protected Keyframe getLastKeyframeLastGroup() {
+        if(keyframeGroups.isEmpty()) return null;
+        if(keyframeGroups.getLast().getKeyframeList().isEmpty()) return null;
         return keyframeGroups.getLast().getKeyframeList().getLast();
     }
 

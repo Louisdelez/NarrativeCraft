@@ -237,7 +237,7 @@ public class CutsceneController extends KeyframeControllerBase {
             return;
         }
         Keyframe lastKeyframeGroup = getLastKeyframeLastGroup();
-        if(currentTick <= lastKeyframeGroup.getTick()) {
+        if(lastKeyframeGroup != null && currentTick < lastKeyframeGroup.getTick()) {
             player.sendSystemMessage(
                     Translation.message("screen.cutscene_controller.cant_add_keyframe",
                             currentTick,
@@ -314,6 +314,7 @@ public class CutsceneController extends KeyframeControllerBase {
                             setSelectedKeyframeGroup(cutscene.getKeyframeGroupList().getLast());
                         }
                     }
+                    return;
                 }
             }
         }
