@@ -126,6 +126,7 @@ public class StoryHandler {
             processStoryContent();
             updatePlayerSession();
             executeInkTags();
+            if(story == null) return false;
 
             save = null;
             handleSceneValidation();
@@ -190,6 +191,7 @@ public class StoryHandler {
             createNewDialog(parsed);
         }
 
+        if(currentDialogBox == null) return;
         updateCurrentCharacterTalking(parsed.characterName);
         configureAutoSkip();
         applyTextEffects(parsed.effects);
@@ -682,7 +684,7 @@ public class StoryHandler {
         } else {
             create2dDialog(parsed);
         }
-
+        if(currentDialogBox == null) return;
         configureDialog();
     }
 
@@ -859,10 +861,11 @@ public class StoryHandler {
         String dialogContent = rawText;
 
         String[] splitText = rawText.split(":");
-        if(splitText.length > 1) {
+        if(splitText.length == 2) {
             characterName = splitText[0].trim();
             dialogContent = splitText[1].trim();
         }
+        dialogContent = dialogContent.replace("::", ":");
 
         if (dialogContent.startsWith("\"") && dialogContent.endsWith("\"")) {
             dialogContent = dialogContent.substring(1, dialogContent.length() - 1);

@@ -216,6 +216,7 @@ public class EditCharacterInfoScreen extends EditInfoScreen {
                 ScreenUtils.sendToast(Translation.message("global.error"), Translation.message("screen.characters_manager.add.failed", name));
                 return;
             }
+            characterStory.getCharacterSkinController().cacheSkins();
             NarrativeCraftMod.getInstance().getCharacterManager().addCharacter(characterStory);
             screen = new CharactersScreen();
         } else if(lastScreen instanceof NpcScreen) {

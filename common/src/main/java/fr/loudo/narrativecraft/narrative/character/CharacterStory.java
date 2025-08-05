@@ -31,9 +31,6 @@ public class CharacterStory extends NarrativeEntry {
     private PlayerSkin.Model model;
     private String birthdate;
     private CharacterType characterType;
-    //TODO: custom skin, one string attr to means either a player name, mineskin url or local skin path.
-    //TODO: Custom dialogue of character options here?
-    //TODO: CharacterLayer class to enable certain part of body of the character
 
     public CharacterStory(String name) {
         super(name, "");
