@@ -9,6 +9,8 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.CutscenePlayback;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.narrative.story.inkAction.validation.ErrorLine;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -26,6 +28,11 @@ public class StoryCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("nc").requires(commandSourceStack -> commandSourceStack.getPlayer().hasPermissions(2))
                 .then(Commands.literal("story")
+                        .then(Commands.literal("skip")
+                                .then(Commands.literal("cutscene")
+                                        .executes(StoryCommand::skipCutscene)
+                                )
+                        )
                         .then(Commands.literal("validate")
                                 .executes(StoryCommand::executeValidateStory)
                         )
@@ -43,6 +50,21 @@ public class StoryCommand {
                         )
                 )
         );
+    }
+
+    private static int skipCutscene(CommandContext<CommandSourceStack> context) {
+
+        StoryHandler storyHandler = NarrativeCraftMod.getInstance().getStoryHandler();
+        if(storyHandler != null && storyHandler.isRunning()) {
+            PlayerSession playerSession = storyHandler.getPlayerSession();
+            CutscenePlayback cutscenePlayback = playerSession.getCutscenePlayback();
+            if(cutscenePlayback != null) {
+                NarrativeCraftMod.server.execute(cutscenePlayback::skip);
+            }
+            return Command.SINGLE_SUCCESS;
+        }
+        context.getSource().sendFailure(Translation.message("story.skip.cutscene"));
+        return 0;
     }
 
     private static int validateStory(CommandContext<CommandSourceStack> context) {
