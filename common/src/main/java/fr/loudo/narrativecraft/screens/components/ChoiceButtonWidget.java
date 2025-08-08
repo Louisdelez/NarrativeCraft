@@ -2,7 +2,15 @@ package fr.loudo.narrativecraft.screens.components;
 
 import com.bladecoder.ink.runtime.Choice;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.gui.ICustomGuiRender;
+import fr.loudo.narrativecraft.narrative.dialog.DialogAnimationType;
+import fr.loudo.narrativecraft.narrative.dialog.animations.DialogLetterEffect;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.narrative.story.text.ParsedDialog;
+import fr.loudo.narrativecraft.narrative.story.text.TextEffect;
+import fr.loudo.narrativecraft.narrative.story.text.TextEffectAnimation;
+import fr.loudo.narrativecraft.utils.MathUtils;
+import fr.loudo.narrativecraft.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -10,6 +18,10 @@ import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
+import org.joml.Vector2f;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ChoiceButtonWidget extends AbstractButton {
 
@@ -19,13 +31,15 @@ public class ChoiceButtonWidget extends AbstractButton {
     private final int hoverWidth;
     private final boolean hoverBorder;
     private int backgroundColor, textColor, hoverColor;
+    private String choiceString;
+    private ParsedDialog parsedDialog;
+    private TextEffectAnimation textEffectAnimation;
     private boolean canPress;
 
     public ChoiceButtonWidget(Choice choice) {
         super(0, 0, 0, 0, Component.literal(choice.getText()));
         Font font = Minecraft.getInstance().font;
-        int width = font.width(choice.getText());
-        int height = font.lineHeight;
+        choiceString = this.getMessage().getString();
         index = choice.getIndex();
         paddingX = 9;
         paddingY = 6;
@@ -35,8 +49,14 @@ public class ChoiceButtonWidget extends AbstractButton {
         hoverBorder = true;
         hoverWidth = 1;
         canPress = true;
+        parsedDialog = ParsedDialog.parse(choiceString);
+        int width = font.width(parsedDialog.cleanedText());
+        int height = font.lineHeight;
         this.setWidth(width + paddingX * 2);
         this.setHeight(height + paddingY * 2);
+        textEffectAnimation = new TextEffectAnimation(
+                TextEffect.apply(parsedDialog.effects())
+        );
     }
 
 
@@ -53,16 +73,25 @@ public class ChoiceButtonWidget extends AbstractButton {
 
         guiGraphics.fill(left, top, right, bottom, backgroundColor);
 
-        guiGraphics.drawString(
-                Minecraft.getInstance().font,
-                this.getMessage().getString(),
-                left + paddingX,
-                top + paddingY + 1,
-                textColor,
-                false
-        );
-    }
+        Map<Integer, Vector2f> letterOffsets = textEffectAnimation.getOffsets();
 
+        float startX = left + paddingX;
+
+        for (int i = 0; i < parsedDialog.cleanedText().length(); i++) {
+            Vector2f offset = letterOffsets.getOrDefault(i, new Vector2f(0, 0));
+            String character = String.valueOf(parsedDialog.cleanedText().charAt(i));
+            ((ICustomGuiRender)guiGraphics).drawStringFloat(
+                    character,
+                    Minecraft.getInstance().font,
+                    startX + offset.x,
+                    top + paddingY + 1 + offset.y,
+                    textColor,
+                    false
+            );
+            startX += Utils.getLetterWidth(parsedDialog.cleanedText().codePointAt(i));
+        }
+
+    }
 
     @Override
     public void onPress() {

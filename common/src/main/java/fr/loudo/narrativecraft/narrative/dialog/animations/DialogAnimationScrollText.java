@@ -1,23 +1,20 @@
 package fr.loudo.narrativecraft.narrative.dialog.animations;
 
-import com.mojang.blaze3d.font.GlyphInfo;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.gui.ICustomGuiRender;
-import fr.loudo.narrativecraft.mixin.fields.FontFields;
 import fr.loudo.narrativecraft.narrative.dialog.Dialog;
 import fr.loudo.narrativecraft.narrative.dialog.Dialog2d;
 import fr.loudo.narrativecraft.narrative.dialog.DialogAnimationType;
-import fr.loudo.narrativecraft.utils.MathUtils;
+import fr.loudo.narrativecraft.narrative.story.text.TextEffectAnimation;
+import fr.loudo.narrativecraft.utils.Utils;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.font.FontSet;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.ARGB;
@@ -45,10 +42,9 @@ public class DialogAnimationScrollText {
     private String text;
     private float letterSpacing;
     private float gap, totalHeight, maxLineWidth;
-    private final Map<Integer, Vector2f> letterOffsets = new HashMap<>();
-    private final Map<Integer, Long> letterStartTime = new HashMap<>();
     private DialogLetterEffect dialogLetterEffect;
-    private long lastTimeChar, animationTime, pauseStartTime, totalPauseTime;
+    private TextEffectAnimation textEffectAnimation;
+    private long lastTimeChar;
 
     public DialogAnimationScrollText(String text, float letterSpacing, float gap, int maxWidth, Dialog dialog) {
         this.dialog = dialog;
@@ -75,11 +71,7 @@ public class DialogAnimationScrollText {
                 0,
                 text.length() - 1
         );
-
-        long now = System.currentTimeMillis();
-        for (int i = 0; i < text.length(); i++) {
-            letterStartTime.put(i, now + i * 50L);
-        }
+        textEffectAnimation = new TextEffectAnimation(dialogLetterEffect);
         totalLetters = lines.stream().mapToInt(String::length).sum();
         init();
     }
@@ -121,14 +113,14 @@ public class DialogAnimationScrollText {
             float textWidth = client.font.width(text) + letterSpacing * (lineLength - 1);
             float startX = textWidth == maxLineWidth ? -textWidth / 2.0F : -maxLineWidth / 2.0F;
 
-            calculateOffset();
+            Map<Integer, Vector2f> letterOffsets = textEffectAnimation.getOffsets();
 
             for (int j = 0; j < lineVisibleLetters; j++) {
                 Vector2f offset = letterOffsets.getOrDefault(globalCharIndex, new Vector2f(0, 0));
                 String character = String.valueOf(text.charAt(j));
                 drawStringPoseStack(character, poseStack, bufferSource, startX + offset.x, currentY + offset.y);
 
-                startX += getLetterWidth(text.codePointAt(j)) + letterSpacing;
+                startX += Utils.getLetterWidth(text.codePointAt(j)) + letterSpacing;
 
                 globalCharIndex++;
             }
@@ -178,7 +170,7 @@ public class DialogAnimationScrollText {
             float lineWidth = font.width(text) * scale;
             float startX = (windowWidth - lineWidth) / 2f;
 
-            calculateOffset();
+            Map<Integer, Vector2f> letterOffsets = textEffectAnimation.getOffsets();
 
             for (int j = 0; j < lineVisibleLetters; j++) {
                 Vector2f offset = letterOffsets.getOrDefault(globalCharIndex, new Vector2f(0, 0));
@@ -194,7 +186,7 @@ public class DialogAnimationScrollText {
                         dialog2d.getTextColor()
                 );
                 poseStack.popMatrix();
-                startX += (getLetterWidth(text.codePointAt(j)) + letterSpacing) * scale;
+                startX += (Utils.getLetterWidth(text.codePointAt(j)) + letterSpacing) * scale;
 
                 globalCharIndex++;
             }
@@ -230,39 +222,6 @@ public class DialogAnimationScrollText {
             count += line.length();
         }
         return ' ';
-    }
-
-    private float getLetterWidth(int letterCode) {
-        Minecraft client = Minecraft.getInstance();
-        Style style = Style.EMPTY;
-        FontSet fontset = ((FontFields) client.font).callGetFontSet(style.getFont());
-        GlyphInfo glyph = fontset.getGlyphInfo(letterCode, ((FontFields) client.font).getFilterFishyGlyphs());
-        boolean bold = style.isBold();
-        return glyph.getAdvance(bold);
-    }
-
-    private void calculateOffset() {
-        long now = System.currentTimeMillis();
-        if (!Minecraft.getInstance().isPaused()) {
-            if (dialogLetterEffect.getAnimation() == DialogAnimationType.SHAKING && now - animationTime >= dialogLetterEffect.getTime()) {
-                animationTime = now;
-                letterOffsets.clear();
-                for (int j = dialogLetterEffect.getStartIndex(); j < dialogLetterEffect.getEndIndex(); j++) {
-                    float offsetX = MathUtils.getRandomFloat(-dialogLetterEffect.getForce(), dialogLetterEffect.getForce());
-                    float offsetY = MathUtils.getRandomFloat(-dialogLetterEffect.getForce(), dialogLetterEffect.getForce());
-                    letterOffsets.put(j, new Vector2f(offsetX, offsetY));
-                }
-            } else if (dialogLetterEffect.getAnimation() == DialogAnimationType.WAVING) {
-                letterOffsets.clear();
-                float waveSpacing = 0.2f;
-                double waveSpeed = (double) (now - totalPauseTime) / dialogLetterEffect.getTime();
-
-                for (int j = dialogLetterEffect.getStartIndex(); j < dialogLetterEffect.getEndIndex(); j++) {
-                    float offsetY = (float) (Math.sin(waveSpeed + j * waveSpacing) * dialogLetterEffect.getForce());
-                    letterOffsets.put(j, new Vector2f(0, offsetY));
-                }
-            }
-        }
     }
 
     private void drawStringPoseStack(String character, PoseStack poseStack, MultiBufferSource bufferSource, float x, float y) {
@@ -332,12 +291,6 @@ public class DialogAnimationScrollText {
     public void reset() {
         currentLetter = 0;
         this.dialogLetterEffect = new DialogLetterEffect(DialogAnimationType.NONE, 0, 0, 0, text.length() - 1);
-        letterStartTime.clear();
-        letterOffsets.clear();
-        long now = System.currentTimeMillis();
-        for (int i = 0; i < text.length(); i++) {
-            letterStartTime.put(i, now + i * 50L);
-        }
         init();
     }
 
@@ -388,6 +341,7 @@ public class DialogAnimationScrollText {
 
     public void setDialogLetterEffect(DialogLetterEffect dialogLetterEffect) {
         this.dialogLetterEffect = dialogLetterEffect;
+        textEffectAnimation = new TextEffectAnimation(dialogLetterEffect);
     }
 
     public void applyEffect(DialogLetterEffect dialogEffect, int startIndex, int endIndex) {

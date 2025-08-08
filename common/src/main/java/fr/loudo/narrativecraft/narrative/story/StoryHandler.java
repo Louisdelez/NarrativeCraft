@@ -18,6 +18,8 @@ import fr.loudo.narrativecraft.narrative.story.inkAction.InkAction;
 import fr.loudo.narrativecraft.narrative.story.inkAction.SongSfxInkAction;
 import fr.loudo.narrativecraft.narrative.story.inkAction.enums.InkTagType;
 import fr.loudo.narrativecraft.narrative.story.inkAction.validation.ErrorLine;
+import fr.loudo.narrativecraft.narrative.story.text.ParsedDialog;
+import fr.loudo.narrativecraft.narrative.story.text.TextEffect;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.screens.choices.ChoicesScreen;
@@ -176,7 +178,7 @@ public class StoryHandler {
     }
 
     public void showDialog() {
-        ParsedDialog parsed = parseDialogContent(currentDialog);
+        ParsedDialog parsed = ParsedDialog.parse(currentDialog);
 
         validateCurrentDialog();
 
@@ -192,9 +194,9 @@ public class StoryHandler {
         }
 
         if(currentDialogBox == null) return;
-        updateCurrentCharacterTalking(parsed.characterName);
+        updateCurrentCharacterTalking(parsed.characterName());
         configureAutoSkip();
-        applyTextEffects(parsed.effects);
+        currentDialogBox.getDialogAnimationScrollText().setDialogLetterEffect(TextEffect.apply(parsed.effects()));
     }
 
     public void addCharacter(CharacterStory characterStory) {
@@ -501,7 +503,7 @@ public class StoryHandler {
 
         currentDialogBox = new Dialog(
                 entity,
-                parseDialogContent(dialogSaveData.getText()).cleanedText,
+                ParsedDialog.parse(dialogSaveData.getText()).cleanedText(),
                 dialogSaveData.getTextColor(),
                 dialogSaveData.getBackgroundColor(),
                 dialogSaveData.getPaddingX(),
@@ -664,12 +666,12 @@ public class StoryHandler {
     }
 
     private boolean shouldReuseDialog(ParsedDialog parsed) {
-        return parsed.characterName.equalsIgnoreCase(currentCharacterTalking) &&
+        return parsed.characterName().equalsIgnoreCase(currentCharacterTalking) &&
                 currentDialogBox != null;
     }
 
     private void reuseExistingDialog(ParsedDialog parsed) {
-        currentDialogBox.getDialogAnimationScrollText().setText(parsed.cleanedText);
+        currentDialogBox.getDialogAnimationScrollText().setText(parsed.cleanedText());
         currentDialogBox.reset();
     }
 
@@ -679,7 +681,7 @@ public class StoryHandler {
     }
 
     private void createNewDialog(ParsedDialog parsed) {
-        if (!parsed.characterName.isEmpty()) {
+        if (!parsed.characterName().isEmpty()) {
             createCharacterDialog(parsed);
         } else {
             create2dDialog(parsed);
@@ -689,10 +691,10 @@ public class StoryHandler {
     }
 
     private void createCharacterDialog(ParsedDialog parsed) {
-        CharacterStory currentCharacter = getCharacter(parsed.characterName);
+        CharacterStory currentCharacter = getCharacter(parsed.characterName());
         if (currentCharacter == null) {
             crash(new Exception(Translation.message("user.crash.character_not_found",
-                    parsed.characterName,
+                    parsed.characterName(),
                     playerSession.getChapter().getIndex(),
                     playerSession.getScene().getName()).getString()), true);
             return;
@@ -700,7 +702,7 @@ public class StoryHandler {
 
         currentDialogBox = new Dialog(
                 currentCharacter.getEntity(),
-                parsed.cleanedText,
+                parsed.cleanedText(),
                 globalDialogValue.getTextColor(),
                 globalDialogValue.getBackgroundColor(),
                 globalDialogValue.getPaddingX(),
@@ -724,7 +726,7 @@ public class StoryHandler {
 
     private void create2dDialog(ParsedDialog parsed) {
         currentDialogBox = new Dialog2d(
-                parsed.cleanedText,
+                parsed.cleanedText(),
                 400, 90,
                 (int) globalDialogValue.getPaddingX(),
                 (int) globalDialogValue.getPaddingY(),
@@ -856,101 +858,6 @@ public class StoryHandler {
         }
     }
 
-    private ParsedDialog parseDialogContent(String rawText) {
-        String characterName = "";
-        String dialogContent = rawText;
-
-        String[] splitText = rawText.split(":", 2);
-        if(splitText.length == 2) {
-            characterName = splitText[0].trim();
-            dialogContent = splitText[1].trim();
-        }
-        dialogContent = dialogContent.replace("::", ":");
-
-        if (dialogContent.startsWith("\"") && dialogContent.endsWith("\"")) {
-            dialogContent = dialogContent.substring(1, dialogContent.length() - 1);
-        }
-
-        List<TextEffect> effects = new ArrayList<>();
-        StringBuilder cleanText = new StringBuilder();
-
-        Pattern pattern = Pattern.compile("\\[(\\w+)((?:\\s+\\w+=\\S+)*?)\\](.*?)\\[/\\1\\]");
-        Matcher matcher = pattern.matcher(dialogContent);
-
-        int currentIndex = 0;
-
-        while (matcher.find()) {
-            cleanText.append(dialogContent, currentIndex, matcher.start());
-
-            String effectName = matcher.group(1);
-            String paramString = matcher.group(2).trim();
-            String innerText = matcher.group(3);
-
-            int effectStart = cleanText.length();
-            cleanText.append(innerText);
-            int effectEnd = cleanText.length();
-
-            Map<String, String> params = new HashMap<>();
-            if (!paramString.isEmpty()) {
-                String[] parts = paramString.split("\\s+");
-                for (String part : parts) {
-                    String[] kv = part.split("=");
-                    if (kv.length == 2) {
-                        params.put(kv[0], kv[1]);
-                    }
-                }
-            }
-
-            DialogAnimationType type;
-            try {
-                type = DialogAnimationType.valueOf(effectName.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                continue;
-            }
-
-            effects.add(new TextEffect(type, effectStart, effectEnd, params));
-            currentIndex = matcher.end();
-        }
-        dialogContent = dialogContent.replace("\n", "");
-        cleanText.append(dialogContent.substring(currentIndex));
-
-        return new ParsedDialog(cleanText.toString(), effects, characterName);
-    }
-
-    private void applyTextEffects(List<TextEffect> effects) {
-        if(effects.isEmpty()) {
-            DialogLetterEffect dialogEffect = new DialogLetterEffect(
-                    DialogAnimationType.NONE
-            );
-            currentDialogBox.getDialogAnimationScrollText().setDialogLetterEffect(dialogEffect);
-            return;
-        }
-        for (TextEffect effect : effects) {
-            double time = Double.parseDouble(effect.parameters.getOrDefault("time", "1"));
-            float force = Float.parseFloat(effect.parameters.getOrDefault("force", "0"));
-
-            switch (effect.type) {
-                case WAVING -> {
-                    time = 0.3;
-                    force = 1f;
-                }
-                case SHAKING -> {
-                    time = 0.02;
-                    force = 0.5f;
-                }
-            }
-
-            DialogLetterEffect dialogEffect = new DialogLetterEffect(
-                    effect.type,
-                    (long) (time * 1000L),
-                    force,
-                    effect.startIndex,
-                    effect.endIndex
-            );
-            currentDialogBox.getDialogAnimationScrollText().setDialogLetterEffect(dialogEffect);
-        }
-    }
-
     public PlayerSession getPlayerSession() {
         return playerSession;
     }
@@ -1037,31 +944,5 @@ public class StoryHandler {
 
     public boolean isFinished() {
         return !story.canContinue() && story.getCurrentChoices().isEmpty() && currentDialog.isEmpty();
-    }
-
-    private static class TextEffect {
-        public DialogAnimationType type;
-        public int startIndex;
-        public int endIndex;
-        public Map<String, String> parameters;
-
-        public TextEffect(DialogAnimationType type, int startIndex, int endIndex, Map<String, String> parameters) {
-            this.type = type;
-            this.startIndex = startIndex;
-            this.endIndex = endIndex;
-            this.parameters = parameters;
-        }
-    }
-
-    private static class ParsedDialog {
-        public String cleanedText;
-        public List<TextEffect> effects;
-        public String characterName;
-
-        public ParsedDialog(String cleanedText, List<TextEffect> effects, String characterName) {
-            this.cleanedText = cleanedText;
-            this.effects = effects;
-            this.characterName = characterName;
-        }
     }
 }
