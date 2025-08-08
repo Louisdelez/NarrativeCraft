@@ -28,7 +28,7 @@ public record ParsedDialog(String cleanedText, List<TextEffect> effects, String 
         List<TextEffect> effects = new ArrayList<>();
         StringBuilder cleanText = new StringBuilder();
 
-        Pattern pattern = Pattern.compile("\\[(\\w+)((?:\\s+\\w+=\\S+)*?)\\](.*?)\\[/\\1\\]");
+        Pattern pattern = Pattern.compile("\\[(\\w+)((?:\\s+\\w+=[^\\]\\s]+)*?)\\](.*?)\\[/\\1\\]");
         Matcher matcher = pattern.matcher(dialogContent);
 
         int currentIndex = 0;

@@ -5,6 +5,7 @@ import fr.loudo.narrativecraft.narrative.dialog.DialogAnimationType;
 public class DialogLetterEffect {
     private DialogAnimationType animation;
     private long time;
+    private long lastUpdateTime;
     private float force;
     private int startIndex, endIndex;
 
@@ -50,5 +51,13 @@ public class DialogLetterEffect {
 
     public int getEndIndex() {
         return endIndex;
+    }
+
+    public long getLastUpdateTime() {
+        return lastUpdateTime;
+    }
+
+    public void setLastUpdateTime(long lastUpdateTime) {
+        this.lastUpdateTime = lastUpdateTime;
     }
 }

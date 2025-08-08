@@ -3,13 +3,9 @@ package fr.loudo.narrativecraft.screens.components;
 import com.bladecoder.ink.runtime.Choice;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.gui.ICustomGuiRender;
-import fr.loudo.narrativecraft.narrative.dialog.DialogAnimationType;
-import fr.loudo.narrativecraft.narrative.dialog.animations.DialogLetterEffect;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.narrative.story.text.ParsedDialog;
-import fr.loudo.narrativecraft.narrative.story.text.TextEffect;
 import fr.loudo.narrativecraft.narrative.story.text.TextEffectAnimation;
-import fr.loudo.narrativecraft.utils.MathUtils;
 import fr.loudo.narrativecraft.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -20,7 +16,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
 import org.joml.Vector2f;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class ChoiceButtonWidget extends AbstractButton {
@@ -54,9 +49,7 @@ public class ChoiceButtonWidget extends AbstractButton {
         int height = font.lineHeight;
         this.setWidth(width + paddingX * 2);
         this.setHeight(height + paddingY * 2);
-        textEffectAnimation = new TextEffectAnimation(
-                TextEffect.apply(parsedDialog.effects())
-        );
+        textEffectAnimation = new TextEffectAnimation(choiceString);
     }
 
 

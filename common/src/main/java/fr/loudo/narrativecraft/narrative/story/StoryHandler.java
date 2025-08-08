@@ -10,8 +10,10 @@ import fr.loudo.narrativecraft.narrative.chapter.scenes.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.keyframes.KeyframeCoordinate;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
-import fr.loudo.narrativecraft.narrative.dialog.*;
-import fr.loudo.narrativecraft.narrative.dialog.animations.DialogLetterEffect;
+import fr.loudo.narrativecraft.narrative.dialog.Dialog;
+import fr.loudo.narrativecraft.narrative.dialog.Dialog2d;
+import fr.loudo.narrativecraft.narrative.dialog.DialogData;
+import fr.loudo.narrativecraft.narrative.dialog.DialogImpl;
 import fr.loudo.narrativecraft.narrative.recordings.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.inkAction.InkAction;
@@ -19,7 +21,6 @@ import fr.loudo.narrativecraft.narrative.story.inkAction.SongSfxInkAction;
 import fr.loudo.narrativecraft.narrative.story.inkAction.enums.InkTagType;
 import fr.loudo.narrativecraft.narrative.story.inkAction.validation.ErrorLine;
 import fr.loudo.narrativecraft.narrative.story.text.ParsedDialog;
-import fr.loudo.narrativecraft.narrative.story.text.TextEffect;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.screens.choices.ChoicesScreen;
@@ -42,7 +43,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.GameType;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -196,7 +199,7 @@ public class StoryHandler {
         if(currentDialogBox == null) return;
         updateCurrentCharacterTalking(parsed.characterName());
         configureAutoSkip();
-        currentDialogBox.getDialogAnimationScrollText().setDialogLetterEffect(TextEffect.apply(parsed.effects()));
+        currentDialogBox.getDialogAnimationScrollText().loadTextEffects(currentDialog);
     }
 
     public void addCharacter(CharacterStory characterStory) {

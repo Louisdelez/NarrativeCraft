@@ -5,7 +5,6 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.gui.ICustomGuiRender;
 import fr.loudo.narrativecraft.narrative.dialog.Dialog;
 import fr.loudo.narrativecraft.narrative.dialog.Dialog2d;
-import fr.loudo.narrativecraft.narrative.dialog.DialogAnimationType;
 import fr.loudo.narrativecraft.narrative.story.text.TextEffectAnimation;
 import fr.loudo.narrativecraft.utils.Utils;
 import net.minecraft.client.DeltaTracker;
@@ -24,25 +23,20 @@ import org.joml.Random;
 import org.joml.Vector2f;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class DialogAnimationScrollText {
 
-    private final long showLetterDelay = 30L;
-    private final float offset = 4.1f;
     private Dialog dialog;
     private Dialog2d dialog2d;
 
     private int maxWidth;
-    private boolean isPaused;
     private List<String> lines;
     private int currentLetter, totalLetters;
     private String text;
     private float letterSpacing;
     private float gap, totalHeight, maxLineWidth;
-    private DialogLetterEffect dialogLetterEffect;
     private TextEffectAnimation textEffectAnimation;
     private long lastTimeChar;
 
@@ -63,15 +57,6 @@ public class DialogAnimationScrollText {
         this.maxWidth = maxWidth;
         this.lines = splitText(text);
         this.currentLetter = 0;
-
-        this.dialogLetterEffect = new DialogLetterEffect(
-                DialogAnimationType.NONE,
-                0,
-                0,
-                0,
-                text.length() - 1
-        );
-        textEffectAnimation = new TextEffectAnimation(dialogLetterEffect);
         totalLetters = lines.stream().mapToInt(String::length).sum();
         init();
     }
@@ -290,7 +275,6 @@ public class DialogAnimationScrollText {
 
     public void reset() {
         currentLetter = 0;
-        this.dialogLetterEffect = new DialogLetterEffect(DialogAnimationType.NONE, 0, 0, 0, text.length() - 1);
         init();
     }
 
@@ -335,15 +319,7 @@ public class DialogAnimationScrollText {
         this.maxWidth = maxWidth;
     }
 
-    public DialogLetterEffect getDialogLetterEffect() {
-        return dialogLetterEffect;
-    }
-
-    public void setDialogLetterEffect(DialogLetterEffect dialogLetterEffect) {
-        this.dialogLetterEffect = dialogLetterEffect;
-        textEffectAnimation = new TextEffectAnimation(dialogLetterEffect);
-    }
-
-    public void applyEffect(DialogLetterEffect dialogEffect, int startIndex, int endIndex) {
+    public void loadTextEffects(String rawText) {
+        textEffectAnimation = new TextEffectAnimation(rawText);
     }
 }
