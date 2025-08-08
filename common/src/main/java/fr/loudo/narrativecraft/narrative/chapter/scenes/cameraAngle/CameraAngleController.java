@@ -248,7 +248,6 @@ public class CameraAngleController extends KeyframeControllerBase {
         entity.remove(Entity.RemovalReason.KILLED);
         if(entity instanceof FakePlayer fakePlayer) {
             ((PlayerListFields)NarrativeCraftMod.server.getPlayerList()).getPlayersByUUID().remove(fakePlayer.getUUID());
-            NarrativeCraftMod.server.getPlayerList().remove(fakePlayer);
         }
         NarrativeCraftMod.server.getPlayerList().broadcastAll(new ClientboundRemoveEntitiesPacket(entity.getId()));
     }

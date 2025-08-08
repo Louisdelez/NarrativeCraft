@@ -763,7 +763,6 @@ public class StoryHandler {
             characterStory.getEntity().remove(Entity.RemovalReason.KILLED);
 
             if (characterStory.getEntity() instanceof FakePlayer fakePlayer) {
-                NarrativeCraftMod.server.getPlayerList().remove(fakePlayer);
                 ((PlayerListFields) NarrativeCraftMod.server.getPlayerList())
                         .getPlayersByUUID().remove(fakePlayer.getUUID());
             }
