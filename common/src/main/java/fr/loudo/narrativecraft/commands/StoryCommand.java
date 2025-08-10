@@ -26,7 +26,7 @@ import java.util.List;
 public class StoryCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register(Commands.literal("nc").requires(commandSourceStack -> commandSourceStack.getPlayer().hasPermissions(2))
+        dispatcher.register(Commands.literal("nc").requires(commandSourceStack -> commandSourceStack.hasPermission(2))
                 .then(Commands.literal("story")
                         .then(Commands.literal("skip")
                                 .then(Commands.literal("cutscene")
@@ -59,7 +59,7 @@ public class StoryCommand {
             PlayerSession playerSession = storyHandler.getPlayerSession();
             CutscenePlayback cutscenePlayback = playerSession.getCutscenePlayback();
             if(cutscenePlayback != null) {
-                NarrativeCraftMod.server.execute(cutscenePlayback::skip);
+                cutscenePlayback.skip();
             }
             return Command.SINGLE_SUCCESS;
         }
@@ -122,7 +122,7 @@ public class StoryCommand {
     }
 
     private static int stopStory(CommandContext<CommandSourceStack> context) {
-        if(!context.getSource().getPlayer().hasPermissions(2)) return 0;
+        if(!context.getSource().hasPermission(2)) return 0;
 
         StoryHandler storyHandler = NarrativeCraftMod.getInstance().getStoryHandler();
         if(storyHandler == null || !storyHandler.isRunning()) {

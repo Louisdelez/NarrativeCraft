@@ -13,7 +13,7 @@ public class LinkCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("nc")
-                .requires(commandSourceStack -> commandSourceStack.getPlayer().hasPermissions(2))
+                .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
                 .then(Commands.literal("link")
                         .then(Commands.literal("discord").executes(commandContext -> openLink(ConstantsLink.DISCORD)))
                         .then(Commands.literal("docs").executes(commandContext -> openLink(ConstantsLink.DOCS)))

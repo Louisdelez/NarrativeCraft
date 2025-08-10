@@ -14,7 +14,7 @@ import net.minecraft.commands.Commands;
 public class OpenScreenCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register(Commands.literal("nc").requires(commandSourceStack -> commandSourceStack.getPlayer().hasPermissions(2))
+        dispatcher.register(Commands.literal("nc").requires(commandSourceStack -> commandSourceStack.hasPermission(2))
                 .then(Commands.literal("open")
                         .then(Commands.literal("story_manager")
                                 .executes(OpenScreenCommand::openStoryManager)

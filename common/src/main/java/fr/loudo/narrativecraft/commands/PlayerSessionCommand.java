@@ -18,7 +18,7 @@ import net.minecraft.server.level.ServerPlayer;
 public class PlayerSessionCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register(Commands.literal("nc").requires(commandSourceStack -> commandSourceStack.getPlayer().hasPermissions(2))
+        dispatcher.register(Commands.literal("nc").requires(commandSourceStack -> commandSourceStack.hasPermission(2))
                 .then(Commands.literal("session")
                         .then(Commands.literal("clear")
                                 .executes(PlayerSessionCommand::clearSession)
