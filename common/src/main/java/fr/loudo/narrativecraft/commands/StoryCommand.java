@@ -2,6 +2,7 @@ package fr.loudo.narrativecraft.commands;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -26,29 +27,38 @@ import java.util.List;
 public class StoryCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register(Commands.literal("nc").requires(commandSourceStack -> commandSourceStack.hasPermission(2))
-                .then(Commands.literal("story")
-                        .then(Commands.literal("skip")
-                                .then(Commands.literal("cutscene")
-                                        .executes(StoryCommand::skipCutscene)
-                                )
-                        )
-                        .then(Commands.literal("validate")
-                                .executes(StoryCommand::executeValidateStory)
-                        )
-                        .then(Commands.literal("play")
-                                .then(Commands.argument("chapter_index", IntegerArgumentType.integer())
-                                        .suggests(NarrativeCraftMod.getInstance().getChapterManager().getChapterSuggestions())
-                                        .then(Commands.argument("scene_name", StringArgumentType.string())
-                                                .suggests(NarrativeCraftMod.getInstance().getChapterManager().getSceneSuggestionsByChapter())
-                                                .executes(context -> playStoryChapterStory(context, IntegerArgumentType.getInteger(context, "chapter_index"), StringArgumentType.getString(context, "scene_name"), false))
+        dispatcher.register(
+                Commands.literal("nc")
+                        .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
+                        .then(Commands.literal("story")
+                                .then(Commands.literal("skip")
+                                        .then(Commands.literal("cutscene")
+                                                .executes(StoryCommand::skipCutscene)
                                         )
                                 )
+                                .then(Commands.literal("validate")
+                                        .executes(StoryCommand::executeValidateStory)
+                                )
+                                .then(Commands.literal("play")
+                                        .then(Commands.argument("chapter_index", IntegerArgumentType.integer())
+                                                .suggests(NarrativeCraftMod.getInstance().getChapterManager().getChapterSuggestions())
+                                                .then(Commands.argument("scene_name", StringArgumentType.string())
+                                                        .suggests(NarrativeCraftMod.getInstance().getChapterManager().getSceneSuggestionsByChapter())
+                                                        .then(Commands.argument("debug", BoolArgumentType.bool())
+                                                                .executes(context -> playStoryChapterStory(
+                                                                        context,
+                                                                        IntegerArgumentType.getInteger(context, "chapter_index"),
+                                                                        StringArgumentType.getString(context, "scene_name"),
+                                                                        BoolArgumentType.getBool(context, "debug")
+                                                                ))
+                                                        )
+                                                )
+                                        )
+                                )
+                                .then(Commands.literal("stop")
+                                        .executes(StoryCommand::stopStory)
+                                )
                         )
-                        .then(Commands.literal("stop")
-                                .executes(StoryCommand::stopStory)
-                        )
-                )
         );
     }
 
@@ -115,7 +125,7 @@ public class StoryCommand {
         }
         if(validateStory(context) == 0) return 0;
         StoryHandler storyHandler = new StoryHandler(chapter, scene);
-        storyHandler.setDebugMode(true);
+        storyHandler.setDebugMode(debug);
         storyHandler.start();
 
         return Command.SINGLE_SUCCESS;
