@@ -158,7 +158,7 @@ public class CharacterStoryData {
         livingEntity.setInvisible(false);
         if(livingEntity instanceof FakePlayer fakePlayer) {
             ((PlayerListFields)serverLevel.getServer().getPlayerList()).getPlayersByUUID().put(fakePlayer.getUUID(), fakePlayer);
-            serverLevel.getServer().getPlayerList().broadcastAll(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(fakePlayer)));
+            serverLevel.getServer().getPlayerList().broadcastAll(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
             serverLevel.addNewPlayer(fakePlayer);
         } else {
             serverLevel.addFreshEntity(livingEntity);
