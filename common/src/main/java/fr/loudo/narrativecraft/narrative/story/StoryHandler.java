@@ -155,7 +155,11 @@ public class StoryHandler {
     public void crash(Exception exception, boolean creatorFault) {
         stop(true);
 
-        CrashReport report = new CrashReport(exception.getMessage(), exception);
+        String message = exception.getMessage();
+        if(NarrativeCraftMod.playingOnIncompatibleWorld) {
+            message += "\nThis crash happened on an incompatible version world";
+        }
+        CrashReport report = new CrashReport(message, exception);
         if(!creatorFault) {
             Minecraft.saveReport(NarrativeCraftFile.mainDirectory, report);
         }

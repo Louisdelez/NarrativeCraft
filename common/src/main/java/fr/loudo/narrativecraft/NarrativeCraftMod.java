@@ -25,6 +25,7 @@ public class NarrativeCraftMod {
     public static final Logger LOG = LoggerFactory.getLogger(MOD_NAME);
     public static RenderType dialogBackgroundRenderType;
     public static boolean firstTime = true;
+    public static boolean playingOnIncompatibleWorld = false;
 
     public static MinecraftServer server;
 

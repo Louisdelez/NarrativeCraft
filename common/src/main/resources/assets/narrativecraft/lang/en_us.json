@@ -51,6 +51,8 @@
   "narrativecraft.chapter.no_exists": "Chapter %s does not exists.",
   "narrativecraft.scene.no_exists": "Scene %s from chapter %s does not exists.",
 
+  "narrativecraft.screen.incompatible-version": "Warning! This story was made for minecraft version %s and you are running %s.\nIf you continue, things may not work correctly or even crash your game!\nAre you sure to continue?",
+
   "narrativecraft.screen.crash.title": "Whoops! A crash occurred...",
   "narrativecraft.screen.crash.from_mod": "Really sorry! This comes from the mod.\nPlease, create an issue on github!",
   "narrativecraft.screen.crash.from_story": "Really sorry! This comes from the story.\nSend it to the creator of the story.",
