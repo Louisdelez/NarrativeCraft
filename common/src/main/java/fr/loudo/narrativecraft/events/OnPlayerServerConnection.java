@@ -15,6 +15,7 @@ import fr.loudo.narrativecraft.utils.FakePlayer;
 import fr.loudo.narrativecraft.utils.Translation;
 import fr.loudo.narrativecraft.utils.Utils;
 import net.minecraft.ChatFormatting;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.network.chat.ClickEvent;
@@ -34,6 +35,11 @@ public class OnPlayerServerConnection {
         CutsceneEditItems.init(player.registryAccess());
         NarrativeCraftMod.getInstance().setNarrativeWorldOption(NarrativeCraftFile.loadWorldOptions());
         NarrativeCraftMod.getInstance().setNarrativeClientOptions(NarrativeCraftFile.loadUserOptions());
+        NarrativeWorldOption worldOption = NarrativeCraftMod.getInstance().getNarrativeWorldOption();
+        if(worldOption.stringMcVersion.isEmpty()) {
+            worldOption.stringMcVersion = SharedConstants.getCurrentVersion().name();
+            NarrativeCraftFile.updateWorldOptions(worldOption);
+        }
         if(NarrativeCraftMod.firstTime) {
             MutableComponent inkyLink = Component.literal("Inky").withStyle(style ->
                     style.withColor(ChatFormatting.YELLOW)
@@ -57,8 +63,7 @@ public class OnPlayerServerConnection {
             ));
         } else {
             if(!NarrativeCraftFile.getStoryFile().exists()) return;
-            NarrativeWorldOption worldOption = NarrativeCraftMod.getInstance().getNarrativeWorldOption();
-            if(!worldOption.stringMcVersion.isEmpty() && !minecraft.getVersionType().equals(worldOption.stringMcVersion)) {
+            if(!SharedConstants.getCurrentVersion().name().equals(worldOption.stringMcVersion)) {
                 ConfirmScreen confirmScreen = new ConfirmScreen(b -> {
                     if(b) {
                         showMainScreen(worldOption, minecraft);
@@ -66,9 +71,9 @@ public class OnPlayerServerConnection {
                     } else {
                         Utils.disconnectPlayer(minecraft);
                     }
-                }, Component.literal(""), Translation.message("screen.incompatible-version", worldOption.stringMcVersion, minecraft.getVersionType()),
-                        CommonComponents.GUI_YES, CommonComponents.GUI_CANCEL);
-                minecraft.setScreen(confirmScreen);
+                }, Component.literal(""), Translation.message("screen.incompatible-version", worldOption.stringMcVersion, SharedConstants.getCurrentVersion().name()),
+                        CommonComponents.GUI_YES, CommonComponents.GUI_NO);
+                minecraft.execute(() -> Minecraft.getInstance().setScreen(confirmScreen));
             } else {
                 showMainScreen(worldOption, minecraft);
             }
