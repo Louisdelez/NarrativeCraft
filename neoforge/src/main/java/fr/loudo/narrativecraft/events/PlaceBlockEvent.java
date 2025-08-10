@@ -15,7 +15,7 @@ public class PlaceBlockEvent {
     }
 
     private static void onPlaceBlock(BlockEvent.EntityPlaceEvent event) {
-        if(event.getEntity() instanceof ServerPlayer serverPlayer) {
+        if(event.getEntity() instanceof ServerPlayer serverPlayer && event.getBlockSnapshot().getState().isAir()) {
             OnPlaceBlock.placeBlock(event.getPlacedBlock(), event.getPos(), serverPlayer);
         }
     }

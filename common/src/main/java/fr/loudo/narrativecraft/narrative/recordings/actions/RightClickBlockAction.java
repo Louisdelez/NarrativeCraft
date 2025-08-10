@@ -5,6 +5,7 @@ import fr.loudo.narrativecraft.narrative.recordings.playback.Playback;
 import fr.loudo.narrativecraft.utils.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -44,10 +45,10 @@ public class RightClickBlockAction extends Action {
         ItemStack itemStack = player.getItemInHand(InteractionHand.valueOf(handName));
         if(itemStack.getItem() instanceof SpawnEggItem
                 || itemStack.getItem() instanceof BoatItem
-                || itemStack.getItem() instanceof BlockItem
+                || !itemStack.isDamageableItem()
         ) return;
-        itemStack.setCount(2);
         BlockState blockState = player.level().getBlockState(blockPos);
+        itemStack.setCount(2);
         BlockHitResult blockHitResult = new BlockHitResult(
                 new Vec3(x, y, z),
                 Direction.valueOf(directionName),
@@ -59,11 +60,11 @@ public class RightClickBlockAction extends Action {
                 InteractionHand.valueOf(handName),
                 blockHitResult
         );
-        InteractionResult result = itemStack.getItem().useOn(useOnContext);
-        if(!result.consumesAction()) {
-            blockState.useWithoutItem(player.level(), player, blockHitResult);
-        }
 
+        InteractionResult result = blockState.useWithoutItem(player.level(), player, blockHitResult);
+        if(!result.consumesAction()) {
+            itemStack.getItem().useOn(useOnContext);
+        }
     }
 
     @Override
