@@ -57,6 +57,9 @@ public class StoryHandler {
     private final PlayerSession playerSession;
     private final InkTagTranslators inkTagTranslators;
 
+    private Chapter chapterToLoad;
+    private Scene sceneToLoad;
+
     private final List<CharacterStory> currentCharacters;
     private final List<TypedSoundInstance> typedSoundInstanceList;
     private final List<InkAction> inkActionList;
@@ -71,7 +74,7 @@ public class StoryHandler {
 
     private KeyframeCoordinate currentKeyframeCoordinate;
 
-    private boolean isDebugMode;
+    private boolean debugMode;
     private boolean isLoading;
     private boolean isSaving;
 
@@ -87,18 +90,19 @@ public class StoryHandler {
 
     public StoryHandler(Chapter chapter, Scene scene) {
         this();
-        playerSession.setChapter(chapter);
-        playerSession.setScene(scene);
+        chapterToLoad = chapter;
+        sceneToLoad = scene;
     }
 
     public void start() {
+        Minecraft.getInstance().gui.getChat().clearMessages(true);
         if (isChaptersEmpty()) return;
 
         try {
             initializeStory();
             loadStoryState();
 
-            if (next() && !isDebugMode) {
+            if (next() && !debugMode) {
                 NarrativeCraftFile.writeSave(this, true);
             }
         } catch (Exception e) {
@@ -156,7 +160,7 @@ public class StoryHandler {
             Minecraft.saveReport(NarrativeCraftFile.mainDirectory, report);
         }
 
-        if (isDebugMode) {
+        if (debugMode) {
             handleDebugModeCrash(exception, creatorFault, report);
         } else {
             showCrashScreen(creatorFault, report);
@@ -268,7 +272,7 @@ public class StoryHandler {
     }
 
     public void save(boolean newScene) {
-        if (!isDebugMode && NarrativeCraftFile.writeSave(this, newScene)) {
+        if (!debugMode && NarrativeCraftFile.writeSave(this, newScene)) {
             isSaving = true;
             StorySave.startTimeSaveIcon = System.currentTimeMillis();
         }
@@ -354,7 +358,7 @@ public class StoryHandler {
     }
 
     private void loadStoryState() throws Exception {
-        if (save != null && !playerSession.sessionSet()) {
+        if (!debugMode && save != null && chapterToLoad == null && sceneToLoad == null) {
             loadFromSave();
         } else {
             loadFromSession();
@@ -383,10 +387,8 @@ public class StoryHandler {
     }
 
     private void loadFromSession() throws Exception {
-        Scene loadScene = playerSession.getScene();
-
-        if (loadScene != null) {
-            loadSpecificScene(loadScene);
+        if (sceneToLoad != null) {
+            loadSpecificScene(sceneToLoad);
         } else {
             loadFirstScene();
         }
@@ -394,6 +396,8 @@ public class StoryHandler {
 
     private void loadSpecificScene(Scene loadScene) throws Exception {
         story.choosePathString(NarrativeCraftFile.getChapterSceneSnakeCase(loadScene));
+        playerSession.setChapter(loadScene.getChapter());
+        playerSession.setScene(loadScene);
         save = null;
     }
 
@@ -583,7 +587,7 @@ public class StoryHandler {
     }
 
     private void showCreditsScreen() {
-        if (!isDebugMode) {
+        if (!debugMode) {
             NarrativeWorldOption option = NarrativeCraftMod.getInstance().getNarrativeWorldOption();
             boolean isFirstCompletion = option.finishedStory;
 
@@ -905,11 +909,11 @@ public class StoryHandler {
     }
 
     public boolean isDebugMode() {
-        return isDebugMode;
+        return debugMode;
     }
 
     public void setDebugMode(boolean debugMode) {
-        isDebugMode = debugMode;
+        this.debugMode = debugMode;
     }
 
     public List<InkAction> getInkActionList() {
