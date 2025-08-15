@@ -10,6 +10,8 @@ import fr.loudo.narrativecraft.narrative.chapter.scenes.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.animations.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.cameraAngle.CameraAngleGroup;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.Cutscene;
+import fr.loudo.narrativecraft.narrative.chapter.scenes.interaction.Interaction;
+import fr.loudo.narrativecraft.narrative.chapter.scenes.interaction.InteractionSerializer;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.subscene.Subscene;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
@@ -52,6 +54,7 @@ public class NarrativeCraftFile {
     public static final String CAMERA_ANGLES_FILE_NAME = "camera_angles" + EXTENSION_DATA_FILE;
     public static final String CUTSCENES_FILE_NAME = "cutscenes" + EXTENSION_DATA_FILE;
     public static final String DETAILS_FILE_NAME = "details" + EXTENSION_DATA_FILE;
+    public static final String INTERACTIONS_FILE_NAME = "interactions" + EXTENSION_DATA_FILE;
     public static final String SUBSCENES_FILE_NAME = "subscenes" + EXTENSION_DATA_FILE;
     public static final String DIALOG_FILE_NAME = "dialog" + EXTENSION_DATA_FILE;
     public static final String SAVE_FILE_NAME = "save" + EXTENSION_DATA_FILE;
@@ -238,8 +241,9 @@ public class NarrativeCraftFile {
             createFile(dataFolder, CUTSCENES_FILE_NAME);
             createFile(dataFolder, SUBSCENES_FILE_NAME);
             createFile(dataFolder, CAMERA_ANGLES_FILE_NAME);
+            createFile(dataFolder, INTERACTIONS_FILE_NAME);
 
-            String content = String.format("{\"name\":\"%s\",\"description\":\"%s\",\"placement\":%s}", scene.getName(), scene.getDescription(), scene.getPlacement());
+            String content = String.format("{\"name\":\"%s\",\"description\":\"%s\",\"placement\":%s}", scene.getName(), scene.getDescription(), scene.getRank());
             try (Writer writer = new BufferedWriter(new FileWriter(detailsFile))) {
                 writer.write(content);
             }
@@ -402,6 +406,19 @@ public class NarrativeCraftFile {
             return true;
         } catch (IOException e) {
             NarrativeCraftMod.LOG.error("Couldn't update animation {} file of scene {} of chapter {} ! {}", animation.getName(), animation.getScene().getName(), animation.getScene().getChapter().getIndex(), e);
+            return false;
+        }
+    }
+
+    public static boolean updateInteractionsFile(Scene scene) {
+        File dataFolder = getDataFolderOfScene(scene);
+        File interactionFile = createFile(dataFolder, INTERACTIONS_FILE_NAME);
+        Gson gson = new GsonBuilder().registerTypeAdapter(Interaction.class, new InteractionSerializer()).create();
+        try (Writer writer = new BufferedWriter(new FileWriter(interactionFile))) {
+            gson.toJson(scene.getInteractionList(), writer);
+            return true;
+        } catch (IOException e) {
+            NarrativeCraftMod.LOG.error("Couldn't update interactions file of scene {} of chapter {} ! {}", scene.getName(), scene.getChapter().getIndex(), e);
             return false;
         }
     }

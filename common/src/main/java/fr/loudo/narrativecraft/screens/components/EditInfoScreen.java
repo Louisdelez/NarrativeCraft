@@ -113,7 +113,7 @@ public class EditInfoScreen extends Screen {
                     centerY,
                     ScreenUtils.Align.HORIZONTAL
             );
-            placementBox.getEditBox().setValue(String.valueOf(scene.getPlacement()));
+            placementBox.getEditBox().setValue(String.valueOf(scene.getRank()));
             placementBox.getEditBox().setFilter(string -> string.matches("^\\d*$"));
             this.addRenderableWidget(placementBox.getEditBox());
             this.addRenderableWidget(placementBox.getStringWidget());
@@ -125,7 +125,7 @@ public class EditInfoScreen extends Screen {
             int placement = 0;
             if(narrativeEntry instanceof Scene scene) {
                 if(placementBox.getEditBox().getValue().isEmpty()) {
-                    placement = scene.getPlacement();
+                    placement = scene.getRank();
                 } else {
                     placement = Math.max(1, Integer.parseInt(placementBox.getEditBox().getValue()));
                 }

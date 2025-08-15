@@ -8,6 +8,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scenes.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.animations.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.cameraAngle.CameraAngleGroup;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.Cutscene;
+import fr.loudo.narrativecraft.narrative.chapter.scenes.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.subscene.Subscene;
 import fr.loudo.narrativecraft.narrative.character.CharacterSkinController;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
@@ -34,7 +35,7 @@ public class ChaptersInit {
         try {
             DialogData.globalDialogData = NarrativeCraftFile.getGlobalDialogValues();
         } catch (Exception e) {
-            NarrativeCraftMod.LOG.warn("Failed to load global dialog data: {}", e.getMessage());
+            NarrativeCraftMod.LOG.warn("Failed to load global dialog data: ", e);
             DialogData.globalDialogData = DialogData.defaultValues();
         }
 
@@ -140,7 +141,7 @@ public class ChaptersInit {
 
                                         scene.setName(name);
                                         scene.setDescription(desc);
-                                        scene.setPlacement(placement);
+                                        scene.setRank(placement);
                                     }
                                 }
                             } catch (IOException e) {
@@ -192,6 +193,9 @@ public class ChaptersInit {
 
         // Camera Angles
         initCameraAngles(dataFolder, scene);
+        
+        // Interactions
+        initInteractions(dataFolder, scene);
     }
 
     private static void initNpcs(File dataFolder, Scene scene) {
@@ -350,9 +354,9 @@ public class ChaptersInit {
                 scene.setSubsceneList(subscenes);
             }
         } catch (IOException e) {
-            NarrativeCraftMod.LOG.warn("Failed to read subscenes file: {}", e.getMessage());
+            NarrativeCraftMod.LOG.warn("Failed to read subscenes file: ", e);
         } catch (Exception e) {
-            NarrativeCraftMod.LOG.warn("Failed to initialize subscenes: {}", e.getMessage());
+            NarrativeCraftMod.LOG.warn("Failed to initialize subscenes: ", e);
         }
     }
 
@@ -416,9 +420,9 @@ public class ChaptersInit {
                 scene.setCutsceneList(cutscenes);
             }
         } catch (IOException e) {
-            NarrativeCraftMod.LOG.warn("Failed to read cutscenes file: {}", e.getMessage());
+            NarrativeCraftMod.LOG.warn("Failed to read cutscenes file: ", e);
         } catch (Exception e) {
-            NarrativeCraftMod.LOG.warn("Failed to initialize cutscenes: {}", e.getMessage());
+            NarrativeCraftMod.LOG.warn("Failed to initialize cutscenes: ", e);
         }
     }
 
@@ -475,9 +479,31 @@ public class ChaptersInit {
                 scene.setCameraAngleGroupList(cameraAngleGroupList);
             }
         } catch (IOException e) {
-            NarrativeCraftMod.LOG.warn("Failed to read camera angles file: {}", e.getMessage());
+            NarrativeCraftMod.LOG.warn("Failed to read camera angles file: ", e);
         } catch (Exception e) {
-            NarrativeCraftMod.LOG.warn("Failed to initialize camera angles: {}", e.getMessage());
+            NarrativeCraftMod.LOG.warn("Failed to initialize camera angles: ", e);
+        }
+    }
+
+    private static void initInteractions(File dataFolder, Scene scene) {
+        File interactionFile = new File(dataFolder, "interactions" + NarrativeCraftFile.EXTENSION_DATA_FILE);
+        if (!interactionFile.exists()) {
+            return;
+        }
+
+        try {
+            String content = Files.readString(interactionFile.toPath());
+            if (content.trim().isEmpty()) {
+                NarrativeCraftMod.LOG.warn("Interactions file is empty");
+                return;
+            }
+            Type listType = new TypeToken<List<Interaction>>() {}.getType();
+            List<Interaction> interactions = new Gson().fromJson(content, listType);
+            scene.setInteractionList(interactions);
+        } catch (IOException e) {
+            NarrativeCraftMod.LOG.warn("Failed to read interactions file: ", e);
+        } catch (Exception e) {
+            NarrativeCraftMod.LOG.warn("Failed to initialize interactions: ", e);
         }
     }
 }

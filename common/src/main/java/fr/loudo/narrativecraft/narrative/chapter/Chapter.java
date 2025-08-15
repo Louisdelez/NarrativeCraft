@@ -36,7 +36,7 @@ public class Chapter extends NarrativeEntry {
             sceneList.add(scene);
             List<Scene> sortedScenes = getSortedSceneList();
             for (int i = 0; i < sceneList.size(); i++) {
-                sortedScenes.get(i).setPlacement(i + 1);
+                sortedScenes.get(i).setRank(i + 1);
             }
             NarrativeCraftFile.updateMainInkFile();
             return true;
@@ -80,7 +80,7 @@ public class Chapter extends NarrativeEntry {
 
     public List<Scene> getSortedSceneList() {
         return sceneList.stream()
-                .sorted(Comparator.comparingInt(Scene::getPlacement))
+                .sorted(Comparator.comparingInt(Scene::getRank))
                 .toList();
     }
 

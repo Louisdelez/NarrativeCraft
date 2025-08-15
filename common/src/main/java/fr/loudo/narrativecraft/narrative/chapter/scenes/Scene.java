@@ -6,6 +6,7 @@ import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.animations.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.cameraAngle.CameraAngleGroup;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.Cutscene;
+import fr.loudo.narrativecraft.narrative.chapter.scenes.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.subscene.Subscene;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.screens.storyManager.scenes.ScenesScreen;
@@ -20,22 +21,19 @@ import java.util.List;
 public class Scene extends NarrativeEntry {
 
     private Chapter chapter;
-    private int placement;
+    private int rank;
     private transient List<CharacterStory> npcs;
-    private List<Animation> animationList;
-    private List<Cutscene> cutsceneList;
-    private List<Subscene> subsceneList;
-    private List<CameraAngleGroup> cameraAngleGroupList;
+    private List<Animation> animationList = new ArrayList<>();
+    private List<Cutscene> cutsceneList = new ArrayList<>();
+    private List<Subscene> subsceneList = new ArrayList<>();
+    private List<CameraAngleGroup> cameraAngleGroupList = new ArrayList<>();
+    private List<Interaction> interactionList = new ArrayList<>();
 
     public Scene(String name, String description, Chapter chapter) {
         super(name, description);
         this.chapter = chapter;
-        this.animationList = new ArrayList<>();
-        this.cutsceneList = new ArrayList<>();
-        this.subsceneList = new ArrayList<>();
-        this.cameraAngleGroupList = new ArrayList<>();
         this.npcs = new ArrayList<>();
-        placement = chapter.getSceneList().size() + 1;
+        rank = chapter.getSceneList().size() + 1;
     }
 
     public Chapter getChapter() {
@@ -46,12 +44,12 @@ public class Scene extends NarrativeEntry {
         this.chapter = chapter;
     }
 
-    public int getPlacement() {
-        return placement;
+    public int getRank() {
+        return rank;
     }
 
-    public void setPlacement(int placement) {
-        this.placement = placement;
+    public void setRank(int rank) {
+        this.rank = rank;
     }
 
     public void addAnimation(Animation animation) {
@@ -80,6 +78,15 @@ public class Scene extends NarrativeEntry {
         cameraAngleGroupList.add(cameraAngleGroup);
         if(!NarrativeCraftFile.updateCameraAnglesFile(this)) {
             cameraAngleGroupList.remove(cameraAngleGroup);
+            return false;
+        }
+        return true;
+    }
+
+    public boolean addInteraction(Interaction interaction) {
+        interactionList.add(interaction);
+        if(!NarrativeCraftFile.updateInteractionsFile(this)) {
+            interactionList.remove(interaction);
             return false;
         }
         return true;
@@ -164,6 +171,10 @@ public class Scene extends NarrativeEntry {
         cameraAngleGroupList.remove(cameraAngleGroup);
     }
 
+    public void removeInteraction(Interaction interaction) {
+        interactionList.remove(interaction);
+    }
+
     public List<Animation> getAnimationList() {
         return animationList;
     }
@@ -174,6 +185,10 @@ public class Scene extends NarrativeEntry {
 
     public List<Subscene> getSubsceneList() {
         return subsceneList;
+    }
+
+    public List<Interaction> getInteractionList() {
+        return interactionList;
     }
 
     public void setAnimationList(List<Animation> animationList) {
@@ -194,6 +209,10 @@ public class Scene extends NarrativeEntry {
 
     public void setCameraAngleGroupList(List<CameraAngleGroup> cameraAngleGroupList) {
         this.cameraAngleGroupList = cameraAngleGroupList;
+    }
+
+    public void setInteractionList(List<Interaction> interactionList) {
+        this.interactionList = interactionList;
     }
 
     public String getSnakeCase() {
@@ -246,12 +265,12 @@ public class Scene extends NarrativeEntry {
         this.name = name;
         this.description = description;
         for(Scene scene : chapter.getSceneList()) {
-            if(scene.getPlacement() == placement) {
-                scene.setPlacement(this.placement);
-                NarrativeCraftFile.updateSceneDetails(scene, scene.getName(), scene.getDescription(), scene.getPlacement());
+            if(scene.getRank() == placement) {
+                scene.setRank(this.rank);
+                NarrativeCraftFile.updateSceneDetails(scene, scene.getName(), scene.getDescription(), scene.getRank());
             }
         }
-        this.placement = placement;
+        this.rank = placement;
         ScreenUtils.sendToast(Translation.message("global.info"), Translation.message("toast.description.updated", name, chapter.getIndex()));
         Minecraft.getInstance().setScreen(reloadScreen());
         NarrativeCraftFile.updateMainInkFile();
