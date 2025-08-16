@@ -6,12 +6,15 @@ import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.cameraAngle.CameraAngleGroup;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.Cutscene;
+import fr.loudo.narrativecraft.narrative.chapter.scenes.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.subscene.Subscene;
+import fr.loudo.narrativecraft.screens.interaction.SelectInteractionTypeScreen;
 import fr.loudo.narrativecraft.screens.storyManager.chapters.ChaptersScreen;
 import fr.loudo.narrativecraft.screens.storyManager.characters.CharactersScreen;
 import fr.loudo.narrativecraft.screens.storyManager.scenes.ScenesScreen;
 import fr.loudo.narrativecraft.screens.storyManager.scenes.cameraAngles.CameraAnglesScreen;
 import fr.loudo.narrativecraft.screens.storyManager.scenes.cutscenes.CutscenesScreen;
+import fr.loudo.narrativecraft.screens.storyManager.scenes.interactions.InteractionScreen;
 import fr.loudo.narrativecraft.screens.storyManager.scenes.subscenes.SubscenesScreen;
 import fr.loudo.narrativecraft.utils.ScreenUtils;
 import fr.loudo.narrativecraft.utils.Translation;
@@ -149,6 +152,9 @@ public class EditInfoScreen extends Screen {
             if(narrativeEntry == null && lastScreen instanceof CameraAnglesScreen) {
                 addCameraAnglesAction(name, desc);
             }
+            if(narrativeEntry == null && lastScreen instanceof InteractionScreen) {
+                addInteraction(name);
+            }
             if(narrativeEntry != null) {
                 if(narrativeEntry instanceof Scene scene) {
                     scene.update(name, desc, placement);
@@ -279,6 +285,23 @@ public class EditInfoScreen extends Screen {
         }
         CameraAnglesScreen screen = new CameraAnglesScreen(scene);
         this.minecraft.setScreen(screen);
+    }
+
+    private void addInteraction(String name) {
+        Scene scene = ((InteractionScreen)lastScreen).getScene();
+        if(scene.interactionExists(name)) {
+            ScreenUtils.sendToast(Translation.message("global.error"), Translation.message("screen.interaction_manager.add.already_exists"));
+            return;
+        }
+        SelectInteractionTypeScreen screen = new SelectInteractionTypeScreen(name, scene, interaction -> {
+            if(!scene.addInteraction(interaction)) {
+                ScreenUtils.sendToast(Translation.message("global.error"), Translation.message("screen.interaction_manager.add.failed", name));
+                return;
+            }
+            InteractionScreen interactionScreen = new InteractionScreen(scene);
+            this.minecraft.setScreen(interactionScreen);
+        });
+        minecraft.setScreen(screen);
     }
 
 }

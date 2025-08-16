@@ -7,7 +7,7 @@ import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 public class CharacterInteraction extends Interaction {
 
     private CharacterStoryData characterData;
-    private Animation animation;
+    private transient Animation animation;
 
     public CharacterInteraction(String name, Scene scene) {
         super(name, "", scene);

@@ -27,7 +27,8 @@ public class InteractionSerializer implements JsonSerializer<Interaction>, JsonD
 
     @Override
     public JsonElement serialize(Interaction interaction, Type typeOfSrc, JsonSerializationContext context) {
-        JsonObject jsonObject = context.serialize(interaction).getAsJsonObject();
+        JsonObject jsonObject = context.serialize(interaction, interaction.getClass()).getAsJsonObject();
+        jsonObject.addProperty("interactionType", interaction.getType().name());
 
         if (interaction instanceof CharacterInteraction characterInteraction) {
             Animation animation = characterInteraction.getAnimation();

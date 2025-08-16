@@ -119,6 +119,15 @@ public class Scene extends NarrativeEntry {
         return false;
     }
 
+    public boolean interactionExists(String name) {
+        for (Interaction interaction : interactionList) {
+            if(interaction.getName().equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Animation getAnimationByName(String name) {
         for(Animation animation : animationList) {
             if(animation.getName().equalsIgnoreCase(name)) {

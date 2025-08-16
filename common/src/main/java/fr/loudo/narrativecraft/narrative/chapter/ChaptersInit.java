@@ -9,6 +9,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scenes.animations.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.cameraAngle.CameraAngleGroup;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.interaction.Interaction;
+import fr.loudo.narrativecraft.narrative.chapter.scenes.interaction.InteractionSerializer;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.subscene.Subscene;
 import fr.loudo.narrativecraft.narrative.character.CharacterSkinController;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
@@ -498,7 +499,11 @@ public class ChaptersInit {
                 return;
             }
             Type listType = new TypeToken<List<Interaction>>() {}.getType();
-            List<Interaction> interactions = new Gson().fromJson(content, listType);
+            Gson gson = new GsonBuilder().registerTypeAdapter(Interaction.class, new InteractionSerializer()).create();
+            List<Interaction> interactions = gson.fromJson(content, listType);
+            for(Interaction interaction : interactions) {
+                interaction.setScene(scene);
+            }
             scene.setInteractionList(interactions);
         } catch (IOException e) {
             NarrativeCraftMod.LOG.warn("Failed to read interactions file: ", e);

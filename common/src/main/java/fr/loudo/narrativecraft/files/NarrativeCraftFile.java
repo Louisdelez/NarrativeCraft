@@ -415,7 +415,7 @@ public class NarrativeCraftFile {
         File interactionFile = createFile(dataFolder, INTERACTIONS_FILE_NAME);
         Gson gson = new GsonBuilder().registerTypeAdapter(Interaction.class, new InteractionSerializer()).create();
         try (Writer writer = new BufferedWriter(new FileWriter(interactionFile))) {
-            gson.toJson(scene.getInteractionList(), writer);
+            gson.toJson(scene.getInteractionList(), new TypeToken<List<Interaction>>() {}.getType(), writer);
             return true;
         } catch (IOException e) {
             NarrativeCraftMod.LOG.error("Couldn't update interactions file of scene {} of chapter {} ! {}", scene.getName(), scene.getChapter().getIndex(), e);
