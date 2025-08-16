@@ -40,8 +40,8 @@ public class InteractionController extends KeyframeControllerBase {
             Vec3 position = objectInteraction.getPosition();
             player.teleportTo(position.x, position.y, position.z);
         } else if(interaction instanceof CharacterInteraction characterInteraction) {
-            characterInteraction.getCharacterData().spawn(Utils.getServerLevel());
             if(characterInteraction.getCharacterData() != null) {
+                characterInteraction.getCharacterData().spawn(Utils.getServerLevel());
                 Vec3 position = characterInteraction.getCharacterData().getVec3();
                 player.teleportTo(position.x, position.y, position.z);
             }

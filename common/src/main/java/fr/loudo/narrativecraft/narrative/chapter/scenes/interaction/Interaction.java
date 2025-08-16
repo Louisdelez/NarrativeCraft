@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screens.Screen;
 public abstract class Interaction extends NarrativeEntry {
 
     protected transient Scene scene;
+    protected String stitch;
 
     public Interaction(String name, String description, Scene scene) {
         super(name, description);
@@ -26,6 +27,14 @@ public abstract class Interaction extends NarrativeEntry {
 
     public void setScene(Scene scene) {
         this.scene = scene;
+    }
+
+    public String getStitch() {
+        return stitch;
+    }
+
+    public void setStitch(String stitch) {
+        this.stitch = stitch;
     }
 
     @Override

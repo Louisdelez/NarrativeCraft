@@ -8,8 +8,10 @@ import fr.loudo.narrativecraft.narrative.chapter.scenes.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.animations.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.cameraAngle.CameraAngleGroup;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.Cutscene;
+import fr.loudo.narrativecraft.narrative.chapter.scenes.interaction.CharacterInteraction;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.interaction.InteractionSerializer;
+import fr.loudo.narrativecraft.narrative.chapter.scenes.interaction.InteractionType;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.subscene.Subscene;
 import fr.loudo.narrativecraft.narrative.character.CharacterSkinController;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
@@ -503,6 +505,14 @@ public class ChaptersInit {
             List<Interaction> interactions = gson.fromJson(content, listType);
             for(Interaction interaction : interactions) {
                 interaction.setScene(scene);
+                if(interaction instanceof CharacterInteraction characterInteraction) {
+                    if(characterInteraction.getCharacterData() == null) continue;
+                    CharacterStory characterStory = NarrativeCraftMod.getInstance().getCharacterManager().getCharacter(characterInteraction.getCharacterData().getCharacterStory().getName());
+                    if(characterStory == null) {
+                        characterStory = scene.getNpc(characterInteraction.getCharacterData().getCharacterStory().getName());
+                    }
+                    characterInteraction.getCharacterData().setCharacterStory(characterStory);
+                }
             }
             scene.setInteractionList(interactions);
         } catch (IOException e) {

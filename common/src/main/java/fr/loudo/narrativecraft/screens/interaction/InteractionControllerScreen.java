@@ -58,6 +58,12 @@ public class InteractionControllerScreen extends Screen {
 //            this.addRenderableWidget(recordMenu);
         }
 
+        Button stitchButton = Button.builder(ImageFontConstants.SETTINGS, button -> {
+            InteractionStitchScreen screen = new InteractionStitchScreen(interactionController.getInteraction());
+            minecraft.setScreen(screen);
+        }).bounds(startX + (BUTTON_WIDTH + spacing) * 2, y, BUTTON_WIDTH, BUTTON_HEIGHT).build();
+        this.addRenderableWidget(stitchButton);
+
         Button saveButton = Button.builder(ImageFontConstants.SAVE, button -> {
             NarrativeCraftMod.server.execute(() -> interactionController.stopSession(true));
             this.onClose();
