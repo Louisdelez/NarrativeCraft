@@ -2,6 +2,9 @@ package fr.loudo.narrativecraft.screens.storyManager.scenes.interactions;
 
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scenes.interaction.InteractionController;
+import fr.loudo.narrativecraft.narrative.recordings.playback.Playback;
+import fr.loudo.narrativecraft.narrative.story.MainScreenController;
 import fr.loudo.narrativecraft.screens.characters.CharacterEntityTypeScreen;
 import fr.loudo.narrativecraft.screens.components.EditCharacterInfoScreen;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
@@ -10,6 +13,7 @@ import fr.loudo.narrativecraft.screens.storyManager.StoryElementScreen;
 import fr.loudo.narrativecraft.screens.storyManager.scenes.ScenesMenuScreen;
 import fr.loudo.narrativecraft.utils.ImageFontConstants;
 import fr.loudo.narrativecraft.utils.Translation;
+import fr.loudo.narrativecraft.utils.Utils;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -51,10 +55,10 @@ public class InteractionScreen extends StoryElementScreen {
         List<StoryElementList.StoryEntryData> entries = scene.getInteractionList().stream()
                 .map(interaction -> {
                     Button button = Button.builder(Component.literal(interaction.getName()), b -> {
-
+                        InteractionController interactionController = new InteractionController(interaction, Utils.getServerPlayerByUUID(this.minecraft.player.getUUID()), Playback.PlaybackType.DEVELOPMENT);
+                        interactionController.startSession();
+                        minecraft.setScreen(null);
                     }).build();
-                    button.active = false;
-
                     return new StoryElementList.StoryEntryData(button, interaction);
                 })
                 .toList();

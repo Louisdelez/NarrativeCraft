@@ -1,6 +1,7 @@
 package fr.loudo.narrativecraft.narrative.chapter.scenes.interaction;
 
 public enum InteractionType {
+    ANIMATION(AnimationInteraction.class),
     CHARACTER(CharacterInteraction.class),
     OBJECT(ObjectInteraction.class);
 

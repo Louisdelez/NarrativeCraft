@@ -6,6 +6,8 @@ import fr.loudo.narrativecraft.keys.ModKeys;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.KeyframeControllerBase;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.cameraAngle.CameraAngleController;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.CutsceneController;
+import fr.loudo.narrativecraft.narrative.chapter.scenes.interaction.InteractionController;
+import fr.loudo.narrativecraft.narrative.chapter.scenes.interaction.InteractionType;
 import fr.loudo.narrativecraft.narrative.dialog.Dialog;
 import fr.loudo.narrativecraft.narrative.dialog.DialogImpl;
 import fr.loudo.narrativecraft.narrative.recordings.Recording;
@@ -18,6 +20,7 @@ import fr.loudo.narrativecraft.narrative.story.inkAction.*;
 import fr.loudo.narrativecraft.narrative.story.inkAction.enums.FadeCurrentState;
 import fr.loudo.narrativecraft.screens.cameraAngles.CameraAngleControllerScreen;
 import fr.loudo.narrativecraft.screens.cutscenes.CutsceneControllerScreen;
+import fr.loudo.narrativecraft.screens.interaction.InteractionControllerScreen;
 import fr.loudo.narrativecraft.screens.mainScreen.MainScreenControllerScreen;
 import fr.loudo.narrativecraft.screens.storyManager.chapters.ChaptersScreen;
 import fr.loudo.narrativecraft.screens.storyManager.scenes.ScenesMenuScreen;
@@ -176,6 +179,13 @@ public class OnClientTick {
             ModKeys.handleKeyPress(ModKeys.OPEN_KEYFRAME_EDIT_SCREEN, () -> {
                 if(!client.player.hasPermissions(2)) return;
                 CameraAngleControllerScreen screen = new CameraAngleControllerScreen(cameraAngleController);
+                client.execute(() -> client.setScreen(screen));
+            });
+        } else if (keyframeControllerBase instanceof InteractionController interactionController) {
+            if (interactionController.getPlaybackType() == Playback.PlaybackType.PRODUCTION) return;
+            ModKeys.handleKeyPress(ModKeys.OPEN_KEYFRAME_EDIT_SCREEN, () -> {
+                if(!client.player.hasPermissions(2)) return;
+                InteractionControllerScreen screen = new InteractionControllerScreen(interactionController);
                 client.execute(() -> client.setScreen(screen));
             });
         }

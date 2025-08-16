@@ -6,6 +6,8 @@ import fr.loudo.narrativecraft.narrative.chapter.scenes.KeyframeControllerBase;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.animations.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.cameraAngle.CameraAngleController;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.CutsceneController;
+import fr.loudo.narrativecraft.narrative.chapter.scenes.interaction.CharacterInteraction;
+import fr.loudo.narrativecraft.narrative.chapter.scenes.interaction.InteractionController;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.screens.components.ChangeSkinLinkScreen;
@@ -16,7 +18,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
-public class CameraAngleCharacterScreen extends Screen {
+public class ChangeCharacterEntityAttributeScreen extends Screen {
 
     private final int BUTTON_WIDTH = 50;
     private final int BUTTON_HEIGHT = 20;
@@ -24,13 +26,13 @@ public class CameraAngleCharacterScreen extends Screen {
     private CharacterStoryData characterStoryData;
     private Animation animation;
 
-    public CameraAngleCharacterScreen(CharacterStoryData characterStoryData, KeyframeControllerBase keyframeControllerBase) {
+    public ChangeCharacterEntityAttributeScreen(CharacterStoryData characterStoryData, KeyframeControllerBase keyframeControllerBase) {
         super(Component.literal("Character screen"));
         this.keyframeControllerBase = keyframeControllerBase;
         this.characterStoryData = characterStoryData;
     }
 
-    public CameraAngleCharacterScreen(Animation animation, KeyframeControllerBase keyframeControllerBase) {
+    public ChangeCharacterEntityAttributeScreen(Animation animation, KeyframeControllerBase keyframeControllerBase) {
         super(Component.literal("Character screen"));
         this.keyframeControllerBase = keyframeControllerBase;
         this.animation = animation;
@@ -41,7 +43,7 @@ public class CameraAngleCharacterScreen extends Screen {
         int totalWidth = 0;
 
         ChangeSkinLinkScreen screen;
-        if(keyframeControllerBase instanceof CameraAngleController cameraAngleController) {
+        if(keyframeControllerBase instanceof CameraAngleController cameraAngleController || keyframeControllerBase instanceof InteractionController) {
             screen = new ChangeSkinLinkScreen(characterStoryData.getCharacterStory(), skin ->  {
                 characterStoryData.setSkinName(skin);
             });
@@ -52,6 +54,11 @@ public class CameraAngleCharacterScreen extends Screen {
                 NarrativeCraftFile.updateAnimationFile(animation);
             });
             totalWidth = BUTTON_WIDTH + 5;
+        } else if(keyframeControllerBase instanceof InteractionController interactionController) {
+            CharacterInteraction characterInteraction = (CharacterInteraction) interactionController.getInteraction();
+            screen = new ChangeSkinLinkScreen(characterInteraction.getCharacterData().getCharacterStory(), skin -> {
+                characterInteraction.getCharacterData().setSkinName(skin);
+            });
         } else {
             screen = null;
         }
@@ -61,6 +68,9 @@ public class CameraAngleCharacterScreen extends Screen {
             characterStory = characterStoryData.getCharacterStory();
         } else if(keyframeControllerBase instanceof CutsceneController) {
             characterStory = animation.getCharacter();
+        } else if(keyframeControllerBase instanceof InteractionController interactionController) {
+            CharacterInteraction characterInteraction = (CharacterInteraction) interactionController.getInteraction();
+            characterStory = characterInteraction.getCharacterData().getCharacterStory();
         }
 
         if(characterStory.getCharacterType() == CharacterStory.CharacterType.MAIN) {
@@ -80,7 +90,7 @@ public class CameraAngleCharacterScreen extends Screen {
         }
 
         int closeX = startX + BUTTON_WIDTH + 5;
-        if(keyframeControllerBase instanceof CameraAngleController cameraAngleController) {
+        if(keyframeControllerBase instanceof CameraAngleController || keyframeControllerBase instanceof InteractionController) {
             Button changePose = Button.builder(Translation.message("screen.camera_angle_character.change_pose"), button -> {
                 CameraAngleChangePoseScreen screen1 = new CameraAngleChangePoseScreen(characterStoryData);
                 minecraft.setScreen(screen1);
@@ -90,7 +100,12 @@ public class CameraAngleCharacterScreen extends Screen {
                 ConfirmScreen confirm = new ConfirmScreen(b -> {
                     if (b) {
                         NarrativeCraftMod.server.execute(() -> {
-                            cameraAngleController.removeCharacter(characterStoryData.getCharacterStory().getEntity());
+                            if(keyframeControllerBase instanceof CameraAngleController cameraAngleController) {
+                                cameraAngleController.removeCharacter(characterStoryData.getCharacterStory().getEntity());
+                            } else if (keyframeControllerBase instanceof InteractionController interactionController) {
+                                CharacterInteraction characterInteraction = (CharacterInteraction) interactionController.getInteraction();
+                                characterInteraction.getCharacterData().getCharacterStory().kill();
+                            }
                         });
                     }
                     minecraft.setScreen(null);

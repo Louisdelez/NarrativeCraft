@@ -8,11 +8,13 @@ import fr.loudo.narrativecraft.narrative.chapter.scenes.cameraAngle.CameraAngleC
 import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.CutsceneController;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.keyframes.Keyframe;
 import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.keyframes.KeyframeTrigger;
+import fr.loudo.narrativecraft.narrative.chapter.scenes.interaction.CharacterInteraction;
+import fr.loudo.narrativecraft.narrative.chapter.scenes.interaction.InteractionController;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.MainScreenController;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.screens.cameraAngles.CameraAngleCharacterScreen;
+import fr.loudo.narrativecraft.screens.cameraAngles.ChangeCharacterEntityAttributeScreen;
 import fr.loudo.narrativecraft.screens.keyframes.KeyframeTriggerScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
@@ -45,14 +47,22 @@ public class OnEntityRightClick {
         if(keyframeControllerBase instanceof CameraAngleController cameraAngleController) {
             if(cameraAngleController.isEntityInController(entity)) {
                 CharacterStoryData characterStoryData = cameraAngleController.getCharacterDataByEntity(entity);
-                CameraAngleCharacterScreen screen = new CameraAngleCharacterScreen(characterStoryData, cameraAngleController);
+                ChangeCharacterEntityAttributeScreen screen = new ChangeCharacterEntityAttributeScreen(characterStoryData, cameraAngleController);
+                Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
+            }
+        }
+        if(keyframeControllerBase instanceof InteractionController interactionController) {
+            CharacterInteraction characterInteraction = (CharacterInteraction) interactionController.getInteraction();
+            CharacterStoryData characterStoryData = characterInteraction.getCharacterData();
+            if(characterStoryData.getCharacterStory().getEntity().getUUID().equals(entity.getUUID())) {
+                ChangeCharacterEntityAttributeScreen screen = new ChangeCharacterEntityAttributeScreen(characterStoryData, interactionController);
                 Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
             }
         }
         if(keyframeControllerBase instanceof CutsceneController cutsceneController) {
             Animation animation = cutsceneController.getAnimationFromEntity(entity);
             if(animation != null) {
-                CameraAngleCharacterScreen screen = new CameraAngleCharacterScreen(animation, cutsceneController);
+                ChangeCharacterEntityAttributeScreen screen = new ChangeCharacterEntityAttributeScreen(animation, cutsceneController);
                 Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
             }
             KeyframeTrigger keyframeTrigger = cutsceneController.getKeyframeTriggerByEntity(entity);

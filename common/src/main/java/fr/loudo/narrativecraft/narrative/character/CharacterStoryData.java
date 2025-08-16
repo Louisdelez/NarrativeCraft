@@ -23,6 +23,7 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -200,6 +201,10 @@ public class CharacterStoryData {
 
     public double getZ() {
         return z;
+    }
+
+    public Vec3 getVec3() {
+        return new Vec3(x, y, z);
     }
 
     public byte getEntityByte() {

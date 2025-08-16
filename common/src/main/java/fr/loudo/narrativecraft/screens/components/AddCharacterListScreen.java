@@ -1,13 +1,9 @@
 package fr.loudo.narrativecraft.screens.components;
 
-import com.mojang.datafixers.util.Pair;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cameraAngle.CameraAngleGroup;
+import fr.loudo.narrativecraft.narrative.chapter.scenes.Scene;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
-import fr.loudo.narrativecraft.narrative.recordings.playback.Playback;
-import fr.loudo.narrativecraft.utils.FakePlayer;
-import fr.loudo.narrativecraft.utils.Translation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -19,32 +15,33 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.OptionsSubScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class AddCharacterListScreen extends OptionsSubScreen {
 
+    private final Scene scene;
     private CharacterList characterList;
     private final List<CharacterStory> characterStoryList;
-    private final CameraAngleGroup cameraAngleGroup;
     private CharacterStory.CharacterType characterType;
+    private Consumer<CharacterStoryData> characterStoryDataConsumer;
 
-    public AddCharacterListScreen(CameraAngleGroup cameraAngleGroup, List<CharacterStory> characterStoryList, CharacterStory.CharacterType characterType) {
+    public AddCharacterListScreen(Scene scene, List<CharacterStory> characterStoryList, CharacterStory.CharacterType characterType, Consumer<CharacterStoryData> characterStoryDataConsumer) {
         super(null, Minecraft.getInstance().options, Component.literal("Spawn character"));
-        this.cameraAngleGroup = cameraAngleGroup;
         this.characterStoryList = characterStoryList;
         this.characterType = characterType;
+        this.characterStoryDataConsumer = characterStoryDataConsumer;
+        this.scene = scene;
     }
 
-    public AddCharacterListScreen(CameraAngleGroup cameraAngleGroup) {
+    public AddCharacterListScreen(Scene scene, Consumer<CharacterStoryData> characterStoryDataConsumer) {
         super(null, Minecraft.getInstance().options, Component.literal("Spawn character"));
-        this.cameraAngleGroup = cameraAngleGroup;
         this.characterStoryList = NarrativeCraftMod.getInstance().getCharacterManager().getCharacterStories();
         this.characterType = CharacterStory.CharacterType.MAIN;
+        this.characterStoryDataConsumer = characterStoryDataConsumer;
+        this.scene = scene;
     }
 
     @Override
@@ -52,13 +49,13 @@ public class AddCharacterListScreen extends OptionsSubScreen {
         LinearLayout linearlayout = this.layout.addToHeader(LinearLayout.horizontal()).spacing(8);
         linearlayout.defaultCellSetting().alignVerticallyMiddle();
         linearlayout.addChild(new StringWidget(this.title, this.font));
-        if(cameraAngleGroup.getScene() != null) {
+        if(scene != null) {
             linearlayout.addChild(Button.builder(characterType == CharacterStory.CharacterType.NPC ? Component.literal("MAIN") : Component.literal("NPC"), button -> {
                 Screen screen;
                 if(characterType == CharacterStory.CharacterType.MAIN) {
-                    screen = new AddCharacterListScreen(cameraAngleGroup, cameraAngleGroup.getScene().getNpcs(), CharacterStory.CharacterType.NPC);
+                    screen = new AddCharacterListScreen(scene, scene.getNpcs(), CharacterStory.CharacterType.NPC, characterStoryDataConsumer);
                 } else {
-                    screen = new AddCharacterListScreen(cameraAngleGroup, NarrativeCraftMod.getInstance().getCharacterManager().getCharacterStories(), CharacterStory.CharacterType.MAIN);
+                    screen = new AddCharacterListScreen(scene, NarrativeCraftMod.getInstance().getCharacterManager().getCharacterStories(), CharacterStory.CharacterType.MAIN, characterStoryDataConsumer);
                 }
                 minecraft.setScreen(screen);
             }).width(40).build());
@@ -85,11 +82,7 @@ public class AddCharacterListScreen extends OptionsSubScreen {
         CharacterStory selectedCharacter = entry.characterStory;
         LocalPlayer localPlayer = Minecraft.getInstance().player;
         Vec3 position = localPlayer.position();
-        if(cameraAngleGroup.getCharacterStoryData(selectedCharacter.getName()) != null) {
-            minecraft.player.displayClientMessage(Component.literal("§c" + Translation.message("screen.camera_angle_character.add.fail").getString()), false);
-            return;
-        }
-        CharacterStoryData characterStoryData = cameraAngleGroup.addCharacter(
+        CharacterStoryData characterStoryData = new CharacterStoryData(
                 selectedCharacter,
                 selectedCharacter.getCharacterSkinController().getMainSkinFile().getName(),
                 position.x,
@@ -97,19 +90,9 @@ public class AddCharacterListScreen extends OptionsSubScreen {
                 position.z,
                 localPlayer.getXRot(),
                 localPlayer.getYRot(),
-                Playback.PlaybackType.DEVELOPMENT,
                 false
         );
-        if(characterStoryData.getCharacterStory().getEntity() instanceof FakePlayer fakePlayer) {
-            for(EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
-                ItemStack itemStack = localPlayer.getItemBySlot(equipmentSlot);
-                fakePlayer.getServer().getPlayerList().broadcastAll(new ClientboundSetEquipmentPacket(
-                        fakePlayer.getId(),
-                        List.of(new Pair<>(equipmentSlot, itemStack))
-                ));
-                fakePlayer.setItemSlot(equipmentSlot, itemStack);
-            }
-        }
+        characterStoryDataConsumer.accept(characterStoryData);
     }
 
     class CharacterList extends ObjectSelectionList<CharacterList.Entry> {

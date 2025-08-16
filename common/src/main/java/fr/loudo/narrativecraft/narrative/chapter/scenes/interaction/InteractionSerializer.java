@@ -14,12 +14,12 @@ public class InteractionSerializer implements JsonSerializer<Interaction>, JsonD
         if(interactionTypeElem == null) return null;
         InteractionType interactionType = InteractionType.valueOf(interactionTypeElem.getAsString());
         Interaction interaction = context.deserialize(json, interactionType.getInteractionClass());
-        if(interaction instanceof CharacterInteraction characterInteraction) {
+        if(interaction instanceof AnimationInteraction animationInteraction) {
             JsonElement animElement = jsonObject.get("animation_name");
             if(animElement != null) {
                 Scene scene = interaction.getScene();
                 Animation animation = scene.getAnimationByName(animElement.getAsString());
-                characterInteraction.setAnimation(animation);
+                animationInteraction.setAnimation(animation);
             }
         }
         return interaction;
@@ -30,8 +30,8 @@ public class InteractionSerializer implements JsonSerializer<Interaction>, JsonD
         JsonObject jsonObject = context.serialize(interaction, interaction.getClass()).getAsJsonObject();
         jsonObject.addProperty("interactionType", interaction.getType().name());
 
-        if (interaction instanceof CharacterInteraction characterInteraction) {
-            Animation animation = characterInteraction.getAnimation();
+        if (interaction instanceof AnimationInteraction animationInteraction) {
+            Animation animation = animationInteraction.getAnimation();
             if (animation != null) {
                 jsonObject.addProperty("animation_name", animation.getName());
             }
