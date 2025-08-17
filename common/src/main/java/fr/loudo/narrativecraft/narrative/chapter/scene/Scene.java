@@ -6,6 +6,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.cameraAngle.CameraAngleGroup;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +20,17 @@ public class Scene extends NarrativeEntry {
     private final List<Subscene> subscenes = new ArrayList<>();
     private final List<CameraAngleGroup> cameraAngleGroups = new ArrayList<>();
 
+    private final List<CharacterStory> npcs = new ArrayList<>();
+
+    private int rank = 1;
+
     public Scene(String name, String description, Chapter chapter) {
         super(name, description);
         this.chapter = chapter;
+    }
+
+    public String knotName() {
+        return "chapter_" + chapter.getIndex() + "_" + name.toLowerCase();
     }
 
     public Animation getAnimationByName(String name) {
@@ -37,6 +46,15 @@ public class Scene extends NarrativeEntry {
         for(Subscene subscene : subscenes) {
             if(subscene.getName().equalsIgnoreCase(name)) {
                 return subscene;
+            }
+        }
+        return null;
+    }
+
+    public CharacterStory getNpcByName(String name) {
+        for(CharacterStory characterStory : npcs) {
+            if(characterStory.getName().equalsIgnoreCase(name)) {
+                return characterStory;
             }
         }
         return null;
@@ -60,5 +78,17 @@ public class Scene extends NarrativeEntry {
 
     public List<CameraAngleGroup> getCameraAngleGroups() {
         return cameraAngleGroups;
+    }
+
+    public List<CharacterStory> getNpcs() {
+        return npcs;
+    }
+
+    public int getRank() {
+        return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
     }
 }
