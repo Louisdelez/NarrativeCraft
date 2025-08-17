@@ -8,8 +8,8 @@ import java.util.List;
 
 public class Cutscene extends SceneData {
 
-    private final List<Subscene> subscenes = new ArrayList<>();
-    private final List<Animation> animations = new ArrayList<>(); // For individual animations.
+    private transient List<Subscene> subscenes = new ArrayList<>();
+    private transient List<Animation> animations = new ArrayList<>(); // For individual animations.
 
     public Cutscene(String name, String description, Scene scene) {
         super(name, description, scene);
@@ -20,6 +20,9 @@ public class Cutscene extends SceneData {
     }
 
     public List<Subscene> getSubscenes() {
+        if (subscenes == null) {
+            subscenes = new ArrayList<>();
+        }
         return subscenes;
     }
 
@@ -28,6 +31,9 @@ public class Cutscene extends SceneData {
     }
 
     public List<Animation> getAnimations() {
+        if (animations == null) {
+            animations = new ArrayList<>();
+        }
         return animations;
     }
 }
