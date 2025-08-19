@@ -7,6 +7,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.cameraAngle.CameraAngleGroup;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,15 +23,16 @@ public class Scene extends NarrativeEntry {
 
     private final List<CharacterStory> npcs = new ArrayList<>();
 
-    private int rank = 1;
+    private int rank;
 
     public Scene(String name, String description, Chapter chapter) {
         super(name, description);
         this.chapter = chapter;
+        this.rank = chapter.getScenes().size() + 1;
     }
 
     public String knotName() {
-        return "chapter_" + chapter.getIndex() + "_" + name.toLowerCase();
+        return "chapter_" + chapter.getIndex() + "_" + Util.snakeCase(name.toLowerCase());
     }
 
     public Animation getAnimationByName(String name) {

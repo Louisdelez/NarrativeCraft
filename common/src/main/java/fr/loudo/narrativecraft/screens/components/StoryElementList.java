@@ -1,0 +1,121 @@
+package fr.loudo.narrativecraft.screens.components;
+
+import fr.loudo.narrativecraft.util.ImageFontConstants;
+import fr.loudo.narrativecraft.util.Translation;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ContainerObjectSelectionList;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.screens.ConfirmScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class StoryElementList extends ContainerObjectSelectionList<StoryElementList.Entry> {
+
+    public StoryElementList(Minecraft minecraft, Screen screen, List<StoryEntryData> entriesData, boolean editButton) {
+        super(minecraft, 240, screen.width, screen.height, 25);
+        for (StoryEntryData data : entriesData) {
+            this.addEntry(new Entry(data, screen, editButton));
+        }
+    }
+
+    public static class StoryEntryData {
+        public final Button mainButton;
+        public List<Button> extraButtons;
+        public Runnable onDelete;
+        public Runnable onUpdate;
+
+        public StoryEntryData(Button mainButton, List<Button> extraButtons, Runnable onUpdate, Runnable onDelete) {
+            this.mainButton = mainButton;
+            this.extraButtons = extraButtons;
+            this.onUpdate = onUpdate;
+            this.onDelete = onDelete;
+        }
+
+        public StoryEntryData(Button mainButton, Runnable onUpdate, Runnable onDelete) {
+            this.mainButton = mainButton;
+            this.onUpdate = onUpdate;
+            this.onDelete = onDelete;
+        }
+
+        public StoryEntryData(Button mainButton) {
+            this.mainButton = mainButton;
+        }
+    }
+
+    public static class Entry extends ContainerObjectSelectionList.Entry<Entry> {
+        private final int gap = 5;
+        private final Button mainButton;
+        private final List<Button> buttons;
+        private final Screen screen;
+
+        public Entry(StoryEntryData data, Screen screen, boolean editButton) {
+            this.screen = screen;
+            this.mainButton = data.mainButton;
+            this.buttons = new ArrayList<>();
+            buttons.add(mainButton);
+
+            if (data.onUpdate != null && editButton) {
+                buttons.add(createEditButton(data.onUpdate));
+                buttons.add(createRemoveButton(data.onDelete));
+            }
+
+            if (data.extraButtons != null) {
+                data.extraButtons.forEach(button -> {
+                    button.setWidth(20);
+                });
+                buttons.addAll(data.extraButtons);
+            }
+        }
+
+        private Button createEditButton(Runnable onUpdate) {
+            return Button.builder(ImageFontConstants.EDIT, btn -> {
+                onUpdate.run();
+            }).width(20).build();
+        }
+
+        private Button createRemoveButton(Runnable onDelete) {
+            return Button.builder(ImageFontConstants.REMOVE, btn -> {
+                ConfirmScreen confirm = new ConfirmScreen(b -> {
+                    if (b) {
+                        onDelete.run();
+                    } else {
+                        Minecraft.getInstance().setScreen(screen);
+                    }
+                }, Component.literal(""), Translation.message("global.confirm_delete"),
+                        CommonComponents.GUI_YES, CommonComponents.GUI_CANCEL);
+                Minecraft.getInstance().setScreen(confirm);
+            }).width(20).build();
+        }
+
+        @Override
+        public void render(GuiGraphics graphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovered, float partial) {
+            int totalWidth = buttons.stream().mapToInt(Button::getWidth).sum() + (buttons.size() - 1) * gap;
+            int x = (screen.width / 2 - totalWidth / 2); //  this line is wrong but sorry my head hurts okay, those mouseX coord shit is driving me crazy
+            if(buttons.size() > 1) {
+                x -= gap;
+            }
+            for (Button button : buttons) {
+                button.setPosition(x, top);
+                button.render(graphics, mouseX, mouseY, partial);
+                x += button.getWidth() + gap;
+            }
+        }
+
+        @Override
+        public List<? extends GuiEventListener> children() {
+            return buttons;
+        }
+
+        @Override
+        public List<? extends NarratableEntry> narratables() {
+            return buttons;
+        }
+    }
+}

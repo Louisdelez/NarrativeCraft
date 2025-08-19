@@ -1,11 +1,11 @@
 package fr.loudo.narrativecraft;
 
+import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import net.minecraft.server.MinecraftServer;
-import org.slf4j.LoggerFactory;
-
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NarrativeCraftMod {
     private static final NarrativeCraftMod instance = new NarrativeCraftMod();
@@ -19,6 +19,7 @@ public class NarrativeCraftMod {
 
     private final CharacterManager characterManager = new CharacterManager();
     private final PlayerSessionManager playerSessionManager = new PlayerSessionManager();
+    private final ChapterManager chapterManager = new ChapterManager();
 
     public static NarrativeCraftMod getInstance() {
         return instance;
@@ -30,5 +31,9 @@ public class NarrativeCraftMod {
 
     public PlayerSessionManager getPlayerSessionManager() {
         return playerSessionManager;
+    }
+
+    public ChapterManager getChapterManager() {
+        return chapterManager;
     }
 }
