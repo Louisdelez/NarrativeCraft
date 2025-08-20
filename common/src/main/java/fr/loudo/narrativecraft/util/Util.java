@@ -27,5 +27,4 @@ public class Util {
         );
         NarrativeCraftMod.LOGGER.error("Unexpected error occurred on NarrativeCraft: ", exception);
     }
-
 }

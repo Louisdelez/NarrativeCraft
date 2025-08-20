@@ -15,7 +15,8 @@ import java.util.Map;
 public interface EditScreenAdapter<T extends NarrativeEntry> {
 
     /**
-     * Init extra fields to EditInfoScreen
+     * Init extra fields to EditInfoScreen.
+     * If you place horizontally, add only widget that has the biggest height.
      */
     void initExtraFields(EditInfoScreen<T> screen, T entry);
 

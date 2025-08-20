@@ -16,7 +16,9 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class EditInfoScreen<T extends NarrativeEntry> extends Screen {
     public final int WIDGET_WIDTH = 190;
@@ -35,6 +37,24 @@ public class EditInfoScreen<T extends NarrativeEntry> extends Screen {
     protected EditScreenAdapter<T> adapter;
 
     public Map<String, Object> extraFields = new HashMap<>();
+
+    public List<String> descriptionPlaceholders = List.of(
+            "Once upon a time... In a wild... wild world...",
+            "Until then is the reason this mod exists!",
+            "Free palestine",
+            "You should try narrative games",
+            "Play Outer Wilds",
+            "This screen was boring to code.",
+            "I'm sure your creating a wonderful story!",
+            "Your gender is valid!",
+            "Easter egg message! No just kidding, not rare at all...",
+            "Play Until Then",
+            "Play Life Is Strange (NOT Double Exposure)",
+            "Do their placeholders have a meaning anymore?",
+            "Watch Frieren!",
+            "Play Signalis",
+            "The pain of your absence is sharp and haunting\nAnd i would give anything not to know it; anything but never knowing you at all, which would be worse"
+    );
 
     /**
      * Creates a new {@code EditInfoScreen}.
@@ -70,7 +90,7 @@ public class EditInfoScreen<T extends NarrativeEntry> extends Screen {
             adapter.initExtraFields(this, narrativeEntry);
             for(Object object : extraFields.values()) {
                 if(object instanceof AbstractWidget widget) {
-                    centerY -= widget.getHeight();
+                    centerY -= widget.getHeight() - GAP;
                 }
             }
         }
@@ -104,7 +124,7 @@ public class EditInfoScreen<T extends NarrativeEntry> extends Screen {
                 EDIT_BOX_DESCRIPTION_HEIGHT,
                 centerX,
                 centerY,
-                Component.literal("Once upon a time...")
+                Component.literal(descriptionPlaceholders.get(new Random().nextInt(0, descriptionPlaceholders.size())))
         );
         descriptionBox.getMultiLineEditBox().setValue(description);
 

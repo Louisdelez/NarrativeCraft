@@ -1,8 +1,10 @@
 package fr.loudo.narrativecraft.files;
 
+import com.google.gson.Gson;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Util;
 import net.minecraft.client.Minecraft;
@@ -244,6 +246,30 @@ public class NarrativeCraftFile {
         updateInkIncludes();
     }
 
+    public static void createCharacterFolder(CharacterStory characterStory) throws IOException {
+        File characterFolder = getCharacterFolder(characterStory);
+        createDirectory(characterFolder, SKINS_FOLDER_NAME);
+        File dataFile = getDataFile(characterFolder);
+        Gson gson = new Gson();
+        try(Writer writer = new BufferedWriter(new FileWriter(dataFile))) {
+            gson.toJson(characterStory, writer);
+        }
+    }
+
+    public static void updateCharacterData(CharacterStory oldCharacter, CharacterStory newCharacter) throws IOException {
+        File dataFile = getDataFile(oldCharacter);
+        Gson gson = new Gson();
+        try(Writer writer = new BufferedWriter(new FileWriter(dataFile))) {
+            gson.toJson(newCharacter, writer);
+        }
+        File oldCharacterFolder = new File(characterDirectory, Util.snakeCase(oldCharacter.getName()));
+        File newCharacterFolder = new File(characterDirectory, Util.snakeCase(newCharacter.getName()));
+        Files.move(oldCharacterFolder.toPath(), newCharacterFolder.toPath());
+    }
+
+    public static void deleteCharacterFolder(CharacterStory characterStory) {
+        deleteDirectory(getCharacterFolder(characterStory));
+    }
 
     public static File getChapterFolder(Chapter chapter) {
         return createDirectory(chaptersDirectory, String.valueOf(chapter.getIndex()));
@@ -282,6 +308,10 @@ public class NarrativeCraftFile {
         return createDirectory(scenesFolder, Util.snakeCase(scene.getName()));
     }
 
+    public static File getCharacterFolder(CharacterStory characterStory) {
+        return createDirectory(characterDirectory, Util.snakeCase(characterStory.getName()));
+    }
+
     private static File getDataFile(Chapter chapter) {
         return getDataFile(getChapterFolder(chapter));
     }
@@ -289,6 +319,10 @@ public class NarrativeCraftFile {
     private static File getDataFile(Scene scene) {
         File dataFolder = createDirectory(getSceneFolder(scene), DATA_FOLDER_NAME);
         return createFile(dataFolder, DATA_FILE_NAME);
+    }
+
+    private static File getDataFile(CharacterStory characterStory) {
+        return createFile(getCharacterFolder(characterStory), DATA_FILE_NAME);
     }
 
     private static File getDataFile(File file) {
