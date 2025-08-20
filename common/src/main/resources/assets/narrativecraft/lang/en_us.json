@@ -6,6 +6,7 @@
   "narrativecraft.global.add": "Add",
   "narrativecraft.global.update": "Update",
   "narrativecraft.global.error": "Error",
+  "narrativecraft.global.confirm_delete": "Are you sure? This can't be undone!",
 
   "narrativecraft.scene.rank": "Rank",
   "narrativecraft.scene.rank_above_scenes_size": "Your rank value is above the size of scenes.",

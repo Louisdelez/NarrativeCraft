@@ -33,9 +33,8 @@ public class CharactersScreen extends StoryElementScreen {
 
         List<StoryElementList.StoryEntryData> entries = characterManager.getCharacterStories().stream()
                 .map(character -> {
-                    Button button = Button.builder(Component.literal(character.getName()), b -> {
-                        //minecraft.setScreen(new EditInfoScreen<>(this, character, new EditScreenCharacterAdapter()));
-                    }).build();
+                    Button button = Button.builder(Component.literal(character.getName()), button1 -> {}).build();
+                    button.active = false;
 
                     return new StoryElementList.StoryEntryData(button, () -> {
                         minecraft.setScreen(new EditInfoScreen<>(this, character, new EditScreenCharacterAdapter()));

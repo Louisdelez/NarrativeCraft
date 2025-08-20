@@ -111,7 +111,7 @@ public class EditInfoScreen<T extends NarrativeEntry> extends Screen {
                 ScreenUtils.Align.VERTICAL
         );
         nameBox.getEditBox().setValue(name);
-        nameBox.getEditBox().setFilter(text -> !text.matches(".*[\\\\/:*?\"<>|].*"));
+        nameBox.getEditBox().setFilter(text -> text.matches("[a-zA-Z0-9 _-]*"));
         this.addRenderableWidget(nameBox.getStringWidget());
         this.addRenderableWidget(nameBox.getEditBox());
 
