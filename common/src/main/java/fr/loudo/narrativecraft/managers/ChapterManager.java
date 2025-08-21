@@ -27,7 +27,36 @@ public class ChapterManager {
         return null;
     }
 
+    public Chapter getChapterByIndex(int index) {
+        for(Chapter chapter : chapters) {
+            if(chapter.getIndex() == index) {
+                return chapter;
+            }
+        }
+        return null;
+    }
+
+    public boolean chapterExists(String name) {
+        for(Chapter chapter : chapters) {
+            if(chapter.getName().equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean chapterExists(int index) {
+        for(Chapter chapter : chapters) {
+            if(chapter.getIndex() == index) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     public List<Chapter> getChapters() {
         return chapters;
     }
+
 }

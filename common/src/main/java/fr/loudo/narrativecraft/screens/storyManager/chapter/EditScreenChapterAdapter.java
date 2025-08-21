@@ -6,6 +6,8 @@ import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.storyManager.EditScreenAdapter;
+import fr.loudo.narrativecraft.util.ScreenUtils;
+import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
@@ -23,8 +25,15 @@ public class EditScreenChapterAdapter implements EditScreenAdapter<Chapter> {
     public void buildFromScreen(Map<String, Object> extraFields, Minecraft minecraft, @Nullable Chapter existing, String name, String description) {
 
         if(existing == null) {
+            ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
+            if(chapterManager.chapterExists(name)) {
+                ScreenUtils.sendToast(
+                        Translation.message("global.error"),
+                        Translation.message("chapter.already_exists", name)
+                );
+                return;
+            }
             try {
-                ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
                 Chapter chapter = new Chapter(name, description, chapterManager.getChapters().size() + 1);
                 chapterManager.addChapter(chapter);
                 NarrativeCraftFile.createChapterDirectory(chapter);

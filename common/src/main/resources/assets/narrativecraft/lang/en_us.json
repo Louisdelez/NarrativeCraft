@@ -1,5 +1,6 @@
 {
-  "narrativecraft.crash.global-message": "An unexpected error occurred trying to execute this action.",
+  "narrativecraft.crash.global-message": "An unexpected error occurred on NarrativeCraft mod.",
+  "narrativecraft.crash.narrative-data": "An unexpected error occurred while initializing narrative data from the world.",
 
   "narrativecraft.global.name": "Name",
   "narrativecraft.global.description": "Description",
@@ -8,9 +9,18 @@
   "narrativecraft.global.error": "Error",
   "narrativecraft.global.confirm_delete": "Are you sure? This can't be undone!",
 
+  "narrativecraft.file.main_ink_warning": "Main ink file, do not write here! If you need to write variables or functions, they have their own separated files.",
+  "narrativecraft.file.vars_placeholder": "Write your variables here.",
+  "narrativecraft.file.funcs_placeholder": "Write your functions here.",
+
+  "narrativecraft.chapter.already_exists": "Chapter %s already exists in the story.",
+
   "narrativecraft.scene.rank": "Rank",
+  "narrativecraft.scene.already_exists": "Scene %s already exists in this chapter.",
   "narrativecraft.scene.rank_above_scenes_size": "Your rank value is above the size of scenes.",
   "narrativecraft.scene.rank_no_under_one": "Rank value cannot be under 1.",
+
+  "narrativecraft.character.already_exists": "Character %s already exists in the story.",
 
   "narrativecraft.screen.story_manager.chapter_list": "Chapters",
   "narrativecraft.screen.story_manager.scene_list": "Scenes of chapter %s",

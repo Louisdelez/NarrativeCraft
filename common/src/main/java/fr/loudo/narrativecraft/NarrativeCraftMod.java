@@ -36,4 +36,10 @@ public class NarrativeCraftMod {
     public ChapterManager getChapterManager() {
         return chapterManager;
     }
+
+    public void clearManagers() {
+        chapterManager.getChapters().clear();
+        playerSessionManager.getPlayerSessions().clear();
+        characterManager.getCharacterStories().clear();
+    }
 }

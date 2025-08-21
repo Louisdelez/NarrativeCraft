@@ -14,6 +14,6 @@ public class LifecycleEvent {
     }
 
     private static void onServerStart(ServerStartedEvent startedEvent) {
-        OnLifecycle.execute(startedEvent.getServer());
+        OnLifecycle.serverStart(startedEvent.getServer());
     }
 }

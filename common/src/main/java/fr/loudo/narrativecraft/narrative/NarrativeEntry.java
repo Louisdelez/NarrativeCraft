@@ -1,6 +1,6 @@
 package fr.loudo.narrativecraft.narrative;
 
-public abstract class NarrativeEntry {
+public class NarrativeEntry {
     protected String name;
     protected String description;
 

@@ -53,6 +53,13 @@ public class EditScreenSceneAdapter implements EditScreenAdapter<Scene> {
     public void buildFromScreen(Map<String, Object> extraFields, Minecraft minecraft, @Nullable Scene existing, String name, String description) {
 
         if(existing == null) {
+            if(chapter.sceneExists(name)) {
+                ScreenUtils.sendToast(
+                        Translation.message("global.error"),
+                        Translation.message("scene.already_exists", name, chapter.getIndex())
+                );
+                return;
+            }
             Scene scene = new Scene(name, description, chapter);
             try {
                 NarrativeCraftFile.createSceneFolder(scene);

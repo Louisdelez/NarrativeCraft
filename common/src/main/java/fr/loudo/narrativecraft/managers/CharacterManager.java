@@ -27,7 +27,17 @@ public class CharacterManager {
         return null;
     }
 
+    public boolean characterExists(String name) {
+        for(CharacterStory characterStory : characterStories) {
+            if(characterStory.getName().equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public List<CharacterStory> getCharacterStories() {
         return characterStories;
     }
+
 }

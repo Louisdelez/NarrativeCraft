@@ -8,6 +8,7 @@ import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.storyManager.EditScreenAdapter;
 import fr.loudo.narrativecraft.util.ScreenUtils;
+import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -120,6 +121,13 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
         String year = ((ScreenUtils.LabelBox)extraFields.get("year")).getEditBox().getValue();
         PlayerSkin.Model model = PlayerSkin.Model.valueOf(((Button)extraFields.get("modelBtn")).getMessage().getString());
         CharacterStory newCharacter = new CharacterStory(name, description, day, month, year, model, CharacterType.MAIN);
+        if(characterManager.characterExists(name)) {
+            ScreenUtils.sendToast(
+                    Translation.message("global.error"),
+                    Translation.message("character.already_exists", name)
+            );
+            return;
+        }
         if(existing == null) {
             try {
                 NarrativeCraftFile.createCharacterFolder(newCharacter);
