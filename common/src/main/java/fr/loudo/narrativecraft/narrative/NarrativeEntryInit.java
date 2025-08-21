@@ -8,9 +8,12 @@ import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.character.CharacterType;
+import net.minecraft.client.resources.PlayerSkin;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.Random;
 
 public class NarrativeEntryInit {
 
@@ -81,6 +84,16 @@ public class NarrativeEntryInit {
                 throw new Exception(String.format("Character %s couldn't be initialized", characterFolder.getName()));
             }
             characterManager.addCharacter(characterStory);
+        }
+        if(NarrativeCraftMod.firstTime) {
+            CharacterStory steve = new CharacterStory("Steve", "Steve from Minecraft.", "17", "05", "2009", PlayerSkin.Model.WIDE, CharacterType.MAIN);
+            CharacterStory alex = new CharacterStory("Alex", "Alex from Minecraft.", "22", "08", "2014", PlayerSkin.Model.SLIM, CharacterType.MAIN);
+            characterManager.addCharacter(steve);
+            characterManager.addCharacter(alex);
+            if(new Random().nextInt(0, 500) >= 445) {
+                CharacterStory herobrine = new CharacterStory("Herobrine", "You can't escape me. §kYour story is now mine...", "00", "00", "9999", PlayerSkin.Model.WIDE, CharacterType.MAIN);
+                characterManager.addCharacter(herobrine);
+            }
         }
     }
 

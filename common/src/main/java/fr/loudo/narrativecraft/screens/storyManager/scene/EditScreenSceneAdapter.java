@@ -5,6 +5,7 @@ import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.storyManager.EditScreenAdapter;
+import fr.loudo.narrativecraft.screens.storyManager.chapter.ChaptersScreen;
 import fr.loudo.narrativecraft.util.ScreenUtils;
 import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
@@ -65,7 +66,7 @@ public class EditScreenSceneAdapter implements EditScreenAdapter<Scene> {
                 NarrativeCraftFile.createSceneFolder(scene);
                 chapter.addScene(scene);
                 NarrativeCraftFile.updateInkIncludes();
-                minecraft.setScreen(new ScenesScreen(chapter));
+                minecraft.setScreen(new ScenesScreen(chapter, new ChaptersScreen()));
             } catch (Exception e) {
                 chapter.removeScene(scene);
                 Util.sendCrashMessage(minecraft.player, e);
@@ -95,7 +96,7 @@ public class EditScreenSceneAdapter implements EditScreenAdapter<Scene> {
                existing.setDescription(description);
                chapter.setSceneRank(existing, rank);
                NarrativeCraftFile.updateInkIncludes();
-               minecraft.setScreen(new ScenesScreen(chapter));
+               minecraft.setScreen(new ScenesScreen(chapter, new ChaptersScreen()));
            } catch (Exception e) {
                existing.setName(oldScene.getName());
                existing.setDescription(oldScene.getDescription());

@@ -10,6 +10,7 @@ import fr.loudo.narrativecraft.screens.storyManager.chapter.ChaptersScreen;
 import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
@@ -19,8 +20,8 @@ public class ScenesScreen extends StoryElementScreen {
 
     private final Chapter chapter;
 
-    public ScenesScreen(Chapter chapter) {
-        super(Translation.message("screen.story_manager.scene_list", chapter.getIndex()));
+    public ScenesScreen(Chapter chapter, Screen lastScreen) {
+        super(Translation.message("screen.story_manager.scene_list", chapter.getIndex()), lastScreen);
         this.chapter = chapter;
     }
 
@@ -48,7 +49,7 @@ public class ScenesScreen extends StoryElementScreen {
         List<StoryElementList.StoryEntryData> entries = chapter.getSortedSceneList().stream()
                 .map(scene -> {
                     Button button = Button.builder(Component.literal(scene.getName()), b -> {
-//                        this.minecraft.setScreen(new ScenesMenuScreen(scene));
+                        this.minecraft.setScreen(new ScenesMenuScreen(scene, this));
                     }).build();
                     return new StoryElementList.StoryEntryData(button, () -> {
                         minecraft.setScreen(new EditInfoScreen<>(this, scene, new EditScreenSceneAdapter(chapter)));
@@ -59,7 +60,7 @@ public class ScenesScreen extends StoryElementScreen {
                              if(scene.getRank() == 1 && chapter.getSortedSceneList().size() > 1) {
                                  NarrativeCraftFile.updateMasterSceneKnot(chapter.getSortedSceneList().getFirst());
                              }
-                             minecraft.setScreen(new ScenesScreen(chapter));
+                             minecraft.setScreen(new ScenesScreen(chapter, new ChaptersScreen()));
                         } catch (Exception e) {
                             chapter.addScene(scene);
                             chapter.setSceneRank(scene, scene.getRank());

@@ -121,14 +121,14 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
         String year = ((ScreenUtils.LabelBox)extraFields.get("year")).getEditBox().getValue();
         PlayerSkin.Model model = PlayerSkin.Model.valueOf(((Button)extraFields.get("modelBtn")).getMessage().getString());
         CharacterStory newCharacter = new CharacterStory(name, description, day, month, year, model, CharacterType.MAIN);
-        if(characterManager.characterExists(name)) {
-            ScreenUtils.sendToast(
-                    Translation.message("global.error"),
-                    Translation.message("character.already_exists", name)
-            );
-            return;
-        }
         if(existing == null) {
+            if(characterManager.characterExists(name)) {
+                ScreenUtils.sendToast(
+                        Translation.message("global.error"),
+                        Translation.message("character.already_exists", name)
+                );
+                return;
+            }
             try {
                 NarrativeCraftFile.createCharacterFolder(newCharacter);
                 characterManager.addCharacter(newCharacter);
@@ -140,8 +140,10 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
         } else {
             try {
                 NarrativeCraftFile.updateCharacterData(existing, newCharacter);
-                characterManager.removeCharacter(existing);
-                characterManager.addCharacter(newCharacter);
+                existing.setName(newCharacter.getName());
+                existing.setDescription(newCharacter.getDescription());
+                existing.setBirthDate(newCharacter.getBirthDate());
+                existing.setModel(newCharacter.getModel());
                 minecraft.setScreen(new CharactersScreen());
             } catch (Exception e) {
                 Util.sendCrashMessage(minecraft.player, e);

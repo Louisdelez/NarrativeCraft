@@ -8,6 +8,11 @@
   "narrativecraft.global.update": "Update",
   "narrativecraft.global.error": "Error",
   "narrativecraft.global.confirm_delete": "Are you sure? This can't be undone!",
+  "narrativecraft.global.animation": "Animation",
+  "narrativecraft.global.subscene": "Subscene",
+  "narrativecraft.global.npc": "Npc",
+  "narrativecraft.global.cutscene": "Cutscene",
+  "narrativecraft.global.interaction": "Interaction",
 
   "narrativecraft.file.main_ink_warning": "Main ink file, do not write here! If you need to write variables or functions, they have their own separated files.",
   "narrativecraft.file.vars_placeholder": "Write your variables here.",
@@ -24,5 +29,6 @@
 
   "narrativecraft.screen.story_manager.chapter_list": "Chapters",
   "narrativecraft.screen.story_manager.scene_list": "Scenes of chapter %s",
+  "narrativecraft.screen.story_manager.scene_menu": "Scene menu of %s",
   "narrativecraft.screen.edit_info.name_must": "You must have a name!"
 }

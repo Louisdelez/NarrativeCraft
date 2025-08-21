@@ -15,9 +15,16 @@ public abstract class StoryElementScreen extends Screen {
     protected final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     protected LinearLayout linearlayout;
     protected StoryElementList storyElementList;
+    protected Screen lastScreen;
 
-    protected StoryElementScreen(Component title) {
+    protected StoryElementScreen(Component title, Screen lastScreen) {
         super(title);
+        this.lastScreen = lastScreen;
+    }
+
+    @Override
+    public void onClose() {
+        minecraft.setScreen(lastScreen);
     }
 
     @Override
