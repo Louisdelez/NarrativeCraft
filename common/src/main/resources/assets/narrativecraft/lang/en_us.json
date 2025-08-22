@@ -25,11 +25,16 @@
   "narrativecraft.scene.rank_above_scenes_size": "Your rank value is above the size of scenes.",
   "narrativecraft.scene.rank_no_under_one": "Rank value cannot be under 1.",
 
+  "narrativecraft.subscene.already_exists": "Subscene %s already exists in scene %s",
+
+  "narrativecraft.cutscene.already_exists": "Cutscene %s already exists in scene %s",
+
   "narrativecraft.character.already_exists": "Character %s already exists in the story.",
 
   "narrativecraft.screen.story_manager.chapter_list": "Chapters",
   "narrativecraft.screen.story_manager.scene_list": "Scenes of chapter %s",
   "narrativecraft.screen.story_manager.scene_menu": "Scene menu of %s",
   "narrativecraft.screen.story_manager.subscene_list": "Subscenes of scene %s",
+  "narrativecraft.screen.story_manager.cutscene_list": "Cutscenes of scene %s",
   "narrativecraft.screen.edit_info.name_must": "You must have a name!"
 }

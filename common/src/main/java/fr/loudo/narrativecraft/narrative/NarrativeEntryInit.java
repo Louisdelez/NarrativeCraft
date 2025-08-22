@@ -9,9 +9,11 @@ import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
+import fr.loudo.narrativecraft.serialization.CutsceneSerializer;
 import fr.loudo.narrativecraft.serialization.SubsceneSerializer;
 import net.minecraft.client.resources.PlayerSkin;
 
@@ -74,6 +76,7 @@ public class NarrativeEntryInit {
             Scene scene = new Scene(sceneData.getName(), sceneData.getDescription(), chapter);
             scene.setRank(sceneData.getRank());
             initSubscenes(scene);
+            initCutscenes(scene);
             chapter.addScene(scene);
         }
     }
@@ -89,6 +92,19 @@ public class NarrativeEntryInit {
         List<Subscene> subscenes = gson.fromJson(content, type);
         if(subscenes == null) return;
         scene.getSubscenes().addAll(subscenes);
+    }
+
+    private static void initCutscenes(Scene scene) throws IOException {
+        File cutsceneFile = NarrativeCraftFile.getCutsceneFile(scene);
+        String content = Files.readString(cutsceneFile.toPath());
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Cutscene.class, new CutsceneSerializer(scene))
+                .create();
+
+        Type type = new TypeToken<List<Cutscene>>() {}.getType();
+        List<Cutscene> cutscenes = gson.fromJson(content, type);
+        if(cutscenes == null) return;
+        scene.getCutscenes().addAll(cutscenes);
     }
 
     private static void initCharacters() throws Exception {

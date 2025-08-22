@@ -4,6 +4,7 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.screens.components.StoryElementList;
 import fr.loudo.narrativecraft.screens.storyManager.StoryElementScreen;
+import fr.loudo.narrativecraft.screens.storyManager.cutscene.CutscenesScreen;
 import fr.loudo.narrativecraft.screens.storyManager.subscene.SubscenesScreen;
 import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.Util;
@@ -45,7 +46,7 @@ public class ScenesMenuScreen extends StoryElementScreen {
         );
         StoryElementList.StoryEntryData cutscene = new StoryElementList.StoryEntryData(
                 Button.builder(Translation.message("global.cutscene"), button -> {
-
+                    minecraft.setScreen(new CutscenesScreen(scene));
                 }).build()
         );
         StoryElementList.StoryEntryData interaction = new StoryElementList.StoryEntryData(

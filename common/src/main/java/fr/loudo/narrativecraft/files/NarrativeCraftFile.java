@@ -6,8 +6,10 @@ import com.google.gson.GsonBuilder;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.serialization.CutsceneSerializer;
 import fr.loudo.narrativecraft.serialization.SubsceneSerializer;
 import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Translation;
@@ -255,10 +257,18 @@ public class NarrativeCraftFile {
     }
 
     public static void updateSubsceneFile(Scene scene) throws IOException {
-        File subsceneFile = createFile(getDataFolder(scene), SUBSCENES_FILE_NAME);
+        File subsceneFile = getSubsceneFile(scene);
         Gson gson = new GsonBuilder().registerTypeAdapter(Subscene.class, new SubsceneSerializer(scene)).create();
         try(Writer writer = new BufferedWriter(new FileWriter(subsceneFile))) {
             gson.toJson(scene.getSubscenes(), writer);
+        }
+    }
+
+    public static void updateCutsceneFile(Scene scene) throws IOException {
+        File cutsceneFile = getCutsceneFile(scene);
+        Gson gson = new GsonBuilder().registerTypeAdapter(Cutscene.class, new CutsceneSerializer(scene)).create();
+        try(Writer writer = new BufferedWriter(new FileWriter(cutsceneFile))) {
+            gson.toJson(scene.getCutscenes(), writer);
         }
     }
 
@@ -334,6 +344,10 @@ public class NarrativeCraftFile {
 
     public static File getSubsceneFile(Scene scene) {
         return createFile(getDataFolder(scene), SUBSCENES_FILE_NAME);
+    }
+
+    public static File getCutsceneFile(Scene scene) {
+        return createFile(getDataFolder(scene), CUTSCENES_FILE_NAME);
     }
 
     public static File getDataFolder(Scene scene) {

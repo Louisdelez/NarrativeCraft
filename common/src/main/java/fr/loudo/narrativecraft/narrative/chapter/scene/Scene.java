@@ -53,6 +53,24 @@ public class Scene extends NarrativeEntry {
         return null;
     }
 
+    public boolean subsceneExists(String name) {
+        for(Subscene subscene : subscenes) {
+            if(subscene.getName().equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean cutsceneExists(String name) {
+        for(Cutscene cutscene : cutscenes) {
+            if(cutscene.getName().equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public CharacterStory getNpcByName(String name) {
         for(CharacterStory characterStory : npcs) {
             if(characterStory.getName().equalsIgnoreCase(name)) {
@@ -69,6 +87,15 @@ public class Scene extends NarrativeEntry {
 
     public void removeSubscene(Subscene subscene) {
         subscenes.remove(subscene);
+    }
+
+    public void addCutscene(Cutscene cutscene) {
+        if(cutscenes.contains(cutscene)) return;
+        cutscenes.add(cutscene);
+    }
+
+    public void removeCutscene(Cutscene cutscene) {
+        cutscenes.remove(cutscene);
     }
 
     public Chapter getChapter() {
@@ -102,5 +129,4 @@ public class Scene extends NarrativeEntry {
     public void setRank(int rank) {
         this.rank = rank;
     }
-
 }
