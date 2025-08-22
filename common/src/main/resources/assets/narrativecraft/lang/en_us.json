@@ -11,6 +11,7 @@
   "narrativecraft.global.animation": "Animation",
   "narrativecraft.global.subscene": "Subscene",
   "narrativecraft.global.npc": "Npc",
+  "narrativecraft.global.camera_angle": "Camera angle",
   "narrativecraft.global.cutscene": "Cutscene",
   "narrativecraft.global.interaction": "Interaction",
 
@@ -36,5 +37,6 @@
   "narrativecraft.screen.story_manager.scene_menu": "Scene menu of %s",
   "narrativecraft.screen.story_manager.subscene_list": "Subscenes of scene %s",
   "narrativecraft.screen.story_manager.cutscene_list": "Cutscenes of scene %s",
+  "narrativecraft.screen.story_manager.camera_angle_list": "Camera angles of scene %s",
   "narrativecraft.screen.edit_info.name_must": "You must have a name!"
 }

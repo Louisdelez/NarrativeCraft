@@ -3,6 +3,7 @@ package fr.loudo.narrativecraft.serialization;
 import com.google.gson.*;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 
 import java.lang.reflect.Type;
@@ -23,9 +24,7 @@ public class SubsceneSerializer implements JsonSerializer<Subscene>, JsonDeseria
 
     @Override
     public JsonElement serialize(Subscene subscene, Type typeOfSrc, JsonSerializationContext context) {
-        JsonObject obj = new JsonObject();
-        obj.addProperty("name", subscene.getName());
-        obj.addProperty("description", subscene.getDescription());
+        JsonObject obj = new Gson().toJsonTree(subscene).getAsJsonObject();
 
         JsonArray animationsArray = new JsonArray();
         for (String name : subscene.getAnimationsName()) {
@@ -40,11 +39,8 @@ public class SubsceneSerializer implements JsonSerializer<Subscene>, JsonDeseria
     public Subscene deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject obj = json.getAsJsonObject();
 
-        Subscene subscene = new Subscene(
-                obj.get("name").getAsString(),
-                obj.get("description").getAsString(),
-                scene
-        );
+        Subscene subscene = new Gson().fromJson(json, Subscene.class);
+        subscene.setScene(scene);
 
         if (obj.has(animationsKey)) {
             for (JsonElement e : obj.getAsJsonArray(animationsKey)) {

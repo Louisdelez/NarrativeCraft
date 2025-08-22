@@ -272,6 +272,14 @@ public class NarrativeCraftFile {
         }
     }
 
+    public static void updateCameraAngleGroup(Scene scene) throws IOException {
+        File cameraAngelGroupFile = getCameraAngelGroupFile(scene);
+        Gson gson = new GsonBuilder().registerTypeAdapter(Subscene.class, new SubsceneSerializer(scene)).create();
+        try(Writer writer = new BufferedWriter(new FileWriter(cameraAngelGroupFile))) {
+            gson.toJson(scene.getCameraAngleGroups(), writer);
+        }
+    }
+
     public static void deleteSceneDirectory(Scene scene) throws IOException {
         File sceneFolder = getSceneFolder(scene);
         deleteDirectory(sceneFolder);
@@ -349,6 +357,11 @@ public class NarrativeCraftFile {
     public static File getCutsceneFile(Scene scene) {
         return createFile(getDataFolder(scene), CUTSCENES_FILE_NAME);
     }
+
+    public static File getCameraAngelGroupFile(Scene scene) {
+        return createFile(getDataFolder(scene), CAMERA_ANGLES_FILE_NAME);
+    }
+
 
     public static File getDataFolder(Scene scene) {
         File sceneFolder = getSceneFolder(scene);

@@ -16,7 +16,7 @@ public class Cutscene extends SceneData {
     }
 
     public List<String> getSubscenesName() {
-        return subscenes.stream().map(Subscene::getName).toList();
+        return getSubscenes().stream().map(Subscene::getName).toList();
     }
 
     public List<Subscene> getSubscenes() {
@@ -27,7 +27,7 @@ public class Cutscene extends SceneData {
     }
 
     public List<String> getAnimationsName() {
-        return animations.stream().map(Animation::getName).toList();
+        return getAnimations().stream().map(Animation::getName).toList();
     }
 
     public List<Animation> getAnimations() {

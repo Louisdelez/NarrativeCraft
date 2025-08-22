@@ -71,6 +71,24 @@ public class Scene extends NarrativeEntry {
         return false;
     }
 
+    public void addCameraAngleGroup(CameraAngleGroup cameraAngleGroup) {
+        if(cameraAngleGroups.contains(cameraAngleGroup)) return;
+        cameraAngleGroups.add(cameraAngleGroup);
+    }
+
+    public void removeCameraAngleGroup(CameraAngleGroup cameraAngleGroup) {
+        cameraAngleGroups.remove(cameraAngleGroup);
+    }
+
+    public boolean cameraAngleExists(String name) {
+        for(CameraAngleGroup cameraAngleGroup : cameraAngleGroups) {
+            if(cameraAngleGroup.getName().equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public CharacterStory getNpcByName(String name) {
         for(CharacterStory characterStory : npcs) {
             if(characterStory.getName().equalsIgnoreCase(name)) {

@@ -24,10 +24,8 @@ public class CutsceneSerializer implements JsonSerializer<Cutscene>, JsonDeseria
     }
 
     @Override
-    public JsonElement serialize(Cutscene cutscene, Type typeOfSrc, JsonSerializationContext context) {
-        JsonObject obj = new JsonObject();
-        obj.addProperty("name", cutscene.getName());
-        obj.addProperty("description", cutscene.getDescription());
+    public JsonElement serialize(Cutscene cutscene, Type typeOfSrc, JsonSerializationContext context) {;
+        JsonObject obj = new Gson().toJsonTree(cutscene).getAsJsonObject();
 
         JsonArray subscenesArray = new JsonArray();
         for (String name : cutscene.getSubscenesName()) {
@@ -48,11 +46,8 @@ public class CutsceneSerializer implements JsonSerializer<Cutscene>, JsonDeseria
     public Cutscene deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject obj = json.getAsJsonObject();
 
-        Cutscene cutscene = new Cutscene(
-                obj.get("name").getAsString(),
-                obj.get("description").getAsString(),
-                scene
-        );
+        Cutscene cutscene = new Gson().fromJson(json, Cutscene.class);
+        cutscene.setScene(scene);
 
         if (obj.has(subscenesKey)) {
             for (JsonElement e : obj.getAsJsonArray(subscenesKey)) {

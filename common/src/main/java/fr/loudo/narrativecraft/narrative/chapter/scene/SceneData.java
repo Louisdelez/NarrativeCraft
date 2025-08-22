@@ -4,7 +4,7 @@ import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 
 public class SceneData extends NarrativeEntry {
 
-    protected Scene scene;
+    protected transient Scene scene;
 
     public SceneData(String name, String description, Scene scene) {
         super(name, description);

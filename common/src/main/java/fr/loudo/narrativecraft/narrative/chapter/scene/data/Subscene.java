@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Subscene extends SceneData {
 
-    private List<Animation> animations = new ArrayList<>();
+    private transient List<Animation> animations = new ArrayList<>();
 
     public Subscene(String name, String description, Scene scene) {
         super(name, description, scene);
@@ -22,6 +22,6 @@ public class Subscene extends SceneData {
     }
 
     public List<String> getAnimationsName() {
-        return animations.stream().map(Animation::getName).toList();
+        return getAnimations().stream().map(Animation::getName).toList();
     }
 }
