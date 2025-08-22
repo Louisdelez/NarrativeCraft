@@ -30,5 +30,6 @@
   "narrativecraft.screen.story_manager.chapter_list": "Chapters",
   "narrativecraft.screen.story_manager.scene_list": "Scenes of chapter %s",
   "narrativecraft.screen.story_manager.scene_menu": "Scene menu of %s",
+  "narrativecraft.screen.story_manager.subscene_list": "Subscenes of scene %s",
   "narrativecraft.screen.edit_info.name_must": "You must have a name!"
 }

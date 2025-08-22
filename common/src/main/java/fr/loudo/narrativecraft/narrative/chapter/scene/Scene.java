@@ -62,6 +62,15 @@ public class Scene extends NarrativeEntry {
         return null;
     }
 
+    public void addSubscene(Subscene subscene) {
+        if(subscenes.contains(subscene)) return;
+        subscenes.add(subscene);
+    }
+
+    public void removeSubscene(Subscene subscene) {
+        subscenes.remove(subscene);
+    }
+
     public Chapter getChapter() {
         return chapter;
     }
@@ -93,4 +102,5 @@ public class Scene extends NarrativeEntry {
     public void setRank(int rank) {
         this.rank = rank;
     }
+
 }

@@ -66,7 +66,7 @@ public class EditScreenSceneAdapter implements EditScreenAdapter<Scene> {
                 NarrativeCraftFile.createSceneFolder(scene);
                 chapter.addScene(scene);
                 NarrativeCraftFile.updateInkIncludes();
-                minecraft.setScreen(new ScenesScreen(chapter, new ChaptersScreen()));
+                minecraft.setScreen(new ScenesScreen(chapter));
             } catch (Exception e) {
                 chapter.removeScene(scene);
                 Util.sendCrashMessage(minecraft.player, e);
@@ -96,7 +96,7 @@ public class EditScreenSceneAdapter implements EditScreenAdapter<Scene> {
                existing.setDescription(description);
                chapter.setSceneRank(existing, rank);
                NarrativeCraftFile.updateInkIncludes();
-               minecraft.setScreen(new ScenesScreen(chapter, new ChaptersScreen()));
+               minecraft.setScreen(new ScenesScreen(chapter));
            } catch (Exception e) {
                existing.setName(oldScene.getName());
                existing.setDescription(oldScene.getDescription());

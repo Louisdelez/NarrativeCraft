@@ -1,10 +1,14 @@
 package fr.loudo.narrativecraft.files;
 
+import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.serialization.SubsceneSerializer;
 import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
@@ -13,6 +17,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -249,6 +254,14 @@ public class NarrativeCraftFile {
         updateInkIncludes();
     }
 
+    public static void updateSubsceneFile(Scene scene) throws IOException {
+        File subsceneFile = createFile(getDataFolder(scene), SUBSCENES_FILE_NAME);
+        Gson gson = new GsonBuilder().registerTypeAdapter(Subscene.class, new SubsceneSerializer(scene)).create();
+        try(Writer writer = new BufferedWriter(new FileWriter(subsceneFile))) {
+            gson.toJson(scene.getSubscenes(), writer);
+        }
+    }
+
     public static void deleteSceneDirectory(Scene scene) throws IOException {
         File sceneFolder = getSceneFolder(scene);
         deleteDirectory(sceneFolder);
@@ -319,6 +332,15 @@ public class NarrativeCraftFile {
         return createDirectory(scenesFolder, Util.snakeCase(scene.getName()));
     }
 
+    public static File getSubsceneFile(Scene scene) {
+        return createFile(getDataFolder(scene), SUBSCENES_FILE_NAME);
+    }
+
+    public static File getDataFolder(Scene scene) {
+        File sceneFolder = getSceneFolder(scene);
+        return createDirectory(sceneFolder, DATA_FOLDER_NAME);
+    }
+
     public static File getCharacterFolder(CharacterStory characterStory) {
         return createDirectory(characterDirectory, Util.snakeCase(characterStory.getName()));
     }
@@ -354,5 +376,4 @@ public class NarrativeCraftFile {
         File sceneFile = getSceneFolder(scene);
         return createFile(sceneFile, Util.snakeCase(scene.getName()) + EXTENSION_SCRIPT_FILE);
     }
-
 }

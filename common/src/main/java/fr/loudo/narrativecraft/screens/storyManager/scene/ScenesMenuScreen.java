@@ -4,6 +4,7 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.screens.components.StoryElementList;
 import fr.loudo.narrativecraft.screens.storyManager.StoryElementScreen;
+import fr.loudo.narrativecraft.screens.storyManager.subscene.SubscenesScreen;
 import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
@@ -16,9 +17,14 @@ public class ScenesMenuScreen extends StoryElementScreen {
 
     private final Scene scene;
 
-    public ScenesMenuScreen(Scene scene, Screen lastScreen) {
-        super(Translation.message("screen.story_manager.scene_menu", scene.getName()), lastScreen);
+    public ScenesMenuScreen(Scene scene) {
+        super(Translation.message("screen.story_manager.scene_menu", scene.getName()));
         this.scene = scene;
+    }
+
+    @Override
+    public void onClose() {
+        minecraft.setScreen(new ScenesScreen(scene.getChapter()));
     }
 
     protected void addTitle() {
@@ -54,7 +60,7 @@ public class ScenesMenuScreen extends StoryElementScreen {
         );
         StoryElementList.StoryEntryData subscene = new StoryElementList.StoryEntryData(
                 Button.builder(Translation.message("global.subscene"), button -> {
-
+                    minecraft.setScreen(new SubscenesScreen(scene));
                 }).build()
         );
         List<StoryElementList.StoryEntryData> entries = List.of(animation, cutscene, interaction, npc, subscene);

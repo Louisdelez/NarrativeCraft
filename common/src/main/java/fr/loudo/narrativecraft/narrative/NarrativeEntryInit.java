@@ -1,18 +1,25 @@
 package fr.loudo.narrativecraft.narrative;
 
+import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
+import fr.loudo.narrativecraft.serialization.SubsceneSerializer;
 import net.minecraft.client.resources.PlayerSkin;
 
 import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Random;
 
 public class NarrativeEntryInit {
@@ -66,8 +73,22 @@ public class NarrativeEntryInit {
             }
             Scene scene = new Scene(sceneData.getName(), sceneData.getDescription(), chapter);
             scene.setRank(sceneData.getRank());
+            initSubscenes(scene);
             chapter.addScene(scene);
         }
+    }
+
+    private static void initSubscenes(Scene scene) throws IOException {
+        File subsceneFile = NarrativeCraftFile.getSubsceneFile(scene);
+        String content = Files.readString(subsceneFile.toPath());
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Subscene.class, new SubsceneSerializer(scene))
+                .create();
+
+        Type type = new TypeToken<List<Subscene>>() {}.getType();
+        List<Subscene> subscenes = gson.fromJson(content, type);
+        if(subscenes == null) return;
+        scene.getSubscenes().addAll(subscenes);
     }
 
     private static void initCharacters() throws Exception {

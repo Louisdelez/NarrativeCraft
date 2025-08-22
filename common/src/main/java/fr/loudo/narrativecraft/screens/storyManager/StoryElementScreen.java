@@ -15,20 +15,14 @@ public abstract class StoryElementScreen extends Screen {
     protected final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     protected LinearLayout linearlayout;
     protected StoryElementList storyElementList;
-    protected Screen lastScreen;
 
-    protected StoryElementScreen(Component title, Screen lastScreen) {
+    protected StoryElementScreen(Component title) {
         super(title);
-        this.lastScreen = lastScreen;
-    }
-
-    @Override
-    public void onClose() {
-        minecraft.setScreen(lastScreen);
     }
 
     @Override
     protected void init() {
+        linearlayout = this.layout.addToHeader(LinearLayout.horizontal()).spacing(8);
         this.addTitle();
         this.addContents();
         this.addFooter();
@@ -37,7 +31,6 @@ public abstract class StoryElementScreen extends Screen {
     }
 
     protected void addTitle() {
-        linearlayout = this.layout.addToHeader(LinearLayout.horizontal()).spacing(8);
         linearlayout.defaultCellSetting().alignVerticallyMiddle();
         linearlayout.addChild(new StringWidget(this.title, this.font));
     }

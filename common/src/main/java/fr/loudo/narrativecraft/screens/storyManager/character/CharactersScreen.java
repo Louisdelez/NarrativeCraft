@@ -14,7 +14,7 @@ import java.util.List;
 
 public class CharactersScreen extends StoryElementScreen {
     public CharactersScreen() {
-        super(Component.literal("Characters"), null);
+        super(Component.literal("Characters"));
     }
 
     @Override

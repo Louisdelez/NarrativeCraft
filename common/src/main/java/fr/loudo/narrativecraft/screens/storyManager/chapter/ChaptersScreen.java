@@ -19,7 +19,7 @@ import java.util.List;
 public class ChaptersScreen extends StoryElementScreen {
 
     public ChaptersScreen() {
-        super(Translation.message("screen.story_manager.chapter_list"), null);
+        super(Translation.message("screen.story_manager.chapter_list"));
     }
 
     protected void addTitle() {
@@ -52,7 +52,7 @@ public class ChaptersScreen extends StoryElementScreen {
                     }
 
                     Button button = Button.builder(Component.literal(label), b -> {
-                        this.minecraft.setScreen(new ScenesScreen(chapter, this));
+                        this.minecraft.setScreen(new ScenesScreen(chapter));
                     }).build();
 
                     return new StoryElementList.StoryEntryData(button, () -> {
