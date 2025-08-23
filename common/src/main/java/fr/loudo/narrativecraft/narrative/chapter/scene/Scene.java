@@ -71,6 +71,15 @@ public class Scene extends NarrativeEntry {
         return false;
     }
 
+    public boolean animationExists(String name) {
+        for(Animation animation : animations) {
+            if(animation.getName().equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void addCameraAngleGroup(CameraAngleGroup cameraAngleGroup) {
         if(cameraAngleGroups.contains(cameraAngleGroup)) return;
         cameraAngleGroups.add(cameraAngleGroup);
@@ -116,6 +125,14 @@ public class Scene extends NarrativeEntry {
         cutscenes.remove(cutscene);
     }
 
+    public void addAnimation(Animation animation) {
+        if(animations.contains(animation)) return;
+        animations.add(animation);
+    }
+
+    public void removeAnimation(Animation animation) {
+        animations.remove(animation);
+    }
     public Chapter getChapter() {
         return chapter;
     }
@@ -147,4 +164,5 @@ public class Scene extends NarrativeEntry {
     public void setRank(int rank) {
         this.rank = rank;
     }
+
 }

@@ -9,11 +9,13 @@ import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.cameraAngle.CameraAngleGroup;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
+import fr.loudo.narrativecraft.serialization.AnimationSerializer;
 import fr.loudo.narrativecraft.serialization.CutsceneSerializer;
 import fr.loudo.narrativecraft.serialization.SubsceneSerializer;
 import net.minecraft.client.resources.PlayerSkin;
@@ -76,10 +78,26 @@ public class NarrativeEntryInit {
             }
             Scene scene = new Scene(sceneData.getName(), sceneData.getDescription(), chapter);
             scene.setRank(sceneData.getRank());
+            initAnimations(scene);
             initSubscenes(scene);
             initCutscenes(scene);
             initCameraAngleGroups(scene);
             chapter.addScene(scene);
+        }
+    }
+
+    private static void initAnimations(Scene scene) throws IOException {
+        File animationFolder = NarrativeCraftFile.getAnimationsFolder(scene);
+        File[] animationsFile = animationFolder.listFiles();
+        if(animationsFile == null) return;
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Animation.class, new AnimationSerializer(scene))
+                .create();
+        for(File animationFile : animationsFile) {
+            String content = Files.readString(animationFile.toPath());
+            Animation animation = gson.fromJson(content, Animation.class);
+            if(animation == null) continue;
+            scene.getAnimations().add(animation);
         }
     }
 
@@ -89,7 +107,6 @@ public class NarrativeEntryInit {
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(Subscene.class, new SubsceneSerializer(scene))
                 .create();
-
         Type type = new TypeToken<List<Subscene>>() {}.getType();
         List<Subscene> subscenes = gson.fromJson(content, type);
         if(subscenes == null) return;
@@ -102,7 +119,6 @@ public class NarrativeEntryInit {
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(Cutscene.class, new CutsceneSerializer(scene))
                 .create();
-
         Type type = new TypeToken<List<Cutscene>>() {}.getType();
         List<Cutscene> cutscenes = gson.fromJson(content, type);
         if(cutscenes == null) return;

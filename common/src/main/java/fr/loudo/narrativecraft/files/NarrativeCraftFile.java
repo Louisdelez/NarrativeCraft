@@ -1,14 +1,15 @@
 package fr.loudo.narrativecraft.files;
 
-import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.serialization.AnimationSerializer;
 import fr.loudo.narrativecraft.serialization.CutsceneSerializer;
 import fr.loudo.narrativecraft.serialization.SubsceneSerializer;
 import fr.loudo.narrativecraft.util.InkUtil;
@@ -19,7 +20,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
 
 import java.io.*;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -280,6 +280,26 @@ public class NarrativeCraftFile {
         }
     }
 
+    public static void updateAnimationFile(Animation newAnimation) throws IOException {
+        File animationsFolder = getAnimationsFolder(newAnimation.getScene());
+        File animationFile = createFile(animationsFolder, Util.snakeCase(newAnimation.getName()) + EXTENSION_DATA_FILE);
+        Gson gson = new GsonBuilder().registerTypeAdapter(Animation.class, new AnimationSerializer(newAnimation.getScene())).create();
+        try(Writer writer = new BufferedWriter(new FileWriter(animationFile))) {
+            gson.toJson(newAnimation, writer);
+        }
+    }
+
+    public static void updateAnimationFile(Animation oldAnimation, Animation newAnimation) throws IOException {
+        File animationsFolder = getAnimationsFolder(newAnimation.getScene());
+        NarrativeCraftFile.updateAnimationFile(newAnimation);
+        new File(animationsFolder, Util.snakeCase(oldAnimation.getName()) + EXTENSION_DATA_FILE).delete();
+    }
+
+    public static void deleteAnimationFile(Animation animation) {
+        File animationsFolder = getAnimationsFolder(animation.getScene());
+        new File(animationsFolder, Util.snakeCase(animation.getName()) + EXTENSION_DATA_FILE).delete();
+    }
+
     public static void deleteSceneDirectory(Scene scene) throws IOException {
         File sceneFolder = getSceneFolder(scene);
         deleteDirectory(sceneFolder);
@@ -343,6 +363,10 @@ public class NarrativeCraftFile {
         try(Writer writer = new BufferedWriter(new FileWriter(mainInkFile))) {
             writer.write(stringBuilder.toString());
         }
+    }
+
+    public static File getAnimationsFolder(Scene scene) {
+        return createDirectory(getDataFolder(scene), ANIMATIONS_FOLDER_NAME);
     }
 
     public static File getSceneFolder(Scene scene) {

@@ -2,7 +2,6 @@ package fr.loudo.narrativecraft.screens.storyManager.subscene;
 
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.storyManager.EditScreenAdapter;
@@ -12,7 +11,6 @@ import fr.loudo.narrativecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.Map;
 
 public class EditScreenSubsceneAdapter implements EditScreenAdapter<Subscene> {

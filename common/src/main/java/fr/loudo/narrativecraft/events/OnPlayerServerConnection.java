@@ -1,14 +1,13 @@
 package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.commands.RecordCommand;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryInit;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.util.FakePlayer;
 import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
 public class OnPlayerServerConnection {
@@ -24,6 +23,7 @@ public class OnPlayerServerConnection {
     public static void playerLeave(ServerPlayer player) {
         if(player instanceof FakePlayer) return;
         clearSession(player);
+        RecordCommand.playerTryingOverride.remove(player);
     }
 
     private static void initSession(ServerPlayer player) {

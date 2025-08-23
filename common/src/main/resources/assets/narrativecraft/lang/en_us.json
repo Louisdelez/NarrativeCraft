@@ -19,12 +19,31 @@
   "narrativecraft.file.vars_placeholder": "Write your variables here.",
   "narrativecraft.file.funcs_placeholder": "Write your functions here.",
 
+  "narrativecraft.session.set": "Your session is now set to §lChapter %d §rand §lScene %s.",
+  "narrativecraft.session.not_set": "You need to set the chapter and scene session.",
+  "narrativecraft.session.cleared": "Session cleared.",
+  "narrativecraft.session.cleared.fail": "You don't have a session set.",
+
+  "narrativecraft.record.start.success": "Record started...",
+  "narrativecraft.record.start.already_recording": "You are currently recording.",
+  "narrativecraft.record.start.no_session": "You need to set the chapter and scene session.",
+  "narrativecraft.record.stop.success": "Record stopped.",
+  "narrativecraft.record.stop.no_recording": "You are not recording.",
+  "narrativecraft.record.save.success": "Record saved animation %s to scene %s of chapter %d.",
+  "narrativecraft.record.save.overwrite": "The animation %s for scene %s of chapter %d is already registered, overwrite? Enter the command again to overwrite.",
+  "narrativecraft.record.save.recorded_nothing": "You recorded nothing!",
+  "narrativecraft.record.save.stop_record_before_save": "Please, stop your record before saving.",
+  "narrativecraft.record.save.fail": "Error while saving animation %s for scene %s of chapter %d!",
+  "narrativecraft.record.start.with_subscenes": "With subscene(s) %s.",
+
   "narrativecraft.chapter.already_exists": "Chapter %s already exists in the story.",
 
   "narrativecraft.scene.rank": "Rank",
   "narrativecraft.scene.already_exists": "Scene %s already exists in this chapter.",
   "narrativecraft.scene.rank_above_scenes_size": "Your rank value is above the size of scenes.",
   "narrativecraft.scene.rank_no_under_one": "Rank value cannot be under 1.",
+
+  "narrativecraft.animation.already_exists": "Animation %s already exists in scene %s.",
 
   "narrativecraft.subscene.already_exists": "Subscene %s already exists in scene %s",
 
@@ -35,6 +54,7 @@
   "narrativecraft.screen.story_manager.chapter_list": "Chapters",
   "narrativecraft.screen.story_manager.scene_list": "Scenes of chapter %s",
   "narrativecraft.screen.story_manager.scene_menu": "Scene menu of %s",
+  "narrativecraft.screen.story_manager.animation_list": "Animations of scene %s",
   "narrativecraft.screen.story_manager.subscene_list": "Subscenes of scene %s",
   "narrativecraft.screen.story_manager.cutscene_list": "Cutscenes of scene %s",
   "narrativecraft.screen.story_manager.camera_angle_list": "Camera angles of scene %s",

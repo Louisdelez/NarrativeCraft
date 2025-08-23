@@ -24,6 +24,15 @@ public class PlayerSession {
         return this.player.getUUID().equals(player.getUUID());
     }
 
+    public boolean isSessionSet() {
+        return chapter != null && scene != null;
+    }
+
+    public void reset() {
+        chapter = null;
+        scene = null;
+    }
+
     public ServerPlayer getPlayer() {
         return player;
     }

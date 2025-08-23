@@ -1,6 +1,8 @@
 package fr.loudo.narrativecraft.narrative;
 
-public class NarrativeEntry {
+import fr.loudo.narrativecraft.screens.components.SelectionScreenSelectable;
+
+public class NarrativeEntry implements SelectionScreenSelectable {
     protected String name;
     protected String description;
 

@@ -1,8 +1,6 @@
 package fr.loudo.narrativecraft;
 
-import fr.loudo.narrativecraft.managers.ChapterManager;
-import fr.loudo.narrativecraft.managers.CharacterManager;
-import fr.loudo.narrativecraft.managers.PlayerSessionManager;
+import fr.loudo.narrativecraft.managers.*;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +18,8 @@ public class NarrativeCraftMod {
     private final CharacterManager characterManager = new CharacterManager();
     private final PlayerSessionManager playerSessionManager = new PlayerSessionManager();
     private final ChapterManager chapterManager = new ChapterManager();
+    private final RecordingManager recordingManager = new RecordingManager();
+    private final PlaybackManager playbackManager = new PlaybackManager();
 
     public static NarrativeCraftMod getInstance() {
         return instance;
@@ -37,9 +37,19 @@ public class NarrativeCraftMod {
         return chapterManager;
     }
 
+    public RecordingManager getRecordingManager() {
+        return recordingManager;
+    }
+
+    public PlaybackManager getPlaybackManager() {
+        return playbackManager;
+    }
+
     public void clearManagers() {
         chapterManager.getChapters().clear();
         playerSessionManager.getPlayerSessions().clear();
         characterManager.getCharacterStories().clear();
+        recordingManager.getRecordings().clear();
+        playbackManager.getPlaybacks().clear();
     }
 }

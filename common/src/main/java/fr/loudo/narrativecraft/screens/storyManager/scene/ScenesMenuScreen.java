@@ -4,13 +4,13 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.screens.components.StoryElementList;
 import fr.loudo.narrativecraft.screens.storyManager.StoryElementScreen;
+import fr.loudo.narrativecraft.screens.storyManager.animations.AnimationsScreen;
 import fr.loudo.narrativecraft.screens.storyManager.cameraAngle.CameraAngleScreen;
 import fr.loudo.narrativecraft.screens.storyManager.cutscene.CutscenesScreen;
 import fr.loudo.narrativecraft.screens.storyManager.subscene.SubscenesScreen;
 import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 
 import java.util.List;
@@ -42,7 +42,7 @@ public class ScenesMenuScreen extends StoryElementScreen {
     protected void addContents() {
         StoryElementList.StoryEntryData animation = new StoryElementList.StoryEntryData(
             Button.builder(Translation.message("global.animation"), button -> {
-
+                minecraft.setScreen(new AnimationsScreen(scene));
             }).build()
         );
         StoryElementList.StoryEntryData cameraAngle = new StoryElementList.StoryEntryData(

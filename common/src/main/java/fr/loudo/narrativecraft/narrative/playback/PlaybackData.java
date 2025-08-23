@@ -1,0 +1,149 @@
+package fr.loudo.narrativecraft.narrative.playback;
+
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.mixin.invoker.LivingEntityInvoker;
+import fr.loudo.narrativecraft.narrative.recording.Location;
+import fr.loudo.narrativecraft.narrative.recording.actions.Action;
+import fr.loudo.narrativecraft.narrative.recording.actions.ActionsData;
+import fr.loudo.narrativecraft.narrative.recording.actions.BreakBlockAction;
+import fr.loudo.narrativecraft.util.FakePlayer;
+import fr.loudo.narrativecraft.util.Util;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.level.Level;
+
+import java.util.List;
+
+public class PlaybackData {
+
+    private final ActionsData actionsData;
+    private final Playback playback;
+    private Entity entity;
+    private int localTick;
+
+    public PlaybackData(ActionsData actionsData, Playback playback) {
+        this.actionsData = actionsData;
+        this.localTick = 0;
+        this.playback = playback;
+    }
+
+    public void tick(int globalTick) {
+        if (globalTick >= actionsData.getSpawnTick()) {
+            if(entity == null) {
+                spawnEntity(actionsData.getLocations().getFirst());
+            }
+        }
+
+        if (entity == null) return;
+
+        List<Location> movements = actionsData.getLocations();
+        if (localTick >= movements.size()) return;
+
+        Location current = movements.get(localTick);
+        Location next = localTick + 1 < movements.size() ? movements.get(localTick + 1) : current;
+
+        moveEntity(current, next, false);
+
+        localTick++;
+    }
+
+    public Level getLevel() {
+        return entity.level();
+    }
+
+    public void changeLocationByTick(int newTick, boolean seamless) {
+        if (newTick >= actionsData.getSpawnTick()) {
+            if(entity == null) {
+                spawnEntity(actionsData.getLocations().getFirst());
+            }
+        } else {
+            killEntity();
+            reset();
+            return;
+        }
+        localTick = newTick - actionsData.getSpawnTick();
+        Location location = actionsData.getLocations().get(localTick);
+        if(seamless) {
+            moveEntity(location, location, true);
+        } else {
+            killEntity();
+            spawnEntity(location);
+        }
+    }
+
+    public void killEntity() {
+        if(entity == null) return;
+        entity.remove(Entity.RemovalReason.KILLED);
+        if(entity instanceof FakePlayer fakePlayer) {
+            Util.removeFakePlayerUUID(fakePlayer);
+        }
+        entity = null;
+    }
+
+    public void spawnEntity(Location location) {
+        if(actionsData.getEntityId() == BuiltInRegistries.ENTITY_TYPE.getId(EntityType.PLAYER)) return;
+        EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.byId(actionsData.getEntityId());
+        entity = entityType.create(entity.level(), EntitySpawnReason.MOB_SUMMONED);
+        if(entity == null) return;
+        try {
+            entity.load(Util.valueInputFromCompoundTag(entity.registryAccess(), actionsData.getNbtData()));
+        } catch (CommandSyntaxException e) {
+            NarrativeCraftMod.LOGGER.error("Unexpected error when trying to load nbt entity data! ", e);
+        }
+        if (entity instanceof Mob mob) mob.setNoAi(true);
+        moveEntity(location, location, true);
+        if(entity instanceof ItemEntity itemEntity) { // Drop Item
+            List<Action> actions = playback.getMasterEntityData().getActions().stream().filter(action -> action instanceof BreakBlockAction && action.getTick() == playback.getTick() - 1).toList();
+            boolean randomizeMotion = !actions.isEmpty();
+            entity = ((LivingEntityInvoker)playback.getMasterEntity()).callCreateItemStackToDrop(itemEntity.getItem(), randomizeMotion, false);
+        }
+        entity.level().addFreshEntity(entity);
+    }
+
+    private void moveEntity(Location current, Location next, boolean silent) {
+        if(entity == null) return;
+        entity.setXRot(current.pitch());
+        entity.setYRot(current.yaw());
+        entity.setYHeadRot(current.yaw());
+        entity.setOnGround(current.onGround());
+        entity.teleportTo(current.x(), current.y(), current.z());
+        if(!silent) {
+            entity.move(MoverType.SELF, Location.deltaLocation(current, next).asVec3());
+        }
+    }
+
+    public void reset() {
+        this.localTick = 0;
+        actionsData.reset(entity);
+    }
+
+    public boolean hasEnded() {
+        return localTick >= actionsData.getLocations().size();
+    }
+
+    public ActionsData getActionsData() {
+        return actionsData;
+    }
+
+    public int getLocalTick() {
+        return localTick;
+    }
+
+    public void setLocalTick(int localTick) {
+        this.localTick = localTick;
+    }
+
+    public Entity getEntity() {
+        return entity;
+    }
+
+    public void setEntity(Entity entity) {
+        this.entity = entity;
+    }
+
+    public Playback getPlayback() {
+        return playback;
+    }
+}

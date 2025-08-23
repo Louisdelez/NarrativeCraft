@@ -4,7 +4,13 @@
   "package": "fr.loudo.narrativecraft.mixin",
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [],
+  "mixins": [
+    "BedItemMixin",
+    "BlockItemMixin",
+    "DoubleHighBlockItemMixin",
+    "LivingEntityFabricMixin",
+    "ServerPlayerFabricMixin"
+  ],
   "client": [],
   "server": [],
   "injectors": {
