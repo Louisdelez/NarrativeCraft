@@ -1,3 +1,26 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.screens.storyManager.scene;
 
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
@@ -9,11 +32,10 @@ import fr.loudo.narrativecraft.screens.storyManager.cameraAngle.CameraAngleScree
 import fr.loudo.narrativecraft.screens.storyManager.cutscene.CutscenesScreen;
 import fr.loudo.narrativecraft.screens.storyManager.subscene.SubscenesScreen;
 import fr.loudo.narrativecraft.util.Translation;
+import java.util.List;
 import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.CommonComponents;
-
-import java.util.List;
 
 public class ScenesMenuScreen extends StoryElementScreen {
 
@@ -35,42 +57,41 @@ public class ScenesMenuScreen extends StoryElementScreen {
     }
 
     protected void addFooter() {
-        this.layout.addToFooter(Button.builder(CommonComponents.GUI_BACK, p_345997_ -> this.onClose()).width(200).build());
+        this.layout.addToFooter(Button.builder(CommonComponents.GUI_BACK, p_345997_ -> this.onClose())
+                .width(200)
+                .build());
     }
 
     @Override
     protected void addContents() {
-        StoryElementList.StoryEntryData animation = new StoryElementList.StoryEntryData(
-            Button.builder(Translation.message("global.animation"), button -> {
-                minecraft.setScreen(new AnimationsScreen(scene));
-            }).build()
-        );
+        StoryElementList.StoryEntryData animation =
+                new StoryElementList.StoryEntryData(Button.builder(Translation.message("global.animation"), button -> {
+                            minecraft.setScreen(new AnimationsScreen(scene));
+                        })
+                        .build());
         StoryElementList.StoryEntryData cameraAngle = new StoryElementList.StoryEntryData(
                 Button.builder(Translation.message("global.camera_angle"), button -> {
-                    minecraft.setScreen(new CameraAngleScreen(scene));
-                }).build()
-        );
-        StoryElementList.StoryEntryData cutscene = new StoryElementList.StoryEntryData(
-                Button.builder(Translation.message("global.cutscene"), button -> {
-                    minecraft.setScreen(new CutscenesScreen(scene));
-                }).build()
-        );
+                            minecraft.setScreen(new CameraAngleScreen(scene));
+                        })
+                        .build());
+        StoryElementList.StoryEntryData cutscene =
+                new StoryElementList.StoryEntryData(Button.builder(Translation.message("global.cutscene"), button -> {
+                            minecraft.setScreen(new CutscenesScreen(scene));
+                        })
+                        .build());
         StoryElementList.StoryEntryData interaction = new StoryElementList.StoryEntryData(
-                Button.builder(Translation.message("global.interaction"), button -> {
-
-                }).build()
-        );
+                Button.builder(Translation.message("global.interaction"), button -> {})
+                        .build());
         StoryElementList.StoryEntryData npc = new StoryElementList.StoryEntryData(
-                Button.builder(Translation.message("global.npc"), button -> {
+                Button.builder(Translation.message("global.npc"), button -> {}).build());
 
-                }).build()
-        );
-        StoryElementList.StoryEntryData subscene = new StoryElementList.StoryEntryData(
-                Button.builder(Translation.message("global.subscene"), button -> {
-                    minecraft.setScreen(new SubscenesScreen(scene));
-                }).build()
-        );
-        List<StoryElementList.StoryEntryData> entries = List.of(animation, cameraAngle, cutscene, interaction, npc, subscene);
+        StoryElementList.StoryEntryData subscene =
+                new StoryElementList.StoryEntryData(Button.builder(Translation.message("global.subscene"), button -> {
+                            minecraft.setScreen(new SubscenesScreen(scene));
+                        })
+                        .build());
+        List<StoryElementList.StoryEntryData> entries =
+                List.of(animation, cameraAngle, cutscene, interaction, npc, subscene);
         this.storyElementList = this.layout.addToContents(new StoryElementList(this.minecraft, this, entries, true));
     }
 
@@ -78,5 +99,4 @@ public class ScenesMenuScreen extends StoryElementScreen {
     protected void openFolder() {
         Util.getPlatform().openPath(NarrativeCraftFile.getSceneFolder(scene).toPath());
     }
-
 }

@@ -1,3 +1,26 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.files;
 
 import com.google.gson.Gson;
@@ -15,14 +38,13 @@ import fr.loudo.narrativecraft.serialization.SubsceneSerializer;
 import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.level.storage.LevelResource;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.regex.Matcher;
+import net.minecraft.client.Minecraft;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.level.storage.LevelResource;
 
 public class NarrativeCraftFile {
     public static final String EXTENSION_SCRIPT_FILE = ".ink";
@@ -84,8 +106,10 @@ public class NarrativeCraftFile {
     public static File functionsInkFile;
 
     public static void init(MinecraftServer server) {
-        NarrativeCraftMod.firstTime = !new File(server.getWorldPath(LevelResource.ROOT).toFile(), DIRECTORY_NAME).exists();
-        NarrativeCraftFile.mainDirectory = createDirectory(server.getWorldPath(LevelResource.ROOT).toFile(), DIRECTORY_NAME);
+        NarrativeCraftMod.firstTime =
+                !new File(server.getWorldPath(LevelResource.ROOT).toFile(), DIRECTORY_NAME).exists();
+        NarrativeCraftFile.mainDirectory =
+                createDirectory(server.getWorldPath(LevelResource.ROOT).toFile(), DIRECTORY_NAME);
         rootDirectory = createDirectory(Minecraft.getInstance().gameDirectory, DIRECTORY_NAME);
         chaptersDirectory = createDirectory(NarrativeCraftFile.mainDirectory, CHAPTERS_DIRECTORY_NAME);
         characterDirectory = createDirectory(NarrativeCraftFile.mainDirectory, CHARACTERS_DIRECTORY_NAME);
@@ -94,19 +118,26 @@ public class NarrativeCraftFile {
         dataDirectory = createDirectory(NarrativeCraftFile.mainDirectory, DATA_FOLDER_NAME);
         mainInkFile = createFile(NarrativeCraftFile.mainDirectory, MAIN_INK_NAME);
         varsInkFile = createFile(NarrativeCraftFile.mainDirectory, VARS_INK_NAME);
-        try(Writer writer = new BufferedWriter(new FileWriter(varsInkFile))) {
-            writer.write("// " + Translation.message("file.vars_placeholder").append("\n").append("\n").getString());
+        try (Writer writer = new BufferedWriter(new FileWriter(varsInkFile))) {
+            writer.write("// "
+                    + Translation.message("file.vars_placeholder")
+                            .append("\n")
+                            .append("\n")
+                            .getString());
         } catch (IOException e) {
             NarrativeCraftMod.LOGGER.warn("Couldn't write on vars ink file", e);
         }
         functionsInkFile = createFile(NarrativeCraftFile.mainDirectory, FUNCTIONS_INK_NAME);
-        try(Writer writer = new BufferedWriter(new FileWriter(functionsInkFile))) {
-            writer.write("// " + Translation.message("file.funcs_placeholder").append("\n").append("\n").getString());
+        try (Writer writer = new BufferedWriter(new FileWriter(functionsInkFile))) {
+            writer.write("// "
+                    + Translation.message("file.funcs_placeholder")
+                            .append("\n")
+                            .append("\n")
+                            .getString());
         } catch (IOException e) {
             NarrativeCraftMod.LOGGER.warn("Couldn't write on functions ink file", e);
         }
     }
-
 
     private static File createDirectory(File parent, String name) {
         File directory = new File(parent, name);
@@ -145,7 +176,8 @@ public class NarrativeCraftFile {
         File chapterInkFile = createFile(chapterFolder, "chapter_" + chapter.getIndex() + EXTENSION_SCRIPT_FILE);
         File dataFile = getDataFile(chapterFolder);
 
-        String content = String.format("{\"name\":\"%s\",\"description\":\"%s\"}", chapter.getName(), chapter.getDescription());
+        String content =
+                String.format("{\"name\":\"%s\",\"description\":\"%s\"}", chapter.getName(), chapter.getDescription());
         try (Writer writer = new BufferedWriter(new FileWriter(dataFile))) {
             writer.write(content);
         }
@@ -157,7 +189,8 @@ public class NarrativeCraftFile {
 
     public static void updateChapterData(Chapter chapter) throws IOException {
         File dataFile = getDataFile(chapter);
-        String content = String.format("{\"name\":\"%s\",\"description\":\"%s\"}", chapter.getName(), chapter.getDescription());
+        String content =
+                String.format("{\"name\":\"%s\",\"description\":\"%s\"}", chapter.getName(), chapter.getDescription());
         try (Writer writer = new BufferedWriter(new FileWriter(dataFile))) {
             writer.write(content);
         }
@@ -171,7 +204,8 @@ public class NarrativeCraftFile {
     }
 
     public static void createSceneFolder(Scene scene) throws IOException {
-        File chapterFolder = createDirectory(chaptersDirectory, String.valueOf(scene.getChapter().getIndex()));
+        File chapterFolder = createDirectory(
+                chaptersDirectory, String.valueOf(scene.getChapter().getIndex()));
         File scenesFolder = createDirectory(chapterFolder.getAbsoluteFile(), SCENES_DIRECTORY_NAME);
         File sceneFolder = createDirectory(scenesFolder, Util.snakeCase(scene.getName()));
 
@@ -186,15 +220,14 @@ public class NarrativeCraftFile {
         createFile(dataFolder, SUBSCENES_FILE_NAME);
         createFile(dataFolder, CAMERA_ANGLES_FILE_NAME);
 
-        String content = String.format("{\"name\":\"%s\",\"description\":\"%s\",\"rank\":%s}", scene.getName(), scene.getDescription(), scene.getRank());
+        String content = String.format(
+                "{\"name\":\"%s\",\"description\":\"%s\",\"rank\":%s}",
+                scene.getName(), scene.getDescription(), scene.getRank());
         try (Writer writer = new BufferedWriter(new FileWriter(dataFile))) {
             writer.write(content);
         }
         try (Writer writer = new BufferedWriter(new FileWriter(sceneInkFile))) {
-            writer.write(
-                    "=== " + scene.knotName() + " ===" + "\n" +
-                    "# on enter"
-            );
+            writer.write("=== " + scene.knotName() + " ===" + "\n" + "# on enter");
         }
         updateMasterSceneKnot(scene);
     }
@@ -232,10 +265,7 @@ public class NarrativeCraftFile {
         File sceneData = getDataFile(newScene);
         String content = String.format(
                 "{\"name\":\"%s\",\"description\":\"%s\",\"rank\":%s}",
-                newScene.getName(),
-                newScene.getDescription(),
-                newScene.getRank()
-        );
+                newScene.getName(), newScene.getDescription(), newScene.getRank());
 
         try (Writer writer = new BufferedWriter(new FileWriter(sceneData))) {
             writer.write(content);
@@ -258,24 +288,30 @@ public class NarrativeCraftFile {
 
     public static void updateSubsceneFile(Scene scene) throws IOException {
         File subsceneFile = getSubsceneFile(scene);
-        Gson gson = new GsonBuilder().registerTypeAdapter(Subscene.class, new SubsceneSerializer(scene)).create();
-        try(Writer writer = new BufferedWriter(new FileWriter(subsceneFile))) {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Subscene.class, new SubsceneSerializer(scene))
+                .create();
+        try (Writer writer = new BufferedWriter(new FileWriter(subsceneFile))) {
             gson.toJson(scene.getSubscenes(), writer);
         }
     }
 
     public static void updateCutsceneFile(Scene scene) throws IOException {
         File cutsceneFile = getCutsceneFile(scene);
-        Gson gson = new GsonBuilder().registerTypeAdapter(Cutscene.class, new CutsceneSerializer(scene)).create();
-        try(Writer writer = new BufferedWriter(new FileWriter(cutsceneFile))) {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Cutscene.class, new CutsceneSerializer(scene))
+                .create();
+        try (Writer writer = new BufferedWriter(new FileWriter(cutsceneFile))) {
             gson.toJson(scene.getCutscenes(), writer);
         }
     }
 
     public static void updateCameraAngleGroup(Scene scene) throws IOException {
         File cameraAngelGroupFile = getCameraAngelGroupFile(scene);
-        Gson gson = new GsonBuilder().registerTypeAdapter(Subscene.class, new SubsceneSerializer(scene)).create();
-        try(Writer writer = new BufferedWriter(new FileWriter(cameraAngelGroupFile))) {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Subscene.class, new SubsceneSerializer(scene))
+                .create();
+        try (Writer writer = new BufferedWriter(new FileWriter(cameraAngelGroupFile))) {
             gson.toJson(scene.getCameraAngleGroups(), writer);
         }
     }
@@ -283,8 +319,10 @@ public class NarrativeCraftFile {
     public static void updateAnimationFile(Animation newAnimation) throws IOException {
         File animationsFolder = getAnimationsFolder(newAnimation.getScene());
         File animationFile = createFile(animationsFolder, Util.snakeCase(newAnimation.getName()) + EXTENSION_DATA_FILE);
-        Gson gson = new GsonBuilder().registerTypeAdapter(Animation.class, new AnimationSerializer(newAnimation.getScene())).create();
-        try(Writer writer = new BufferedWriter(new FileWriter(animationFile))) {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Animation.class, new AnimationSerializer(newAnimation.getScene()))
+                .create();
+        try (Writer writer = new BufferedWriter(new FileWriter(animationFile))) {
             gson.toJson(newAnimation, writer);
         }
     }
@@ -311,15 +349,16 @@ public class NarrativeCraftFile {
         createDirectory(characterFolder, SKINS_FOLDER_NAME);
         File dataFile = getDataFile(characterFolder);
         Gson gson = new Gson();
-        try(Writer writer = new BufferedWriter(new FileWriter(dataFile))) {
+        try (Writer writer = new BufferedWriter(new FileWriter(dataFile))) {
             gson.toJson(characterStory, writer);
         }
     }
 
-    public static void updateCharacterData(CharacterStory oldCharacter, CharacterStory newCharacter) throws IOException {
+    public static void updateCharacterData(CharacterStory oldCharacter, CharacterStory newCharacter)
+            throws IOException {
         File dataFile = getDataFile(oldCharacter);
         Gson gson = new Gson();
-        try(Writer writer = new BufferedWriter(new FileWriter(dataFile))) {
+        try (Writer writer = new BufferedWriter(new FileWriter(dataFile))) {
             gson.toJson(newCharacter, writer);
         }
         File oldCharacterFolder = new File(characterDirectory, Util.snakeCase(oldCharacter.getName()));
@@ -340,27 +379,33 @@ public class NarrativeCraftFile {
     }
 
     public static void updateInkIncludes() throws IOException {
-        List<Chapter> chapters = NarrativeCraftMod.getInstance().getChapterManager().getChapters();
+        List<Chapter> chapters =
+                NarrativeCraftMod.getInstance().getChapterManager().getChapters();
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("// ").append(Translation.message("file.main_ink_warning").append("\n\n").getString());
+        stringBuilder
+                .append("// ")
+                .append(Translation.message("file.main_ink_warning")
+                        .append("\n\n")
+                        .getString());
         stringBuilder.append("INCLUDE funcs.ink").append("\n");
         stringBuilder.append("INCLUDE vars.ink").append("\n\n");
-        for(Chapter chapter : chapters) {
+        for (Chapter chapter : chapters) {
             stringBuilder.append("// Chapter ").append(chapter.getIndex()).append("\n");
-            String chapterInkFilePath = "chapters\\" + chapter.getIndex() + "\\" + chapter.knotName() + EXTENSION_SCRIPT_FILE;
+            String chapterInkFilePath =
+                    "chapters\\" + chapter.getIndex() + "\\" + chapter.knotName() + EXTENSION_SCRIPT_FILE;
             stringBuilder.append("INCLUDE ").append(chapterInkFilePath).append("\n");
-            for(Scene scene : chapter.getSortedSceneList()) {
+            for (Scene scene : chapter.getSortedSceneList()) {
                 String sceneInkFilePath =
-                        "chapters\\" + chapter.getIndex() + "\\"  +
-                                "scenes\\" + Util.snakeCase(scene.getName()) + "\\" + Util.snakeCase(scene.getName()) + EXTENSION_SCRIPT_FILE;
+                        "chapters\\" + chapter.getIndex() + "\\" + "scenes\\" + Util.snakeCase(scene.getName()) + "\\"
+                                + Util.snakeCase(scene.getName()) + EXTENSION_SCRIPT_FILE;
                 stringBuilder.append("INCLUDE ").append(sceneInkFilePath).append("\n");
             }
             stringBuilder.append("\n");
         }
-        if(chapters.size() > 1) {
+        if (chapters.size() > 1) {
             stringBuilder.append("->").append(chapters.getFirst().knotName());
         }
-        try(Writer writer = new BufferedWriter(new FileWriter(mainInkFile))) {
+        try (Writer writer = new BufferedWriter(new FileWriter(mainInkFile))) {
             writer.write(stringBuilder.toString());
         }
     }
@@ -385,7 +430,6 @@ public class NarrativeCraftFile {
     public static File getCameraAngelGroupFile(Scene scene) {
         return createFile(getDataFolder(scene), CAMERA_ANGLES_FILE_NAME);
     }
-
 
     public static File getDataFolder(Scene scene) {
         File sceneFolder = getSceneFolder(scene);

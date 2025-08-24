@@ -1,3 +1,26 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.narrative.chapter.scene;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
@@ -8,7 +31,6 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.cameraAngle.CameraAngleGroup;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.util.Util;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,8 +58,8 @@ public class Scene extends NarrativeEntry {
     }
 
     public Animation getAnimationByName(String name) {
-        for(Animation animation : animations) {
-            if(animation.getName().equalsIgnoreCase(name)) {
+        for (Animation animation : animations) {
+            if (animation.getName().equalsIgnoreCase(name)) {
                 return animation;
             }
         }
@@ -45,8 +67,8 @@ public class Scene extends NarrativeEntry {
     }
 
     public Subscene getSubsceneByName(String name) {
-        for(Subscene subscene : subscenes) {
-            if(subscene.getName().equalsIgnoreCase(name)) {
+        for (Subscene subscene : subscenes) {
+            if (subscene.getName().equalsIgnoreCase(name)) {
                 return subscene;
             }
         }
@@ -54,8 +76,8 @@ public class Scene extends NarrativeEntry {
     }
 
     public boolean subsceneExists(String name) {
-        for(Subscene subscene : subscenes) {
-            if(subscene.getName().equalsIgnoreCase(name)) {
+        for (Subscene subscene : subscenes) {
+            if (subscene.getName().equalsIgnoreCase(name)) {
                 return true;
             }
         }
@@ -63,8 +85,8 @@ public class Scene extends NarrativeEntry {
     }
 
     public boolean cutsceneExists(String name) {
-        for(Cutscene cutscene : cutscenes) {
-            if(cutscene.getName().equalsIgnoreCase(name)) {
+        for (Cutscene cutscene : cutscenes) {
+            if (cutscene.getName().equalsIgnoreCase(name)) {
                 return true;
             }
         }
@@ -72,8 +94,8 @@ public class Scene extends NarrativeEntry {
     }
 
     public boolean animationExists(String name) {
-        for(Animation animation : animations) {
-            if(animation.getName().equalsIgnoreCase(name)) {
+        for (Animation animation : animations) {
+            if (animation.getName().equalsIgnoreCase(name)) {
                 return true;
             }
         }
@@ -81,7 +103,7 @@ public class Scene extends NarrativeEntry {
     }
 
     public void addCameraAngleGroup(CameraAngleGroup cameraAngleGroup) {
-        if(cameraAngleGroups.contains(cameraAngleGroup)) return;
+        if (cameraAngleGroups.contains(cameraAngleGroup)) return;
         cameraAngleGroups.add(cameraAngleGroup);
     }
 
@@ -90,8 +112,8 @@ public class Scene extends NarrativeEntry {
     }
 
     public boolean cameraAngleExists(String name) {
-        for(CameraAngleGroup cameraAngleGroup : cameraAngleGroups) {
-            if(cameraAngleGroup.getName().equalsIgnoreCase(name)) {
+        for (CameraAngleGroup cameraAngleGroup : cameraAngleGroups) {
+            if (cameraAngleGroup.getName().equalsIgnoreCase(name)) {
                 return true;
             }
         }
@@ -99,8 +121,8 @@ public class Scene extends NarrativeEntry {
     }
 
     public CharacterStory getNpcByName(String name) {
-        for(CharacterStory characterStory : npcs) {
-            if(characterStory.getName().equalsIgnoreCase(name)) {
+        for (CharacterStory characterStory : npcs) {
+            if (characterStory.getName().equalsIgnoreCase(name)) {
                 return characterStory;
             }
         }
@@ -108,7 +130,7 @@ public class Scene extends NarrativeEntry {
     }
 
     public void addSubscene(Subscene subscene) {
-        if(subscenes.contains(subscene)) return;
+        if (subscenes.contains(subscene)) return;
         subscenes.add(subscene);
     }
 
@@ -117,7 +139,7 @@ public class Scene extends NarrativeEntry {
     }
 
     public void addCutscene(Cutscene cutscene) {
-        if(cutscenes.contains(cutscene)) return;
+        if (cutscenes.contains(cutscene)) return;
         cutscenes.add(cutscene);
     }
 
@@ -126,13 +148,14 @@ public class Scene extends NarrativeEntry {
     }
 
     public void addAnimation(Animation animation) {
-        if(animations.contains(animation)) return;
+        if (animations.contains(animation)) return;
         animations.add(animation);
     }
 
     public void removeAnimation(Animation animation) {
         animations.remove(animation);
     }
+
     public Chapter getChapter() {
         return chapter;
     }
@@ -164,5 +187,4 @@ public class Scene extends NarrativeEntry {
     public void setRank(int rank) {
         this.rank = rank;
     }
-
 }

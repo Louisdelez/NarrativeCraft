@@ -1,3 +1,26 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.commands;
 
 import com.mojang.brigadier.Command;
@@ -16,72 +39,78 @@ import fr.loudo.narrativecraft.narrative.recording.Recording;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.screens.animation.AnimationCharacterLinkScreen;
 import fr.loudo.narrativecraft.util.Translation;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 public class RecordCommand {
-    
-    private static final RecordingManager recordingManager = NarrativeCraftMod.getInstance().getRecordingManager();
-    private static final PlayerSessionManager playerSessionManager = NarrativeCraftMod.getInstance().getPlayerSessionManager();
+
+    private static final RecordingManager recordingManager =
+            NarrativeCraftMod.getInstance().getRecordingManager();
+    private static final PlayerSessionManager playerSessionManager =
+            NarrativeCraftMod.getInstance().getPlayerSessionManager();
     public static final List<ServerPlayer> playerTryingOverride = new ArrayList<>();
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register(Commands.literal("nc").requires(commandSourceStack -> commandSourceStack.hasPermission(2))
+        dispatcher.register(Commands.literal("nc")
+                .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
                 .then(Commands.literal("record")
                         .then(Commands.literal("start")
                                 .then(Commands.literal("with")
                                         .then(Commands.argument("subscenes", StringArgumentType.greedyString())
-//                                                .suggests(NarrativeCraftMod.getInstance().getChapterManager().getSubscenesOfScenesSuggestions())
+                                                //
+                                                // .suggests(NarrativeCraftMod.getInstance().getChapterManager().getSubscenesOfScenesSuggestions())
                                                 .executes(commandContext -> {
-                                                    String subscenes = StringArgumentType.getString(commandContext, "subscenes");
+                                                    String subscenes =
+                                                            StringArgumentType.getString(commandContext, "subscenes");
                                                     return startRecordingWithSubscenes(commandContext, subscenes);
-                                                })
-                                        )
-                                )
-                                .executes(RecordCommand::startRecording)
-                        )
-                        .then(Commands.literal("stop")
-                                .executes(RecordCommand::stopRecording)
-                        )
+                                                })))
+                                .executes(RecordCommand::startRecording))
+                        .then(Commands.literal("stop").executes(RecordCommand::stopRecording))
                         .then(Commands.literal("save")
                                 .then(Commands.argument("animation_name", StringArgumentType.string())
-                                        .executes(context -> saveRecording(context, StringArgumentType.getString(context, "animation_name")))
-                                )
-                        )
-                        .then(Commands.literal("test")
-                                .executes(context -> {
-                                    Animation animation = NarrativeCraftMod.getInstance().getChapterManager().getChapters().getFirst().getScenes().getFirst().getAnimations().getFirst();
-                                    Playback playback = new Playback(PlaybackManager.ids.incrementAndGet(), animation, context.getSource().getLevel(), Environnement.RECORDING, false);
-                                    playback.start();
-                                    NarrativeCraftMod.getInstance().getPlaybackManager().addPlayback(playback);
-                                    return 1;
-                                })
-                        )
-                )
-        );
+                                        .executes(context -> saveRecording(
+                                                context, StringArgumentType.getString(context, "animation_name")))))
+                        .then(Commands.literal("test").executes(context -> {
+                            Animation animation = NarrativeCraftMod.getInstance()
+                                    .getChapterManager()
+                                    .getChapters()
+                                    .getFirst()
+                                    .getScenes()
+                                    .getFirst()
+                                    .getAnimations()
+                                    .getFirst();
+                            Playback playback = new Playback(
+                                    PlaybackManager.ids.incrementAndGet(),
+                                    animation,
+                                    context.getSource().getLevel(),
+                                    Environnement.RECORDING,
+                                    false);
+                            playback.start();
+                            NarrativeCraftMod.getInstance().getPlaybackManager().addPlayback(playback);
+                            return 1;
+                        }))));
     }
 
     private static int startRecording(CommandContext<CommandSourceStack> context) {
 
         PlayerSession playerSession = getSession(context);
-        if(playerSession == null) return 0;
+        if (playerSession == null) return 0;
 
         ServerPlayer player = context.getSource().getPlayer();
 
-        if(recordingManager.isRecording(player)) {
+        if (recordingManager.isRecording(player)) {
             context.getSource().sendFailure(Translation.message("record.start.already_recording"));
             return 0;
         }
 
         Recording recording = recordingManager.getRecording(player);
-        if(recording == null) {
+        if (recording == null) {
             recording = new Recording(context.getSource().getPlayer());
         }
         recording.start();
@@ -95,11 +124,11 @@ public class RecordCommand {
     private static int startRecordingWithSubscenes(CommandContext<CommandSourceStack> context, String subscenes) {
 
         PlayerSession playerSession = getSession(context);
-        if(playerSession == null) return 0;
+        if (playerSession == null) return 0;
 
         ServerPlayer player = context.getSource().getPlayer();
 
-        if(recordingManager.isRecording(player)) {
+        if (recordingManager.isRecording(player)) {
             context.getSource().sendFailure(Translation.message("record.start.already_recording"));
             return 0;
         }
@@ -107,38 +136,39 @@ public class RecordCommand {
         List<Subscene> subsceneToPlay = new ArrayList<>();
         subscenes = subscenes.replaceAll("\"", "");
         String[] subsceneNameList = subscenes.split(",");
-        for(String subsceneName : subsceneNameList) {
+        for (String subsceneName : subsceneNameList) {
             Subscene subscene = playerSession.getScene().getSubsceneByName(subsceneName);
-            if(subscene != null) {
+            if (subscene != null) {
                 subsceneToPlay.add(subscene);
             } else {
                 context.getSource().sendFailure(Translation.message("subscene.no_exists", subsceneName));
             }
         }
 
-        if(subsceneNameList.length == subsceneToPlay.size()) {
+        if (subsceneNameList.length == subsceneToPlay.size()) {
             Recording recording = recordingManager.getRecording(player);
-            if(recording == null) {
+            if (recording == null) {
                 recording = new Recording(context.getSource().getPlayer(), subsceneToPlay);
             }
             recording.start();
             recordingManager.addRecording(recording);
-            context.getSource().sendSuccess(() -> Translation.message("record.start.with_subscenes", Arrays.toString(subsceneNameList)), true);
+            context.getSource()
+                    .sendSuccess(
+                            () -> Translation.message("record.start.with_subscenes", Arrays.toString(subsceneNameList)),
+                            true);
         }
-
 
         return Command.SINGLE_SUCCESS;
     }
 
-
     private static int stopRecording(CommandContext<CommandSourceStack> context) {
 
         PlayerSession playerSession = getSession(context);
-        if(playerSession == null) return 0;
+        if (playerSession == null) return 0;
 
         ServerPlayer player = context.getSource().getPlayer();
 
-        if(!recordingManager.isRecording(player)) {
+        if (!recordingManager.isRecording(player)) {
             context.getSource().sendFailure(Translation.message("record.stop.no_recording"));
             return 0;
         }
@@ -153,17 +183,17 @@ public class RecordCommand {
 
     private static int saveRecording(CommandContext<CommandSourceStack> context, String newAnimationName) {
         PlayerSession playerSession = getSession(context);
-        if(playerSession == null) return 0;
+        if (playerSession == null) return 0;
 
         ServerPlayer player = context.getSource().getPlayer();
 
         Recording recording = recordingManager.getRecording(context.getSource().getPlayer());
-        if(recording == null) {
+        if (recording == null) {
             context.getSource().sendFailure(Translation.message("record.save.recorded_nothing"));
             return 0;
         }
 
-        if(recording.isRecording()) {
+        if (recording.isRecording()) {
             context.getSource().sendFailure(Translation.message("record.save.stop_record_before_save"));
             return 0;
         }
@@ -173,9 +203,14 @@ public class RecordCommand {
         Animation animation = playerSession.getScene().getAnimationByName(newAnimationName);
         // If a player tries to override an animation that already exists
         if (animation != null) {
-            if(!playerTryingOverride.contains(player)) {
+            if (!playerTryingOverride.contains(player)) {
                 playerTryingOverride.add(context.getSource().getPlayer());
-                context.getSource().sendFailure(Translation.message("record.save.overwrite", newAnimationName, playerSession.getScene().getName(), playerSession.getChapter().getIndex()));
+                context.getSource()
+                        .sendFailure(Translation.message(
+                                "record.save.overwrite",
+                                newAnimationName,
+                                playerSession.getScene().getName(),
+                                playerSession.getChapter().getIndex()));
                 return 0;
             } else {
                 playerTryingOverride.remove(player);
@@ -189,22 +224,34 @@ public class RecordCommand {
             try {
                 finalAnimation.setCharacter(characterStory);
                 recording.save(finalAnimation);
-                context.getSource().sendSuccess(() -> Translation.message("record.save.success", finalAnimation.getName(), playerSession.getScene().getName(), playerSession.getChapter().getIndex()), true);
+                context.getSource()
+                        .sendSuccess(
+                                () -> Translation.message(
+                                        "record.save.success",
+                                        finalAnimation.getName(),
+                                        playerSession.getScene().getName(),
+                                        playerSession.getChapter().getIndex()),
+                                true);
                 recordingManager.removeRecording(recording);
             } catch (IOException e) {
-                context.getSource().sendFailure(Translation.message("record.save.fail", finalAnimation.getName(), playerSession.getChapter().getIndex(), playerSession.getScene().getName()));
+                context.getSource()
+                        .sendFailure(Translation.message(
+                                "record.save.fail",
+                                finalAnimation.getName(),
+                                playerSession.getChapter().getIndex(),
+                                playerSession.getScene().getName()));
             }
         });
         Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
 
         return Command.SINGLE_SUCCESS;
-
     }
 
     private static PlayerSession getSession(CommandContext<CommandSourceStack> context) {
 
-        PlayerSession playerSession = playerSessionManager.getSessionByPlayer(context.getSource().getPlayer());
-        if(!playerSession.isSessionSet()) {
+        PlayerSession playerSession =
+                playerSessionManager.getSessionByPlayer(context.getSource().getPlayer());
+        if (!playerSession.isSessionSet()) {
             context.getSource().sendFailure(Translation.message("session.not_set"));
             return null;
         }

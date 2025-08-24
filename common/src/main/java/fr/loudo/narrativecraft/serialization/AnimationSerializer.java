@@ -1,3 +1,26 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.serialization;
 
 import com.google.gson.*;
@@ -7,7 +30,6 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.recording.actions.Action;
-
 import java.lang.reflect.Type;
 
 public class AnimationSerializer implements JsonSerializer<Animation>, JsonDeserializer<Animation> {
@@ -23,13 +45,14 @@ public class AnimationSerializer implements JsonSerializer<Animation>, JsonDeser
     public JsonElement serialize(Animation animation, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject obj = new Gson().toJsonTree(animation).getAsJsonObject();
         CharacterStory characterStory = animation.getCharacter();
-        if(characterStory == null) return obj;
+        if (characterStory == null) return obj;
         obj.addProperty(characterKey, characterStory.getName());
         return obj;
     }
 
     @Override
-    public Animation deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public Animation deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+            throws JsonParseException {
         Animation animation = new GsonBuilder()
                 .registerTypeAdapter(Action.class, new ActionSerializer())
                 .create()
@@ -37,10 +60,10 @@ public class AnimationSerializer implements JsonSerializer<Animation>, JsonDeser
         animation.setScene(scene);
         CharacterManager characterManager = NarrativeCraftMod.getInstance().getCharacterManager();
         JsonObject jsonObject = json.getAsJsonObject();
-        if(jsonObject.has(characterKey)) {
+        if (jsonObject.has(characterKey)) {
             String characterName = jsonObject.get(characterKey).getAsString();
             CharacterStory characterStory = characterManager.getCharacterByName(characterName);
-            if(characterStory == null) return animation;
+            if (characterStory == null) return animation;
             animation.setCharacter(characterStory);
         }
         return animation;

@@ -1,3 +1,26 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.util;
 
 import net.minecraft.client.Minecraft;
@@ -21,13 +44,9 @@ public class ScreenUtils {
     }
 
     public static void sendToast(Component name, Component description) {
-        Minecraft.getInstance().getToastManager().addToast(
-                new SystemToast(
-                        SystemToast.SystemToastId.NARRATOR_TOGGLE,
-                        name,
-                        description
-                )
-        );
+        Minecraft.getInstance()
+                .getToastManager()
+                .addToast(new SystemToast(SystemToast.SystemToastId.NARRATOR_TOGGLE, name, description));
     }
 
     public static class LabelBox {
@@ -38,35 +57,28 @@ public class ScreenUtils {
 
         public LabelBox(Component text, Font font, int width, int height, int x, int y, Align align) {
             int yStringWidget = y;
-            if(align == Align.HORIZONTAL) {
+            if (align == Align.HORIZONTAL) {
                 y += height / 2;
                 yStringWidget = y - font.lineHeight / 2;
             }
             stringWidget = ScreenUtils.text(text, font, x, yStringWidget);
-            if(align == Align.HORIZONTAL) {
+            if (align == Align.HORIZONTAL) {
                 x = stringWidget.getX() + stringWidget.getWidth() + 5;
                 y -= height / 2;
             } else if (align == Align.VERTICAL) {
                 y += font.lineHeight + 5;
             }
-            editBox = new EditBox(
-                    font,
-                    x,
-                    y,
-                    width,
-                    height,
-                    Component.literal(text + " value")
-            );
+            editBox = new EditBox(font, x, y, width, height, Component.literal(text + " value"));
             this.align = align;
         }
 
         public void setPosition(int x, int y) {
-            if(align == Align.HORIZONTAL) {
+            if (align == Align.HORIZONTAL) {
                 stringWidget.setPosition(x, y + editBox.getHeight() / 2 - stringWidget.getHeight() / 2);
             } else if (align == Align.VERTICAL) {
                 stringWidget.setPosition(x, y);
             }
-            if(align == Align.HORIZONTAL) {
+            if (align == Align.HORIZONTAL) {
                 x += stringWidget.getWidth() + 5;
             } else if (align == Align.VERTICAL) {
                 y = stringWidget.getY() + stringWidget.getHeight() + 5;
@@ -81,7 +93,6 @@ public class ScreenUtils {
         public EditBox getEditBox() {
             return editBox;
         }
-
     }
 
     public static class MultilineLabelBox {
@@ -89,18 +100,14 @@ public class ScreenUtils {
         private final StringWidget stringWidget;
         private final MultiLineEditBox multiLineEditBox;
 
-        public MultilineLabelBox(Component text, Font font, int width, int height, int x, int y, Component placeholder) {
+        public MultilineLabelBox(
+                Component text, Font font, int width, int height, int x, int y, Component placeholder) {
             stringWidget = ScreenUtils.text(text, font, x, y);
             multiLineEditBox = MultiLineEditBox.builder()
                     .setPlaceholder(placeholder)
                     .setX(x)
                     .setY(y + stringWidget.getHeight() + 5)
-                    .build(
-                        font,
-                        width,
-                        height,
-                        Component.literal("")
-            );
+                    .build(font, width, height, Component.literal(""));
         }
 
         public void setPosition(int x, int y) {
@@ -122,5 +129,4 @@ public class ScreenUtils {
         VERTICAL,
         HORIZONTAL
     }
-
 }

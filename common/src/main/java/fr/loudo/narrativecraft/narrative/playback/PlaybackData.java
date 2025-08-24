@@ -1,3 +1,26 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.narrative.playback;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -9,12 +32,11 @@ import fr.loudo.narrativecraft.narrative.recording.actions.ActionsData;
 import fr.loudo.narrativecraft.narrative.recording.actions.BreakBlockAction;
 import fr.loudo.narrativecraft.util.FakePlayer;
 import fr.loudo.narrativecraft.util.Util;
+import java.util.List;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
-
-import java.util.List;
 
 public class PlaybackData {
 
@@ -31,7 +53,7 @@ public class PlaybackData {
 
     public void tick(int globalTick) {
         if (globalTick >= actionsData.getSpawnTick()) {
-            if(entity == null) {
+            if (entity == null) {
                 spawnEntity(actionsData.getLocations().getFirst());
             }
         }
@@ -55,7 +77,7 @@ public class PlaybackData {
 
     public void changeLocationByTick(int newTick, boolean seamless) {
         if (newTick >= actionsData.getSpawnTick()) {
-            if(entity == null) {
+            if (entity == null) {
                 spawnEntity(actionsData.getLocations().getFirst());
             }
         } else {
@@ -65,7 +87,7 @@ public class PlaybackData {
         }
         localTick = newTick - actionsData.getSpawnTick();
         Location location = actionsData.getLocations().get(localTick);
-        if(seamless) {
+        if (seamless) {
             moveEntity(location, location, true);
         } else {
             killEntity();
@@ -74,19 +96,19 @@ public class PlaybackData {
     }
 
     public void killEntity() {
-        if(entity == null) return;
+        if (entity == null) return;
         entity.remove(Entity.RemovalReason.KILLED);
-        if(entity instanceof FakePlayer fakePlayer) {
+        if (entity instanceof FakePlayer fakePlayer) {
             Util.removeFakePlayerUUID(fakePlayer);
         }
         entity = null;
     }
 
     public void spawnEntity(Location location) {
-        if(actionsData.getEntityId() == BuiltInRegistries.ENTITY_TYPE.getId(EntityType.PLAYER)) return;
+        if (actionsData.getEntityId() == BuiltInRegistries.ENTITY_TYPE.getId(EntityType.PLAYER)) return;
         EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.byId(actionsData.getEntityId());
         entity = entityType.create(entity.level(), EntitySpawnReason.MOB_SUMMONED);
-        if(entity == null) return;
+        if (entity == null) return;
         try {
             entity.load(Util.valueInputFromCompoundTag(entity.registryAccess(), actionsData.getNbtData()));
         } catch (CommandSyntaxException e) {
@@ -94,22 +116,25 @@ public class PlaybackData {
         }
         if (entity instanceof Mob mob) mob.setNoAi(true);
         moveEntity(location, location, true);
-        if(entity instanceof ItemEntity itemEntity) { // Drop Item
-            List<Action> actions = playback.getMasterEntityData().getActions().stream().filter(action -> action instanceof BreakBlockAction && action.getTick() == playback.getTick() - 1).toList();
+        if (entity instanceof ItemEntity itemEntity) { // Drop Item
+            List<Action> actions = playback.getMasterEntityData().getActions().stream()
+                    .filter(action -> action instanceof BreakBlockAction && action.getTick() == playback.getTick() - 1)
+                    .toList();
             boolean randomizeMotion = !actions.isEmpty();
-            entity = ((LivingEntityInvoker)playback.getMasterEntity()).callCreateItemStackToDrop(itemEntity.getItem(), randomizeMotion, false);
+            entity = ((LivingEntityInvoker) playback.getMasterEntity())
+                    .callCreateItemStackToDrop(itemEntity.getItem(), randomizeMotion, false);
         }
         entity.level().addFreshEntity(entity);
     }
 
     private void moveEntity(Location current, Location next, boolean silent) {
-        if(entity == null) return;
+        if (entity == null) return;
         entity.setXRot(current.pitch());
         entity.setYRot(current.yaw());
         entity.setYHeadRot(current.yaw());
         entity.setOnGround(current.onGround());
         entity.teleportTo(current.x(), current.y(), current.z());
-        if(!silent) {
+        if (!silent) {
             entity.move(MoverType.SELF, Location.deltaLocation(current, next).asVec3());
         }
     }

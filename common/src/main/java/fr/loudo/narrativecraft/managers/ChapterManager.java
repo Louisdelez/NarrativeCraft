@@ -1,3 +1,26 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.managers;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -6,10 +29,9 @@ import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import net.minecraft.commands.CommandSourceStack;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.commands.CommandSourceStack;
 
 public class ChapterManager {
 
@@ -28,9 +50,9 @@ public class ChapterManager {
         return (context, builder) -> {
             int chapterIndex = IntegerArgumentType.getInteger(context, "chapter_index");
             Chapter chapter = getChapterByIndex(chapterIndex);
-            if(chapter == null) return builder.buildFuture();
+            if (chapter == null) return builder.buildFuture();
             for (Scene scene : chapter.getSortedSceneList()) {
-                if(scene.getName().split(" ").length > 1) {
+                if (scene.getName().split(" ").length > 1) {
                     builder.suggest("\"" + scene.getName() + "\"");
                 } else {
                     builder.suggest(scene.getName());
@@ -42,9 +64,9 @@ public class ChapterManager {
 
     public SuggestionProvider<CommandSourceStack> getSubscenesOfScenesSuggestions(PlayerSession playerSession) {
         return (context, builder) -> {
-            if(!playerSession.isSessionSet()) return builder.buildFuture();
+            if (!playerSession.isSessionSet()) return builder.buildFuture();
             for (Subscene subscene : playerSession.getScene().getSubscenes()) {
-                if(subscene.getName().split(" ").length > 1) {
+                if (subscene.getName().split(" ").length > 1) {
                     builder.suggest("\"" + subscene.getName() + "\"");
                 } else {
                     builder.suggest(subscene.getName());
@@ -55,7 +77,7 @@ public class ChapterManager {
     }
 
     public void addChapter(Chapter chapter) {
-        if(chapters.contains(chapter)) return;
+        if (chapters.contains(chapter)) return;
         chapters.add(chapter);
     }
 
@@ -64,8 +86,8 @@ public class ChapterManager {
     }
 
     public Chapter getChapterByName(String name) {
-        for(Chapter chapter : chapters) {
-            if(chapter.getName().equalsIgnoreCase(name)) {
+        for (Chapter chapter : chapters) {
+            if (chapter.getName().equalsIgnoreCase(name)) {
                 return chapter;
             }
         }
@@ -73,8 +95,8 @@ public class ChapterManager {
     }
 
     public Chapter getChapterByIndex(int index) {
-        for(Chapter chapter : chapters) {
-            if(chapter.getIndex() == index) {
+        for (Chapter chapter : chapters) {
+            if (chapter.getIndex() == index) {
                 return chapter;
             }
         }
@@ -82,8 +104,8 @@ public class ChapterManager {
     }
 
     public boolean chapterExists(String name) {
-        for(Chapter chapter : chapters) {
-            if(chapter.getName().equalsIgnoreCase(name)) {
+        for (Chapter chapter : chapters) {
+            if (chapter.getName().equalsIgnoreCase(name)) {
                 return true;
             }
         }
@@ -91,8 +113,8 @@ public class ChapterManager {
     }
 
     public boolean chapterExists(int index) {
-        for(Chapter chapter : chapters) {
-            if(chapter.getIndex() == index) {
+        for (Chapter chapter : chapters) {
+            if (chapter.getIndex() == index) {
                 return true;
             }
         }

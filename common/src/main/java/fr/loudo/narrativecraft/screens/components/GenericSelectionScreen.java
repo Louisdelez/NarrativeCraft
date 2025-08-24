@@ -1,5 +1,31 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.screens.components;
 
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -12,10 +38,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 public class GenericSelectionScreen<T extends SelectionScreenSelectable> extends Screen {
     protected final List<T> itemList;
     protected final Consumer<T> consumer;
@@ -24,15 +46,16 @@ public class GenericSelectionScreen<T extends SelectionScreenSelectable> extends
     protected final String screenTitle;
     protected final Screen lastScreen;
     protected final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
-    
+
     private SelectionList<T> selectionList;
 
-    public GenericSelectionScreen(Screen lastScreen, 
-                                String screenTitle,
-                                List<T> itemList, 
-                                T currentSelection,
-                                Function<T, String> nameExtractor,
-                                Consumer<T> consumer) {
+    public GenericSelectionScreen(
+            Screen lastScreen,
+            String screenTitle,
+            List<T> itemList,
+            T currentSelection,
+            Function<T, String> nameExtractor,
+            Consumer<T> consumer) {
         super(Component.literal(screenTitle));
         this.lastScreen = lastScreen;
         this.screenTitle = screenTitle;
@@ -42,11 +65,8 @@ public class GenericSelectionScreen<T extends SelectionScreenSelectable> extends
         this.consumer = consumer;
     }
 
-    public GenericSelectionScreen(Screen lastScreen,
-                                String screenTitle,
-                                List<T> itemList, 
-                                T currentSelection,
-                                Consumer<T> consumer) {
+    public GenericSelectionScreen(
+            Screen lastScreen, String screenTitle, List<T> itemList, T currentSelection, Consumer<T> consumer) {
         this(lastScreen, screenTitle, itemList, currentSelection, SelectionScreenSelectable::getName, consumer);
     }
 
@@ -60,13 +80,14 @@ public class GenericSelectionScreen<T extends SelectionScreenSelectable> extends
     }
 
     protected void addTitle() {
-        LinearLayout linearlayout = this.layout.addToHeader(LinearLayout.horizontal()).spacing(8);
+        LinearLayout linearlayout =
+                this.layout.addToHeader(LinearLayout.horizontal()).spacing(8);
         linearlayout.defaultCellSetting().alignVerticallyMiddle();
         linearlayout.addChild(new StringWidget(this.title, this.font));
-        
+
         addCustomTitleButtons(linearlayout);
     }
-    
+
     protected void addCustomTitleButtons(LinearLayout layout) {}
 
     protected void addContents() {
@@ -74,7 +95,9 @@ public class GenericSelectionScreen<T extends SelectionScreenSelectable> extends
     }
 
     protected void addFooter() {
-        this.layout.addToFooter(Button.builder(CommonComponents.GUI_DONE, p_345997_ -> this.onClose()).width(200).build());
+        this.layout.addToFooter(Button.builder(CommonComponents.GUI_DONE, p_345997_ -> this.onClose())
+                .width(200)
+                .build());
     }
 
     protected void repositionElements() {
@@ -85,40 +108,49 @@ public class GenericSelectionScreen<T extends SelectionScreenSelectable> extends
     @Override
     public void onClose() {
         SelectionList<T>.Entry entry = this.selectionList.getSelected();
-        if(entry == null) {
+        if (entry == null) {
             consumer.accept(null);
         } else {
             consumer.accept(entry.getItem());
         }
         minecraft.setScreen(lastScreen);
     }
-    
-    protected List<T> getItemList() { return itemList; }
-    protected Function<T, String> getNameExtractor() { return nameExtractor; }
-    protected T getCurrentSelection() { return currentSelection; }
 
-    static class SelectionList<T extends SelectionScreenSelectable> extends ObjectSelectionList<SelectionList<T>.Entry> {
+    protected List<T> getItemList() {
+        return itemList;
+    }
+
+    protected Function<T, String> getNameExtractor() {
+        return nameExtractor;
+    }
+
+    protected T getCurrentSelection() {
+        return currentSelection;
+    }
+
+    static class SelectionList<T extends SelectionScreenSelectable>
+            extends ObjectSelectionList<SelectionList<T>.Entry> {
         private final GenericSelectionScreen<T> parentScreen;
 
         public SelectionList(Minecraft minecraft, GenericSelectionScreen<T> parentScreen) {
             super(minecraft, parentScreen.width, parentScreen.height - 33 - 53, 33, 18);
             this.parentScreen = parentScreen;
-            
+
             String selectedName = "";
-            if(parentScreen.getCurrentSelection() != null) {
+            if (parentScreen.getCurrentSelection() != null) {
                 selectedName = parentScreen.getNameExtractor().apply(parentScreen.getCurrentSelection());
             }
-            
-            for(T item : parentScreen.getItemList()) {
+
+            for (T item : parentScreen.getItemList()) {
                 Entry entry = new Entry(item);
                 this.addEntry(entry);
-                
+
                 String itemName = parentScreen.getNameExtractor().apply(item);
-                if(selectedName.equalsIgnoreCase(itemName)) {
+                if (selectedName.equalsIgnoreCase(itemName)) {
                     this.setSelected(entry);
                 }
             }
-            
+
             if (this.getSelected() != null) {
                 this.centerScrollOn(this.getSelected());
             }
@@ -134,13 +166,23 @@ public class GenericSelectionScreen<T extends SelectionScreenSelectable> extends
             public Entry(T item) {
                 this.item = item;
             }
-            
+
             public T getItem() {
                 return item;
             }
 
             @Override
-            public void render(GuiGraphics guiGraphics, int x, int y, int width, int height, int mouseX, int mouseY, int i6, boolean isSelected, float partialTick) {
+            public void render(
+                    GuiGraphics guiGraphics,
+                    int x,
+                    int y,
+                    int width,
+                    int height,
+                    int mouseX,
+                    int mouseY,
+                    int i6,
+                    boolean isSelected,
+                    float partialTick) {
                 String displayName = parentScreen.getNameExtractor().apply(this.item);
                 guiGraphics.drawCenteredString(parentScreen.font, displayName, SelectionList.this.width / 2, y + 3, -1);
             }
@@ -169,7 +211,6 @@ public class GenericSelectionScreen<T extends SelectionScreenSelectable> extends
                 String displayName = parentScreen.getNameExtractor().apply(this.item);
                 return Component.literal(displayName);
             }
-
         }
     }
 }

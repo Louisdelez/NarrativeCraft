@@ -1,3 +1,26 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.screens.storyManager.character;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
@@ -10,6 +33,8 @@ import fr.loudo.narrativecraft.screens.storyManager.EditScreenAdapter;
 import fr.loudo.narrativecraft.util.ScreenUtils;
 import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
+import java.time.LocalDate;
+import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StringWidget;
@@ -17,62 +42,40 @@ import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.LocalDate;
-import java.util.Map;
-
 public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterStory> {
     @Override
     public void initExtraFields(EditInfoScreen<CharacterStory> screen, CharacterStory entry) {
         LocalDate localDate = LocalDate.now();
         ScreenUtils.LabelBox dayLabelBox = new ScreenUtils.LabelBox(
-                Component.literal("Day"),
-                screen.getFont(),
-                20,
-                20,
-                0,
-                0,
-                ScreenUtils.Align.HORIZONTAL
-        );
+                Component.literal("Day"), screen.getFont(), 20, 20, 0, 0, ScreenUtils.Align.HORIZONTAL);
         screen.extraFields.put("day", dayLabelBox);
         screen.extraFields.put("dayBox", dayLabelBox.getEditBox());
         dayLabelBox.getEditBox().setFilter(string -> string.matches("^\\d*$"));
         dayLabelBox.getEditBox().setValue(String.valueOf(localDate.getDayOfMonth()));
         ScreenUtils.LabelBox monthLabelBox = new ScreenUtils.LabelBox(
-                Component.literal("Month"),
-                screen.getFont(),
-                20,
-                20,
-                0,
-                0,
-                ScreenUtils.Align.HORIZONTAL
-        );
+                Component.literal("Month"), screen.getFont(), 20, 20, 0, 0, ScreenUtils.Align.HORIZONTAL);
         monthLabelBox.getEditBox().setFilter(string -> string.matches("^\\d*$"));
         monthLabelBox.getEditBox().setValue(String.valueOf(localDate.getMonthValue()));
         screen.extraFields.put("month", monthLabelBox);
         ScreenUtils.LabelBox yearLabelBox = new ScreenUtils.LabelBox(
-                Component.literal("Year"),
-                screen.getFont(),
-                32,
-                20,
-                0,
-                0,
-                ScreenUtils.Align.HORIZONTAL
-        );
+                Component.literal("Year"), screen.getFont(), 32, 20, 0, 0, ScreenUtils.Align.HORIZONTAL);
         yearLabelBox.getEditBox().setFilter(string -> string.matches("^\\d*$"));
         yearLabelBox.getEditBox().setValue("2000");
         screen.extraFields.put("year", yearLabelBox);
 
         Button modelButton = Button.builder(Component.literal(PlayerSkin.Model.WIDE.name()), button -> {
-            String currentModel = button.getMessage().getString();
+                    String currentModel = button.getMessage().getString();
 
-            if(currentModel.equalsIgnoreCase(PlayerSkin.Model.WIDE.name())) {
-                button.setMessage(Component.literal(PlayerSkin.Model.SLIM.name()));
-            } else {
-                button.setMessage(Component.literal(PlayerSkin.Model.WIDE.name()));
-            }
-        }).width(70).build();
+                    if (currentModel.equalsIgnoreCase(PlayerSkin.Model.WIDE.name())) {
+                        button.setMessage(Component.literal(PlayerSkin.Model.SLIM.name()));
+                    } else {
+                        button.setMessage(Component.literal(PlayerSkin.Model.WIDE.name()));
+                    }
+                })
+                .width(70)
+                .build();
         screen.extraFields.put("modelBtn", modelButton);
-        if(entry != null) {
+        if (entry != null) {
             String[] birthDateSplit = entry.getBirthDate().split("/");
             try {
                 dayLabelBox.getEditBox().setValue(birthDateSplit[0]);
@@ -94,12 +97,14 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
         screen.addRenderableWidget(dayLabelBox.getStringWidget());
 
         ScreenUtils.LabelBox monthLabelBox = (ScreenUtils.LabelBox) screen.extraFields.get("month");
-        monthLabelBox.setPosition( dayLabelBox.getEditBox().getX() + dayLabelBox.getEditBox().getWidth() + 10, y);
+        monthLabelBox.setPosition(
+                dayLabelBox.getEditBox().getX() + dayLabelBox.getEditBox().getWidth() + 10, y);
         screen.addRenderableWidget(monthLabelBox.getEditBox());
         screen.addRenderableWidget(monthLabelBox.getStringWidget());
 
         ScreenUtils.LabelBox yearLabelBox = (ScreenUtils.LabelBox) screen.extraFields.get("year");
-        yearLabelBox.setPosition( monthLabelBox.getEditBox().getX() + monthLabelBox.getEditBox().getWidth() + 10, y);
+        yearLabelBox.setPosition(
+                monthLabelBox.getEditBox().getX() + monthLabelBox.getEditBox().getWidth() + 10, y);
         screen.addRenderableWidget(yearLabelBox.getEditBox());
         screen.addRenderableWidget(yearLabelBox.getStringWidget());
 
@@ -107,26 +112,35 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
 
         Button modelButton = (Button) screen.extraFields.get("modelBtn");
         Component label = Component.literal("Model");
-        StringWidget modelText = ScreenUtils.text(label, screen.getFont(), x, y + modelButton.getHeight() / 2 - screen.getFont().lineHeight / 2);
+        StringWidget modelText = ScreenUtils.text(
+                label, screen.getFont(), x, y + modelButton.getHeight() / 2 - screen.getFont().lineHeight / 2);
         screen.addRenderableWidget(modelText);
         modelButton.setPosition(x + modelText.getWidth() + 5, y);
         screen.addRenderableWidget(modelButton);
     }
 
     @Override
-    public void buildFromScreen(Map<String, Object> extraFields, Minecraft minecraft, @Nullable CharacterStory existing, String name, String description) {
+    public void buildFromScreen(
+            Map<String, Object> extraFields,
+            Minecraft minecraft,
+            @Nullable CharacterStory existing,
+            String name,
+            String description) {
         CharacterManager characterManager = NarrativeCraftMod.getInstance().getCharacterManager();
-        String day = ((ScreenUtils.LabelBox)extraFields.get("day")).getEditBox().getValue();
-        String month = ((ScreenUtils.LabelBox)extraFields.get("month")).getEditBox().getValue();
-        String year = ((ScreenUtils.LabelBox)extraFields.get("year")).getEditBox().getValue();
-        PlayerSkin.Model model = PlayerSkin.Model.valueOf(((Button)extraFields.get("modelBtn")).getMessage().getString());
-        CharacterStory newCharacter = new CharacterStory(name, description, day, month, year, model, CharacterType.MAIN);
-        if(existing == null) {
-            if(characterManager.characterExists(name)) {
+        String day =
+                ((ScreenUtils.LabelBox) extraFields.get("day")).getEditBox().getValue();
+        String month =
+                ((ScreenUtils.LabelBox) extraFields.get("month")).getEditBox().getValue();
+        String year =
+                ((ScreenUtils.LabelBox) extraFields.get("year")).getEditBox().getValue();
+        PlayerSkin.Model model = PlayerSkin.Model.valueOf(
+                ((Button) extraFields.get("modelBtn")).getMessage().getString());
+        CharacterStory newCharacter =
+                new CharacterStory(name, description, day, month, year, model, CharacterType.MAIN);
+        if (existing == null) {
+            if (characterManager.characterExists(name)) {
                 ScreenUtils.sendToast(
-                        Translation.message("global.error"),
-                        Translation.message("character.already_exists", name)
-                );
+                        Translation.message("global.error"), Translation.message("character.already_exists", name));
                 return;
             }
             try {
