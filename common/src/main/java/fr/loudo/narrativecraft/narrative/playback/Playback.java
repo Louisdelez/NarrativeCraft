@@ -115,6 +115,7 @@ public class Playback {
     }
 
     public void tick() {
+        if (!isPlaying) return;
         for (PlaybackData playbackData : entityPlaybacks) {
             playbackData.tick(globalTick);
         }

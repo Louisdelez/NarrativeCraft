@@ -29,7 +29,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.managers.PlaybackManager;
-import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.managers.RecordingManager;
 import fr.loudo.narrativecraft.narrative.Environnement;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
@@ -38,6 +37,7 @@ import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.recording.Recording;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.screens.animation.AnimationCharacterLinkScreen;
+import fr.loudo.narrativecraft.util.CommandUtil;
 import fr.loudo.narrativecraft.util.Translation;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,8 +52,6 @@ public class RecordCommand {
 
     private static final RecordingManager recordingManager =
             NarrativeCraftMod.getInstance().getRecordingManager();
-    private static final PlayerSessionManager playerSessionManager =
-            NarrativeCraftMod.getInstance().getPlayerSessionManager();
     public static final List<ServerPlayer> playerTryingOverride = new ArrayList<>();
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -99,7 +97,8 @@ public class RecordCommand {
 
     private static int startRecording(CommandContext<CommandSourceStack> context) {
 
-        PlayerSession playerSession = getSession(context);
+        PlayerSession playerSession =
+                CommandUtil.getSession(context, context.getSource().getPlayer());
         if (playerSession == null) return 0;
 
         ServerPlayer player = context.getSource().getPlayer();
@@ -116,14 +115,15 @@ public class RecordCommand {
         recording.start();
         recordingManager.addRecording(recording);
 
-        context.getSource().sendSuccess(() -> Translation.message("record.start.success"), true);
+        context.getSource().sendSuccess(() -> Translation.message("record.start.success"), false);
 
         return Command.SINGLE_SUCCESS;
     }
 
     private static int startRecordingWithSubscenes(CommandContext<CommandSourceStack> context, String subscenes) {
 
-        PlayerSession playerSession = getSession(context);
+        PlayerSession playerSession =
+                CommandUtil.getSession(context, context.getSource().getPlayer());
         if (playerSession == null) return 0;
 
         ServerPlayer player = context.getSource().getPlayer();
@@ -163,7 +163,8 @@ public class RecordCommand {
 
     private static int stopRecording(CommandContext<CommandSourceStack> context) {
 
-        PlayerSession playerSession = getSession(context);
+        PlayerSession playerSession =
+                CommandUtil.getSession(context, context.getSource().getPlayer());
         if (playerSession == null) return 0;
 
         ServerPlayer player = context.getSource().getPlayer();
@@ -176,13 +177,14 @@ public class RecordCommand {
         Recording recording = recordingManager.getRecording(player);
         recording.stop();
 
-        context.getSource().sendSuccess(() -> Translation.message("record.stop.success"), true);
+        context.getSource().sendSuccess(() -> Translation.message("record.stop.success"), false);
 
         return Command.SINGLE_SUCCESS;
     }
 
     private static int saveRecording(CommandContext<CommandSourceStack> context, String newAnimationName) {
-        PlayerSession playerSession = getSession(context);
+        PlayerSession playerSession =
+                CommandUtil.getSession(context, context.getSource().getPlayer());
         if (playerSession == null) return 0;
 
         ServerPlayer player = context.getSource().getPlayer();
@@ -245,16 +247,5 @@ public class RecordCommand {
         Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
 
         return Command.SINGLE_SUCCESS;
-    }
-
-    private static PlayerSession getSession(CommandContext<CommandSourceStack> context) {
-
-        PlayerSession playerSession =
-                playerSessionManager.getSessionByPlayer(context.getSource().getPlayer());
-        if (!playerSession.isSessionSet()) {
-            context.getSource().sendFailure(Translation.message("session.not_set"));
-            return null;
-        }
-        return playerSession;
     }
 }

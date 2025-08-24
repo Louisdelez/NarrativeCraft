@@ -33,8 +33,10 @@ import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.util.Translation;
+import fr.loudo.narrativecraft.util.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.server.level.ServerPlayer;
 
 public class PlayerSessionCommand {
@@ -56,12 +58,19 @@ public class PlayerSessionCommand {
                                                 .executes(context -> setSession(
                                                         context,
                                                         IntegerArgumentType.getInteger(context, "chapter_index"),
-                                                        StringArgumentType.getString(context, "scene_name"))))))));
+                                                        StringArgumentType.getString(context, "scene_name"),
+                                                        context.getSource().getPlayer()))
+                                                .then(Commands.argument("target", EntityArgument.player())
+                                                        .executes(context -> setSession(
+                                                                context,
+                                                                IntegerArgumentType.getInteger(
+                                                                        context, "chapter_index"),
+                                                                StringArgumentType.getString(context, "scene_name"),
+                                                                EntityArgument.getPlayer(context, "target")))))))));
     }
 
-    private static int setSession(CommandContext<CommandSourceStack> context, int chapterIndex, String sceneName) {
-
-        ServerPlayer player = context.getSource().getPlayer();
+    private static int setSession(
+            CommandContext<CommandSourceStack> context, int chapterIndex, String sceneName, ServerPlayer player) {
 
         if (!NarrativeCraftMod.getInstance().getChapterManager().chapterExists(chapterIndex)) {
             context.getSource().sendFailure(Translation.message("chapter.no_exists", chapterIndex));
@@ -80,8 +89,16 @@ public class PlayerSessionCommand {
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
         playerSession.setChapter(chapter);
         playerSession.setScene(scene);
-        context.getSource()
-                .sendSuccess(() -> Translation.message("session.set", chapter.getIndex(), scene.getName()), false);
+        if (Util.isSamePlayer(context.getSource().getPlayer(), player)) {
+            context.getSource()
+                    .sendSuccess(() -> Translation.message("session.set", chapter.getIndex(), scene.getName()), false);
+        } else {
+            context.getSource()
+                    .sendSuccess(
+                            () -> Translation.message(
+                                    "session.set_to_player", chapter.getIndex(), scene.getName(), player.getName()),
+                            false);
+        }
 
         return Command.SINGLE_SUCCESS;
     }

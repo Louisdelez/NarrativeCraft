@@ -58,8 +58,20 @@ public class Subscene extends SceneData {
         for (Playback playback : playbacks) {
             playback.stop(killEntity);
         }
-        NarrativeCraftMod.getInstance().getPlaybackManager().getPlaybacks().removeAll(playbacks);
+        NarrativeCraftMod.getInstance()
+                .getPlaybackManager()
+                .getAnimationsByNamePlaying()
+                .removeAll(playbacks);
         playbacks.clear();
+    }
+
+    public boolean isPlaying() {
+        for (Playback playback : playbacks) {
+            if (playback.isPlaying()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<Playback> getPlaybacks() {

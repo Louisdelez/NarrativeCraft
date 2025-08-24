@@ -31,13 +31,13 @@ import net.minecraft.server.MinecraftServer;
 public class PlaybackTickHandler {
     public static void tick(MinecraftServer minecraftServer) {
         List<Playback> playbacks =
-                NarrativeCraftMod.getInstance().getPlaybackManager().getPlaybacksPlaying();
+                NarrativeCraftMod.getInstance().getPlaybackManager().getPlaybacks();
         List<Playback> toRemove = new ArrayList<>();
         for (Playback playback : playbacks) {
-            playback.tick();
             if (playback.hasEnded()) {
                 toRemove.add(playback);
             }
+            playback.tick();
         }
         NarrativeCraftMod.getInstance().getPlaybackManager().getPlaybacks().removeAll(toRemove);
     }

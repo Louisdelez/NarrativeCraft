@@ -32,17 +32,13 @@ import net.minecraft.world.entity.Entity;
 public class PlaybackManager {
 
     public static final AtomicInteger ids = new AtomicInteger();
-    private final List<Playback> playbacks;
-
-    public PlaybackManager() {
-        this.playbacks = new ArrayList<>();
-    }
+    private final List<Playback> playbacks = new ArrayList<>();
 
     public List<Playback> getPlaybacksPlaying() {
         return playbacks.stream().filter(Playback::isPlaying).toList();
     }
 
-    public List<Playback> getPlaybacks() {
+    public List<Playback> getAnimationsByNamePlaying() {
         return playbacks;
     }
 
@@ -68,10 +64,24 @@ public class PlaybackManager {
         return null;
     }
 
+    public List<Playback> getAnimationsByNamePlaying(String animationName) {
+        List<Playback> animationsPlaying = new ArrayList<>();
+        for (Playback playback : playbacks) {
+            if (playback.getAnimation().getName().equalsIgnoreCase(animationName)) {
+                animationsPlaying.add(playback);
+            }
+        }
+        return animationsPlaying;
+    }
+
     public boolean entityInPlayback(Entity entity) {
         for (Playback playback : playbacks) {
             if (playback.entityInPlayback(entity)) return true;
         }
         return false;
+    }
+
+    public List<Playback> getPlaybacks() {
+        return playbacks;
     }
 }

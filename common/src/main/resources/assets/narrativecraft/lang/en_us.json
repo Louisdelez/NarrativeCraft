@@ -20,9 +20,10 @@
   "narrativecraft.file.funcs_placeholder": "Write your functions here.",
 
   "narrativecraft.session.set": "Your session is now set to §lChapter %d §rand §lScene %s.",
-  "narrativecraft.session.not_set": "You need to set the chapter and scene session.",
+  "narrativecraft.session.set_to_player": "Session is now set to §lChapter %d §rand §lScene %s for %s.",
+  "narrativecraft.session.not_set": "You don't have a session set.",
+  "narrativecraft.session.player_not_set": "%s don't have a session set.",
   "narrativecraft.session.cleared": "Session cleared.",
-  "narrativecraft.session.cleared.fail": "You don't have a session set.",
 
   "narrativecraft.record.start.success": "Record started...",
   "narrativecraft.record.start.already_recording": "You are currently recording.",
@@ -36,6 +37,15 @@
   "narrativecraft.record.save.fail": "Error while saving animation %s for scene %s of chapter %d!",
   "narrativecraft.record.start.with_subscenes": "With subscene(s) %s.",
 
+  "narrativecraft.playback.animation.play": "Playing animation %s...",
+  "narrativecraft.playback.animation.stop": "Stopped animation %s.",
+  "narrativecraft.playback.animation.not_playing": "Animation %s is not playing.",
+  "narrativecraft.playback.subscene.play": "Playing subscene %s...",
+  "narrativecraft.playback.subscene.stop": "Stopped subscene %s.",
+  "narrativecraft.playback.subscene.not_playing": "Subscene %s is not playing.",
+  "narrativecraft.playbacks.not_playing": "No playbacks are currently playing.",
+  "narrativecraft.playback.stop_all": "All playback stopped.",
+
   "narrativecraft.chapter.already_exists": "Chapter %s already exists in the story.",
 
   "narrativecraft.scene.rank": "Rank",
@@ -44,8 +54,12 @@
   "narrativecraft.scene.rank_no_under_one": "Rank value cannot be under 1.",
 
   "narrativecraft.animation.already_exists": "Animation %s already exists in scene %s.",
+  "narrativecraft.animation.no_exists": "Animation %s does not exists in scene %s.",
+  "narrativecraft.animation.playing": "Playing animation %s of scene %s...",
 
   "narrativecraft.subscene.already_exists": "Subscene %s already exists in scene %s",
+  "narrativecraft.subscene.no_exists": "Subscene %s does not exists in scene %s.",
+  "narrativecraft.subscene.playing": "Playing subscene %s of scene %s...",
 
   "narrativecraft.cutscene.already_exists": "Cutscene %s already exists in scene %s",
 

@@ -23,11 +23,14 @@
 
 package fr.loudo.narrativecraft.narrative.chapter;
 
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import net.minecraft.commands.CommandSourceStack;
 
 public class Chapter extends NarrativeEntry {
 
@@ -94,6 +97,19 @@ public class Chapter extends NarrativeEntry {
         }
 
         scene.setRank(newRank);
+    }
+
+    public SuggestionProvider<CommandSourceStack> getAnimationSuggestionFromScene(Scene scene) {
+        return (context, builder) -> {
+            for (Animation animation : scene.getAnimations()) {
+                if (animation.getName().split(" ").length > 1) {
+                    builder.suggest("\"" + animation.getName() + "\"");
+                } else {
+                    builder.suggest(animation.getName());
+                }
+            }
+            return builder.buildFuture();
+        };
     }
 
     public List<Scene> getSortedSceneList() {

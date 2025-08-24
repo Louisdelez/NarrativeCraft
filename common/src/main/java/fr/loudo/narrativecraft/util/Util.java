@@ -35,7 +35,9 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -130,5 +132,15 @@ public class Util {
         ((PlayerListAccessor) NarrativeCraftMod.server.getPlayerList())
                 .getPlayersByUUID()
                 .remove(fakePlayer.getUUID());
+    }
+
+    public static boolean isSameEntity(Entity entity1, Entity entity2) {
+        if (entity1 == null || entity2 == null) return false;
+        return entity1.getUUID().equals(entity2.getUUID());
+    }
+
+    public static boolean isSamePlayer(ServerPlayer player1, ServerPlayer player2) {
+        if (player1 == null || player2 == null) return false;
+        return player1.getUUID().equals(player2.getUUID());
     }
 }

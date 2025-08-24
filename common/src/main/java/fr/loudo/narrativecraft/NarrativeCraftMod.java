@@ -73,6 +73,6 @@ public class NarrativeCraftMod {
         playerSessionManager.getPlayerSessions().clear();
         characterManager.getCharacterStories().clear();
         recordingManager.getRecordings().clear();
-        playbackManager.getPlaybacks().clear();
+        playbackManager.getAnimationsByNamePlaying().clear();
     }
 }
