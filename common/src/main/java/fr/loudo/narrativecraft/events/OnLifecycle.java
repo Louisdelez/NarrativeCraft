@@ -36,4 +36,8 @@ public class OnLifecycle {
         NarrativeCraftFile.init(server);
         NarrativeEntryInit.init();
     }
+
+    public static void serverStop(MinecraftServer server) {
+        NarrativeCraftMod.getInstance().getPlaybackManager().stopAll();
+    }
 }

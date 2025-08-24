@@ -26,7 +26,9 @@ package fr.loudo.narrativecraft.events;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.commands.RecordCommand;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
+import fr.loudo.narrativecraft.managers.RecordingManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryInit;
+import fr.loudo.narrativecraft.narrative.recording.Recording;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.util.FakePlayer;
 import fr.loudo.narrativecraft.util.Translation;
@@ -47,6 +49,13 @@ public class OnPlayerServerConnection {
         if (player instanceof FakePlayer) return;
         clearSession(player);
         RecordCommand.playerTryingOverride.remove(player);
+        // If player is recording while leaving, then stop it and remove recording from manager.
+        RecordingManager recordingManager = NarrativeCraftMod.getInstance().getRecordingManager();
+        Recording recording = recordingManager.getRecording(player);
+        if (recording != null && recording.isRecording()) {
+            recording.stop();
+        }
+        recordingManager.removeRecording(recording);
     }
 
     private static void initSession(ServerPlayer player) {

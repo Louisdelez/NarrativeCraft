@@ -30,4 +30,8 @@ public class LifecycleEvent {
     public static void onServerStart(MinecraftServer server) {
         OnLifecycle.serverStart(server);
     }
+
+    public static void onServerStop(MinecraftServer server) {
+        OnLifecycle.serverStop(server);
+    }
 }

@@ -197,9 +197,7 @@ public class PlaybackCommand {
                             "playbacks.not_playing", playerSession.getScene().getName()));
             return 0;
         }
-        for (Playback playback : playbackManager.getPlaybacksPlaying()) {
-            playback.stop(true);
-        }
+        playbackManager.stopAll();
         context.getSource().sendSuccess(() -> Translation.message("playback.stop_all"), false);
         return Command.SINGLE_SUCCESS;
     }

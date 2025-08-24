@@ -39,6 +39,7 @@ public class EventsRegister {
 
     public static void register() {
         ServerLifecycleEvents.SERVER_STARTED.register(LifecycleEvent::onServerStart);
+        ServerLifecycleEvents.SERVER_STOPPING.register(LifecycleEvent::onServerStop);
         ServerPlayConnectionEvents.JOIN.register(PlayerServerConnection::onPlayerJoin);
         ServerPlayConnectionEvents.DISCONNECT.register(PlayerServerConnection::onPlayerLeave);
         ClientTickEvents.END_CLIENT_TICK.register(PressKeyListener::onPressKey);

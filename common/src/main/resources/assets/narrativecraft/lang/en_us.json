@@ -56,6 +56,8 @@
   "narrativecraft.animation.already_exists": "Animation %s already exists in scene %s.",
   "narrativecraft.animation.no_exists": "Animation %s does not exists in scene %s.",
   "narrativecraft.animation.playing": "Playing animation %s of scene %s...",
+  "narrativecraft.animation.no_character_linked": "Animations %s has no character linked, can't start.",
+  "narrativecraft.animation.must_link_character": "You must choose a character.",
 
   "narrativecraft.subscene.already_exists": "Subscene %s already exists in scene %s",
   "narrativecraft.subscene.no_exists": "Subscene %s does not exists in scene %s.",

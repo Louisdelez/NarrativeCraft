@@ -28,15 +28,21 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 
 @Mod(NarrativeCraftMod.MOD_ID)
 public class LifecycleEvent {
 
     public LifecycleEvent(IEventBus modBus) {
         NeoForge.EVENT_BUS.addListener(LifecycleEvent::onServerStart);
+        NeoForge.EVENT_BUS.addListener(LifecycleEvent::onServerStopping);
     }
 
     private static void onServerStart(ServerStartedEvent startedEvent) {
         OnLifecycle.serverStart(startedEvent.getServer());
+    }
+
+    private static void onServerStopping(ServerStoppingEvent stoppingEvent) {
+        OnLifecycle.serverStop(stoppingEvent.getServer());
     }
 }

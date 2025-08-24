@@ -84,4 +84,11 @@ public class PlaybackManager {
     public List<Playback> getPlaybacks() {
         return playbacks;
     }
+
+    public void stopAll() {
+        for (Playback playback : playbacks) {
+            playback.stop(true);
+        }
+        playbacks.clear();
+    }
 }

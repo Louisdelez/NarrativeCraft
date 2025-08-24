@@ -34,9 +34,11 @@ import fr.loudo.narrativecraft.narrative.recording.Location;
 import fr.loudo.narrativecraft.narrative.recording.actions.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.util.FakePlayer;
+import fr.loudo.narrativecraft.util.Translation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.server.level.ServerLevel;
@@ -71,6 +73,13 @@ public class Playback {
     }
 
     public void start() {
+
+        if (animation.getCharacter() == null) {
+            Minecraft.getInstance()
+                    .player
+                    .displayClientMessage(Translation.message("animation.no_character_linked"), false);
+            return;
+        }
 
         //        if(environnement == Environnement.PRODUCTION) {
         //            StoryHandler storyHandler = NarrativeCraftMod.getInstance().getStoryHandler();
@@ -333,6 +342,7 @@ public class Playback {
     }
 
     public void stop(boolean killEntity) {
+        if (!isPlaying || hasEnded) return;
         isPlaying = false;
         hasEnded = true;
         if (killEntity) {

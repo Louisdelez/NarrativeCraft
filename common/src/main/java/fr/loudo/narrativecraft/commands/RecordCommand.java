@@ -38,6 +38,7 @@ import fr.loudo.narrativecraft.narrative.recording.Recording;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.screens.animation.AnimationCharacterLinkScreen;
 import fr.loudo.narrativecraft.util.CommandUtil;
+import fr.loudo.narrativecraft.util.ScreenUtils;
 import fr.loudo.narrativecraft.util.Translation;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -223,6 +224,11 @@ public class RecordCommand {
         }
         Animation finalAnimation = animation;
         AnimationCharacterLinkScreen screen = new AnimationCharacterLinkScreen(null, animation, characterStory -> {
+            if (characterStory == null) {
+                ScreenUtils.sendToast(
+                        Translation.message("global.error"), Translation.message("animation.must_link_character"));
+                return;
+            }
             try {
                 finalAnimation.setCharacter(characterStory);
                 recording.save(finalAnimation);
