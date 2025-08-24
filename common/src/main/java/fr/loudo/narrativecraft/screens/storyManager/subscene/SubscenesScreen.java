@@ -25,12 +25,16 @@ package fr.loudo.narrativecraft.screens.storyManager.subscene;
 
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
+import fr.loudo.narrativecraft.screens.components.PickElementScreen;
 import fr.loudo.narrativecraft.screens.components.StoryElementList;
 import fr.loudo.narrativecraft.screens.storyManager.StoryElementScreen;
 import fr.loudo.narrativecraft.screens.storyManager.scene.ScenesMenuScreen;
+import fr.loudo.narrativecraft.util.ImageFontConstants;
 import fr.loudo.narrativecraft.util.Translation;
+import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
@@ -68,8 +72,47 @@ public class SubscenesScreen extends StoryElementScreen {
                             .build();
                     button.active = false;
 
+                    List<Animation> availableAnimations = scene.getAnimations().stream()
+                            .filter(anim -> subscene.getAnimations().stream()
+                                    .noneMatch(a -> a.getName().equals(anim.getName())))
+                            .toList();
+                    Button settingsButton = Button.builder(ImageFontConstants.SETTINGS, b -> {
+                                PickElementScreen screen = new PickElementScreen(
+                                        this,
+                                        Translation.message(
+                                                "screen.selector.subscene.title",
+                                                Translation.message("global.animations"),
+                                                Component.literal(subscene.getName())),
+                                        Translation.message("global.animations"),
+                                        availableAnimations,
+                                        subscene.getAnimations(),
+                                        entries1 -> {
+                                            List<Animation> oldAnimations = subscene.getAnimations();
+                                            List<Animation> selected = new ArrayList<>();
+                                            for (var entry : entries1) {
+                                                Animation a = (Animation) entry.getNarrativeEntry();
+                                                selected.add(a);
+                                            }
+                                            try {
+                                                subscene.getAnimations().clear();
+                                                subscene.getAnimations().addAll(selected);
+                                                NarrativeCraftFile.updateSubsceneFile(scene);
+                                                minecraft.setScreen(new SubscenesScreen(scene));
+                                            } catch (Exception e) {
+                                                subscene.getAnimations().clear();
+                                                subscene.getAnimations().addAll(oldAnimations);
+                                                fr.loudo.narrativecraft.util.Util.sendCrashMessage(minecraft.player, e);
+                                                minecraft.setScreen(null);
+                                            }
+                                        });
+                                this.minecraft.setScreen(screen);
+                            })
+                            .width(20)
+                            .build();
+
                     return new StoryElementList.StoryEntryData(
                             button,
+                            List.of(settingsButton),
                             () -> {
                                 minecraft.setScreen(
                                         new EditInfoScreen<>(this, subscene, new EditScreenSubsceneAdapter(scene)));
