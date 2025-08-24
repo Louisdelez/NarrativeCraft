@@ -23,8 +23,10 @@
 
 package fr.loudo.narrativecraft.screens.storyManager.scene;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.screens.components.StoryElementList;
 import fr.loudo.narrativecraft.screens.storyManager.StoryElementScreen;
 import fr.loudo.narrativecraft.screens.storyManager.animations.AnimationsScreen;
@@ -35,6 +37,7 @@ import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.network.chat.CommonComponents;
 
 public class ScenesMenuScreen extends StoryElementScreen {
@@ -56,10 +59,29 @@ public class ScenesMenuScreen extends StoryElementScreen {
         initFolderButton();
     }
 
+    @Override
     protected void addFooter() {
-        this.layout.addToFooter(Button.builder(CommonComponents.GUI_BACK, p_345997_ -> this.onClose())
-                .width(200)
-                .build());
+        int width = 200;
+        LinearLayout linearLayout =
+                this.layout.addToFooter(LinearLayout.horizontal().spacing(8));
+        PlayerSession playerSession =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
+        if (playerSession.isSessionSet() && playerSession.getScene().equals(scene)) {
+            width = 100;
+            linearLayout.addChild(Button.builder(CommonComponents.GUI_BACK, (p_345997_) -> {
+                        ScenesScreen screen = new ScenesScreen(scene.getChapter());
+                        this.minecraft.setScreen(screen);
+                    })
+                    .width(width)
+                    .build());
+            linearLayout.addChild(Button.builder(CommonComponents.GUI_DONE, (p_345997_) -> minecraft.setScreen(null))
+                    .width(width)
+                    .build());
+        } else {
+            linearLayout.addChild(Button.builder(CommonComponents.GUI_BACK, (p_345997_) -> this.onClose())
+                    .width(width)
+                    .build());
+        }
     }
 
     @Override

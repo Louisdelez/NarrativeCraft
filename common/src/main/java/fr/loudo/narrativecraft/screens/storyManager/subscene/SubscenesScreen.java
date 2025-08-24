@@ -38,6 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 public class SubscenesScreen extends StoryElementScreen {
@@ -57,6 +59,12 @@ public class SubscenesScreen extends StoryElementScreen {
             this.minecraft.setScreen(screen);
         });
         initFolderButton();
+    }
+
+    protected void addFooter() {
+        this.layout.addToFooter(Button.builder(CommonComponents.GUI_BACK, p_345997_ -> this.onClose())
+                .width(200)
+                .build());
     }
 
     @Override
@@ -80,7 +88,7 @@ public class SubscenesScreen extends StoryElementScreen {
                                 PickElementScreen screen = new PickElementScreen(
                                         this,
                                         Translation.message(
-                                                "screen.selector.subscene.title",
+                                                "screen.pick.subscene.title",
                                                 Translation.message("global.animations"),
                                                 Component.literal(subscene.getName())),
                                         Translation.message("global.animations"),
@@ -109,6 +117,8 @@ public class SubscenesScreen extends StoryElementScreen {
                             })
                             .width(20)
                             .build();
+                    settingsButton.setTooltip(
+                            Tooltip.create(Translation.message("screen.story_manager.subscene_animation_link")));
 
                     return new StoryElementList.StoryEntryData(
                             button,

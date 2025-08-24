@@ -39,6 +39,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.cameraAngle.CameraAn
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.serialization.AnimationSerializer;
+import fr.loudo.narrativecraft.serialization.CharacterSerializer;
 import fr.loudo.narrativecraft.serialization.CutsceneSerializer;
 import fr.loudo.narrativecraft.serialization.SubsceneSerializer;
 import java.io.File;
@@ -164,7 +165,9 @@ public class NarrativeEntryInit {
         File[] charactersFolder = NarrativeCraftFile.characterDirectory.listFiles();
         if (charactersFolder == null) return;
         CharacterManager characterManager = NarrativeCraftMod.getInstance().getCharacterManager();
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(CharacterStory.class, new CharacterSerializer())
+                .create();
         for (File characterFolder : charactersFolder) {
             File dataFile = NarrativeCraftFile.getDataFile(characterFolder);
             String dataContent = Files.readString(dataFile.toPath());

@@ -80,9 +80,8 @@ public class PlaybackCommand {
     }
 
     private static int playAnimation(CommandContext<CommandSourceStack> context, String animationName) {
-        PlayerSession playerSession = NarrativeCraftMod.getInstance()
-                .getPlayerSessionManager()
-                .getSessionByPlayer(context.getSource().getPlayer());
+        PlayerSession playerSession =
+                CommandUtil.getSession(context, context.getSource().getPlayer());
         if (playerSession == null) return 0;
         Animation animation = playerSession.getScene().getAnimationByName(animationName);
         if (animation == null) {
@@ -107,9 +106,8 @@ public class PlaybackCommand {
     }
 
     private static int playSubscene(CommandContext<CommandSourceStack> context, String subsceneName) {
-        PlayerSession playerSession = NarrativeCraftMod.getInstance()
-                .getPlayerSessionManager()
-                .getSessionByPlayer(context.getSource().getPlayer());
+        PlayerSession playerSession =
+                CommandUtil.getSession(context, context.getSource().getPlayer());
         if (playerSession == null) return 0;
         Subscene subscene = playerSession.getScene().getSubsceneByName(subsceneName);
         if (subscene == null) {
@@ -126,9 +124,8 @@ public class PlaybackCommand {
     }
 
     private static int stopAnimation(CommandContext<CommandSourceStack> context, String animationName) {
-        PlayerSession playerSession = NarrativeCraftMod.getInstance()
-                .getPlayerSessionManager()
-                .getSessionByPlayer(context.getSource().getPlayer());
+        PlayerSession playerSession =
+                CommandUtil.getSession(context, context.getSource().getPlayer());
         if (playerSession == null) return 0;
         Animation animation = playerSession.getScene().getAnimationByName(animationName);
         if (animation == null) {
@@ -158,9 +155,8 @@ public class PlaybackCommand {
     }
 
     private static int stopSubscene(CommandContext<CommandSourceStack> context, String subsceneName) {
-        PlayerSession playerSession = NarrativeCraftMod.getInstance()
-                .getPlayerSessionManager()
-                .getSessionByPlayer(context.getSource().getPlayer());
+        PlayerSession playerSession =
+                CommandUtil.getSession(context, context.getSource().getPlayer());
         if (playerSession == null) return 0;
         Subscene subscene = playerSession.getScene().getSubsceneByName(subsceneName);
         if (subscene == null) {

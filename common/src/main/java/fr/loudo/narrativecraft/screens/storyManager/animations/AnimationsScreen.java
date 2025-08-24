@@ -25,14 +25,19 @@ package fr.loudo.narrativecraft.screens.storyManager.animations;
 
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
+import fr.loudo.narrativecraft.screens.animation.AnimationCharacterLinkScreen;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.components.StoryElementList;
 import fr.loudo.narrativecraft.screens.storyManager.StoryElementScreen;
 import fr.loudo.narrativecraft.screens.storyManager.scene.ScenesMenuScreen;
+import fr.loudo.narrativecraft.util.ImageFontConstants;
+import fr.loudo.narrativecraft.util.ScreenUtils;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 public class AnimationsScreen extends StoryElementScreen {
@@ -50,6 +55,12 @@ public class AnimationsScreen extends StoryElementScreen {
         initFolderButton();
     }
 
+    protected void addFooter() {
+        this.layout.addToFooter(Button.builder(CommonComponents.GUI_BACK, p_345997_ -> this.onClose())
+                .width(200)
+                .build());
+    }
+
     @Override
     public void onClose() {
         minecraft.setScreen(new ScenesMenuScreen(scene));
@@ -62,9 +73,9 @@ public class AnimationsScreen extends StoryElementScreen {
                     Button button = Button.builder(Component.literal(animation.getName()), button1 -> {})
                             .build();
                     button.active = false;
-
                     return new StoryElementList.StoryEntryData(
                             button,
+                            List.of(createSettingsButton(animation)),
                             () -> {
                                 minecraft.setScreen(
                                         new EditInfoScreen<>(this, animation, new EditScreenAnimationAdapter(scene)));
@@ -79,6 +90,24 @@ public class AnimationsScreen extends StoryElementScreen {
                 .toList();
 
         this.storyElementList = this.layout.addToContents(new StoryElementList(this.minecraft, this, entries, true));
+    }
+
+    private Button createSettingsButton(Animation animation) {
+
+        return Button.builder(ImageFontConstants.SETTINGS, button1 -> {
+                    AnimationCharacterLinkScreen screen =
+                            new AnimationCharacterLinkScreen(this, animation, characterStory -> {
+                                if (characterStory == null) {
+                                    ScreenUtils.sendToast(
+                                            Translation.message("global.error"),
+                                            Translation.message("animation.must_link_character"));
+                                    return;
+                                }
+                                animation.setCharacter(characterStory);
+                            });
+                    this.minecraft.setScreen(screen);
+                })
+                .build();
     }
 
     @Override

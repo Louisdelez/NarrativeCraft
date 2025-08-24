@@ -21,36 +21,25 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.managers;
+package fr.loudo.narrativecraft.serialization;
 
-import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import java.util.ArrayList;
-import java.util.List;
-import net.minecraft.world.entity.player.Player;
+import com.google.gson.*;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import java.lang.reflect.Type;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.EntityType;
 
-public class PlayerSessionManager {
-
-    private final List<PlayerSession> playerSessions = new ArrayList<>();
-
-    public void addSession(PlayerSession playerSession) {
-        if (playerSessions.contains(playerSession)) return;
-        playerSessions.add(playerSession);
-    }
-
-    public void removeSession(PlayerSession playerSession) {
-        playerSessions.remove(playerSession);
-    }
-
-    public PlayerSession getSessionByPlayer(Player player) {
-        for (PlayerSession playerSession : playerSessions) {
-            if (playerSession.isSamePlayer(player)) {
-                return playerSession;
-            }
+public class CharacterSerializer implements JsonDeserializer<CharacterStory> {
+    @Override
+    public CharacterStory deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+            throws JsonParseException {
+        JsonObject obj = json.getAsJsonObject();
+        CharacterStory characterStory = new Gson().fromJson(json, CharacterStory.class);
+        if (obj.has("entityTypeId")) {
+            int entityTypeId = obj.get("entityTypeId").getAsInt();
+            EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.byId(entityTypeId);
+            characterStory.setEntityType(entityType);
         }
-        return null;
-    }
-
-    public List<PlayerSession> getPlayerSessions() {
-        return playerSessions;
+        return characterStory;
     }
 }

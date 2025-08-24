@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.narrative.session;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 public class PlayerSession {
 
@@ -43,7 +44,7 @@ public class PlayerSession {
         this.scene = scene;
     }
 
-    public boolean isSamePlayer(ServerPlayer player) {
+    public boolean isSamePlayer(Player player) {
         return this.player.getUUID().equals(player.getUUID());
     }
 

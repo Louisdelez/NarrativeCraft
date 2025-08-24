@@ -27,11 +27,15 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.screens.characters.CharacterEntityTypeScreen;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.components.StoryElementList;
 import fr.loudo.narrativecraft.screens.storyManager.StoryElementScreen;
+import fr.loudo.narrativecraft.util.ImageFontConstants;
+import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 
 public class CharactersScreen extends StoryElementScreen {
@@ -58,9 +62,16 @@ public class CharactersScreen extends StoryElementScreen {
                     Button button = Button.builder(Component.literal(character.getName()), button1 -> {})
                             .build();
                     button.active = false;
+                    Button entityTypeButton = Button.builder(ImageFontConstants.ENTITY, button1 -> {
+                                CharacterEntityTypeScreen screen = new CharacterEntityTypeScreen(this, character);
+                                minecraft.setScreen(screen);
+                            })
+                            .build();
+                    entityTypeButton.setTooltip(Tooltip.create(Translation.message("tooltip.character_entity_type")));
 
                     return new StoryElementList.StoryEntryData(
                             button,
+                            List.of(entityTypeButton),
                             () -> {
                                 minecraft.setScreen(
                                         new EditInfoScreen<>(this, character, new EditScreenCharacterAdapter()));

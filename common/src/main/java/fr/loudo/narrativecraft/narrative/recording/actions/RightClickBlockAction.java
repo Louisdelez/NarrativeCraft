@@ -59,9 +59,7 @@ public class RightClickBlockAction extends Action {
         if (playbackData.getEntity() instanceof FakePlayer fakePlayer) {
             BlockPos blockPos = new BlockPos(x, y, z);
             ItemStack itemStack = fakePlayer.getItemInHand(InteractionHand.valueOf(handName));
-            if (itemStack.getItem() instanceof SpawnEggItem
-                    || itemStack.getItem() instanceof BoatItem
-                    || !itemStack.isDamageableItem()) return;
+            if (itemStack.getItem() instanceof SpawnEggItem || itemStack.getItem() instanceof BoatItem) return;
             BlockState blockState = fakePlayer.level().getBlockState(blockPos);
             itemStack.setCount(2);
             BlockHitResult blockHitResult =
@@ -69,7 +67,7 @@ public class RightClickBlockAction extends Action {
             UseOnContext useOnContext = new UseOnContext(fakePlayer, InteractionHand.valueOf(handName), blockHitResult);
 
             InteractionResult result = blockState.useWithoutItem(fakePlayer.level(), fakePlayer, blockHitResult);
-            if (!result.consumesAction()) {
+            if (!result.consumesAction() && itemStack.isDamageableItem()) {
                 itemStack.getItem().useOn(useOnContext);
             }
         }

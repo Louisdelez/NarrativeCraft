@@ -23,8 +23,13 @@
 
 package fr.loudo.narrativecraft.narrative.character;
 
+import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.util.Util;
+import java.io.IOException;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.PlayerSkin;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 
 public class CharacterStory extends NarrativeEntry {
@@ -34,6 +39,7 @@ public class CharacterStory extends NarrativeEntry {
     private String birthDate;
     private CharacterType characterType;
     private PlayerSkin.Model model;
+    private int entityTypeId;
 
     public CharacterStory(
             String name,
@@ -47,6 +53,22 @@ public class CharacterStory extends NarrativeEntry {
         this.birthDate = day + "/" + month + "/" + year;
         this.characterType = characterType;
         this.model = model;
+        this.entityType = EntityType.PLAYER;
+    }
+
+    public void updateEntityType(EntityType<?> entityType) {
+        EntityType<?> oldEntityType = this.entityType;
+        int oldEntityTypeId = entityTypeId;
+        try {
+            this.entityType = entityType;
+            entityTypeId = BuiltInRegistries.ENTITY_TYPE.getId(entityType);
+            NarrativeCraftFile.updateCharacterData(this, this);
+        } catch (IOException e) {
+            this.entityType = oldEntityType;
+            entityTypeId = oldEntityTypeId;
+            Util.sendCrashMessage(Minecraft.getInstance().player, e);
+            Minecraft.getInstance().setScreen(null);
+        }
     }
 
     public String getBirthDate() {
@@ -71,6 +93,14 @@ public class CharacterStory extends NarrativeEntry {
 
     public void setModel(PlayerSkin.Model model) {
         this.model = model;
+    }
+
+    public void setEntityType(EntityType<?> entityType) {
+        this.entityType = entityType;
+    }
+
+    public int getEntityTypeId() {
+        return entityTypeId;
     }
 
     public EntityType<?> getEntityType() {

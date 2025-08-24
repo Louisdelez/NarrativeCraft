@@ -9,7 +9,9 @@
   "narrativecraft.global.error": "Error",
   "narrativecraft.global.confirm_delete": "Are you sure? This can't be undone!",
   "narrativecraft.global.animation": "Animation",
+  "narrativecraft.global.animations": "Animations",
   "narrativecraft.global.subscene": "Subscene",
+  "narrativecraft.global.subscenes": "Subscenes",
   "narrativecraft.global.npc": "Npc",
   "narrativecraft.global.camera_angle": "Camera angle",
   "narrativecraft.global.cutscene": "Cutscene",
@@ -74,5 +76,13 @@
   "narrativecraft.screen.story_manager.subscene_list": "Subscenes of scene %s",
   "narrativecraft.screen.story_manager.cutscene_list": "Cutscenes of scene %s",
   "narrativecraft.screen.story_manager.camera_angle_list": "Camera angles of scene %s",
-  "narrativecraft.screen.edit_info.name_must": "You must have a name!"
+  "narrativecraft.screen.story_manager.link_animation_character": "Link animation to character",
+  "narrativecraft.screen.story_manager.subscene_cutscene_link": "Link subscene to cutscene",
+  "narrativecraft.screen.story_manager.animation_cutscene_link": "Link animation to cutscene",
+  "narrativecraft.screen.story_manager.subscene_animation_link": "Link animation to subscene",
+  "narrativecraft.screen.edit_info.name_must": "You must have a name!",
+  "narrativecraft.screen.pick.subscene.title": "%s selector for subscene %s",
+  "narrativecraft.screen.pick.cutscene.title": "%s selector for cutscene %s",
+
+  "narrativecraft.tooltip.character_entity_type": "Change entity type"
 }

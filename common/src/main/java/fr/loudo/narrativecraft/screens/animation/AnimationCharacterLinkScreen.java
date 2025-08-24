@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.screens.components.GenericSelectionScreen;
+import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import java.util.function.Consumer;
 import net.minecraft.client.gui.components.Button;
@@ -45,7 +46,13 @@ public class AnimationCharacterLinkScreen extends GenericSelectionScreen<Charact
             List<CharacterStory> characterStoryList,
             CharacterType characterType,
             Consumer<CharacterStory> consumer) {
-        super(lastScreen, "Link animation to character", characterStoryList, animation.getCharacter(), consumer);
+        super(
+                lastScreen,
+                Translation.message("screen.story_manager.link_animation_character")
+                        .getString(),
+                characterStoryList,
+                animation.getCharacter(),
+                consumer);
         this.characterType = characterType;
         this.animation = animation;
     }
@@ -53,7 +60,8 @@ public class AnimationCharacterLinkScreen extends GenericSelectionScreen<Charact
     public AnimationCharacterLinkScreen(Screen lastScreen, Animation animation, Consumer<CharacterStory> consumer) {
         super(
                 lastScreen,
-                "Link animation to character",
+                Translation.message("screen.story_manager.link_animation_character")
+                        .getString(),
                 NarrativeCraftMod.getInstance().getCharacterManager().getCharacterStories(),
                 animation.getCharacter(),
                 consumer);
@@ -64,7 +72,7 @@ public class AnimationCharacterLinkScreen extends GenericSelectionScreen<Charact
     @Override
     protected void addCustomTitleButtons(LinearLayout layout) {
         layout.addChild(Button.builder(
-                        characterType == CharacterType.NPC ? Component.literal("MAIN") : Component.literal("NPC"),
+                        characterType == CharacterType.NPC ? Component.literal("<- MAIN") : Component.literal("NPC ->"),
                         button -> {
                             Screen screen;
                             if (characterType == CharacterType.MAIN) {

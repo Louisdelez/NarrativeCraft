@@ -26,6 +26,9 @@ package fr.loudo.narrativecraft.managers;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
 
 public class CharacterManager {
 
@@ -60,5 +63,16 @@ public class CharacterManager {
 
     public List<CharacterStory> getCharacterStories() {
         return characterStories;
+    }
+
+    public List<EntityType<?>> getAvailableEntityTypes() {
+        List<EntityType<?>> finalList = new ArrayList<>();
+        for (EntityType<?> entityType : BuiltInRegistries.ENTITY_TYPE.stream().toList()) {
+            String key = BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath();
+            if (entityType.getCategory() != MobCategory.MISC || key.equals("player") || key.equals("villager")) {
+                finalList.add(entityType);
+            }
+        }
+        return finalList;
     }
 }

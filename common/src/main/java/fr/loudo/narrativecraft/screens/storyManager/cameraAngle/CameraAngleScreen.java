@@ -34,6 +34,7 @@ import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 public class CameraAngleScreen extends StoryElementScreen {
@@ -54,6 +55,12 @@ public class CameraAngleScreen extends StoryElementScreen {
             this.minecraft.setScreen(screen);
         });
         initFolderButton();
+    }
+
+    protected void addFooter() {
+        this.layout.addToFooter(Button.builder(CommonComponents.GUI_BACK, p_345997_ -> this.onClose())
+                .width(200)
+                .build());
     }
 
     @Override

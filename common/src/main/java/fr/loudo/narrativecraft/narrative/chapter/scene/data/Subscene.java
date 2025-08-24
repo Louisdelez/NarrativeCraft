@@ -44,7 +44,6 @@ public class Subscene extends SceneData {
 
     public void start(Level level, Environnement environnement, boolean looping) {
         playbacks = getPlaybacks();
-        playbacks.clear();
         for (Animation animation : animations) {
             Playback playback =
                     new Playback(PlaybackManager.ids.incrementAndGet(), animation, level, environnement, looping);
@@ -58,10 +57,6 @@ public class Subscene extends SceneData {
         for (Playback playback : playbacks) {
             playback.stop(killEntity);
         }
-        NarrativeCraftMod.getInstance()
-                .getPlaybackManager()
-                .getAnimationsByNamePlaying()
-                .removeAll(playbacks);
         playbacks.clear();
     }
 
