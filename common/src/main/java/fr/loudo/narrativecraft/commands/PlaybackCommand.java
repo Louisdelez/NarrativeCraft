@@ -43,7 +43,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.server.level.ServerPlayer;
 
 // TODO: Play a playback for a specific player
 public class PlaybackCommand {
@@ -57,38 +56,33 @@ public class PlaybackCommand {
                                                 .suggests(PlaybackCommand::getAnimationSuggestion)
                                                 .executes(context -> playAnimation(
                                                         context,
-                                                        StringArgumentType.getString(context, "animation_name"),
-                                                        context.getSource().getPlayer()))))
+                                                        StringArgumentType.getString(context, "animation_name")))))
                                 .then(Commands.literal("subscene")
                                         .then(Commands.argument("subscene_name", StringArgumentType.string())
                                                 .suggests(PlaybackCommand::getSubscenesSuggestion)
                                                 .executes(context -> playSubscene(
                                                         context,
-                                                        StringArgumentType.getString(context, "subscene_name"),
-                                                        context.getSource().getPlayer())))))
+                                                        StringArgumentType.getString(context, "subscene_name"))))))
                         .then(Commands.literal("stop")
                                 .then(Commands.literal("animation")
                                         .then(Commands.argument("animation_name", StringArgumentType.string())
                                                 .suggests(PlaybackCommand::getAnimationsPlaying)
                                                 .executes(context -> stopAnimation(
                                                         context,
-                                                        StringArgumentType.getString(context, "animation_name"),
-                                                        context.getSource().getPlayer()))))
+                                                        StringArgumentType.getString(context, "animation_name")))))
                                 .then(Commands.literal("subscene")
                                         .then(Commands.argument("subscene_name", StringArgumentType.string())
                                                 .suggests(PlaybackCommand::getSubscenesPlaying)
                                                 .executes(context -> stopSubscene(
                                                         context,
-                                                        StringArgumentType.getString(context, "subscene_name"),
-                                                        context.getSource().getPlayer())))))
-                        .then(Commands.literal("stop_all")
-                                .executes(context -> stopAllPlayback(
-                                        context, context.getSource().getPlayer())))));
+                                                        StringArgumentType.getString(context, "subscene_name"))))))
+                        .then(Commands.literal("stop_all").executes(PlaybackCommand::stopAllPlayback))));
     }
 
-    private static int playAnimation(
-            CommandContext<CommandSourceStack> context, String animationName, ServerPlayer player) {
-        PlayerSession playerSession = CommandUtil.getSession(context, player);
+    private static int playAnimation(CommandContext<CommandSourceStack> context, String animationName) {
+        PlayerSession playerSession = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getSessionByPlayer(context.getSource().getPlayer());
         if (playerSession == null) return 0;
         Animation animation = playerSession.getScene().getAnimationByName(animationName);
         if (animation == null) {
@@ -112,9 +106,10 @@ public class PlaybackCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int playSubscene(
-            CommandContext<CommandSourceStack> context, String subsceneName, ServerPlayer player) {
-        PlayerSession playerSession = CommandUtil.getSession(context, player);
+    private static int playSubscene(CommandContext<CommandSourceStack> context, String subsceneName) {
+        PlayerSession playerSession = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getSessionByPlayer(context.getSource().getPlayer());
         if (playerSession == null) return 0;
         Subscene subscene = playerSession.getScene().getSubsceneByName(subsceneName);
         if (subscene == null) {
@@ -130,9 +125,10 @@ public class PlaybackCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int stopAnimation(
-            CommandContext<CommandSourceStack> context, String animationName, ServerPlayer player) {
-        PlayerSession playerSession = CommandUtil.getSession(context, player);
+    private static int stopAnimation(CommandContext<CommandSourceStack> context, String animationName) {
+        PlayerSession playerSession = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getSessionByPlayer(context.getSource().getPlayer());
         if (playerSession == null) return 0;
         Animation animation = playerSession.getScene().getAnimationByName(animationName);
         if (animation == null) {
@@ -161,9 +157,10 @@ public class PlaybackCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int stopSubscene(
-            CommandContext<CommandSourceStack> context, String subsceneName, ServerPlayer player) {
-        PlayerSession playerSession = CommandUtil.getSession(context, player);
+    private static int stopSubscene(CommandContext<CommandSourceStack> context, String subsceneName) {
+        PlayerSession playerSession = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getSessionByPlayer(context.getSource().getPlayer());
         if (playerSession == null) return 0;
         Subscene subscene = playerSession.getScene().getSubsceneByName(subsceneName);
         if (subscene == null) {
@@ -187,14 +184,10 @@ public class PlaybackCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int stopAllPlayback(CommandContext<CommandSourceStack> context, ServerPlayer player) {
-        PlayerSession playerSession = CommandUtil.getSession(context, player);
-        if (playerSession == null) return 0;
+    private static int stopAllPlayback(CommandContext<CommandSourceStack> context) {
         PlaybackManager playbackManager = NarrativeCraftMod.getInstance().getPlaybackManager();
         if (playbackManager.getPlaybacksPlaying().isEmpty()) {
-            context.getSource()
-                    .sendFailure(Translation.message(
-                            "playbacks.not_playing", playerSession.getScene().getName()));
+            context.getSource().sendFailure(Translation.message("playbacks.not_playing"));
             return 0;
         }
         playbackManager.stopAll();
