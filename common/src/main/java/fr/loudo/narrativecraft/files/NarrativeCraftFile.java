@@ -71,11 +71,9 @@ public class NarrativeCraftFile {
     public static final String ANIMATIONS_FOLDER_NAME = "animations";
     public static final String NPC_FOLDER_NAME = "npc";
     public static final String DATA_FOLDER_NAME = "data";
-    public static final String SKINS_FOLDER_NAME = "skins";
 
     public static final String CAMERA_ANGLES_FILE_NAME = "camera_angles" + EXTENSION_DATA_FILE;
     public static final String CUTSCENES_FILE_NAME = "cutscenes" + EXTENSION_DATA_FILE;
-    public static final String DETAILS_FILE_NAME = "details" + EXTENSION_DATA_FILE;
     public static final String SUBSCENES_FILE_NAME = "subscenes" + EXTENSION_DATA_FILE;
 
     // DATA
@@ -93,6 +91,7 @@ public class NarrativeCraftFile {
 
     // RESOURCES
     public static final String MAIN_SCREEN_BACKGROUND_FILE_NAME = "main_screen_background" + EXTENSION_DATA_FILE;
+    public static final String SKINS_FOLDER_NAME = "skins";
 
     public static File mainDirectory;
     public static File rootDirectory;
@@ -117,25 +116,29 @@ public class NarrativeCraftFile {
         buildDirectory = createDirectory(NarrativeCraftFile.mainDirectory, BUILD_DIRECTORY_NAME);
         dataDirectory = createDirectory(NarrativeCraftFile.mainDirectory, DATA_FOLDER_NAME);
         mainInkFile = createFile(NarrativeCraftFile.mainDirectory, MAIN_INK_NAME);
-        varsInkFile = createFile(NarrativeCraftFile.mainDirectory, VARS_INK_NAME);
-        try (Writer writer = new BufferedWriter(new FileWriter(varsInkFile))) {
-            writer.write("// "
-                    + Translation.message("file.vars_placeholder")
-                            .append("\n")
-                            .append("\n")
-                            .getString());
-        } catch (IOException e) {
-            NarrativeCraftMod.LOGGER.warn("Couldn't write on vars ink file", e);
+        if(!new File(NarrativeCraftFile.mainDirectory, VARS_INK_NAME).exists()) {
+            varsInkFile = createFile(NarrativeCraftFile.mainDirectory, VARS_INK_NAME);
+            try (Writer writer = new BufferedWriter(new FileWriter(varsInkFile))) {
+                writer.write("// "
+                        + Translation.message("file.vars_placeholder")
+                                .append("\n")
+                                .append("\n")
+                                .getString());
+            } catch (IOException e) {
+                NarrativeCraftMod.LOGGER.warn("Couldn't write on vars ink file", e);
+            }
         }
-        functionsInkFile = createFile(NarrativeCraftFile.mainDirectory, FUNCTIONS_INK_NAME);
-        try (Writer writer = new BufferedWriter(new FileWriter(functionsInkFile))) {
-            writer.write("// "
-                    + Translation.message("file.funcs_placeholder")
-                            .append("\n")
-                            .append("\n")
-                            .getString());
-        } catch (IOException e) {
-            NarrativeCraftMod.LOGGER.warn("Couldn't write on functions ink file", e);
+        if(!new File(NarrativeCraftFile.mainDirectory, FUNCTIONS_INK_NAME).exists()) {
+            functionsInkFile = createFile(NarrativeCraftFile.mainDirectory, FUNCTIONS_INK_NAME);
+            try (Writer writer = new BufferedWriter(new FileWriter(functionsInkFile))) {
+                writer.write("// "
+                        + Translation.message("file.funcs_placeholder")
+                        .append("\n")
+                        .append("\n")
+                        .getString());
+            } catch (IOException e) {
+                NarrativeCraftMod.LOGGER.warn("Couldn't write on functions ink file", e);
+            }
         }
     }
 
