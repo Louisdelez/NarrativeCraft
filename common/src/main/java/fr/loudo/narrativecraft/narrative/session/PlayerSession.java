@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.session;
 
+import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import net.minecraft.server.level.ServerPlayer;
@@ -31,6 +32,7 @@ import net.minecraft.world.entity.player.Player;
 public class PlayerSession {
 
     private final ServerPlayer player;
+    private AbstractController controller;
     private Chapter chapter;
     private Scene scene;
 
@@ -75,5 +77,13 @@ public class PlayerSession {
 
     public void setScene(Scene scene) {
         this.scene = scene;
+    }
+
+    public AbstractController getController() {
+        return controller;
+    }
+
+    public void setController(AbstractController controller) {
+        this.controller = controller;
     }
 }

@@ -21,10 +21,24 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative;
+package fr.loudo.narrativecraft.util;
 
-public enum Environnement {
-    DEVELOPMENT,
-    PRODUCTION,
-    RECORDING
+import java.util.function.DoubleUnaryOperator;
+
+public enum Easing {
+    SMOOTH(t -> t * t * t * (t * (6 * t - 15) + 10)),
+    LINEAR(t -> t),
+    EASE_IN(t -> t * t),
+    EASE_OUT(t -> t * (2 - t)),
+    EASE_IN_OUT(t -> t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
+
+    private final DoubleUnaryOperator function;
+
+    Easing(DoubleUnaryOperator function) {
+        this.function = function;
+    }
+
+    public double interpolate(double t) {
+        return function.applyAsDouble(t);
+    }
 }

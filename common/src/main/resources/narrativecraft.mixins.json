@@ -16,6 +16,7 @@
     "accessor.LivingEntityAccessor",
     "accessor.PlayerAccessor",
     "accessor.PlayerListAccessor",
+    "invoker.ArmorStandInvoker",
     "invoker.LivingEntityInvoker"
   ],
   "client": [],

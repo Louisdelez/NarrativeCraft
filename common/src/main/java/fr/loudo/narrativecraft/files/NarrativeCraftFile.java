@@ -116,7 +116,7 @@ public class NarrativeCraftFile {
         buildDirectory = createDirectory(NarrativeCraftFile.mainDirectory, BUILD_DIRECTORY_NAME);
         dataDirectory = createDirectory(NarrativeCraftFile.mainDirectory, DATA_FOLDER_NAME);
         mainInkFile = createFile(NarrativeCraftFile.mainDirectory, MAIN_INK_NAME);
-        if(!new File(NarrativeCraftFile.mainDirectory, VARS_INK_NAME).exists()) {
+        if (!new File(NarrativeCraftFile.mainDirectory, VARS_INK_NAME).exists()) {
             varsInkFile = createFile(NarrativeCraftFile.mainDirectory, VARS_INK_NAME);
             try (Writer writer = new BufferedWriter(new FileWriter(varsInkFile))) {
                 writer.write("// "
@@ -128,14 +128,14 @@ public class NarrativeCraftFile {
                 NarrativeCraftMod.LOGGER.warn("Couldn't write on vars ink file", e);
             }
         }
-        if(!new File(NarrativeCraftFile.mainDirectory, FUNCTIONS_INK_NAME).exists()) {
+        if (!new File(NarrativeCraftFile.mainDirectory, FUNCTIONS_INK_NAME).exists()) {
             functionsInkFile = createFile(NarrativeCraftFile.mainDirectory, FUNCTIONS_INK_NAME);
             try (Writer writer = new BufferedWriter(new FileWriter(functionsInkFile))) {
                 writer.write("// "
                         + Translation.message("file.funcs_placeholder")
-                        .append("\n")
-                        .append("\n")
-                        .getString());
+                                .append("\n")
+                                .append("\n")
+                                .getString());
             } catch (IOException e) {
                 NarrativeCraftMod.LOGGER.warn("Couldn't write on functions ink file", e);
             }

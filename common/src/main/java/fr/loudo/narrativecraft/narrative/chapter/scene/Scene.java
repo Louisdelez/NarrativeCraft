@@ -26,9 +26,9 @@ package fr.loudo.narrativecraft.narrative.chapter.scene;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.CameraAngle;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.cameraAngle.CameraAngleGroup;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class Scene extends NarrativeEntry {
     private final List<Animation> animations = new ArrayList<>();
     private final List<Cutscene> cutscenes = new ArrayList<>();
     private final List<Subscene> subscenes = new ArrayList<>();
-    private final List<CameraAngleGroup> cameraAngleGroups = new ArrayList<>();
+    private final List<CameraAngle> cameraAngleGroups = new ArrayList<>();
 
     private final List<CharacterStory> npcs = new ArrayList<>();
 
@@ -102,17 +102,17 @@ public class Scene extends NarrativeEntry {
         return false;
     }
 
-    public void addCameraAngleGroup(CameraAngleGroup cameraAngleGroup) {
+    public void addCameraAngleGroup(CameraAngle cameraAngleGroup) {
         if (cameraAngleGroups.contains(cameraAngleGroup)) return;
         cameraAngleGroups.add(cameraAngleGroup);
     }
 
-    public void removeCameraAngleGroup(CameraAngleGroup cameraAngleGroup) {
+    public void removeCameraAngleGroup(CameraAngle cameraAngleGroup) {
         cameraAngleGroups.remove(cameraAngleGroup);
     }
 
     public boolean cameraAngleExists(String name) {
-        for (CameraAngleGroup cameraAngleGroup : cameraAngleGroups) {
+        for (CameraAngle cameraAngleGroup : cameraAngleGroups) {
             if (cameraAngleGroup.getName().equalsIgnoreCase(name)) {
                 return true;
             }
@@ -172,7 +172,7 @@ public class Scene extends NarrativeEntry {
         return subscenes;
     }
 
-    public List<CameraAngleGroup> getCameraAngleGroups() {
+    public List<CameraAngle> getCameraAngleGroups() {
         return cameraAngleGroups;
     }
 

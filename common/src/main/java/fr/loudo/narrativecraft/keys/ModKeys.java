@@ -42,7 +42,7 @@ public class ModKeys {
             registerKey("key.animation.record.start", InputConstants.KEY_V);
     public static final KeyMapping STOP_ANIMATION_RECORDING =
             registerKey("key.animation.record.stop", InputConstants.KEY_B);
-    public static final KeyMapping OPEN_KEYFRAME_EDIT_SCREEN =
+    public static final KeyMapping OPEN_CONTROLLER_SCREEN =
             registerKey("key.screen.keyframe_controller", InputConstants.KEY_G);
     public static final KeyMapping NEXT_DIALOG = registerKey("key.dialog.next", InputConstants.KEY_RETURN);
     public static final KeyMapping SELECT_CHOICE_1 = registerKey("key.choice.1", InputConstants.KEY_1);

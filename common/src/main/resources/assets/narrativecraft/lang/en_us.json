@@ -69,6 +69,8 @@
 
   "narrativecraft.character.already_exists": "Character %s already exists in the story.",
 
+  "narrativecraft.controller.cutscene.hud": "Cutscene controller. Tick %s/%s",
+
   "narrativecraft.screen.story_manager.chapter_list": "Chapters",
   "narrativecraft.screen.story_manager.scene_list": "Scenes of chapter %s",
   "narrativecraft.screen.story_manager.scene_menu": "Scene menu of %s",

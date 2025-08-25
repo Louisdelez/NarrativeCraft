@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.narrative.chapter.scene.data;
 
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.SceneData;
+import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframeGroup;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +33,7 @@ public class Cutscene extends SceneData {
 
     private transient List<Subscene> subscenes = new ArrayList<>();
     private transient List<Animation> animations = new ArrayList<>(); // For individual animations.
+    private List<CutsceneKeyframeGroup> keyframeGroups = new ArrayList<>();
 
     public Cutscene(String name, String description, Scene scene) {
         super(name, description, scene);
@@ -57,5 +59,12 @@ public class Cutscene extends SceneData {
             animations = new ArrayList<>();
         }
         return animations;
+    }
+
+    public List<CutsceneKeyframeGroup> getKeyframeGroups() {
+        if (keyframeGroups == null) {
+            keyframeGroups = new ArrayList<>();
+        }
+        return keyframeGroups;
     }
 }

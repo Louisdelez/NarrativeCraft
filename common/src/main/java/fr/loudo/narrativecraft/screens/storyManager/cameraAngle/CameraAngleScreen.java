@@ -25,7 +25,7 @@ package fr.loudo.narrativecraft.screens.storyManager.cameraAngle;
 
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.cameraAngle.CameraAngleGroup;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.CameraAngle;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.components.StoryElementList;
 import fr.loudo.narrativecraft.screens.storyManager.StoryElementScreen;
@@ -50,7 +50,7 @@ public class CameraAngleScreen extends StoryElementScreen {
     protected void addTitle() {
         super.addTitle();
         initAddButton(button -> {
-            EditInfoScreen<CameraAngleGroup> screen =
+            EditInfoScreen<CameraAngle> screen =
                     new EditInfoScreen<>(this, null, new EditScreenCameraAngleAdapter(scene));
             this.minecraft.setScreen(screen);
         });

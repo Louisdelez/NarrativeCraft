@@ -26,7 +26,7 @@ package fr.loudo.narrativecraft.narrative.playback;
 import com.mojang.authlib.GameProfile;
 import fr.loudo.narrativecraft.mixin.accessor.PlayerAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.PlayerListAccessor;
-import fr.loudo.narrativecraft.narrative.Environnement;
+import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
@@ -53,18 +53,18 @@ public class Playback {
     private final Animation animation;
     private final CharacterRuntime characterRuntime;
     private final Level level;
-    private final Environnement environnement;
+    private final Environment environment;
     private final List<PlaybackData> entityPlaybacks = new ArrayList<>();
 
     private LivingEntity masterEntity;
     private boolean isPlaying, hasEnded, isUnique;
     private int globalTick;
 
-    public Playback(int id, Animation animation, Level level, Environnement environnement, boolean isLooping) {
+    public Playback(int id, Animation animation, Level level, Environment environment, boolean isLooping) {
         this.id = id;
         this.animation = animation;
         this.level = level;
-        this.environnement = environnement;
+        this.environment = environment;
         this.characterRuntime = new CharacterRuntime(animation.getCharacter(), this);
         this.isPlaying = false;
         this.hasEnded = false;
@@ -150,12 +150,12 @@ public class Playback {
     }
 
     public void finalizePlaybackCycle() {
-        if (isUnique || environnement == Environnement.RECORDING) {
+        if (isUnique || environment == Environment.RECORDING) {
             stop(true);
             return;
         }
-        reset();
         if (isLooping) {
+            reset();
             for (PlaybackData playbackData : entityPlaybacks) {
                 if (playbackData.getEntity() == null) continue;
 
@@ -248,8 +248,9 @@ public class Playback {
             }
             globalTick = oldTick;
         }
-        this.globalTick = newTick;
-        this.hasEnded = entityPlaybacks.stream().allMatch(PlaybackData::hasEnded);
+        globalTick = newTick;
+        isPlaying = true;
+        hasEnded = false;
     }
 
     public void actionListener(PlaybackData playbackData) {
@@ -342,7 +343,6 @@ public class Playback {
     }
 
     public void stop(boolean killEntity) {
-        if (!isPlaying || hasEnded) return;
         isPlaying = false;
         hasEnded = true;
         if (killEntity) {
@@ -441,8 +441,8 @@ public class Playback {
         return id;
     }
 
-    public Environnement getEnvironnement() {
-        return environnement;
+    public Environment getEnvironnement() {
+        return environment;
     }
 
     public Level getLevel() {

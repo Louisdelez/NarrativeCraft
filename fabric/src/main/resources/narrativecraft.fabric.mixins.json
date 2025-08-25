@@ -11,7 +11,9 @@
     "LivingEntityFabricMixin",
     "ServerPlayerFabricMixin"
   ],
-  "client": [],
+  "client": [
+    "GuiMixin"
+  ],
   "server": [],
   "injectors": {
     "defaultRequire": 1

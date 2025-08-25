@@ -21,6 +21,6 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.chapter.scene.data.cameraAngle;
+package fr.loudo.narrativecraft.narrative.keyframes.cameraAngle;
 
-public class CameraAngle {}
+public class CameraAngleKeyframe {}

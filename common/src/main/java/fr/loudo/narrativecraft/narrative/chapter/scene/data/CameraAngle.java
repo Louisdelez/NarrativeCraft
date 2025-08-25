@@ -21,14 +21,14 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.chapter.scene.data.cameraAngle;
+package fr.loudo.narrativecraft.narrative.chapter.scene.data;
 
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.SceneData;
 
-public class CameraAngleGroup extends SceneData {
+public class CameraAngle extends SceneData {
 
-    public CameraAngleGroup(String name, String description, Scene scene) {
+    public CameraAngle(String name, String description, Scene scene) {
         super(name, description, scene);
     }
 }

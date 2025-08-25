@@ -23,7 +23,10 @@
 
 package fr.loudo.narrativecraft.managers;
 
+import fr.loudo.narrativecraft.narrative.Environment;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -40,6 +43,14 @@ public class PlaybackManager {
 
     public List<Playback> getAnimationsByNamePlaying() {
         return playbacks;
+    }
+
+    public Playback createAndStart(Animation animation, Environment env, PlayerSession session) {
+        Playback playback = new Playback(
+                ids.incrementAndGet(), animation, session.getPlayer().level(), env, false);
+        playback.start();
+        this.addPlayback(playback);
+        return playback;
     }
 
     public void addPlayback(Playback playback) {

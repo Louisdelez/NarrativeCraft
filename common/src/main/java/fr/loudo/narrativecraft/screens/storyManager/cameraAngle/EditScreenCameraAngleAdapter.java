@@ -25,7 +25,7 @@ package fr.loudo.narrativecraft.screens.storyManager.cameraAngle;
 
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.cameraAngle.CameraAngleGroup;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.CameraAngle;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.storyManager.EditScreenAdapter;
 import fr.loudo.narrativecraft.util.ScreenUtils;
@@ -35,7 +35,7 @@ import java.util.Map;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
 
-public class EditScreenCameraAngleAdapter implements EditScreenAdapter<CameraAngleGroup> {
+public class EditScreenCameraAngleAdapter implements EditScreenAdapter<CameraAngle> {
 
     private final Scene scene;
 
@@ -44,16 +44,16 @@ public class EditScreenCameraAngleAdapter implements EditScreenAdapter<CameraAng
     }
 
     @Override
-    public void initExtraFields(EditInfoScreen<CameraAngleGroup> screen, CameraAngleGroup entry) {}
+    public void initExtraFields(EditInfoScreen<CameraAngle> screen, CameraAngle entry) {}
 
     @Override
-    public void renderExtraFields(EditInfoScreen<CameraAngleGroup> screen, CameraAngleGroup entry, int x, int y) {}
+    public void renderExtraFields(EditInfoScreen<CameraAngle> screen, CameraAngle entry, int x, int y) {}
 
     @Override
     public void buildFromScreen(
             Map<String, Object> extraFields,
             Minecraft minecraft,
-            @Nullable CameraAngleGroup existing,
+            @Nullable CameraAngle existing,
             String name,
             String description) {
         if (existing == null) {
@@ -63,7 +63,7 @@ public class EditScreenCameraAngleAdapter implements EditScreenAdapter<CameraAng
                         Translation.message("camera_angle.already_exists", name, scene.getName()));
                 return;
             }
-            CameraAngleGroup cameraAngleGroup = new CameraAngleGroup(name, description, scene);
+            CameraAngle cameraAngleGroup = new CameraAngle(name, description, scene);
             try {
                 scene.addCameraAngleGroup(cameraAngleGroup);
                 NarrativeCraftFile.updateCameraAngleGroup(scene);
@@ -74,8 +74,7 @@ public class EditScreenCameraAngleAdapter implements EditScreenAdapter<CameraAng
                 minecraft.setScreen(null);
             }
         } else {
-            CameraAngleGroup oldCameraAngleGroup =
-                    new CameraAngleGroup(existing.getName(), existing.getDescription(), scene);
+            CameraAngle oldCameraAngleGroup = new CameraAngle(existing.getName(), existing.getDescription(), scene);
             try {
                 existing.setName(name);
                 existing.setDescription(description);

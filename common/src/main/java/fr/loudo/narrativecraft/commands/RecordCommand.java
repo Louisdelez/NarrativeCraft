@@ -30,7 +30,7 @@ import com.mojang.brigadier.context.CommandContext;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.managers.PlaybackManager;
 import fr.loudo.narrativecraft.managers.RecordingManager;
-import fr.loudo.narrativecraft.narrative.Environnement;
+import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
@@ -88,7 +88,7 @@ public class RecordCommand {
                                     PlaybackManager.ids.incrementAndGet(),
                                     animation,
                                     context.getSource().getLevel(),
-                                    Environnement.RECORDING,
+                                    Environment.RECORDING,
                                     false);
                             playback.start();
                             NarrativeCraftMod.getInstance().getPlaybackManager().addPlayback(playback);

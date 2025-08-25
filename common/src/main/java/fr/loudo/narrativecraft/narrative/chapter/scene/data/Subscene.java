@@ -23,9 +23,8 @@
 
 package fr.loudo.narrativecraft.narrative.chapter.scene.data;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.managers.PlaybackManager;
-import fr.loudo.narrativecraft.narrative.Environnement;
+import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.SceneData;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
@@ -42,14 +41,13 @@ public class Subscene extends SceneData {
         super(name, description, scene);
     }
 
-    public void start(Level level, Environnement environnement, boolean looping) {
+    public void start(Level level, Environment environment, boolean looping) {
         playbacks = getPlaybacks();
         for (Animation animation : animations) {
             Playback playback =
-                    new Playback(PlaybackManager.ids.incrementAndGet(), animation, level, environnement, looping);
+                    new Playback(PlaybackManager.ids.incrementAndGet(), animation, level, environment, looping);
             playback.start();
             playbacks.add(playback);
-            NarrativeCraftMod.getInstance().getPlaybackManager().addPlayback(playback);
         }
     }
 

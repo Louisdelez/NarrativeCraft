@@ -31,7 +31,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.managers.PlaybackManager;
-import fr.loudo.narrativecraft.narrative.Environnement;
+import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
@@ -96,7 +96,7 @@ public class PlaybackCommand {
                 PlaybackManager.ids.incrementAndGet(),
                 animation,
                 context.getSource().getLevel(),
-                Environnement.RECORDING,
+                Environment.RECORDING,
                 false);
         playback.start();
         context.getSource()
@@ -118,7 +118,8 @@ public class PlaybackCommand {
                             playerSession.getScene().getName()));
             return 0;
         }
-        subscene.start(context.getSource().getLevel(), Environnement.RECORDING, false);
+        subscene.start(context.getSource().getLevel(), Environment.RECORDING, false);
+        NarrativeCraftMod.getInstance().getPlaybackManager().getPlaybacks().addAll(subscene.getPlaybacks());
         context.getSource().sendSuccess(() -> Translation.message("playback.subscene.play", subscene.getName()), false);
         return Command.SINGLE_SUCCESS;
     }
