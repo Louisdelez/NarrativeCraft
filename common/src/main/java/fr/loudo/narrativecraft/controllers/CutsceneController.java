@@ -23,24 +23,40 @@
 
 package fr.loudo.narrativecraft.controllers;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import fr.loudo.narrativecraft.controllers.keyframe.AbstractKeyframeGroupsBase;
 import fr.loudo.narrativecraft.managers.PlaybackManager;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
+import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
+import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframeGroup;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.recording.Location;
 import fr.loudo.narrativecraft.screens.controller.cutscene.CutsceneControllerScreen;
+import fr.loudo.narrativecraft.screens.controller.cutscene.KeyframeCutsceneOptionScreen;
+import fr.loudo.narrativecraft.util.MathHelper;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
 
-public class CutsceneController extends AbstractController {
+public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyframe, CutsceneKeyframeGroup> {
+
+    private final AtomicInteger keyframeGroupCounter = new AtomicInteger();
+    private final AtomicInteger keyframeCounter = new AtomicInteger();
 
     private final List<Playback> playbacks = new ArrayList<>();
     private final Cutscene cutscene;
@@ -55,6 +71,7 @@ public class CutsceneController extends AbstractController {
         this.cutscene = cutscene;
         skipTickCount = 20;
         isPlaying = false;
+        keyframeGroups.addAll(cutscene.getKeyframeGroups());
     }
 
     public void tick() {
@@ -92,8 +109,8 @@ public class CutsceneController extends AbstractController {
             playback.setPlaying(false);
             playbacks.add(playback);
         }
-        if (!cutscene.getKeyframeGroups().isEmpty()) {
-            selectedGroup = cutscene.getKeyframeGroups().getFirst();
+        if (!keyframeGroups.isEmpty()) {
+            selectedGroup = keyframeGroups.getFirst();
             KeyframeLocation keyframeLocation =
                     selectedGroup.getKeyframes().getFirst().getKeyframeLocation();
             playerSession
@@ -104,6 +121,84 @@ public class CutsceneController extends AbstractController {
             playerSession.getPlayer().teleportTo(location.x(), location.y(), location.z());
         }
         totalTick = calculateTotalTick();
+        Minecraft minecraft = Minecraft.getInstance();
+        minecraft.execute(() -> minecraft.setScreen(new CutsceneControllerScreen(this)));
+        if (!keyframeGroups.isEmpty()) {
+            CutsceneKeyframeGroup keyframeGroup = keyframeGroups.getLast();
+            keyframeGroupCounter.set(keyframeGroup.getId());
+            CutsceneKeyframe cutsceneKeyframe = getLastKeyframeLastGroup();
+            if (cutsceneKeyframe == null) return;
+            keyframeCounter.set(keyframeGroup.getId());
+        }
+    }
+
+    @Override
+    public void stopSession(boolean save) {
+        for (Playback playback : playbacks) {
+            playback.stop(true);
+        }
+        for (CutsceneKeyframeGroup keyframeGroup : keyframeGroups) {
+            keyframeGroup.hideKeyframes(playerSession.getPlayer());
+        }
+        playerSession.setController(null);
+        playerSession.setCurrentCamera(null);
+    }
+
+    @Override
+    public Screen getControllerScreen() {
+        return new CutsceneControllerScreen(this);
+    }
+
+    @Override
+    public void setCamera(Keyframe keyframe) {
+        super.setCamera(keyframe);
+        CutsceneKeyframe cutsceneKeyframe = (CutsceneKeyframe) keyframe;
+        if (keyframe == null) {
+            updateSelectedGroupGlow();
+            showTextGroups();
+        } else {
+            changeTimePosition(cutsceneKeyframe.getTick(), false);
+        }
+    }
+
+    private void showTextGroups() {
+        for (CutsceneKeyframeGroup keyframeGroup : keyframeGroups) {
+            keyframeGroup.showGroupText(playerSession.getPlayer());
+        }
+    }
+
+    @Override
+    public Screen keyframeOptionScreen(Keyframe keyframe) {
+        return new KeyframeCutsceneOptionScreen(
+                selectedGroup, (CutsceneKeyframe) keyframe, playerSession.getPlayer(), false);
+    }
+
+    @Override
+    public void removeKeyframe(CutsceneKeyframe keyframe) {
+        CutsceneKeyframeGroup keyframeGroup = getKeyframeGroupOfKeyframe(keyframe);
+        List<CutsceneKeyframe> keyframes = keyframeGroup.getKeyframes();
+        super.removeKeyframe(keyframe);
+        if (!keyframes.isEmpty()) {
+            // If the user delete the first keyframe from the group, then set the first keyframe group to the next
+            // keyframe
+            keyframeGroup.showGroupText(playerSession.getPlayer());
+        } else {
+            // Re-assign automatically the group id if the user delete a keyframe group without any child
+            keyframeGroupCounter.decrementAndGet();
+            keyframeGroups.remove(keyframeGroup);
+            for (int i = 0; i < keyframeGroups.size(); i++) {
+                CutsceneKeyframeGroup keyframeGroup1 = keyframeGroups.get(i);
+                keyframeGroup1.showGroupText(playerSession.getPlayer());
+                keyframeGroup1.setId(i + 1);
+                keyframeGroup1.showGroupText(playerSession.getPlayer());
+            }
+            if (!keyframeGroups.isEmpty()) {
+                selectedGroup = keyframeGroups.getLast();
+                updateSelectedGroupGlow();
+            } else {
+                selectedGroup = null;
+            }
+        }
     }
 
     public void resume() {
@@ -119,6 +214,90 @@ public class CutsceneController extends AbstractController {
         for (Playback playback : playbacks) {
             playback.setPlaying(false);
         }
+    }
+
+    public CutsceneKeyframeGroup createKeyframeGroup() {
+        if (environment != Environment.DEVELOPMENT) return null;
+        CutsceneKeyframeGroup keyframeGroup = new CutsceneKeyframeGroup(keyframeGroupCounter.incrementAndGet());
+        selectedGroup = keyframeGroup;
+        keyframeGroups.add(keyframeGroup);
+        CutsceneKeyframe keyframe = createKeyframe();
+        keyframeGroup.showGroupText(playerSession.getPlayer());
+        updateSelectedGroupGlow();
+        return keyframeGroup;
+    }
+
+    public void updateSelectedGroupGlow() {
+        for (CutsceneKeyframeGroup keyframeGroup : keyframeGroups) {
+            if (keyframeGroup.getId() == selectedGroup.getId()) {
+                keyframeGroup.showGlow(playerSession.getPlayer());
+            } else {
+                keyframeGroup.hideGlow(playerSession.getPlayer());
+            }
+        }
+    }
+
+    public CutsceneKeyframe createKeyframe() {
+        if (environment != Environment.DEVELOPMENT) return null;
+        ServerPlayer player = playerSession.getPlayer();
+        KeyframeLocation location = new KeyframeLocation(
+                player.position().add(0, player.getEyeHeight(), 0), player.getXRot(), player.getYRot(), 0, 85.0f);
+        long pathTime = 0;
+        CutsceneKeyframe lastKeyframe = getLastKeyframeLastGroup();
+        if (lastKeyframe != null) {
+            pathTime = MathHelper.tickToMills(lastKeyframe.getTick()) - MathHelper.tickToMills(currentTick);
+        }
+        CutsceneKeyframe keyframe =
+                new CutsceneKeyframe(keyframeCounter.incrementAndGet(), location, currentTick, 0, pathTime);
+        selectedGroup.addKeyframe(keyframe);
+        keyframe.setParentGroup(selectedGroup.getKeyframes().getFirst().getId() == keyframe.getId());
+        keyframe.showKeyframe(player);
+        keyframe.getCamera().setGlowingTag(true);
+        keyframe.updateEntityData(player);
+        return keyframe;
+    }
+
+    public void drawLinesBetweenKeyframes(PoseStack poseStack) {
+        if (playerSession.getCurrentCamera() != null) return;
+        Minecraft client = Minecraft.getInstance();
+        Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+        Vec3 cameraPos = camera.getPosition();
+        PoseStack.Pose matrix4f = poseStack.last();
+
+        for (CutsceneKeyframeGroup keyframeGroup : keyframeGroups) {
+            VertexConsumer vertexConsumer =
+                    client.renderBuffers().bufferSource().getBuffer(RenderType.debugLineStrip(1.0F));
+            for (int i = 0; i < keyframeGroup.getKeyframes().size() - 1; i++) {
+                CutsceneKeyframe firstKeyFrame = keyframeGroup.getKeyframes().get(i);
+                CutsceneKeyframe secondKeyFrame = keyframeGroup.getKeyframes().get(i + 1);
+
+                KeyframeLocation startPos = firstKeyFrame.getKeyframeLocation();
+                KeyframeLocation endPos = secondKeyFrame.getKeyframeLocation();
+                double x1 = startPos.getX() - cameraPos.x;
+                double y1 = startPos.getY() - cameraPos.y;
+                double z1 = startPos.getZ() - cameraPos.z;
+                double x2 = endPos.getX() - cameraPos.x;
+                double y2 = endPos.getY() - cameraPos.y;
+                double z2 = endPos.getZ() - cameraPos.z;
+
+                vertexConsumer
+                        .addVertex(matrix4f, new Vector3f((float) x1, (float) y1, (float) z1))
+                        .setColor(1.0F, 1.0F, 0.0F, 1.0F)
+                        .setNormal(0, 1, 0);
+                vertexConsumer
+                        .addVertex(matrix4f, new Vector3f((float) x2, (float) y2, (float) z2))
+                        .setColor(1.0F, 1.0F, 0.0F, 1.0F)
+                        .setNormal(0, 1, 0);
+            }
+            client.renderBuffers().bufferSource().endBatch();
+        }
+    }
+
+    public CutsceneKeyframe getLastKeyframeLastGroup() {
+        if (keyframeGroups.isEmpty()) return null;
+        List<CutsceneKeyframe> keyframes = keyframeGroups.getLast().getKeyframes();
+        if (keyframes.isEmpty()) return null;
+        return keyframes.getLast();
     }
 
     public boolean atMaxTick() {
@@ -138,19 +317,6 @@ public class CutsceneController extends AbstractController {
         for (Playback playback : playbacks) {
             playback.changeLocationByTick(newTick, seamless);
         }
-    }
-
-    @Override
-    public void stopSession(boolean save) {
-        for (Playback playback : playbacks) {
-            playback.stop(true);
-        }
-        playerSession.setController(null);
-    }
-
-    @Override
-    public Screen getControllerScreen() {
-        return new CutsceneControllerScreen(this);
     }
 
     private int calculateTotalTick() {
@@ -202,5 +368,22 @@ public class CutsceneController extends AbstractController {
 
     public void setSelectedGroup(CutsceneKeyframeGroup selectedGroup) {
         this.selectedGroup = selectedGroup;
+        updateSelectedGroupGlow();
+    }
+
+    public List<Playback> getPlaybacks() {
+        return playbacks;
+    }
+
+    public Cutscene getCutscene() {
+        return cutscene;
+    }
+
+    public int getTotalTick() {
+        return totalTick;
+    }
+
+    public CutsceneKeyframeGroup getSelectedGroup() {
+        return selectedGroup;
     }
 }

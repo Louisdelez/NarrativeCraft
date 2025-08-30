@@ -28,7 +28,6 @@ import fr.loudo.narrativecraft.items.CutsceneEditItems;
 import fr.loudo.narrativecraft.mixin.invoker.ArmorStandInvoker;
 import fr.loudo.narrativecraft.util.MathHelper;
 import java.util.List;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Rotations;
 import net.minecraft.network.protocol.game.*;
@@ -39,12 +38,12 @@ import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.phys.Vec3;
 
-public abstract class AbstractKeyframe {
+public class Keyframe {
     protected transient ArmorStand camera;
     protected final int id;
     protected KeyframeLocation keyframeLocation;
 
-    public AbstractKeyframe(int id, KeyframeLocation keyframeLocation) {
+    public Keyframe(int id, KeyframeLocation keyframeLocation) {
         this.id = id;
         this.keyframeLocation = keyframeLocation;
     }
@@ -87,8 +86,6 @@ public abstract class AbstractKeyframe {
         player.connection.send(new ClientboundSetEntityDataPacket(
                 camera.getId(), camera.getEntityData().getNonDefaultValues()));
     }
-
-    public abstract Screen optionScreen();
 
     public int getId() {
         return id;

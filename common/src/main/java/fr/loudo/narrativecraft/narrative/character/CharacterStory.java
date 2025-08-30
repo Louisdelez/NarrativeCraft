@@ -28,7 +28,6 @@ import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.util.Util;
 import java.io.IOException;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 
@@ -38,7 +37,7 @@ public class CharacterStory extends NarrativeEntry {
 
     private String birthDate;
     private CharacterType characterType;
-    private PlayerSkin.Model model;
+    private CharacterModel model;
     private int entityTypeId;
 
     public CharacterStory(
@@ -47,7 +46,7 @@ public class CharacterStory extends NarrativeEntry {
             String day,
             String month,
             String year,
-            PlayerSkin.Model model,
+            CharacterModel model,
             CharacterType characterType) {
         super(name, description);
         this.birthDate = day + "/" + month + "/" + year;
@@ -87,11 +86,11 @@ public class CharacterStory extends NarrativeEntry {
         this.characterType = characterType;
     }
 
-    public PlayerSkin.Model getModel() {
+    public CharacterModel getModel() {
         return model;
     }
 
-    public void setModel(PlayerSkin.Model model) {
+    public void setModel(CharacterModel model) {
         this.model = model;
     }
 

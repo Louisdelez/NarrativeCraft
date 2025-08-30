@@ -50,7 +50,7 @@ public abstract class LivingEntityMixin {
     public abstract void remove(Entity.RemovalReason p_276115_);
 
     @Inject(method = "swing(Lnet/minecraft/world/InteractionHand;)V", at = @At(value = "HEAD"))
-    private void onSwing(InteractionHand hand, CallbackInfo ci) {
+    private void narrativecraft$onSwing(InteractionHand hand, CallbackInfo ci) {
         if ((Object) this instanceof ServerPlayer player) {
             Recording recording =
                     NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);

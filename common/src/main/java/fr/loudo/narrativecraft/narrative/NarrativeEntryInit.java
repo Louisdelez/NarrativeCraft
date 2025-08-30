@@ -36,6 +36,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.CameraAngle;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
+import fr.loudo.narrativecraft.narrative.character.CharacterModel;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.serialization.AnimationSerializer;
@@ -48,7 +49,6 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Random;
-import net.minecraft.client.resources.PlayerSkin;
 
 public class NarrativeEntryInit {
 
@@ -180,9 +180,9 @@ public class NarrativeEntryInit {
         }
         if (NarrativeCraftMod.firstTime) {
             CharacterStory steve = new CharacterStory(
-                    "Steve", "Steve from Minecraft.", "17", "05", "2009", PlayerSkin.Model.WIDE, CharacterType.MAIN);
+                    "Steve", "Steve from Minecraft.", "17", "05", "2009", CharacterModel.WIDE, CharacterType.MAIN);
             CharacterStory alex = new CharacterStory(
-                    "Alex", "Alex from Minecraft.", "22", "08", "2014", PlayerSkin.Model.SLIM, CharacterType.MAIN);
+                    "Alex", "Alex from Minecraft.", "22", "08", "2014", CharacterModel.SLIM, CharacterType.MAIN);
             characterManager.addCharacter(steve);
             characterManager.addCharacter(alex);
             if (new Random().nextInt(0, 500) >= 445) {
@@ -192,7 +192,7 @@ public class NarrativeEntryInit {
                         "00",
                         "00",
                         "9999",
-                        PlayerSkin.Model.WIDE,
+                        CharacterModel.WIDE,
                         CharacterType.MAIN);
                 characterManager.addCharacter(herobrine);
             }

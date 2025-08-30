@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.managers;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,7 @@ public class PlayerSessionManager {
     public void addSession(PlayerSession playerSession) {
         if (playerSessions.contains(playerSession)) return;
         playerSessions.add(playerSession);
+        NarrativeCraftMod.LOGGER.info(playerSessions.toString());
     }
 
     public void removeSession(PlayerSession playerSession) {

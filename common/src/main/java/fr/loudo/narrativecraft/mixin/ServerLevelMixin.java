@@ -45,7 +45,7 @@ public class ServerLevelMixin {
     private MinecraftServer server;
 
     @Inject(method = "destroyBlockProgress", at = @At(value = "HEAD"))
-    private void onDestroyBlockProgress(int breakerId, BlockPos pos, int progress, CallbackInfo ci) {
+    private void narrativecraft$onDestroyBlockProgress(int breakerId, BlockPos pos, int progress, CallbackInfo ci) {
         for (ServerPlayer player : this.server.getPlayerList().getPlayers()) {
             Recording recording =
                     NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);

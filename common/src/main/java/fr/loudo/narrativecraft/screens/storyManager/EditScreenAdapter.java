@@ -37,13 +37,13 @@ import org.jetbrains.annotations.Nullable;
 public interface EditScreenAdapter<T extends NarrativeEntry> {
 
     /**
-     * Init extra accessor to EditInfoScreen.
+     * Init extra fields to EditInfoScreen.
      * If you place horizontally, add only widget that has the biggest height.
      */
     void initExtraFields(EditInfoScreen<T> screen, T entry);
 
     /**
-     * Render extra accessor to EditInfoScreen
+     * Render extra fields previously initiated to EditInfoScreen
      */
     void renderExtraFields(EditInfoScreen<T> screen, T entry, int x, int y);
 

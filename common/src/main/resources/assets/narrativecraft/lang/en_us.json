@@ -5,6 +5,7 @@
   "narrativecraft.global.name": "Name",
   "narrativecraft.global.description": "Description",
   "narrativecraft.global.add": "Add",
+  "narrativecraft.global.remove": "Remove",
   "narrativecraft.global.update": "Update",
   "narrativecraft.global.error": "Error",
   "narrativecraft.global.confirm_delete": "Are you sure? This can't be undone!",
@@ -70,6 +71,18 @@
   "narrativecraft.character.already_exists": "Character %s already exists in the story.",
 
   "narrativecraft.controller.cutscene.hud": "Cutscene controller. Tick %s/%s",
+  "narrativecraft.controller.cutscene.keyframe_group_created": "Keyframe group #%s created.",
+  "narrativecraft.controller.cutscene.keyframe_group.start_text": "Group #%s.",
+  "narrativecraft.controller.cutscene.keyframe_created": "Keyframe #%s created for group #%s.",
+  "narrativecraft.controller.cutscene.changed_time_skip_value": "Skip value now set to %d seconds",
+  "narrativecraft.controller.cutscene.settings.screen_name": "Cutscenes Settings",
+  "narrativecraft.controller.cutscene.settings.time_skip": "Change Time Skip",
+  "narrativecraft.controller.cutscene.settings.select_group": "Select Keyframe Group",
+  "narrativecraft.controller.cutscene.settings.select_group_name": "Keyframe Group #%d",
+  "narrativecraft.controller.cutscene.settings.select_group_name_selected": "Keyframe Group #%d (selected)",
+  "narrativecraft.controller.cutscene.settings.group_selected": "Keyframe Group #%d selected.",
+
+  "narrativecraft.tooltip.character_entity_type": "Change entity type",
 
   "narrativecraft.screen.story_manager.chapter_list": "Chapters",
   "narrativecraft.screen.story_manager.scene_list": "Scenes of chapter %s",
@@ -86,5 +99,20 @@
   "narrativecraft.screen.pick.subscene.title": "%s selector for subscene %s",
   "narrativecraft.screen.pick.cutscene.title": "%s selector for cutscene %s",
 
-  "narrativecraft.tooltip.character_entity_type": "Change entity type"
+  "narrativecraft.screen.keyframe_advanced.name": "Advanced Settings",
+  "narrativecraft.screen.keyframe_advanced.easings": "Easings",
+
+  "narrativecraft.screen.keyframe_option.up_down": "Up/Down: %.2f",
+  "narrativecraft.screen.keyframe_option.left_right": "Left/Right %.2f",
+  "narrativecraft.screen.keyframe_option.rotation": "Rotation: %d",
+  "narrativecraft.screen.keyframe_option.fov": "Zoom: %.2f",
+  "narrativecraft.screen.keyframe_option.update": "Update",
+  "narrativecraft.screen.keyframe_option.advanced": "Advanced",
+  "narrativecraft.screen.keyframe_option.play_from_here": "Play here",
+  "narrativecraft.screen.keyframe_option.start_delay": "Start delay:",
+  "narrativecraft.screen.keyframe_option.path_time": "Path time:",
+  "narrativecraft.screen.keyframe_option.transition_delay": "Transition delay:",
+  "narrativecraft.screen.keyframe_option.speed": "Speed:",
+  "narrativecraft.screen.keyframe_option.keyframe_group": "Group %d",
+  "narrativecraft.screen.keyframe_option.keyframe_id": "Keyframe ID #%d"
 }

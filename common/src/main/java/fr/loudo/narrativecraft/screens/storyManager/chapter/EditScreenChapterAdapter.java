@@ -58,13 +58,14 @@ public class EditScreenChapterAdapter implements EditScreenAdapter<Chapter> {
                         Translation.message("global.error"), Translation.message("chapter.already_exists", name));
                 return;
             }
+            Chapter chapter =
+                    new Chapter(name, description, chapterManager.getChapters().size() + 1);
             try {
-                Chapter chapter = new Chapter(
-                        name, description, chapterManager.getChapters().size() + 1);
                 chapterManager.addChapter(chapter);
                 NarrativeCraftFile.createChapterDirectory(chapter);
                 minecraft.setScreen(new ChaptersScreen());
             } catch (Exception e) {
+                chapterManager.removeChapter(chapter);
                 Util.sendCrashMessage(minecraft.player, e);
                 minecraft.setScreen(null);
             }

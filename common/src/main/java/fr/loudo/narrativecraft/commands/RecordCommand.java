@@ -36,15 +36,11 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.recording.Recording;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.screens.animation.AnimationCharacterLinkScreen;
 import fr.loudo.narrativecraft.util.CommandUtil;
-import fr.loudo.narrativecraft.util.ScreenUtils;
 import fr.loudo.narrativecraft.util.Translation;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
@@ -223,34 +219,36 @@ public class RecordCommand {
             playerTryingOverride.remove(player);
         }
         Animation finalAnimation = animation;
-        AnimationCharacterLinkScreen screen = new AnimationCharacterLinkScreen(null, animation, characterStory -> {
-            if (characterStory == null) {
-                ScreenUtils.sendToast(
-                        Translation.message("global.error"), Translation.message("animation.must_link_character"));
-                return;
-            }
-            try {
-                finalAnimation.setCharacter(characterStory);
-                recording.save(finalAnimation);
-                context.getSource()
-                        .sendSuccess(
-                                () -> Translation.message(
-                                        "record.save.success",
-                                        finalAnimation.getName(),
-                                        playerSession.getScene().getName(),
-                                        playerSession.getChapter().getIndex()),
-                                true);
-                recordingManager.removeRecording(recording);
-            } catch (IOException e) {
-                context.getSource()
-                        .sendFailure(Translation.message(
-                                "record.save.fail",
-                                finalAnimation.getName(),
-                                playerSession.getChapter().getIndex(),
-                                playerSession.getScene().getName()));
-            }
-        });
-        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
+        //        AnimationCharacterLinkScreen screen = new AnimationCharacterLinkScreen(null, animation, characterStory
+        // -> {
+        //            if (characterStory == null) {
+        //                ScreenUtils.sendToast(
+        //                        Translation.message("global.error"),
+        // Translation.message("animation.must_link_character"));
+        //                return;
+        //            }
+        //            try {
+        //                finalAnimation.setCharacter(characterStory);
+        //                recording.save(finalAnimation);
+        //                context.getSource()
+        //                        .sendSuccess(
+        //                                () -> Translation.message(
+        //                                        "record.save.success",
+        //                                        finalAnimation.getName(),
+        //                                        playerSession.getScene().getName(),
+        //                                        playerSession.getChapter().getIndex()),
+        //                                true);
+        //                recordingManager.removeRecording(recording);
+        //            } catch (IOException e) {
+        //                context.getSource()
+        //                        .sendFailure(Translation.message(
+        //                                "record.save.fail",
+        //                                finalAnimation.getName(),
+        //                                playerSession.getChapter().getIndex(),
+        //                                playerSession.getScene().getName()));
+        //            }
+        //        });
+        //        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
 
         return Command.SINGLE_SUCCESS;
     }

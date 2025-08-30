@@ -27,4 +27,16 @@ public class MathHelper {
     public static float wrapDegrees360(float value) {
         return (value + 360) % 360;
     }
+
+    public static long tickToMills(int tick) {
+        return (tick / 20L) * 1000L;
+    }
+
+    public static double millisToSeconds(long millis) {
+        return (double) millis / 1000L;
+    }
+
+    public static long secondsToMillis(float seconds) {
+        return (long) (seconds * 1000L);
+    }
 }

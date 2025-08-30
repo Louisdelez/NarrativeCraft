@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.narrative.session;
 import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -33,6 +34,7 @@ public class PlayerSession {
 
     private final ServerPlayer player;
     private AbstractController controller;
+    private KeyframeLocation currentCamera;
     private Chapter chapter;
     private Scene scene;
 
@@ -85,5 +87,13 @@ public class PlayerSession {
 
     public void setController(AbstractController controller) {
         this.controller = controller;
+    }
+
+    public KeyframeLocation getCurrentCamera() {
+        return currentCamera;
+    }
+
+    public void setCurrentCamera(KeyframeLocation currentCamera) {
+        this.currentCamera = currentCamera;
     }
 }

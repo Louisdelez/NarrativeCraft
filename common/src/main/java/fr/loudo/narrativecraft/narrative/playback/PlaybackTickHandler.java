@@ -49,6 +49,7 @@ public class PlaybackTickHandler {
         for (ServerPlayer serverPlayer : server.getPlayerList().getPlayers()) {
             PlayerSession playerSession =
                     NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(serverPlayer);
+            if (playerSession == null) return;
             if (playerSession.getController() instanceof CutsceneController controller) {
                 controller.tick();
             }

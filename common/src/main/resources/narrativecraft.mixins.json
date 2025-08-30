@@ -19,7 +19,11 @@
     "invoker.ArmorStandInvoker",
     "invoker.LivingEntityInvoker"
   ],
-  "client": [],
+  "client": [
+    "CameraMixin",
+    "GameRendererMixin",
+    "KeyboardHandlerMixin"
+  ],
   "server": [],
   "injectors": {
     "defaultRequire": 1

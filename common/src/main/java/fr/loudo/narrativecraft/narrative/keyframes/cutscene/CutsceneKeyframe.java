@@ -23,12 +23,11 @@
 
 package fr.loudo.narrativecraft.narrative.keyframes.cutscene;
 
-import fr.loudo.narrativecraft.narrative.keyframes.AbstractKeyframe;
+import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.util.Easing;
-import net.minecraft.client.gui.screens.Screen;
 
-public class CutsceneKeyframe extends AbstractKeyframe {
+public class CutsceneKeyframe extends Keyframe {
 
     private int tick;
     private double speed;
@@ -50,11 +49,6 @@ public class CutsceneKeyframe extends AbstractKeyframe {
     public CutsceneKeyframe(int id, KeyframeLocation keyframeCoordinate) {
         super(id, keyframeCoordinate);
         this.isParentGroup = false;
-    }
-
-    @Override
-    public Screen optionScreen() {
-        return null;
     }
 
     public int getTick() {

@@ -42,7 +42,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.regex.Matcher;
-import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
 
@@ -94,7 +93,6 @@ public class NarrativeCraftFile {
     public static final String SKINS_FOLDER_NAME = "skins";
 
     public static File mainDirectory;
-    public static File rootDirectory;
     public static File chaptersDirectory;
     public static File characterDirectory;
     public static File savesDirectory;
@@ -109,7 +107,6 @@ public class NarrativeCraftFile {
                 !new File(server.getWorldPath(LevelResource.ROOT).toFile(), DIRECTORY_NAME).exists();
         NarrativeCraftFile.mainDirectory =
                 createDirectory(server.getWorldPath(LevelResource.ROOT).toFile(), DIRECTORY_NAME);
-        rootDirectory = createDirectory(Minecraft.getInstance().gameDirectory, DIRECTORY_NAME);
         chaptersDirectory = createDirectory(NarrativeCraftFile.mainDirectory, CHAPTERS_DIRECTORY_NAME);
         characterDirectory = createDirectory(NarrativeCraftFile.mainDirectory, CHARACTERS_DIRECTORY_NAME);
         savesDirectory = createDirectory(NarrativeCraftFile.mainDirectory, SAVES_DIRECTORY_NAME);

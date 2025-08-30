@@ -123,12 +123,14 @@ public class Util {
     }
 
     public static void addFakePlayerUUID(FakePlayer fakePlayer) {
+        if (NarrativeCraftMod.server == null) return;
         ((PlayerListAccessor) NarrativeCraftMod.server.getPlayerList())
                 .getPlayersByUUID()
                 .put(fakePlayer.getUUID(), fakePlayer);
     }
 
     public static void removeFakePlayerUUID(FakePlayer fakePlayer) {
+        if (NarrativeCraftMod.server == null) return;
         ((PlayerListAccessor) NarrativeCraftMod.server.getPlayerList())
                 .getPlayersByUUID()
                 .remove(fakePlayer.getUUID());

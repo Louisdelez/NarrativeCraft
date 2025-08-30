@@ -50,6 +50,8 @@ public class CutscenesScreen extends StoryElementScreen {
 
     private final Scene scene;
 
+    private Button settingsButton;
+
     public CutscenesScreen(Scene scene) {
         super(Translation.message("screen.story_manager.cutscene_list", scene.getName()));
         this.scene = scene;
@@ -86,14 +88,14 @@ public class CutscenesScreen extends StoryElementScreen {
                                 minecraft.setScreen(null);
                             })
                             .build();
-                    Button settingButton = createSettingsButton(cutscene);
-                    settingButton.setTooltip(Tooltip.create(
+                    settingsButton = createSettingsButton(cutscene);
+                    settingsButton.setTooltip(Tooltip.create(
                             hasShiftDown()
                                     ? Translation.message("screen.story_manager.animation_cutscene_link")
                                     : Translation.message("screen.story_manager.subscene_cutscene_link")));
                     return new StoryElementList.StoryEntryData(
                             button,
-                            List.of(settingButton),
+                            List.of(settingsButton),
                             () -> {
                                 minecraft.setScreen(
                                         new EditInfoScreen<>(this, cutscene, new EditScreenCutsceneAdapter(scene)));
@@ -193,5 +195,14 @@ public class CutscenesScreen extends StoryElementScreen {
     @Override
     protected void openFolder() {
         Util.getPlatform().openPath(NarrativeCraftFile.getDataFolder(scene).toPath());
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        settingsButton.setTooltip(Tooltip.create(
+                hasShiftDown()
+                        ? Translation.message("screen.story_manager.animation_cutscene_link")
+                        : Translation.message("screen.story_manager.subscene_cutscene_link")));
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 }

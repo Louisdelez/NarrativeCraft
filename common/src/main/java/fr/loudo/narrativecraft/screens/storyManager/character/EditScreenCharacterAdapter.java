@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.screens.storyManager.character;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.managers.CharacterManager;
+import fr.loudo.narrativecraft.narrative.character.CharacterModel;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
@@ -38,7 +39,6 @@ import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StringWidget;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
@@ -63,13 +63,13 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
         yearLabelBox.getEditBox().setValue("2000");
         screen.extraFields.put("year", yearLabelBox);
 
-        Button modelButton = Button.builder(Component.literal(PlayerSkin.Model.WIDE.name()), button -> {
+        Button modelButton = Button.builder(Component.literal(CharacterModel.WIDE.name()), button -> {
                     String currentModel = button.getMessage().getString();
 
-                    if (currentModel.equalsIgnoreCase(PlayerSkin.Model.WIDE.name())) {
-                        button.setMessage(Component.literal(PlayerSkin.Model.SLIM.name()));
+                    if (currentModel.equalsIgnoreCase(CharacterModel.WIDE.name())) {
+                        button.setMessage(Component.literal(CharacterModel.SLIM.name()));
                     } else {
-                        button.setMessage(Component.literal(PlayerSkin.Model.WIDE.name()));
+                        button.setMessage(Component.literal(CharacterModel.WIDE.name()));
                     }
                 })
                 .width(70)
@@ -133,7 +133,7 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
                 ((ScreenUtils.LabelBox) extraFields.get("month")).getEditBox().getValue();
         String year =
                 ((ScreenUtils.LabelBox) extraFields.get("year")).getEditBox().getValue();
-        PlayerSkin.Model model = PlayerSkin.Model.valueOf(
+        CharacterModel model = CharacterModel.valueOf(
                 ((Button) extraFields.get("modelBtn")).getMessage().getString());
         CharacterStory newCharacter =
                 new CharacterStory(name, description, day, month, year, model, CharacterType.MAIN);

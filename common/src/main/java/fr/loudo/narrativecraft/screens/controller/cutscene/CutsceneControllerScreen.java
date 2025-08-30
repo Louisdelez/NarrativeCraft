@@ -25,9 +25,9 @@ package fr.loudo.narrativecraft.screens.controller.cutscene;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.controllers.CutsceneController;
+import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframeGroup;
 import fr.loudo.narrativecraft.util.ImageFontConstants;
 import fr.loudo.narrativecraft.util.Translation;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
@@ -36,7 +36,6 @@ import net.minecraft.network.chat.Component;
 
 public class CutsceneControllerScreen extends Screen {
 
-    private final Minecraft client = Minecraft.getInstance();
     private final Component pauseText = Component.literal("⏸");
     private final Component playText = Component.literal("▶");
 
@@ -68,9 +67,10 @@ public class CutsceneControllerScreen extends Screen {
         totalWidthControllerBtn = pauseBtnWidth + (btnWidth * 2) + (gap * 2);
         int startX = (this.width - totalWidthControllerBtn) / 2;
 
-        String previousText = "- %ds";
+        String previousText = "- %.1fs";
         Button previousSkip = Button.builder(
-                        Component.literal(String.format(previousText, cutsceneController.getSkipTickCount() / 20)),
+                        Component.literal(
+                                String.format(previousText, ((double) cutsceneController.getSkipTickCount()) / 20)),
                         button -> {
                             cutsceneController.previousSecondSkip();
                         })
@@ -83,9 +83,10 @@ public class CutsceneControllerScreen extends Screen {
                 .bounds(startX + btnWidth + gap, initialY, pauseBtnWidth, BUTTON_HEIGHT)
                 .build();
 
-        String nextText = "+ %ds";
+        String nextText = "+ %.1fs";
         Button nextSkip = Button.builder(
-                        Component.literal(String.format(nextText, cutsceneController.getSkipTickCount() / 20)),
+                        Component.literal(
+                                String.format(nextText, ((double) cutsceneController.getSkipTickCount()) / 20)),
                         button -> {
                             cutsceneController.nextSecondSkip();
                         })
@@ -105,10 +106,11 @@ public class CutsceneControllerScreen extends Screen {
         int startX = controllerStartX - gap - totalWidth;
 
         Button createKeyframeGroup = Button.builder(ImageFontConstants.CREATE_KEYFRAME_GROUP, button -> {
-                    //            CutsceneKeyframeGroup keyframeGroup = cutsceneController.createKeyframeGroup();
-                    //
-                    // client.player.displayClientMessage(Translation.message("cutscene.keyframegroup.created",
-                    // keyframeGroup.getId()), false);
+                    CutsceneKeyframeGroup keyframeGroup = cutsceneController.createKeyframeGroup();
+
+                    minecraft.player.displayClientMessage(
+                            Translation.message("controller.cutscene.keyframe_group_created", keyframeGroup.getId()),
+                            false);
                 })
                 .bounds(startX, initialY, btnWidth, BUTTON_HEIGHT)
                 .build();
@@ -116,11 +118,11 @@ public class CutsceneControllerScreen extends Screen {
                 Tooltip.create(Translation.message("screen.cutscene_controller.tooltip.keyframe_group")));
 
         Button addKeyframe = Button.builder(ImageFontConstants.ADD_KEYFRAME, button -> {
-                    //            cutsceneController.addKeyframe();
+                    cutsceneController.createKeyframe();
                 })
                 .bounds(startX + btnWidth + gap, initialY, btnWidth, BUTTON_HEIGHT)
                 .build();
-        addKeyframe.setTooltip(Tooltip.create(Translation.message("screen.cutscene_controller.tooltip.keyframe")));
+        addKeyframe.setTooltip(Tooltip.create(Translation.message("screen.cutscene_controller.tooltip.helper")));
 
         Button addTriggerKeyframe = Button.builder(ImageFontConstants.ADD_KEYFRAME_TRIGGER, button -> {
                     //            KeyframeTriggerScreen screen = new KeyframeTriggerScreen(cutsceneController,
@@ -143,8 +145,8 @@ public class CutsceneControllerScreen extends Screen {
         int startX = controllerStartX + totalWidthControllerBtn + 15;
 
         Button settingsButton = Button.builder(ImageFontConstants.SETTINGS, button -> {
-                    //            client.execute(() -> client.setScreen(new CutsceneSettingsScreen(cutsceneController,
-                    // this, Translation.message("screen.cutscenes_settings.name"))));
+                    minecraft.setScreen(new CutsceneSettingsScreen(
+                            cutsceneController, this, Translation.message("controller.cutscene.settings.screen_name")));
                 })
                 .bounds(startX, initialY, btnWidth, BUTTON_HEIGHT)
                 .build();

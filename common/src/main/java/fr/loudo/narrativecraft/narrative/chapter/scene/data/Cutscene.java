@@ -61,6 +61,15 @@ public class Cutscene extends SceneData {
         return animations;
     }
 
+    public void addKeyframeGroup(CutsceneKeyframeGroup keyframeGroup) {
+        if (keyframeGroups.contains(keyframeGroup)) return;
+        keyframeGroups.add(keyframeGroup);
+    }
+
+    public void removeKeyframeGroup(CutsceneKeyframeGroup keyframeGroup) {
+        keyframeGroups.remove(keyframeGroup);
+    }
+
     public List<CutsceneKeyframeGroup> getKeyframeGroups() {
         if (keyframeGroups == null) {
             keyframeGroups = new ArrayList<>();

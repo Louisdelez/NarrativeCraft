@@ -24,14 +24,23 @@
 package fr.loudo.narrativecraft.narrative.keyframes.cutscene;
 
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeGroup;
+import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.server.level.ServerPlayer;
 
 public class CutsceneKeyframeGroup extends KeyframeGroup<CutsceneKeyframe> {
 
-    private final int id;
+    private int id;
 
     public CutsceneKeyframeGroup(int id) {
         this.id = id;
+    }
+
+    public void showGroupText(ServerPlayer player) {
+        if (keyframes.isEmpty()) return;
+        CutsceneKeyframe keyframe = keyframes.getFirst();
+        keyframe.getCamera().setCustomNameVisible(true);
+        keyframe.getCamera().setCustomName(Translation.message("controller.cutscene.keyframe_group.start_text", id));
+        keyframe.updateEntityData(player);
     }
 
     public void showGlow(ServerPlayer player) {
@@ -58,5 +67,9 @@ public class CutsceneKeyframeGroup extends KeyframeGroup<CutsceneKeyframe> {
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

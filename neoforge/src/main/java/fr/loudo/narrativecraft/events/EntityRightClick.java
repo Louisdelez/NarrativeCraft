@@ -42,7 +42,9 @@ public class EntityRightClick {
             ServerPlayer serverPlayer = NarrativeCraftMod.server
                     .getPlayerList()
                     .getPlayer(event.getEntity().getUUID());
-            // OnEntityRightClick.entityRightClick(serverPlayer, event.getTarget());
+            if (serverPlayer == null) return;
+            NarrativeCraftMod.server.execute(
+                    () -> OnEntityRightClick.entityRightClick(serverPlayer, event.getTarget()));
         }
     }
 }

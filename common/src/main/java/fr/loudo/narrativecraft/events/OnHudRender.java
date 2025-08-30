@@ -26,16 +26,16 @@ package fr.loudo.narrativecraft.events;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.server.level.ServerPlayer;
 
 public class OnHudRender {
     public static void controllerHudInfo(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
-        for (ServerPlayer player : NarrativeCraftMod.server.getPlayerList().getPlayers()) {
-            PlayerSession playerSession =
-                    NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
-            if (playerSession.getController() == null) return;
-            playerSession.getController().renderHUDInfo(guiGraphics);
-        }
+        PlayerSession playerSession = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getSessionByPlayer(Minecraft.getInstance().player);
+        if (playerSession == null) return;
+        if (playerSession.getController() == null) return;
+        playerSession.getController().renderHUDInfo(guiGraphics);
     }
 }

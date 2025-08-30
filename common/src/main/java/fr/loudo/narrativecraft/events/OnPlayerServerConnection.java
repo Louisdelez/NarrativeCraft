@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.commands.RecordCommand;
+import fr.loudo.narrativecraft.items.CutsceneEditItems;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.managers.RecordingManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryInit;
@@ -43,6 +44,7 @@ public class OnPlayerServerConnection {
         if (player.hasPermissions(2) && NarrativeEntryInit.hasError) {
             player.sendSystemMessage(Translation.message("crash.narrative-data").withStyle(ChatFormatting.RED));
         }
+        CutsceneEditItems.init(player.registryAccess());
     }
 
     public static void playerLeave(ServerPlayer player) {

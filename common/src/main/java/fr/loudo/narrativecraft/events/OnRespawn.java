@@ -34,6 +34,7 @@ import net.minecraft.world.entity.player.Player;
 public class OnRespawn {
 
     public static void respawn(Player player) {
+        if (NarrativeCraftMod.server == null) return;
         Recording recording =
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
         if (recording == null || !recording.isRecording()) return;

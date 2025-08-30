@@ -26,11 +26,11 @@ package fr.loudo.narrativecraft.commands;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
-import fr.loudo.narrativecraft.screens.storyManager.chapter.ChaptersScreen;
-import fr.loudo.narrativecraft.screens.storyManager.character.CharactersScreen;
-import net.minecraft.client.Minecraft;
+import fr.loudo.narrativecraft.network.OpenChaptersScreenPacket;
+import fr.loudo.narrativecraft.platform.Services;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.server.level.ServerPlayer;
 
 public class OpenScreenCommand {
 
@@ -45,20 +45,19 @@ public class OpenScreenCommand {
     }
 
     private static int openStoryOptions(CommandContext<CommandSourceStack> context) {
-        //        StoryOptionsScreen screen = new StoryOptionsScreen();
-        //        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
+
         return Command.SINGLE_SUCCESS;
     }
 
     private static int openStoryManager(CommandContext<CommandSourceStack> context) {
-        ChaptersScreen screen = new ChaptersScreen();
-        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
+        ServerPlayer player = context.getSource().getPlayer();
+        Services.PACKET_SENDER.sendToPlayer(player, new OpenChaptersScreenPacket("caca", 13));
         return Command.SINGLE_SUCCESS;
     }
 
     private static int openCharacterManager(CommandContext<CommandSourceStack> context) {
-        CharactersScreen screen = new CharactersScreen();
-        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
+        //        CharactersScreen screen = new CharactersScreen();
+        //        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
         return Command.SINGLE_SUCCESS;
     }
 

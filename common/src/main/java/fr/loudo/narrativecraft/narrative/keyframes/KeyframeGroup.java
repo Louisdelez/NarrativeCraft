@@ -25,12 +25,30 @@ package fr.loudo.narrativecraft.narrative.keyframes;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.server.level.ServerPlayer;
 
-public class KeyframeGroup<T extends AbstractKeyframe> {
+public class KeyframeGroup<T extends Keyframe> {
     protected final List<T> keyframes = new ArrayList<>();
 
     public List<T> getKeyframes() {
         return keyframes;
+    }
+
+    public boolean isLastKeyframe(T keyframe) {
+        if (keyframes.isEmpty()) return false;
+        return keyframes.getLast().getId() == keyframe.getId();
+    }
+
+    public void hideKeyframes(ServerPlayer player) {
+        for (T keyframe : keyframes) {
+            keyframe.hideKeyframe(player);
+        }
+    }
+
+    public void showKeyframes(ServerPlayer player) {
+        for (T keyframe : keyframes) {
+            keyframe.showKeyframe(player);
+        }
     }
 
     public void addKeyframe(T keyframe) {
