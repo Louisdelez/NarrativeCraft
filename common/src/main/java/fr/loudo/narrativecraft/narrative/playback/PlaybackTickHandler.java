@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.narrative.playback;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.controllers.CutsceneController;
+import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import java.util.ArrayList;
 import java.util.List;

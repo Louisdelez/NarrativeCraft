@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.screens.controller.cutscene;
 
-import fr.loudo.narrativecraft.controllers.CutsceneController;
+import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
 import fr.loudo.narrativecraft.screens.components.ButtonListScreen;
 import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.client.gui.components.Button;

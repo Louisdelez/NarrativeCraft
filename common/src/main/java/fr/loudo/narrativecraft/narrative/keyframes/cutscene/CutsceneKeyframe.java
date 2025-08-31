@@ -29,18 +29,17 @@ import fr.loudo.narrativecraft.util.Easing;
 
 public class CutsceneKeyframe extends Keyframe {
 
-    private int tick;
+    private int tick, pathTick, startDelayTick, transitionDelayTick;
     private double speed;
-    private long startDelay, pathTime, transitionDelay;
     private boolean isParentGroup;
     private Easing easing;
 
-    public CutsceneKeyframe(int id, KeyframeLocation keyframeCoordinate, int tick, long startDelay, long pathTime) {
+    public CutsceneKeyframe(int id, KeyframeLocation keyframeCoordinate, int tick, int startDelayTick, int pathTick) {
         super(id, keyframeCoordinate);
         this.tick = tick;
-        this.startDelay = startDelay;
-        this.pathTime = pathTime;
-        this.transitionDelay = 0;
+        this.startDelayTick = startDelayTick;
+        this.pathTick = pathTick;
+        this.transitionDelayTick = 0;
         this.isParentGroup = false;
         this.speed = 1;
         this.easing = Easing.SMOOTH;
@@ -67,28 +66,28 @@ public class CutsceneKeyframe extends Keyframe {
         this.speed = speed;
     }
 
-    public long getStartDelay() {
-        return startDelay;
+    public int getStartDelayTick() {
+        return startDelayTick;
     }
 
-    public void setStartDelay(long startDelay) {
-        this.startDelay = startDelay;
+    public void setStartDelayTick(int startDelayTick) {
+        this.startDelayTick = startDelayTick;
     }
 
-    public long getPathTime() {
-        return pathTime;
+    public int getPathTick() {
+        return pathTick;
     }
 
-    public void setPathTime(long pathTime) {
-        this.pathTime = pathTime;
+    public void setPathTick(int pathTick) {
+        this.pathTick = pathTick;
     }
 
-    public long getTransitionDelay() {
-        return transitionDelay;
+    public int getTransitionDelayTick() {
+        return transitionDelayTick;
     }
 
-    public void setTransitionDelay(long transitionDelay) {
-        this.transitionDelay = transitionDelay;
+    public void setTransitionDelayTick(int transitionDelayTick) {
+        this.transitionDelayTick = transitionDelayTick;
     }
 
     public boolean isParentGroup() {

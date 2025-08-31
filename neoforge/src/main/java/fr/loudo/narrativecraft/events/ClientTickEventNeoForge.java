@@ -39,6 +39,7 @@ public class ClientTickEventNeoForge {
     }
 
     public static void onClientTick(ClientTickEvent.Post event) {
+        OnClientTick.clientTick(Minecraft.getInstance());
         PressKeyListener.onPressKey(Minecraft.getInstance());
     }
 }

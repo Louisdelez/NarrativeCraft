@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.screens.storyManager.cutscene;
 
-import fr.loudo.narrativecraft.controllers.CutsceneController;
+import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;

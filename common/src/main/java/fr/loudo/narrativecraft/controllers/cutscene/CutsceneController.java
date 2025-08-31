@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.controllers;
+package fr.loudo.narrativecraft.controllers.cutscene;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -38,8 +38,7 @@ import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframeGrou
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.recording.Location;
 import fr.loudo.narrativecraft.screens.controller.cutscene.CutsceneControllerScreen;
-import fr.loudo.narrativecraft.screens.controller.cutscene.KeyframeCutsceneOptionScreen;
-import fr.loudo.narrativecraft.util.MathHelper;
+import fr.loudo.narrativecraft.screens.controller.cutscene.CutsceneKeyframeOptionScreen;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +59,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
 
     private final List<Playback> playbacks = new ArrayList<>();
     private final Cutscene cutscene;
+    private final CutscenePlayback cutscenePlayback;
 
     private boolean isPlaying;
     private int currentTick, skipTickCount;
@@ -72,6 +72,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         skipTickCount = 20;
         isPlaying = false;
         keyframeGroups.addAll(cutscene.getKeyframeGroups());
+        cutscenePlayback = new CutscenePlayback(this, () -> {});
     }
 
     public void tick() {
@@ -169,8 +170,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
 
     @Override
     public Screen keyframeOptionScreen(Keyframe keyframe) {
-        return new KeyframeCutsceneOptionScreen(
-                selectedGroup, (CutsceneKeyframe) keyframe, playerSession.getPlayer(), false);
+        return new CutsceneKeyframeOptionScreen((CutsceneKeyframe) keyframe, playerSession.getPlayer(), false);
     }
 
     @Override
@@ -218,10 +218,14 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
 
     public CutsceneKeyframeGroup createKeyframeGroup() {
         if (environment != Environment.DEVELOPMENT) return null;
+        CutsceneKeyframe lastKeyframe = getLastKeyframeLastGroup();
         CutsceneKeyframeGroup keyframeGroup = new CutsceneKeyframeGroup(keyframeGroupCounter.incrementAndGet());
         selectedGroup = keyframeGroup;
         keyframeGroups.add(keyframeGroup);
         CutsceneKeyframe keyframe = createKeyframe();
+        if (lastKeyframe != null) {
+            keyframe.setTransitionDelayTick(currentTick - keyframe.getTick());
+        }
         keyframeGroup.showGroupText(playerSession.getPlayer());
         updateSelectedGroupGlow();
         return keyframeGroup;
@@ -242,13 +246,25 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         ServerPlayer player = playerSession.getPlayer();
         KeyframeLocation location = new KeyframeLocation(
                 player.position().add(0, player.getEyeHeight(), 0), player.getXRot(), player.getYRot(), 0, 85.0f);
-        long pathTime = 0;
+        int pathTime = 0;
         CutsceneKeyframe lastKeyframe = getLastKeyframeLastGroup();
         if (lastKeyframe != null) {
-            pathTime = MathHelper.tickToMills(lastKeyframe.getTick()) - MathHelper.tickToMills(currentTick);
+            pathTime = currentTick - lastKeyframe.getTick();
         }
         CutsceneKeyframe keyframe =
                 new CutsceneKeyframe(keyframeCounter.incrementAndGet(), location, currentTick, 0, pathTime);
+        for (CutsceneKeyframeGroup keyframeGroup : keyframeGroups) {
+            for (int i = 0; i < keyframeGroup.getKeyframes().size(); i++) {
+                if (keyframeGroup.getKeyframes().get(i).getTick() > currentTick) {
+                    CutsceneKeyframe before = keyframeGroup.getKeyframes().get(i - 1);
+                    CutsceneKeyframe after = keyframeGroup.getKeyframes().get(i);
+                    keyframe.setPathTick((before.getTick() + after.getTick()) - currentTick);
+                    selectedGroup.getKeyframes().add(i, keyframe);
+                    updateCurrentTick(keyframe.getTick());
+                    break;
+                }
+            }
+        }
         selectedGroup.addKeyframe(keyframe);
         keyframe.setParentGroup(selectedGroup.getKeyframes().getFirst().getId() == keyframe.getId());
         keyframe.showKeyframe(player);
@@ -300,6 +316,49 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         return keyframes.getLast();
     }
 
+    public void updateCurrentTick(int tick) {
+        List<CutsceneKeyframeGroup> groups = keyframeGroups;
+
+        int initialFirstTick = 0;
+        if (!groups.isEmpty() && !groups.getFirst().getKeyframes().isEmpty()) {
+            initialFirstTick = groups.getFirst().getKeyframes().getFirst().getTick();
+        }
+
+        int referenceTick = 0;
+
+        for (int i = 0; i < groups.size(); i++) {
+            CutsceneKeyframeGroup group = groups.get(i);
+            List<CutsceneKeyframe> keyframes = group.getKeyframes();
+            if (keyframes.isEmpty()) continue;
+
+            if (i > 0) {
+                List<CutsceneKeyframe> prevGroup = groups.get(i - 1).getKeyframes();
+                if (!prevGroup.isEmpty()) {
+                    CutsceneKeyframe lastPrev = prevGroup.getLast();
+                    referenceTick += lastPrev.getTransitionDelayTick();
+                }
+            }
+
+            for (int j = 0; j < keyframes.size(); j++) {
+                CutsceneKeyframe current = keyframes.get(j);
+                int newTick;
+
+                if (i == 0 && j == 0) {
+                    newTick = initialFirstTick + current.getStartDelayTick();
+                } else if (j > 0) {
+                    CutsceneKeyframe previous = keyframes.get(j - 1);
+                    newTick = previous.getTick() + previous.getStartDelayTick() + current.getPathTick();
+                } else {
+                    newTick = referenceTick + current.getStartDelayTick();
+                }
+
+                current.setTick(newTick);
+                referenceTick = newTick;
+            }
+        }
+        changeTimePosition(tick, true);
+    }
+
     public boolean atMaxTick() {
         return currentTick >= totalTick;
     }
@@ -317,6 +376,12 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         for (Playback playback : playbacks) {
             playback.changeLocationByTick(newTick, seamless);
         }
+    }
+
+    public boolean isLastKeyframe(CutsceneKeyframe keyframe) {
+        if (keyframeGroups.isEmpty()) return false;
+        if (keyframeGroups.getLast().getKeyframes().isEmpty()) return false;
+        return keyframeGroups.getLast().isLastKeyframe(keyframe);
     }
 
     private int calculateTotalTick() {
@@ -385,5 +450,9 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
 
     public CutsceneKeyframeGroup getSelectedGroup() {
         return selectedGroup;
+    }
+
+    public CutscenePlayback getCutscenePlayback() {
+        return cutscenePlayback;
     }
 }

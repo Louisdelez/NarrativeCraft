@@ -101,7 +101,7 @@ public class KeyframeOptionScreen<T extends Keyframe> extends Screen {
                 Component.literal(text.getString() + " Value"));
 
         editBox.setValue(defaultValue);
-        editBox.setFilter((s -> s.matches("^\\d*$")));
+        editBox.setFilter(s -> s.matches("^-?\\d*(\\.\\d*)?$"));
 
         this.addRenderableWidget(labelWidget);
         this.addRenderableWidget(editBox);
@@ -189,7 +189,7 @@ public class KeyframeOptionScreen<T extends Keyframe> extends Screen {
                 EDIT_BOX_HEIGHT,
                 Component.literal("Up Down Value"));
         upDownBox.setValue(formatFloat.apply(defaultValXRot));
-        upDownBox.setFilter(s -> s.matches("^\\d*$"));
+        upDownBox.setFilter(s -> s.matches("^-?\\d*(\\.\\d*)?$"));
         Button upDownButton = Button.builder(Component.literal("✔"), btn -> {
                     upDownValue = Float.parseFloat(upDownBox.getValue()) - 90F;
                     updateValues();
@@ -243,7 +243,7 @@ public class KeyframeOptionScreen<T extends Keyframe> extends Screen {
                 EDIT_BOX_HEIGHT,
                 Component.literal("Left Right Value"));
         leftRightBox.setValue(formatFloat.apply(defaultYRot));
-        leftRightBox.setFilter(s -> s.matches("^\\d*$"));
+        leftRightBox.setFilter(s -> s.matches("^-?\\d*(\\.\\d*)?$"));
         Button leftRightButton = Button.builder(Component.literal("✔"), btn -> {
                     leftRightValue = Float.parseFloat(leftRightBox.getValue());
                     updateValues();
@@ -291,7 +291,7 @@ public class KeyframeOptionScreen<T extends Keyframe> extends Screen {
                 EDIT_BOX_HEIGHT,
                 Component.literal("Rotation Value"));
         rotationBox.setValue(formatFloat.apply(defaultZRot));
-        rotationBox.setFilter(s -> s.matches("^\\d*$"));
+        rotationBox.setFilter(s -> s.matches("^-?\\d*(\\.\\d*)?$"));
         Button rotationButton = Button.builder(Component.literal("✔"), btn -> {
                     if (rotationBox.getValue().equals("-")) return;
                     float angle = Float.parseFloat(rotationBox.getValue());

@@ -21,24 +21,31 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.util;
+package fr.loudo.narrativecraft.screens.controller.cutscene;
 
-import java.util.function.DoubleUnaryOperator;
+import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframe;
+import fr.loudo.narrativecraft.screens.components.ButtonListScreen;
+import fr.loudo.narrativecraft.util.Translation;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
 
-public enum Easing {
-    SMOOTH(t -> t * t * t * (t * (6 * t - 15) + 10)), // Formula used if catmull cannot be used
-    LINEAR(t -> t),
-    EASE_IN(t -> t * t),
-    EASE_OUT(t -> t * (2 - t)),
-    EASE_IN_OUT(t -> t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
+public class CutsceneKeyframeAdvancedSettings extends ButtonListScreen {
 
-    private final DoubleUnaryOperator function;
+    private final CutsceneKeyframe keyframe;
 
-    Easing(DoubleUnaryOperator function) {
-        this.function = function;
+    public CutsceneKeyframeAdvancedSettings(Screen lastScreen, CutsceneKeyframe keyframe) {
+        super(lastScreen, Translation.message("screen.keyframe_advanced.name"));
+        this.keyframe = keyframe;
     }
 
-    public double interpolate(double t) {
-        return function.applyAsDouble(t);
+    @Override
+    protected void addContents() {
+        Button easingsButton = Button.builder(Translation.message("screen.keyframe_advanced.easings"), button -> {
+                    CutsceneKeyframeEasingsScreen screen = new CutsceneKeyframeEasingsScreen(this, keyframe);
+                    this.minecraft.setScreen(screen);
+                })
+                .build();
+
+        objectListScreen.addButton(easingsButton);
     }
 }

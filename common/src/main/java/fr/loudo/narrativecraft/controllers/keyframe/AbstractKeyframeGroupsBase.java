@@ -65,7 +65,7 @@ public abstract class AbstractKeyframeGroupsBase<T extends Keyframe, E extends K
                 }
             }
         }
-        return null;
+        return toKeyframe;
     }
 
     @Override
@@ -84,7 +84,7 @@ public abstract class AbstractKeyframeGroupsBase<T extends Keyframe, E extends K
                 }
             }
         }
-        return null;
+        return fromKeyframe;
     }
 
     @Override

@@ -21,24 +21,22 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.util;
+package fr.loudo.narrativecraft.events;
 
-import java.util.function.DoubleUnaryOperator;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import net.minecraft.client.Minecraft;
 
-public enum Easing {
-    SMOOTH(t -> t * t * t * (t * (6 * t - 15) + 10)), // Formula used if catmull cannot be used
-    LINEAR(t -> t),
-    EASE_IN(t -> t * t),
-    EASE_OUT(t -> t * (2 - t)),
-    EASE_IN_OUT(t -> t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
+public class OnClientTick {
 
-    private final DoubleUnaryOperator function;
-
-    Easing(DoubleUnaryOperator function) {
-        this.function = function;
-    }
-
-    public double interpolate(double t) {
-        return function.applyAsDouble(t);
+    public static void clientTick(Minecraft minecraft) {
+        if (minecraft.isPaused() && minecraft.isSingleplayer()) return;
+        PlayerSession playerSession =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
+        if (playerSession == null) return;
+        if (playerSession.getController() instanceof CutsceneController controller) {
+            controller.getCutscenePlayback().tick();
+        }
     }
 }

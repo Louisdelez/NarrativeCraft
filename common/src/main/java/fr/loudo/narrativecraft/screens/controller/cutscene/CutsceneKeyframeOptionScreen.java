@@ -24,7 +24,8 @@
 package fr.loudo.narrativecraft.screens.controller.cutscene;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.controllers.CutsceneController;
+import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
+import fr.loudo.narrativecraft.controllers.cutscene.CutscenePlayback;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframeGroup;
@@ -33,7 +34,6 @@ import fr.loudo.narrativecraft.util.ImageFontConstants;
 import fr.loudo.narrativecraft.util.MathHelper;
 import fr.loudo.narrativecraft.util.ScreenUtils;
 import fr.loudo.narrativecraft.util.Translation;
-import java.util.List;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
@@ -43,17 +43,16 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 
-public class KeyframeCutsceneOptionScreen extends KeyframeOptionScreen<CutsceneKeyframe> {
+public class CutsceneKeyframeOptionScreen extends KeyframeOptionScreen<CutsceneKeyframe> {
 
     private final CutsceneController cutsceneController;
     private final CutsceneKeyframeGroup cutsceneKeyframeGroup;
     private EditBox startDelayBox, pathTimeBox, transitionDelayBox, speedBox;
 
-    public KeyframeCutsceneOptionScreen(
-            CutsceneKeyframeGroup cutsceneKeyframeGroup, CutsceneKeyframe keyframe, ServerPlayer player, boolean hide) {
+    public CutsceneKeyframeOptionScreen(CutsceneKeyframe keyframe, ServerPlayer player, boolean hide) {
         super(keyframe, player, hide);
-        this.cutsceneKeyframeGroup = cutsceneKeyframeGroup;
         this.cutsceneController = (CutsceneController) playerSession.getController();
+        this.cutsceneKeyframeGroup = cutsceneController.getKeyframeGroupOfKeyframe(keyframe);
     }
 
     @Override
@@ -62,18 +61,18 @@ public class KeyframeCutsceneOptionScreen extends KeyframeOptionScreen<CutsceneK
             if (!keyframe.isParentGroup()) {
                 pathTimeBox = addLabeledEditBox(
                         Translation.message("screen.keyframe_option.path_time"),
-                        String.valueOf(MathHelper.millisToSeconds(keyframe.getPathTime())));
+                        String.valueOf(MathHelper.tickToSeconds(keyframe.getPathTick())));
                 speedBox = addLabeledEditBox(
                         Translation.message("screen.keyframe_option.speed"), String.valueOf(keyframe.getSpeed()));
             }
             if (cutsceneKeyframeGroup.isLastKeyframe(keyframe)) {
                 transitionDelayBox = addLabeledEditBox(
                         Translation.message("screen.keyframe_option.transition_delay"),
-                        String.valueOf(MathHelper.millisToSeconds(keyframe.getTransitionDelay())));
+                        String.valueOf(MathHelper.tickToSeconds(keyframe.getTransitionDelayTick())));
             } else {
                 startDelayBox = addLabeledEditBox(
                         Translation.message("screen.keyframe_option.start_delay"),
-                        String.valueOf(MathHelper.millisToSeconds(keyframe.getStartDelay())));
+                        String.valueOf(MathHelper.tickToSeconds(keyframe.getStartDelayTick())));
             }
             initPositionLabelBox();
             initSliders();
@@ -95,18 +94,21 @@ public class KeyframeCutsceneOptionScreen extends KeyframeOptionScreen<CutsceneK
         Component updateTitle = Translation.message("screen.keyframe_option.update");
         Button updateButton = Button.builder(updateTitle, button -> {
                     updateValues();
-                    updateCurrentTick();
+                    cutsceneController.updateCurrentTick(keyframe.getTick());
                 })
                 .bounds(INITIAL_POS_X, currentY, this.font.width(updateTitle) + margin, BUTTON_HEIGHT)
                 .build();
         Component playTitle = Translation.message("screen.keyframe_option.play_from_here");
         Button playFromHere = Button.builder(playTitle, button -> {
                     if (playerSession != null) {
-                        //                CutscenePlayback cutscenePlayback = new CutscenePlayback(player,
-                        // cutsceneController.getCutscene().getKeyframeGroupList(), helper, cutsceneController);
-                        //                cutscenePlayback.start();
-                        //                playerSession.setCutscenePlayback(cutscenePlayback);
-                        //                minecraft.setScreen(null);
+                        CutscenePlayback cutscenePlayback = cutsceneController.getCutscenePlayback();
+                        if (cutsceneKeyframeGroup.isLastKeyframe(keyframe)) {
+                            cutscenePlayback.setupAndPlay(cutsceneController.getPreviousKeyframe(keyframe), keyframe);
+                            cutscenePlayback.setSegmentTick(keyframe.getTick());
+                        } else {
+                            cutscenePlayback.setupAndPlay(keyframe, cutsceneController.getNextKeyframe(keyframe));
+                        }
+                        minecraft.setScreen(null);
                     }
                 })
                 .bounds(
@@ -118,9 +120,8 @@ public class KeyframeCutsceneOptionScreen extends KeyframeOptionScreen<CutsceneK
         currentY += BUTTON_HEIGHT + gap - 10;
         Component advancedTitle = Translation.message("screen.keyframe_option.advanced");
         Button advancedButton = Button.builder(advancedTitle, button -> {
-                    //            KeyframeAdvancedSettings screen = new KeyframeAdvancedSettings(cutsceneController,
-                    // this, helper);
-                    //            this.minecraft.setScreen(screen);
+                    CutsceneKeyframeAdvancedSettings screen = new CutsceneKeyframeAdvancedSettings(this, keyframe);
+                    this.minecraft.setScreen(screen);
                 })
                 .bounds(INITIAL_POS_X, currentY, this.font.width(advancedTitle) + margin, BUTTON_HEIGHT)
                 .build();
@@ -133,12 +134,12 @@ public class KeyframeCutsceneOptionScreen extends KeyframeOptionScreen<CutsceneK
                                     if (playerSession != null) {
                                         cutsceneController.setCamera(null);
                                         cutsceneController.removeKeyframe(keyframe);
-                                        updateCurrentTick();
+                                        cutsceneController.updateCurrentTick(keyframe.getTick());
                                         minecraft.setScreen(null);
                                     }
                                 } else {
-                                    KeyframeCutsceneOptionScreen screen = new KeyframeCutsceneOptionScreen(
-                                            cutsceneKeyframeGroup, keyframe, player, false);
+                                    CutsceneKeyframeOptionScreen screen =
+                                            new CutsceneKeyframeOptionScreen(keyframe, player, false);
                                     minecraft.setScreen(screen);
                                 }
                             },
@@ -152,7 +153,9 @@ public class KeyframeCutsceneOptionScreen extends KeyframeOptionScreen<CutsceneK
                 .build();
         this.addRenderableWidget(updateButton);
         this.addRenderableWidget(advancedButton);
-        this.addRenderableWidget(playFromHere);
+        if (!cutsceneController.isLastKeyframe(keyframe)) {
+            this.addRenderableWidget(playFromHere);
+        }
         this.addRenderableWidget(removeKeyframe);
     }
 
@@ -184,8 +187,7 @@ public class KeyframeCutsceneOptionScreen extends KeyframeOptionScreen<CutsceneK
         int width = 20;
         if (hide) {
             Button eyeClosed = Button.builder(ImageFontConstants.EYE_CLOSED, button -> {
-                        KeyframeCutsceneOptionScreen screen =
-                                new KeyframeCutsceneOptionScreen(cutsceneKeyframeGroup, keyframe, player, false);
+                        CutsceneKeyframeOptionScreen screen = new CutsceneKeyframeOptionScreen(keyframe, player, false);
                         minecraft.setScreen(screen);
                     })
                     .bounds(currentX - (width / 2), INITIAL_POS_Y - 5, width, BUTTON_HEIGHT)
@@ -200,7 +202,7 @@ public class KeyframeCutsceneOptionScreen extends KeyframeOptionScreen<CutsceneK
                 .bounds(currentX - (width / 2), INITIAL_POS_Y - 5, width, BUTTON_HEIGHT)
                 .build();
         CutsceneKeyframe nextKeyframe = cutsceneController.getNextKeyframe(keyframe);
-        if (nextKeyframe != null) {
+        if (nextKeyframe.getId() != keyframe.getId()) {
             currentX -= INITIAL_POS_X + gap;
             Button rightKeyframeButton = Button.builder(Component.literal("▶"), button -> {
                         // TODO: Send a packet to the server instead.
@@ -211,7 +213,7 @@ public class KeyframeCutsceneOptionScreen extends KeyframeOptionScreen<CutsceneK
             this.addRenderableWidget(rightKeyframeButton);
         }
         CutsceneKeyframe previousKeyframe = cutsceneController.getPreviousKeyframe(keyframe);
-        if (previousKeyframe != null) {
+        if (previousKeyframe.getId() != keyframe.getId()) {
             currentX -= INITIAL_POS_X + gap;
             Button leftKeyframeButton = Button.builder(Component.literal("◀"), button -> {
                         // TODO: Send a packet to the server instead.
@@ -224,8 +226,7 @@ public class KeyframeCutsceneOptionScreen extends KeyframeOptionScreen<CutsceneK
         this.addRenderableWidget(closeButton);
         currentX -= INITIAL_POS_X + gap;
         Button eyeOpen = Button.builder(ImageFontConstants.EYE_OPEN, button -> {
-                    KeyframeCutsceneOptionScreen screen =
-                            new KeyframeCutsceneOptionScreen(cutsceneKeyframeGroup, keyframe, player, true);
+                    CutsceneKeyframeOptionScreen screen = new CutsceneKeyframeOptionScreen(keyframe, player, true);
                     minecraft.setScreen(screen);
                 })
                 .bounds(currentX - (width / 2), INITIAL_POS_Y - 5, width, BUTTON_HEIGHT)
@@ -236,18 +237,18 @@ public class KeyframeCutsceneOptionScreen extends KeyframeOptionScreen<CutsceneK
     protected void updateValues() {
         if (startDelayBox != null) {
             float startDelayVal = Float.parseFloat((startDelayBox.getValue()));
-            keyframe.setStartDelay(MathHelper.secondsToMillis(startDelayVal));
+            keyframe.setStartDelayTick(MathHelper.secondsToTick(startDelayVal));
         }
         if (transitionDelayBox != null) {
             float transitionDelayValue = Float.parseFloat((transitionDelayBox.getValue()));
-            keyframe.setTransitionDelay(MathHelper.secondsToMillis(transitionDelayValue));
+            keyframe.setTransitionDelayTick(MathHelper.secondsToTick(transitionDelayValue));
         }
         if (speedBox != null) {
             double speedValue = Double.parseDouble((speedBox.getValue()));
             keyframe.setSpeed(speedValue);
         }
         float pathTimeVal = pathTimeBox == null ? 0 : Float.parseFloat((pathTimeBox.getValue()));
-        keyframe.setPathTime(MathHelper.secondsToMillis(pathTimeVal));
+        keyframe.setPathTick(MathHelper.secondsToTick(pathTimeVal));
         KeyframeLocation location = getKeyframeLocation();
         keyframe.setKeyframeLocation(location);
         keyframe.updateEntityData(player);
@@ -266,50 +267,5 @@ public class KeyframeCutsceneOptionScreen extends KeyframeOptionScreen<CutsceneK
         location.setZ(zVal);
         location.setFov(fovValue);
         return location;
-    }
-
-    protected void updateCurrentTick() {
-        List<CutsceneKeyframeGroup> keyframeGroupList =
-                cutsceneController.getCutscene().getKeyframeGroups();
-
-        int initialFirstTick = 0;
-        if (!keyframeGroupList.isEmpty()
-                && !keyframeGroupList.getFirst().getKeyframes().isEmpty()) {
-            initialFirstTick =
-                    keyframeGroupList.getFirst().getKeyframes().getFirst().getTick();
-        }
-
-        int referenceTick = 0;
-
-        for (int i = 0; i < keyframeGroupList.size(); i++) {
-            CutsceneKeyframeGroup group = keyframeGroupList.get(i);
-            List<CutsceneKeyframe> keyframes = group.getKeyframes();
-
-            if (i > 0 && !keyframeGroupList.get(i - 1).getKeyframes().isEmpty()) {
-                CutsceneKeyframe lastKeyframePrevGroup =
-                        keyframeGroupList.get(i - 1).getKeyframes().getLast();
-                referenceTick += (int) (lastKeyframePrevGroup.getTransitionDelay() / 1000.0 * 20);
-            }
-
-            for (int j = 0; j < keyframes.size(); j++) {
-                CutsceneKeyframe current = keyframes.get(j);
-
-                int newTick;
-                if (i == 0 && j == 0) {
-                    newTick = initialFirstTick;
-                } else if (j > 0) {
-                    CutsceneKeyframe previous = keyframes.get(j - 1);
-                    double startDelay = previous.getStartDelay() / 1000.0;
-                    double pathTime = current.getPathTime() / 1000.0;
-                    newTick = previous.getTick() + (int) ((startDelay + pathTime) * 20);
-                } else {
-                    newTick = referenceTick;
-                }
-
-                current.setTick(newTick);
-                referenceTick = newTick;
-            }
-        }
-        cutsceneController.changeTimePosition(keyframe.getTick(), true);
     }
 }

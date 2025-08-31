@@ -60,7 +60,7 @@ public class CutsceneKeyframeGroup extends KeyframeGroup<CutsceneKeyframe> {
     public long getTotalDuration() {
         long totalDuration = 0;
         for (CutsceneKeyframe keyframe : keyframes) {
-            totalDuration += keyframe.getPathTime();
+            totalDuration += keyframe.getPathTick();
         }
         return totalDuration;
     }

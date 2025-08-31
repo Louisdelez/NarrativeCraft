@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import net.minecraft.client.Camera;
@@ -66,6 +67,9 @@ public abstract class CameraMixin {
         if (playerSession == null) return;
         if (playerSession.getCurrentCamera() == null) return;
         KeyframeLocation location = playerSession.getCurrentCamera();
+        if (playerSession.getController() instanceof CutsceneController controller) {
+            controller.getCutscenePlayback().cameraInterpolation(partialTick);
+        }
 
         this.setPosition(location.getX(), location.getY(), location.getZ());
         this.setRotation(location.getYaw(), location.getPitch());
