@@ -29,9 +29,9 @@ import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframeGroup;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.screens.controller.cutscene.CutsceneKeyframeOptionScreen;
-import fr.loudo.narrativecraft.util.CatmullRoll;
 import fr.loudo.narrativecraft.util.Easing;
 import fr.loudo.narrativecraft.util.MathHelper;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
@@ -96,23 +96,21 @@ public class CutscenePlayback {
         if (keyframeB.getEasing() != Easing.SMOOTH
                 || currentKeyframeGroup.getKeyframes().size() < 2) {
             totalDelta = keyframeB.getEasing().interpolate(totalDelta);
-            playerSession.setCurrentCamera(
-                    interpolate(totalDelta, keyframeA.getKeyframeLocation(), keyframeB.getKeyframeLocation()));
+            playerSession.setCurrentCamera(interpolate(
+                    totalDelta / keyframeB.getSpeed(),
+                    keyframeA.getKeyframeLocation(),
+                    keyframeB.getKeyframeLocation()));
         } else {
-            KeyframeLocation location = CatmullRoll.interpolate(partialTick, currentKeyframeGroup, totalTick);
-            float roll = MathHelper.normalRotation(
-                    Easing.SMOOTH.interpolate(totalDelta),
-                    keyframeA.getKeyframeLocation().getRoll(),
-                    keyframeB.getKeyframeLocation().getRoll()); // Roll separated from main catmull roll
-            location.setRoll(roll);
+            KeyframeLocation location = interpolateByCatmull(partialTick);
             playerSession.setCurrentCamera(location);
         }
 
+        double extraDelay = 0;
+        if (currentKeyframeGroup.isLastKeyframe(keyframeB)) {
+            extraDelay += keyframeB.getTransitionDelayTick();
+        }
         if (totalDelta >= 1.0
-                && segmentTick
-                        >= (keyframeB.getPathTick()
-                                + keyframeB.getTransitionDelayTick()
-                                + keyframeA.getStartDelayTick())) {
+                && segmentTick >= (keyframeB.getPathTick() + keyframeA.getStartDelayTick() + extraDelay)) {
             if (cutsceneController.isLastKeyframe(keyframeB)) {
                 onEnd();
             } else {
@@ -121,8 +119,81 @@ public class CutscenePlayback {
         }
     }
 
+    private KeyframeLocation interpolateByCatmull(double partialTick) {
+        List<CutsceneKeyframe> keyframes = currentKeyframeGroup.getKeyframes();
+        if (keyframes.size() < 2) return keyframes.getLast().getKeyframeLocation();
+
+        int startIndex = 0;
+        for (CutsceneKeyframe keyframe : keyframes) {
+            if (keyframe.getId() == keyframeA.getId()) {
+                break;
+            }
+            startIndex++;
+        }
+
+        double elapsedTick = (totalTick + partialTick) - keyframeA.getTick();
+        int accumulatedTick = 0;
+        for (int i = startIndex; i < keyframes.size() - 1; i++) {
+            CutsceneKeyframe k1 = keyframes.get(i);
+            CutsceneKeyframe k2 = keyframes.get(i + 1);
+
+            int segmentDuration = (int) (k2.getPathTick() / k2.getSpeed());
+            if (elapsedTick < accumulatedTick + segmentDuration) {
+                double t = (elapsedTick - accumulatedTick) / segmentDuration;
+
+                CutsceneKeyframe p0 = keyframes.get(Math.max(i - 1, 0));
+                CutsceneKeyframe p1 = k1;
+                CutsceneKeyframe p2 = k2;
+                CutsceneKeyframe p3 = keyframes.get(Math.min(i + 2, keyframes.size() - 1));
+
+                return catmullRom(
+                        p0.getKeyframeLocation(),
+                        p1.getKeyframeLocation(),
+                        p2.getKeyframeLocation(),
+                        p3.getKeyframeLocation(),
+                        t);
+            }
+            accumulatedTick += segmentDuration;
+        }
+        return keyframes.getLast().getKeyframeLocation();
+    }
+
+    private KeyframeLocation catmullRom(
+            KeyframeLocation p0, KeyframeLocation p1, KeyframeLocation p2, KeyframeLocation p3, double t) {
+
+        double x = MathHelper.catmullRom(
+                (float) p0.getX(), (float) p1.getX(), (float) p2.getX(), (float) p3.getX(), (float) t);
+
+        double y = MathHelper.catmullRom(
+                (float) p0.getY(), (float) p1.getY(), (float) p2.getY(), (float) p3.getY(), (float) t);
+
+        double z = MathHelper.catmullRom(
+                (float) p0.getZ(), (float) p1.getZ(), (float) p2.getZ(), (float) p3.getZ(), (float) t);
+
+        float pitch = MathHelper.catmullRom(p0.getPitch(), p1.getPitch(), p2.getPitch(), p3.getPitch(), (float) t);
+
+        float yaw = MathHelper.catmullRom(
+                Mth.wrapDegrees(p0.getYaw()),
+                Mth.wrapDegrees(p1.getYaw()),
+                Mth.wrapDegrees(p2.getYaw()),
+                Mth.wrapDegrees(p3.getYaw()),
+                (float) t);
+
+        float fov = MathHelper.catmullRom(p0.getFov(), p1.getFov(), p2.getFov(), p3.getFov(), (float) t);
+
+        float roll = MathHelper.catmullRom(
+                Mth.wrapDegrees(p0.getRoll()),
+                Mth.wrapDegrees(p1.getRoll()),
+                Mth.wrapDegrees(p2.getRoll()),
+                Mth.wrapDegrees(p3.getRoll()),
+                (float) t);
+
+        return new KeyframeLocation(x, y, z, pitch, yaw, roll, fov);
+    }
+
     private void onEnd() {
         stop();
+        playerSession.setCurrentCamera(keyframeB.getKeyframeLocation());
         if (cutsceneController.getEnvironment() == Environment.DEVELOPMENT) {
             CutsceneKeyframeOptionScreen screen =
                     new CutsceneKeyframeOptionScreen(keyframeB, playerSession.getPlayer(), false);
@@ -133,18 +204,29 @@ public class CutscenePlayback {
     }
 
     private void pickNextKeyframes() {
-        keyframeA = keyframeB;
-        keyframeB = cutsceneController.getNextKeyframe(keyframeB);
+        if (currentKeyframeGroup.getKeyframes().size() == 1) {
+            keyframeB = cutsceneController.getNextKeyframe(keyframeB);
+        }
+        CutsceneKeyframeGroup cutsceneKeyframeGroupB = cutsceneController.getKeyframeGroupOfKeyframe(keyframeB);
+        if (cutsceneKeyframeGroupB.getKeyframes().size() == 1) {
+            keyframeA = cutsceneKeyframeGroupB.getKeyframes().getFirst();
+        } else if (currentKeyframeGroup.getId() != cutsceneKeyframeGroupB.getId()) {
+            keyframeA = cutsceneKeyframeGroupB.getKeyframes().getFirst();
+            keyframeB = cutsceneController.getNextKeyframe(keyframeA);
+        } else {
+            keyframeA = keyframeB;
+            keyframeB = cutsceneController.getNextKeyframe(keyframeB);
+        }
         segmentTick = 0;
-        currentKeyframeGroup = cutsceneController.getKeyframeGroupOfKeyframe(keyframeA);
+        currentKeyframeGroup = cutsceneKeyframeGroupB;
     }
 
     public KeyframeLocation interpolate(double delta, KeyframeLocation a, KeyframeLocation b) {
         if (!isPlaying) return null;
         Vec3 position = Mth.lerp(delta, a.getPosition(), b.getPosition());
         float pitch = (float) Mth.lerp(delta, a.getPitch(), b.getPitch());
-        float yaw = MathHelper.normalYaw(delta, a.getYaw(), b.getYaw());
-        float roll = MathHelper.normalRotation(delta, a.getRoll(), b.getRoll());
+        float yaw = (float) Mth.lerp(delta, Mth.wrapDegrees(a.getYaw()), Mth.wrapDegrees(b.getYaw()));
+        float roll = (float) Mth.lerp(delta, Mth.wrapDegrees(a.getRoll()), Mth.wrapDegrees(b.getRoll()));
         float fov = (float) Mth.lerp(delta, a.getFov(), b.getFov());
         return new KeyframeLocation(position, pitch, yaw, roll, fov);
     }
@@ -179,5 +261,13 @@ public class CutscenePlayback {
 
     public void setSegmentTick(int segmentTick) {
         this.segmentTick = segmentTick;
+    }
+
+    public int getTotalTick() {
+        return totalTick;
+    }
+
+    public void setTotalTick(int totalTick) {
+        this.totalTick = totalTick;
     }
 }

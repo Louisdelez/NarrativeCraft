@@ -55,7 +55,7 @@ public class EditScreenSceneAdapter implements EditScreenAdapter<Scene> {
                 0,
                 0,
                 ScreenUtils.Align.HORIZONTAL);
-        rankBox.getEditBox().setFilter(string -> string.matches("^\\d*$"));
+        rankBox.getEditBox().setFilter(string -> string.matches(Util.REGEX_INT));
         rankBox.getEditBox().setValue(String.valueOf(entry.getRank()));
         screen.extraFields.putIfAbsent("rank", rankBox);
         screen.extraFields.putIfAbsent("rankEditBox", rankBox.getEditBox());

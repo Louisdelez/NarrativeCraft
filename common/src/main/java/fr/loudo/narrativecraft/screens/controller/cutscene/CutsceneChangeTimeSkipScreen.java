@@ -102,9 +102,4 @@ public class CutsceneChangeTimeSkipScreen extends Screen {
             this.addRenderableWidget(b);
         }
     }
-
-    @Override
-    public boolean isPauseScreen() {
-        return false;
-    }
 }

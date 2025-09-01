@@ -30,6 +30,7 @@ import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.util.MathHelper;
 import fr.loudo.narrativecraft.util.ScreenUtils;
 import fr.loudo.narrativecraft.util.Translation;
+import fr.loudo.narrativecraft.util.Util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -56,6 +57,7 @@ public class KeyframeOptionScreen<T extends Keyframe> extends Screen {
     protected final ServerPlayer player;
     protected final PlayerSession playerSession;
     protected final T keyframe;
+    protected Runnable reloadScreen;
 
     protected float upDownValue, leftRightValue, rotationValue, fovValue;
     protected int currentY = INITIAL_POS_Y;
@@ -101,7 +103,7 @@ public class KeyframeOptionScreen<T extends Keyframe> extends Screen {
                 Component.literal(text.getString() + " Value"));
 
         editBox.setValue(defaultValue);
-        editBox.setFilter(s -> s.matches("^-?\\d*(\\.\\d*)?$"));
+        editBox.setFilter(s -> s.matches(Util.REGEX_FLOAT_ONLY_POSITIVE));
 
         this.addRenderableWidget(labelWidget);
         this.addRenderableWidget(editBox);
@@ -128,7 +130,7 @@ public class KeyframeOptionScreen<T extends Keyframe> extends Screen {
                     editWidth,
                     EDIT_BOX_HEIGHT,
                     Component.literal(stringWidget + " Value"));
-            box.setFilter(s -> s.matches("^-?\\d*(\\.\\d*)?$"));
+            box.setFilter(s -> s.matches(Util.REGEX_FLOAT));
             box.setValue(String.format(Locale.US, "%.2f", coords[i]));
             this.addRenderableWidget(stringWidget);
             this.addRenderableWidget(box);
@@ -189,10 +191,14 @@ public class KeyframeOptionScreen<T extends Keyframe> extends Screen {
                 EDIT_BOX_HEIGHT,
                 Component.literal("Up Down Value"));
         upDownBox.setValue(formatFloat.apply(defaultValXRot));
-        upDownBox.setFilter(s -> s.matches("^-?\\d*(\\.\\d*)?$"));
+        upDownBox.setFilter(s -> s.matches(Util.REGEX_FLOAT));
         Button upDownButton = Button.builder(Component.literal("✔"), btn -> {
-                    upDownValue = Float.parseFloat(upDownBox.getValue()) - 90F;
+                    try {
+                        upDownValue = Float.parseFloat(upDownBox.getValue()) - 90F;
+                    } catch (NumberFormatException ignored) {
+                    }
                     updateValues();
+                    reloadScreen.run();
                 })
                 .bounds(currentX + EDIT_BOX_WIDTH + 5, upDownBox.getY(), 20, EDIT_BOX_HEIGHT)
                 .build();
@@ -243,10 +249,14 @@ public class KeyframeOptionScreen<T extends Keyframe> extends Screen {
                 EDIT_BOX_HEIGHT,
                 Component.literal("Left Right Value"));
         leftRightBox.setValue(formatFloat.apply(defaultYRot));
-        leftRightBox.setFilter(s -> s.matches("^-?\\d*(\\.\\d*)?$"));
+        leftRightBox.setFilter(s -> s.matches(Util.REGEX_FLOAT));
         Button leftRightButton = Button.builder(Component.literal("✔"), btn -> {
-                    leftRightValue = Float.parseFloat(leftRightBox.getValue());
+                    try {
+                        leftRightValue = Float.parseFloat(leftRightBox.getValue());
+                    } catch (NumberFormatException ignored) {
+                    }
                     updateValues();
+                    reloadScreen.run();
                 })
                 .bounds(currentX + EDIT_BOX_WIDTH + 5, leftRightBox.getY(), 20, EDIT_BOX_HEIGHT)
                 .build();
@@ -266,7 +276,7 @@ public class KeyframeOptionScreen<T extends Keyframe> extends Screen {
                         initialY,
                         sliderWidth,
                         BUTTON_HEIGHT,
-                        Translation.message("screen.keyframe_option.rotation", defaultZRot),
+                        Translation.message("screen.keyframe_option.rotation", formatFloat.apply(defaultZRot)),
                         ((keyframe.getKeyframeLocation().getRoll() + 180F) % 360F) / 360F) {
                     @Override
                     protected void updateMessage() {
@@ -291,12 +301,15 @@ public class KeyframeOptionScreen<T extends Keyframe> extends Screen {
                 EDIT_BOX_HEIGHT,
                 Component.literal("Rotation Value"));
         rotationBox.setValue(formatFloat.apply(defaultZRot));
-        rotationBox.setFilter(s -> s.matches("^-?\\d*(\\.\\d*)?$"));
+        rotationBox.setFilter(s -> s.matches(Util.REGEX_FLOAT));
         Button rotationButton = Button.builder(Component.literal("✔"), btn -> {
-                    if (rotationBox.getValue().equals("-")) return;
-                    float angle = Float.parseFloat(rotationBox.getValue());
-                    rotationValue = (angle + 360F) % 360F;
+                    try {
+                        float angle = Float.parseFloat(rotationBox.getValue());
+                        rotationValue = (angle + 360F) % 360F;
+                    } catch (NumberFormatException ignored) {
+                    }
                     updateValues();
+                    reloadScreen.run();
                 })
                 .bounds(currentX + EDIT_BOX_WIDTH + 5, rotationBox.getY(), 20, EDIT_BOX_HEIGHT)
                 .build();
@@ -343,10 +356,14 @@ public class KeyframeOptionScreen<T extends Keyframe> extends Screen {
                 EDIT_BOX_HEIGHT,
                 Component.literal("FOV Value"));
         fovBox.setValue(formatFloat.apply(defaultFov));
-        fovBox.setFilter(s -> s.matches("^\\d*$"));
+        fovBox.setFilter(s -> s.matches(Util.REGEX_INT));
         Button fovButton = Button.builder(Component.literal("✔"), btn -> {
-                    fovValue = Float.parseFloat(fovBox.getValue());
+                    try {
+                        fovValue = Float.parseFloat(fovBox.getValue());
+                    } catch (NumberFormatException ignored) {
+                    }
                     updateValues();
+                    reloadScreen.run();
                 })
                 .bounds(currentX + EDIT_BOX_WIDTH + 5, fovBox.getY(), 20, EDIT_BOX_HEIGHT)
                 .build();

@@ -50,16 +50,16 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
                 Component.literal("Day"), screen.getFont(), 20, 20, 0, 0, ScreenUtils.Align.HORIZONTAL);
         screen.extraFields.put("day", dayLabelBox);
         screen.extraFields.put("dayBox", dayLabelBox.getEditBox());
-        dayLabelBox.getEditBox().setFilter(string -> string.matches("^\\d*$"));
+        dayLabelBox.getEditBox().setFilter(string -> string.matches(Util.REGEX_INT));
         dayLabelBox.getEditBox().setValue(String.valueOf(localDate.getDayOfMonth()));
         ScreenUtils.LabelBox monthLabelBox = new ScreenUtils.LabelBox(
                 Component.literal("Month"), screen.getFont(), 20, 20, 0, 0, ScreenUtils.Align.HORIZONTAL);
-        monthLabelBox.getEditBox().setFilter(string -> string.matches("^\\d*$"));
+        monthLabelBox.getEditBox().setFilter(string -> string.matches(Util.REGEX_INT));
         monthLabelBox.getEditBox().setValue(String.valueOf(localDate.getMonthValue()));
         screen.extraFields.put("month", monthLabelBox);
         ScreenUtils.LabelBox yearLabelBox = new ScreenUtils.LabelBox(
                 Component.literal("Year"), screen.getFont(), 32, 20, 0, 0, ScreenUtils.Align.HORIZONTAL);
-        yearLabelBox.getEditBox().setFilter(string -> string.matches("^\\d*$"));
+        yearLabelBox.getEditBox().setFilter(string -> string.matches(Util.REGEX_INT));
         yearLabelBox.getEditBox().setValue("2000");
         screen.extraFields.put("year", yearLabelBox);
 

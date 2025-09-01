@@ -47,6 +47,10 @@ import net.minecraft.world.level.storage.ValueInput;
 
 public class Util {
 
+    public static final String REGEX_FLOAT = "^-?\\d*(\\.\\d*)?$";
+    public static final String REGEX_FLOAT_ONLY_POSITIVE = "^\\d*(\\.\\d*)?$";
+    public static final String REGEX_INT = "^\\d*$";
+
     public static String snakeCase(String value) {
         return String.join("_", value.toLowerCase().split(" "));
     }

@@ -76,8 +76,12 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
     }
 
     public void tick() {
-        hudMessage = Translation.message("controller.cutscene.hud", currentTick, totalTick)
-                .getString();
+        if (totalTick > 0) {
+            hudMessage = Translation.message("controller.cutscene.hud_tick", currentTick, totalTick)
+                    .getString();
+        } else {
+            hudMessage = Translation.message("controller.cutscene.hud_no_tick").getString();
+        }
         if (!isPlaying) return;
         currentTick++;
         for (Playback playback : playbacks) {
@@ -93,7 +97,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
 
     @Override
     public void startSession() {
-        stopSession(false);
+        stopCurrentSession();
         playerSession.setController(this);
         for (Subscene subscene : cutscene.getSubscenes()) {
             subscene.start(playerSession.getPlayer().level(), environment, false);
@@ -117,7 +121,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
             playerSession
                     .getPlayer()
                     .teleportTo(keyframeLocation.getX(), keyframeLocation.getY(), keyframeLocation.getY());
-        } else {
+        } else if (!playbacks.isEmpty()) {
             Location location = playbacks.getFirst().getAnimation().getFirstLocation();
             playerSession.getPlayer().teleportTo(location.x(), location.y(), location.z());
         }
@@ -222,9 +226,9 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         CutsceneKeyframeGroup keyframeGroup = new CutsceneKeyframeGroup(keyframeGroupCounter.incrementAndGet());
         selectedGroup = keyframeGroup;
         keyframeGroups.add(keyframeGroup);
-        CutsceneKeyframe keyframe = createKeyframe();
-        if (lastKeyframe != null) {
-            keyframe.setTransitionDelayTick(currentTick - keyframe.getTick());
+        createKeyframe();
+        if (lastKeyframe != null && totalTick > 0) {
+            lastKeyframe.setTransitionDelayTick(currentTick - lastKeyframe.getTick());
         }
         keyframeGroup.showGroupText(playerSession.getPlayer());
         updateSelectedGroupGlow();
@@ -248,20 +252,27 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
                 player.position().add(0, player.getEyeHeight(), 0), player.getXRot(), player.getYRot(), 0, 85.0f);
         int pathTime = 0;
         CutsceneKeyframe lastKeyframe = getLastKeyframeLastGroup();
-        if (lastKeyframe != null) {
+        if (lastKeyframe != null && totalTick > 0) {
             pathTime = currentTick - lastKeyframe.getTick();
         }
         CutsceneKeyframe keyframe =
                 new CutsceneKeyframe(keyframeCounter.incrementAndGet(), location, currentTick, 0, pathTime);
-        for (CutsceneKeyframeGroup keyframeGroup : keyframeGroups) {
-            for (int i = 0; i < keyframeGroup.getKeyframes().size(); i++) {
-                if (keyframeGroup.getKeyframes().get(i).getTick() > currentTick) {
-                    CutsceneKeyframe before = keyframeGroup.getKeyframes().get(i - 1);
-                    CutsceneKeyframe after = keyframeGroup.getKeyframes().get(i);
-                    keyframe.setPathTick((before.getTick() + after.getTick()) - currentTick);
-                    selectedGroup.getKeyframes().add(i, keyframe);
-                    updateCurrentTick(keyframe.getTick());
-                    break;
+        if (totalTick > 0) {
+            outer:
+            for (CutsceneKeyframeGroup keyframeGroup : keyframeGroups) {
+                for (int i = 0; i < keyframeGroup.getKeyframes().size(); i++) {
+                    if (keyframeGroup.getKeyframes().get(i).getTick() > currentTick) {
+                        CutsceneKeyframe before = i > 0
+                                ? keyframeGroup.getKeyframes().get(i - 1)
+                                : keyframeGroup.getKeyframes().get(i);
+                        CutsceneKeyframe after = keyframeGroup.getKeyframes().get(i);
+                        keyframe.setPathTick(currentTick - before.getTick());
+                        after.setPathTick(after.getTick() - currentTick);
+                        selectedGroup = keyframeGroup;
+                        selectedGroup.getKeyframes().add(i, keyframe);
+                        updateCurrentTick(keyframe.getTick());
+                        break outer;
+                    }
                 }
             }
         }
@@ -270,6 +281,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         keyframe.showKeyframe(player);
         keyframe.getCamera().setGlowingTag(true);
         keyframe.updateEntityData(player);
+        updateSelectedGroupGlow();
         return keyframe;
     }
 

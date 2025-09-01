@@ -53,6 +53,7 @@ public class CutsceneKeyframeOptionScreen extends KeyframeOptionScreen<CutsceneK
         super(keyframe, player, hide);
         this.cutsceneController = (CutsceneController) playerSession.getController();
         this.cutsceneKeyframeGroup = cutsceneController.getKeyframeGroupOfKeyframe(keyframe);
+        this.reloadScreen = () -> minecraft.setScreen(new CutsceneKeyframeOptionScreen(keyframe, player, false));
     }
 
     @Override
@@ -95,6 +96,7 @@ public class CutsceneKeyframeOptionScreen extends KeyframeOptionScreen<CutsceneK
         Button updateButton = Button.builder(updateTitle, button -> {
                     updateValues();
                     cutsceneController.updateCurrentTick(keyframe.getTick());
+                    cutsceneController.changeTimePosition(keyframe.getTick(), true);
                 })
                 .bounds(INITIAL_POS_X, currentY, this.font.width(updateTitle) + margin, BUTTON_HEIGHT)
                 .build();
@@ -103,8 +105,15 @@ public class CutsceneKeyframeOptionScreen extends KeyframeOptionScreen<CutsceneK
                     if (playerSession != null) {
                         CutscenePlayback cutscenePlayback = cutsceneController.getCutscenePlayback();
                         if (cutsceneKeyframeGroup.isLastKeyframe(keyframe)) {
-                            cutscenePlayback.setupAndPlay(cutsceneController.getPreviousKeyframe(keyframe), keyframe);
-                            cutscenePlayback.setSegmentTick(keyframe.getTick());
+                            if (cutsceneKeyframeGroup.getKeyframes().size() > 1) {
+                                CutsceneKeyframe previous = cutsceneController.getPreviousKeyframe(keyframe);
+                                cutscenePlayback.setupAndPlay(previous, keyframe);
+                                int offset = keyframe.getTick() - previous.getTick();
+                                cutscenePlayback.setSegmentTick(offset);
+                                cutscenePlayback.setTotalTick(previous.getTick() + offset);
+                            } else {
+                                cutscenePlayback.setupAndPlay(keyframe, keyframe);
+                            }
                         } else {
                             cutscenePlayback.setupAndPlay(keyframe, cutsceneController.getNextKeyframe(keyframe));
                         }
@@ -236,35 +245,50 @@ public class CutsceneKeyframeOptionScreen extends KeyframeOptionScreen<CutsceneK
 
     protected void updateValues() {
         if (startDelayBox != null) {
-            float startDelayVal = Float.parseFloat((startDelayBox.getValue()));
-            keyframe.setStartDelayTick(MathHelper.secondsToTick(startDelayVal));
+            try {
+                float startDelayVal = Float.parseFloat((startDelayBox.getValue()));
+                keyframe.setStartDelayTick(MathHelper.secondsToTick(startDelayVal));
+            } catch (NumberFormatException ignored) {
+            }
         }
         if (transitionDelayBox != null) {
-            float transitionDelayValue = Float.parseFloat((transitionDelayBox.getValue()));
-            keyframe.setTransitionDelayTick(MathHelper.secondsToTick(transitionDelayValue));
+            try {
+                float transitionDelayValue = Float.parseFloat((transitionDelayBox.getValue()));
+                keyframe.setTransitionDelayTick(MathHelper.secondsToTick(transitionDelayValue));
+            } catch (NumberFormatException ignored) {
+            }
         }
         if (speedBox != null) {
-            double speedValue = Double.parseDouble((speedBox.getValue()));
-            keyframe.setSpeed(speedValue);
+            try {
+                double speedValue = Double.parseDouble((speedBox.getValue()));
+                keyframe.setSpeed(speedValue);
+            } catch (NumberFormatException ignored) {
+            }
         }
-        float pathTimeVal = pathTimeBox == null ? 0 : Float.parseFloat((pathTimeBox.getValue()));
-        keyframe.setPathTick(MathHelper.secondsToTick(pathTimeVal));
+        try {
+            float pathTimeVal = pathTimeBox == null ? 0 : Float.parseFloat((pathTimeBox.getValue()));
+            keyframe.setPathTick(MathHelper.secondsToTick(pathTimeVal));
+        } catch (NumberFormatException ignored) {
+        }
         KeyframeLocation location = getKeyframeLocation();
         keyframe.setKeyframeLocation(location);
         keyframe.updateEntityData(player);
     }
 
     private KeyframeLocation getKeyframeLocation() {
-        float xVal = Float.parseFloat((coordinatesBoxList.get(0).getValue()));
-        float yVal = Float.parseFloat((coordinatesBoxList.get(1).getValue()));
-        float zVal = Float.parseFloat((coordinatesBoxList.get(2).getValue()));
         KeyframeLocation location = keyframe.getKeyframeLocation();
         location.setPitch(upDownValue);
         location.setYaw(leftRightValue);
         location.setRoll(rotationValue);
-        location.setX(xVal);
-        location.setY(yVal);
-        location.setZ(zVal);
+        try {
+            float xVal = Float.parseFloat((coordinatesBoxList.get(0).getValue()));
+            float yVal = Float.parseFloat((coordinatesBoxList.get(1).getValue()));
+            float zVal = Float.parseFloat((coordinatesBoxList.get(2).getValue()));
+            location.setX(xVal);
+            location.setY(yVal);
+            location.setZ(zVal);
+        } catch (NumberFormatException ignored) {
+        }
         location.setFov(fovValue);
         return location;
     }

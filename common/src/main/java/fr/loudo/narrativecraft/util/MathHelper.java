@@ -28,18 +28,6 @@ public class MathHelper {
         return (value + 360) % 360;
     }
 
-    public static long tickToMills(int tick) {
-        return (long) ((tick / 20.0) * 1000);
-    }
-
-    public static double millisToSeconds(long millis) {
-        return millis / 1000.0;
-    }
-
-    public static long secondsToMillis(float seconds) {
-        return (long) (seconds * 1000L);
-    }
-
     public static int secondsToTick(float seconds) {
         return (int) (seconds * 20);
     }
@@ -48,66 +36,13 @@ public class MathHelper {
         return tick / 20.0;
     }
 
-    public static float normalRotation(double t, float startAngle, float endAngle) {
-        float diff = endAngle - startAngle;
-        if (diff > 180) {
-            diff -= 360;
-        } else if (diff < -180) {
-            diff += 360;
-        }
-        return startAngle + (float) (diff * t);
-    }
-
-    public static float normalYaw(double t, float startAngle, float endAngle) {
-        float diff = endAngle - startAngle;
-
-        if (diff > 180) {
-            diff -= 360;
-        } else if (diff < -180) {
-            diff += 360;
-        }
-
-        float interpolated = startAngle + (float) (diff * t);
-
-        if (interpolated > 180) {
-            interpolated -= 360;
-        } else if (interpolated < -180) {
-            interpolated += 360;
-        }
-
-        return interpolated;
-    }
-
     public static float catmullRom(float p0, float p1, float p2, float p3, float t) {
-        double t2 = t * t;
-        double t3 = t2 * t;
-        return (float) (0.5
-                * ((2 * p1)
+        float t2 = t * t;
+        float t3 = t2 * t;
+        return (0.5f
+                * ((2.0f * p1)
                         + (-p0 + p2) * t
-                        + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2
-                        + (-p0 + 3 * p1 - 3 * p2 + p3) * t3));
-    }
-
-    public static float unwrap360(float angle, float reference) {
-        float diff = angle - reference;
-        while (diff < -180) diff += 360;
-        while (diff > 180) diff -= 360;
-        return reference + diff;
-    }
-
-    public static float wrap360(float angle) {
-        while (angle <= -180) angle += 360;
-        while (angle > 180) angle -= 360;
-        return angle;
-    }
-
-    private float normalRotation(float startAngle, float endAngle, double t) {
-        float diff = endAngle - startAngle;
-        if (diff > 180) {
-            diff -= 360;
-        } else if (diff < -180) {
-            diff += 360;
-        }
-        return startAngle + (float) (diff * t);
+                        + (2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3) * t2
+                        + (-p0 + 3.0f * p1 - 3.0f * p2 + p3) * t3));
     }
 }

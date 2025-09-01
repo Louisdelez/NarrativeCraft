@@ -50,6 +50,12 @@ public abstract class AbstractController {
 
     public abstract Screen getControllerScreen();
 
+    protected void stopCurrentSession() {
+        AbstractController controller = playerSession.getController();
+        if (controller == null) return;
+        controller.stopSession(false);
+    }
+
     public void renderHUDInfo(GuiGraphics guiGraphics) {
         if (playerSession.getCurrentCamera() != null) return;
         Minecraft minecraft = Minecraft.getInstance();

@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.screens.storyManager.cutscene;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.Environment;
@@ -199,10 +200,19 @@ public class CutscenesScreen extends StoryElementScreen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        settingsButton.setTooltip(Tooltip.create(
-                hasShiftDown()
-                        ? Translation.message("screen.story_manager.animation_cutscene_link")
-                        : Translation.message("screen.story_manager.subscene_cutscene_link")));
+        if (keyCode == InputConstants.KEY_LSHIFT) {
+            settingsButton.setTooltip(
+                    Tooltip.create(Translation.message("screen.story_manager.animation_cutscene_link")));
+        }
         return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == InputConstants.KEY_LSHIFT) {
+            settingsButton.setTooltip(
+                    Tooltip.create(Translation.message("screen.story_manager.subscene_cutscene_link")));
+        }
+        return super.keyReleased(keyCode, scanCode, modifiers);
     }
 }

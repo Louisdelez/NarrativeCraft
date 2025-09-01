@@ -31,7 +31,9 @@ import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 public class CutsceneControllerScreen extends Screen {
@@ -114,15 +116,14 @@ public class CutsceneControllerScreen extends Screen {
                 })
                 .bounds(startX, initialY, btnWidth, BUTTON_HEIGHT)
                 .build();
-        createKeyframeGroup.setTooltip(
-                Tooltip.create(Translation.message("screen.cutscene_controller.tooltip.keyframe_group")));
+        createKeyframeGroup.setTooltip(Tooltip.create(Translation.message("tooltip.create_keyframe_group")));
 
         Button addKeyframe = Button.builder(ImageFontConstants.ADD_KEYFRAME, button -> {
                     cutsceneController.createKeyframe();
                 })
                 .bounds(startX + btnWidth + gap, initialY, btnWidth, BUTTON_HEIGHT)
                 .build();
-        addKeyframe.setTooltip(Tooltip.create(Translation.message("screen.cutscene_controller.tooltip.helper")));
+        addKeyframe.setTooltip(Tooltip.create(Translation.message("tooltip.create_keyframe")));
 
         Button addTriggerKeyframe = Button.builder(ImageFontConstants.ADD_KEYFRAME_TRIGGER, button -> {
                     //            KeyframeTriggerScreen screen = new KeyframeTriggerScreen(cutsceneController,
@@ -131,8 +132,7 @@ public class CutsceneControllerScreen extends Screen {
                 })
                 .bounds(startX + (btnWidth + gap) * 2, initialY, btnWidth, BUTTON_HEIGHT)
                 .build();
-        addTriggerKeyframe.setTooltip(
-                Tooltip.create(Translation.message("screen.cutscene_controller.tooltip.keyframe_trigger")));
+        addTriggerKeyframe.setTooltip(Tooltip.create(Translation.message("tooltip.create_keyframe_trigger")));
 
         this.addRenderableWidget(createKeyframeGroup);
         this.addRenderableWidget(addKeyframe);
@@ -150,6 +150,7 @@ public class CutsceneControllerScreen extends Screen {
                 })
                 .bounds(startX, initialY, btnWidth, BUTTON_HEIGHT)
                 .build();
+        settingsButton.setTooltip(Tooltip.create(Translation.message("tooltip.cutscene_settings")));
         this.addRenderableWidget(settingsButton);
 
         startX = settingsButton.getX() + settingsButton.getWidth() + 5;
@@ -160,18 +161,32 @@ public class CutsceneControllerScreen extends Screen {
                 })
                 .bounds(startX, initialY, btnWidth, BUTTON_HEIGHT)
                 .build();
+        saveButton.setTooltip(Tooltip.create(Translation.message("tooltip.save")));
         this.addRenderableWidget(saveButton);
 
         startX = saveButton.getX() + saveButton.getWidth() + 5;
 
         Button closeButton = Button.builder(Component.literal("✖"), button -> {
-                    NarrativeCraftMod.server.execute(() -> {
-                        cutsceneController.stopSession(false);
-                    });
-                    this.onClose();
+                    ConfirmScreen confirm = new ConfirmScreen(
+                            b -> {
+                                if (b) {
+                                    NarrativeCraftMod.server.execute(() -> {
+                                        cutsceneController.stopSession(false);
+                                    });
+                                    this.onClose();
+                                } else {
+                                    minecraft.setScreen(this);
+                                }
+                            },
+                            Component.literal(""),
+                            Translation.message("controller.confirm_leaving"),
+                            CommonComponents.GUI_YES,
+                            CommonComponents.GUI_CANCEL);
+                    minecraft.setScreen(confirm);
                 })
                 .bounds(startX, initialY, btnWidth, BUTTON_HEIGHT)
                 .build();
+        closeButton.setTooltip(Tooltip.create(Translation.message("tooltip.close_without_saving")));
         this.addRenderableWidget(closeButton);
     }
 
