@@ -23,14 +23,13 @@
 
 package fr.loudo.narrativecraft.screens.controller.cutscene;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
 import fr.loudo.narrativecraft.controllers.cutscene.CutscenePlayback;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframeGroup;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.screens.components.KeyframeOptionScreen;
-import fr.loudo.narrativecraft.util.ImageFontConstants;
 import fr.loudo.narrativecraft.util.MathHelper;
 import fr.loudo.narrativecraft.util.ScreenUtils;
 import fr.loudo.narrativecraft.util.Translation;
@@ -41,19 +40,18 @@ import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.server.level.ServerPlayer;
 
-public class CutsceneKeyframeOptionScreen extends KeyframeOptionScreen<CutsceneKeyframe> {
+public class CutsceneKeyframeOptionScreen extends KeyframeOptionScreen<CutsceneKeyframe, CutsceneController> {
 
     private final CutsceneController cutsceneController;
     private final CutsceneKeyframeGroup cutsceneKeyframeGroup;
     private EditBox startDelayBox, pathTimeBox, transitionDelayBox, speedBox;
 
-    public CutsceneKeyframeOptionScreen(CutsceneKeyframe keyframe, ServerPlayer player, boolean hide) {
-        super(keyframe, player, hide);
+    public CutsceneKeyframeOptionScreen(CutsceneKeyframe keyframe, PlayerSession playerSession, boolean hide) {
+        super(keyframe, (CutsceneController) playerSession.getController(), playerSession, hide);
         this.cutsceneController = (CutsceneController) playerSession.getController();
         this.cutsceneKeyframeGroup = cutsceneController.getKeyframeGroupOfKeyframe(keyframe);
-        this.reloadScreen = () -> minecraft.setScreen(new CutsceneKeyframeOptionScreen(keyframe, player, false));
+        this.reloadScreen = () -> minecraft.setScreen(new CutsceneKeyframeOptionScreen(keyframe, playerSession, false));
     }
 
     @Override
@@ -148,7 +146,7 @@ public class CutsceneKeyframeOptionScreen extends KeyframeOptionScreen<CutsceneK
                                     }
                                 } else {
                                     CutsceneKeyframeOptionScreen screen =
-                                            new CutsceneKeyframeOptionScreen(keyframe, player, false);
+                                            new CutsceneKeyframeOptionScreen(keyframe, playerSession, false);
                                     minecraft.setScreen(screen);
                                 }
                             },
@@ -188,59 +186,6 @@ public class CutsceneKeyframeOptionScreen extends KeyframeOptionScreen<CutsceneK
 
         this.addRenderableWidget(groupLabel);
         this.addRenderableWidget(keyframeIdLabel);
-    }
-
-    protected void initLittleButtons() {
-        int currentX = this.width - INITIAL_POS_X;
-        int gap = 5;
-        int width = 20;
-        if (hide) {
-            Button eyeClosed = Button.builder(ImageFontConstants.EYE_CLOSED, button -> {
-                        CutsceneKeyframeOptionScreen screen = new CutsceneKeyframeOptionScreen(keyframe, player, false);
-                        minecraft.setScreen(screen);
-                    })
-                    .bounds(currentX - (width / 2), INITIAL_POS_Y - 5, width, BUTTON_HEIGHT)
-                    .build();
-            this.addRenderableWidget(eyeClosed);
-            return;
-        }
-        Button closeButton = Button.builder(Component.literal("✖"), button -> {
-                    cutsceneController.setCamera(null);
-                    minecraft.setScreen(null);
-                })
-                .bounds(currentX - (width / 2), INITIAL_POS_Y - 5, width, BUTTON_HEIGHT)
-                .build();
-        CutsceneKeyframe nextKeyframe = cutsceneController.getNextKeyframe(keyframe);
-        if (nextKeyframe.getId() != keyframe.getId()) {
-            currentX -= INITIAL_POS_X + gap;
-            Button rightKeyframeButton = Button.builder(Component.literal("▶"), button -> {
-                        // TODO: Send a packet to the server instead.
-                        NarrativeCraftMod.server.execute(() -> cutsceneController.setCamera(nextKeyframe));
-                    })
-                    .bounds(currentX - (width / 2), INITIAL_POS_Y - 5, width, BUTTON_HEIGHT)
-                    .build();
-            this.addRenderableWidget(rightKeyframeButton);
-        }
-        CutsceneKeyframe previousKeyframe = cutsceneController.getPreviousKeyframe(keyframe);
-        if (previousKeyframe.getId() != keyframe.getId()) {
-            currentX -= INITIAL_POS_X + gap;
-            Button leftKeyframeButton = Button.builder(Component.literal("◀"), button -> {
-                        // TODO: Send a packet to the server instead.
-                        NarrativeCraftMod.server.execute(() -> cutsceneController.setCamera(previousKeyframe));
-                    })
-                    .bounds(currentX - (width / 2), INITIAL_POS_Y - 5, width, BUTTON_HEIGHT)
-                    .build();
-            this.addRenderableWidget(leftKeyframeButton);
-        }
-        this.addRenderableWidget(closeButton);
-        currentX -= INITIAL_POS_X + gap;
-        Button eyeOpen = Button.builder(ImageFontConstants.EYE_OPEN, button -> {
-                    CutsceneKeyframeOptionScreen screen = new CutsceneKeyframeOptionScreen(keyframe, player, true);
-                    minecraft.setScreen(screen);
-                })
-                .bounds(currentX - (width / 2), INITIAL_POS_Y - 5, width, BUTTON_HEIGHT)
-                .build();
-        this.addRenderableWidget(eyeOpen);
     }
 
     protected void updateValues() {

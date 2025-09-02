@@ -71,6 +71,8 @@
   "narrativecraft.character.already_exists": "Character %s already exists in the story.",
 
   "narrativecraft.controller.confirm_leaving": "Are you sure you want to leave without saving?",
+  "narrativecraft.controller.saved": "Successfully saved!",
+
   "narrativecraft.controller.cutscene.hud_tick": "Cutscene controller. Tick %s/%s",
   "narrativecraft.controller.cutscene.hud_no_tick": "Cutscene controller.",
   "narrativecraft.controller.cutscene.keyframe_group_created": "Keyframe group #%s created.",
@@ -90,7 +92,7 @@
   "narrativecraft.tooltip.create_keyframe_trigger": "Create keyframe trigger",
   "narrativecraft.tooltip.cutscene_settings": "Cutscene settings",
   "narrativecraft.tooltip.save": "Save",
-  "narrativecraft.tooltip.close_without_saving": "Close without saving",
+  "narrativecraft.tooltip.leave_without_saving": "Leave without saving",
 
   "narrativecraft.screen.story_manager.chapter_list": "Chapters",
   "narrativecraft.screen.story_manager.scene_list": "Scenes of chapter %s",

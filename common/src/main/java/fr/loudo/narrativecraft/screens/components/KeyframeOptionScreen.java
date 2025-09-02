@@ -24,13 +24,11 @@
 package fr.loudo.narrativecraft.screens.components;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.controllers.keyframe.AbstractKeyframeController;
 import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.util.MathHelper;
-import fr.loudo.narrativecraft.util.ScreenUtils;
-import fr.loudo.narrativecraft.util.Translation;
-import fr.loudo.narrativecraft.util.Util;
+import fr.loudo.narrativecraft.util.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -45,7 +43,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 
-public class KeyframeOptionScreen<T extends Keyframe> extends Screen {
+public class KeyframeOptionScreen<T extends Keyframe, E extends AbstractKeyframeController<T>> extends Screen {
 
     protected final int INITIAL_POS_X = 20;
     protected final int INITIAL_POS_Y = 15;
@@ -57,6 +55,7 @@ public class KeyframeOptionScreen<T extends Keyframe> extends Screen {
     protected final ServerPlayer player;
     protected final PlayerSession playerSession;
     protected final T keyframe;
+    protected final E keyframeController;
     protected Runnable reloadScreen;
 
     protected float upDownValue, leftRightValue, rotationValue, fovValue;
@@ -64,18 +63,18 @@ public class KeyframeOptionScreen<T extends Keyframe> extends Screen {
 
     protected boolean hide;
 
-    public KeyframeOptionScreen(T keyframe, ServerPlayer player, boolean hide) {
+    public KeyframeOptionScreen(T keyframe, E keyframeController, PlayerSession playerSession, boolean hide) {
         super(Component.literal("Keyframe Option"));
         this.keyframe = keyframe;
-        this.player = player;
+        this.player = playerSession.getPlayer();
+        this.playerSession = playerSession;
         this.coordinatesBoxList = new ArrayList<>();
         this.upDownValue = keyframe.getKeyframeLocation().getPitch();
         this.leftRightValue = keyframe.getKeyframeLocation().getYaw();
         this.rotationValue = keyframe.getKeyframeLocation().getRoll();
         this.fovValue = keyframe.getKeyframeLocation().getFov();
-        this.playerSession =
-                NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
         this.hide = hide;
+        this.keyframeController = keyframeController;
     }
 
     protected void init() {}
@@ -143,7 +142,56 @@ public class KeyframeOptionScreen<T extends Keyframe> extends Screen {
 
     protected void initTextSelectedKeyframe() {}
 
-    protected void initLittleButtons() {}
+    protected void initLittleButtons() {
+        int currentX = this.width - INITIAL_POS_X;
+        int gap = 5;
+        int width = 20;
+        if (hide) {
+            Button eyeClosed = Button.builder(ImageFontConstants.EYE_CLOSED, button -> {
+                        minecraft.setScreen(keyframeController.keyframeOptionScreen(keyframe, false));
+                    })
+                    .bounds(currentX - (width / 2), INITIAL_POS_Y - 5, width, BUTTON_HEIGHT)
+                    .build();
+            this.addRenderableWidget(eyeClosed);
+            return;
+        }
+        Button closeButton = Button.builder(Component.literal("✖"), button -> {
+                    keyframeController.setCamera(null);
+                    minecraft.setScreen(null);
+                })
+                .bounds(currentX - (width / 2), INITIAL_POS_Y - 5, width, BUTTON_HEIGHT)
+                .build();
+        T nextKeyframe = keyframeController.getNextKeyframe(keyframe);
+        if (nextKeyframe.getId() != keyframe.getId()) {
+            currentX -= INITIAL_POS_X + gap;
+            Button rightKeyframeButton = Button.builder(Component.literal("▶"), button -> {
+                        // TODO: Send a packet to the server instead.
+                        NarrativeCraftMod.server.execute(() -> keyframeController.setCamera(nextKeyframe));
+                    })
+                    .bounds(currentX - (width / 2), INITIAL_POS_Y - 5, width, BUTTON_HEIGHT)
+                    .build();
+            this.addRenderableWidget(rightKeyframeButton);
+        }
+        T previousKeyframe = keyframeController.getPreviousKeyframe(keyframe);
+        if (previousKeyframe.getId() != keyframe.getId()) {
+            currentX -= INITIAL_POS_X + gap;
+            Button leftKeyframeButton = Button.builder(Component.literal("◀"), button -> {
+                        // TODO: Send a packet to the server instead.
+                        NarrativeCraftMod.server.execute(() -> keyframeController.setCamera(previousKeyframe));
+                    })
+                    .bounds(currentX - (width / 2), INITIAL_POS_Y - 5, width, BUTTON_HEIGHT)
+                    .build();
+            this.addRenderableWidget(leftKeyframeButton);
+        }
+        this.addRenderableWidget(closeButton);
+        currentX -= INITIAL_POS_X + gap;
+        Button eyeOpen = Button.builder(ImageFontConstants.EYE_OPEN, button -> {
+                    minecraft.setScreen(keyframeController.keyframeOptionScreen(keyframe, true));
+                })
+                .bounds(currentX - (width / 2), INITIAL_POS_Y - 5, width, BUTTON_HEIGHT)
+                .build();
+        this.addRenderableWidget(eyeOpen);
+    }
 
     protected void initSliders() {
         int initialY = this.height - 50;

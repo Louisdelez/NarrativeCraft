@@ -186,7 +186,7 @@ public class CutsceneControllerScreen extends Screen {
                 })
                 .bounds(startX, initialY, btnWidth, BUTTON_HEIGHT)
                 .build();
-        closeButton.setTooltip(Tooltip.create(Translation.message("tooltip.close_without_saving")));
+        closeButton.setTooltip(Tooltip.create(Translation.message("tooltip.leave_without_saving")));
         this.addRenderableWidget(closeButton);
     }
 

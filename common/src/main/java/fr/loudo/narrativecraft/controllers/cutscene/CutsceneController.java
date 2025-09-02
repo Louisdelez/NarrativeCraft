@@ -25,7 +25,9 @@ package fr.loudo.narrativecraft.controllers.cutscene;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.controllers.keyframe.AbstractKeyframeGroupsBase;
+import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.managers.PlaybackManager;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
@@ -40,6 +42,7 @@ import fr.loudo.narrativecraft.narrative.recording.Location;
 import fr.loudo.narrativecraft.screens.controller.cutscene.CutsceneControllerScreen;
 import fr.loudo.narrativecraft.screens.controller.cutscene.CutsceneKeyframeOptionScreen;
 import fr.loudo.narrativecraft.util.Translation;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -120,20 +123,23 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
                     selectedGroup.getKeyframes().getFirst().getKeyframeLocation();
             playerSession
                     .getPlayer()
-                    .teleportTo(keyframeLocation.getX(), keyframeLocation.getY(), keyframeLocation.getY());
+                    .teleportTo(keyframeLocation.getX(), keyframeLocation.getY(), keyframeLocation.getZ());
         } else if (!playbacks.isEmpty()) {
             Location location = playbacks.getFirst().getAnimation().getFirstLocation();
             playerSession.getPlayer().teleportTo(location.x(), location.y(), location.z());
         }
         totalTick = calculateTotalTick();
-        Minecraft minecraft = Minecraft.getInstance();
-        minecraft.execute(() -> minecraft.setScreen(new CutsceneControllerScreen(this)));
         if (!keyframeGroups.isEmpty()) {
             CutsceneKeyframeGroup keyframeGroup = keyframeGroups.getLast();
             keyframeGroupCounter.set(keyframeGroup.getId());
             CutsceneKeyframe cutsceneKeyframe = getLastKeyframeLastGroup();
             if (cutsceneKeyframe == null) return;
             keyframeCounter.set(keyframeGroup.getId());
+            for (CutsceneKeyframeGroup keyframeGroup1 : keyframeGroups) {
+                keyframeGroup1.showKeyframes(playerSession.getPlayer());
+            }
+            selectedGroup.showGroupText(playerSession.getPlayer());
+            updateSelectedGroupGlow();
         }
     }
 
@@ -142,8 +148,24 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         for (Playback playback : playbacks) {
             playback.stop(true);
         }
-        for (CutsceneKeyframeGroup keyframeGroup : keyframeGroups) {
-            keyframeGroup.hideKeyframes(playerSession.getPlayer());
+        if (environment == Environment.DEVELOPMENT) {
+            for (CutsceneKeyframeGroup keyframeGroup : keyframeGroups) {
+                keyframeGroup.hideKeyframes(playerSession.getPlayer());
+            }
+            List<CutsceneKeyframeGroup> oldData = cutscene.getKeyframeGroups();
+            if (save) {
+                cutscene.getKeyframeGroups().clear();
+                try {
+                    cutscene.getKeyframeGroups().addAll(keyframeGroups);
+                    NarrativeCraftFile.updateCutsceneFile(cutscene.getScene());
+                    playerSession.getPlayer().sendSystemMessage(Translation.message("controller.saved"));
+                } catch (IOException e) {
+                    cutscene.getKeyframeGroups().removeAll(keyframeGroups);
+                    cutscene.getKeyframeGroups().addAll(oldData);
+                    playerSession.getPlayer().sendSystemMessage(Translation.message("crash.global-message"));
+                    NarrativeCraftMod.LOGGER.error("Impossible to save the cutscene: ", e);
+                }
+            }
         }
         playerSession.setController(null);
         playerSession.setCurrentCamera(null);
@@ -173,8 +195,8 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
     }
 
     @Override
-    public Screen keyframeOptionScreen(Keyframe keyframe) {
-        return new CutsceneKeyframeOptionScreen((CutsceneKeyframe) keyframe, playerSession.getPlayer(), false);
+    public Screen keyframeOptionScreen(Keyframe keyframe, boolean hide) {
+        return new CutsceneKeyframeOptionScreen((CutsceneKeyframe) keyframe, playerSession, hide);
     }
 
     @Override

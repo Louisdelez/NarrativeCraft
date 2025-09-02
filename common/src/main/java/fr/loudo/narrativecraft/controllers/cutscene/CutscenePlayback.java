@@ -75,6 +75,13 @@ public class CutscenePlayback {
 
     public void tick() {
         if (!isPlaying) return;
+        if (Minecraft.getInstance().options.keyShift.isDown()
+                && cutsceneController.getEnvironment() == Environment.DEVELOPMENT) {
+            stop();
+            playerSession.setCurrentCamera(keyframeA.getKeyframeLocation());
+            Minecraft.getInstance().setScreen(new CutsceneKeyframeOptionScreen(keyframeA, playerSession, false));
+            cutsceneController.changeTimePosition(keyframeA.getTick(), true);
+        }
         segmentTick++;
         if (segmentTick >= keyframeA.getStartDelayTick()) {
             totalTick++;
@@ -195,8 +202,7 @@ public class CutscenePlayback {
         stop();
         playerSession.setCurrentCamera(keyframeB.getKeyframeLocation());
         if (cutsceneController.getEnvironment() == Environment.DEVELOPMENT) {
-            CutsceneKeyframeOptionScreen screen =
-                    new CutsceneKeyframeOptionScreen(keyframeB, playerSession.getPlayer(), false);
+            CutsceneKeyframeOptionScreen screen = new CutsceneKeyframeOptionScreen(keyframeB, playerSession, false);
             Minecraft.getInstance().setScreen(screen);
         } else if (cutsceneController.getEnvironment() == Environment.PRODUCTION) {
             onCutsceneEnd.run();

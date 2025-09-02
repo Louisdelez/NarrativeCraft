@@ -65,9 +65,9 @@ public abstract class AbstractKeyframeController<T extends Keyframe> extends Abs
         hideKeyframes(playerSession.getPlayer());
         minecraft.options.hideGui = true;
         if (environment == Environment.DEVELOPMENT) {
-            minecraft.execute(() -> minecraft.setScreen(keyframeOptionScreen(keyframe)));
+            minecraft.execute(() -> minecraft.setScreen(keyframeOptionScreen(keyframe, false)));
         }
     }
 
-    public abstract Screen keyframeOptionScreen(Keyframe keyframe);
+    public abstract Screen keyframeOptionScreen(Keyframe keyframe, boolean hide);
 }
