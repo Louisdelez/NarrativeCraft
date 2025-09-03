@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
+import fr.loudo.narrativecraft.narrative.recording.Location;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -59,6 +60,11 @@ public class PlayerSession {
     public void reset() {
         chapter = null;
         scene = null;
+    }
+
+    public Location getPlayerPosition() {
+        return new Location(
+                player.getX(), player.getY(), player.getZ(), player.getXRot(), player.getYRot(), player.onGround());
     }
 
     public ServerPlayer getPlayer() {

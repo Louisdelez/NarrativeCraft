@@ -21,14 +21,12 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.screens.animation;
+package fr.loudo.narrativecraft.screens.components;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
+import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
-import fr.loudo.narrativecraft.screens.components.GenericSelectionScreen;
-import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import java.util.function.Consumer;
 import net.minecraft.client.gui.components.Button;
@@ -36,37 +34,37 @@ import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
-public class AnimationCharacterLinkScreen extends GenericSelectionScreen<CharacterStory> {
+public class ChooseCharacterScreen extends GenericSelectionScreen<CharacterStory> {
     private final CharacterType characterType;
-    private final Animation animation;
+    private final Scene scene;
 
-    public AnimationCharacterLinkScreen(
+    public ChooseCharacterScreen(
             Screen lastScreen,
-            Animation animation,
-            List<CharacterStory> characterStoryList,
+            String screenTitle,
+            List<CharacterStory> itemList,
             CharacterType characterType,
+            CharacterStory currentSelection,
+            Scene scene,
+            Consumer<CharacterStory> consumer) {
+        super(lastScreen, screenTitle, itemList, currentSelection, consumer);
+        this.characterType = characterType;
+        this.scene = scene;
+    }
+
+    public ChooseCharacterScreen(
+            Screen lastScreen,
+            String screenTitle,
+            CharacterStory currentSelection,
+            Scene scene,
             Consumer<CharacterStory> consumer) {
         super(
                 lastScreen,
-                Translation.message("screen.story_manager.link_animation_character")
-                        .getString(),
-                characterStoryList,
-                animation.getCharacter(),
-                consumer);
-        this.characterType = characterType;
-        this.animation = animation;
-    }
-
-    public AnimationCharacterLinkScreen(Screen lastScreen, Animation animation, Consumer<CharacterStory> consumer) {
-        super(
-                lastScreen,
-                Translation.message("screen.story_manager.link_animation_character")
-                        .getString(),
+                screenTitle,
                 NarrativeCraftMod.getInstance().getCharacterManager().getCharacterStories(),
-                animation.getCharacter(),
+                currentSelection,
                 consumer);
         this.characterType = CharacterType.MAIN;
-        this.animation = animation;
+        this.scene = scene;
     }
 
     @Override
@@ -74,24 +72,18 @@ public class AnimationCharacterLinkScreen extends GenericSelectionScreen<Charact
         layout.addChild(Button.builder(
                         characterType == CharacterType.NPC ? Component.literal("<- MAIN") : Component.literal("NPC ->"),
                         button -> {
-                            Screen screen;
-                            if (characterType == CharacterType.MAIN) {
-                                screen = new AnimationCharacterLinkScreen(
-                                        lastScreen,
-                                        animation,
-                                        animation.getScene().getNpcs(),
-                                        CharacterType.NPC,
-                                        consumer);
-                            } else {
-                                screen = new AnimationCharacterLinkScreen(
-                                        lastScreen,
-                                        animation,
-                                        NarrativeCraftMod.getInstance()
-                                                .getCharacterManager()
-                                                .getCharacterStories(),
-                                        CharacterType.MAIN,
-                                        consumer);
-                            }
+                            Screen screen = new ChooseCharacterScreen(
+                                    lastScreen,
+                                    screenTitle,
+                                    characterType == CharacterType.MAIN
+                                            ? scene.getNpcs()
+                                            : NarrativeCraftMod.getInstance()
+                                                    .getCharacterManager()
+                                                    .getCharacterStories(),
+                                    characterType == CharacterType.MAIN ? CharacterType.NPC : CharacterType.MAIN,
+                                    null,
+                                    scene,
+                                    consumer);
                             minecraft.setScreen(screen);
                         })
                 .width(40)

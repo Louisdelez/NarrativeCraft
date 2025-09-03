@@ -23,22 +23,26 @@
 
 package fr.loudo.narrativecraft.narrative.character;
 
-import fr.loudo.narrativecraft.narrative.playback.Playback;
+import net.minecraft.world.entity.LivingEntity;
 
 public class CharacterRuntime {
     private final CharacterStory characterStory;
-    private final Playback playback;
+    private LivingEntity entity;
 
-    public CharacterRuntime(CharacterStory characterStory, Playback playback) {
+    public CharacterRuntime(CharacterStory characterStory, LivingEntity entity) {
         this.characterStory = characterStory;
-        this.playback = playback;
+        this.entity = entity;
     }
 
     public CharacterStory getCharacterStory() {
         return characterStory;
     }
 
-    public Playback getAnimation() {
-        return playback;
+    public LivingEntity getEntity() {
+        return entity;
+    }
+
+    public void setEntity(LivingEntity entity) {
+        this.entity = entity;
     }
 }

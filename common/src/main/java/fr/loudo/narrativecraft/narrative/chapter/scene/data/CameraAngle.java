@@ -25,10 +25,31 @@ package fr.loudo.narrativecraft.narrative.chapter.scene.data;
 
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.SceneData;
+import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
+import fr.loudo.narrativecraft.narrative.keyframes.cameraAngle.CameraAngleKeyframe;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CameraAngle extends SceneData {
 
+    private List<CameraAngleKeyframe> cameraAngles = new ArrayList<>();
+    private List<CharacterStoryData> characterStoryDataList = new ArrayList<>();
+
     public CameraAngle(String name, String description, Scene scene) {
         super(name, description, scene);
+    }
+
+    public List<CameraAngleKeyframe> getCameraAngles() {
+        if (cameraAngles == null) {
+            cameraAngles = new ArrayList<>();
+        }
+        return cameraAngles;
+    }
+
+    public List<CharacterStoryData> getCharacterStoryDataList() {
+        if (characterStoryDataList == null) {
+            characterStoryDataList = new ArrayList<>();
+        }
+        return characterStoryDataList;
     }
 }

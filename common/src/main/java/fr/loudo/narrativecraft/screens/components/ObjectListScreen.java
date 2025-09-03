@@ -48,6 +48,10 @@ public class ObjectListScreen extends ContainerObjectSelectionList<ObjectListScr
         this.addEntry(new Entry(button, screen));
     }
 
+    public void clear() {
+        children().clear();
+    }
+
     protected static class Entry extends ContainerObjectSelectionList.Entry<Entry> {
         private final AbstractWidget children;
         private final Screen screen;

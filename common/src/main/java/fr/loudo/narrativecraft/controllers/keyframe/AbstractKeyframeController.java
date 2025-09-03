@@ -26,8 +26,11 @@ package fr.loudo.narrativecraft.controllers.keyframe;
 import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
+import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
+import java.util.concurrent.atomic.AtomicInteger;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 
@@ -41,9 +44,16 @@ public abstract class AbstractKeyframeController<T extends Keyframe> extends Abs
         implements KeyframeControllerInterface<T> {
 
     protected GameType lastGameType;
+    protected final AtomicInteger keyframesCounter = new AtomicInteger();
 
     public AbstractKeyframeController(Environment environment, Player player) {
         super(environment, player);
+    }
+
+    protected KeyframeLocation getKeyframeLocationFromPlayer() {
+        ServerPlayer player = playerSession.getPlayer();
+        return new KeyframeLocation(
+                player.position().add(0, player.getEyeHeight(), 0), player.getXRot(), player.getYRot(), 0, 85.0f);
     }
 
     @Override

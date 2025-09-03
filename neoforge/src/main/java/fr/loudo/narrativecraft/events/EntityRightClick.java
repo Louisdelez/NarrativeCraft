@@ -24,7 +24,6 @@
 package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
@@ -39,12 +38,7 @@ public class EntityRightClick {
 
     public static void onEntityRightClick(PlayerInteractEvent.EntityInteractSpecific event) {
         if (event.getLevel().isClientSide) {
-            ServerPlayer serverPlayer = NarrativeCraftMod.server
-                    .getPlayerList()
-                    .getPlayer(event.getEntity().getUUID());
-            if (serverPlayer == null) return;
-            NarrativeCraftMod.server.execute(
-                    () -> OnEntityRightClick.entityRightClick(serverPlayer, event.getTarget()));
+            OnEntityRightClick.entityRightClick(event.getEntity(), event.getTarget());
         }
     }
 }

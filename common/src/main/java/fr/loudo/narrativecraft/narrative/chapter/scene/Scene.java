@@ -41,7 +41,7 @@ public class Scene extends NarrativeEntry {
     private final List<Animation> animations = new ArrayList<>();
     private final List<Cutscene> cutscenes = new ArrayList<>();
     private final List<Subscene> subscenes = new ArrayList<>();
-    private final List<CameraAngle> cameraAngleGroups = new ArrayList<>();
+    private final List<CameraAngle> cameraAngles = new ArrayList<>();
 
     private final List<CharacterStory> npcs = new ArrayList<>();
 
@@ -103,16 +103,16 @@ public class Scene extends NarrativeEntry {
     }
 
     public void addCameraAngleGroup(CameraAngle cameraAngleGroup) {
-        if (cameraAngleGroups.contains(cameraAngleGroup)) return;
-        cameraAngleGroups.add(cameraAngleGroup);
+        if (cameraAngles.contains(cameraAngleGroup)) return;
+        cameraAngles.add(cameraAngleGroup);
     }
 
     public void removeCameraAngleGroup(CameraAngle cameraAngleGroup) {
-        cameraAngleGroups.remove(cameraAngleGroup);
+        cameraAngles.remove(cameraAngleGroup);
     }
 
     public boolean cameraAngleExists(String name) {
-        for (CameraAngle cameraAngleGroup : cameraAngleGroups) {
+        for (CameraAngle cameraAngleGroup : cameraAngles) {
             if (cameraAngleGroup.getName().equalsIgnoreCase(name)) {
                 return true;
             }
@@ -172,11 +172,12 @@ public class Scene extends NarrativeEntry {
         return subscenes;
     }
 
-    public List<CameraAngle> getCameraAngleGroups() {
-        return cameraAngleGroups;
+    public List<CameraAngle> getCameraAngles() {
+        return cameraAngles;
     }
 
     public List<CharacterStory> getNpcs() {
+
         return npcs;
     }
 

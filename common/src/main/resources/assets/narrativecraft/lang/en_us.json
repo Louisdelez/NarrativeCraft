@@ -6,6 +6,7 @@
   "narrativecraft.global.description": "Description",
   "narrativecraft.global.add": "Add",
   "narrativecraft.global.remove": "Remove",
+  "narrativecraft.global.close": "Close",
   "narrativecraft.global.update": "Update",
   "narrativecraft.global.error": "Error",
   "narrativecraft.global.confirm_delete": "Are you sure? This can't be undone!",
@@ -16,6 +17,7 @@
   "narrativecraft.global.npc": "Npc",
   "narrativecraft.global.camera_angle": "Camera angle",
   "narrativecraft.global.cutscene": "Cutscene",
+  "narrativecraft.global.cutscenes": "Cutscenes",
   "narrativecraft.global.interaction": "Interaction",
 
   "narrativecraft.file.main_ink_warning": "Main ink file, do not write here! If you need to write variables or functions, they have their own separated files.",
@@ -60,7 +62,6 @@
   "narrativecraft.animation.no_exists": "Animation %s does not exists in scene %s.",
   "narrativecraft.animation.playing": "Playing animation %s of scene %s...",
   "narrativecraft.animation.no_character_linked": "Animations %s has no character linked, can't start.",
-  "narrativecraft.animation.must_link_character": "You must choose a character.",
 
   "narrativecraft.subscene.already_exists": "Subscene %s already exists in scene %s",
   "narrativecraft.subscene.no_exists": "Subscene %s does not exists in scene %s.",
@@ -68,7 +69,12 @@
 
   "narrativecraft.cutscene.already_exists": "Cutscene %s already exists in scene %s",
 
+  "narrativecraft.camera_angle.already_exists": "Camera angle %s already exists in %s.",
+  "narrativecraft.camera_angle.name_no_empty": "The name cannot be empty.",
+
   "narrativecraft.character.already_exists": "Character %s already exists in the story.",
+  "narrativecraft.character.must_link_character": "You must choose a character.",
+  "narrativecraft.character.change_pose": "Change character pose",
 
   "narrativecraft.controller.confirm_leaving": "Are you sure you want to leave without saving?",
   "narrativecraft.controller.saved": "Successfully saved!",
@@ -86,10 +92,16 @@
   "narrativecraft.controller.cutscene.settings.select_group_name_selected": "Keyframe Group #%d (selected)",
   "narrativecraft.controller.cutscene.settings.group_selected": "Keyframe Group #%d selected.",
 
+  "narrativecraft.controller.camera_angle.hud": "Camera angle controller",
+  "narrativecraft.controller.camera_angle.add_character": "Add character to %s",
+  "narrativecraft.controller.camera_angle.template_character": "Add template character to %s",
+
   "narrativecraft.tooltip.character_entity_type": "Change entity type",
   "narrativecraft.tooltip.create_keyframe_group": "Create keyframe group",
   "narrativecraft.tooltip.create_keyframe": "Create keyframe",
   "narrativecraft.tooltip.create_keyframe_trigger": "Create keyframe trigger",
+  "narrativecraft.tooltip.add_character": "Add character",
+  "narrativecraft.tooltip.template_character": "Template character",
   "narrativecraft.tooltip.cutscene_settings": "Cutscene settings",
   "narrativecraft.tooltip.save": "Save",
   "narrativecraft.tooltip.leave_without_saving": "Leave without saving",

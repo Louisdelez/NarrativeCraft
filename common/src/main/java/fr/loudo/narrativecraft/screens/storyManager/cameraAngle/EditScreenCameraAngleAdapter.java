@@ -66,7 +66,7 @@ public class EditScreenCameraAngleAdapter implements EditScreenAdapter<CameraAng
             CameraAngle cameraAngleGroup = new CameraAngle(name, description, scene);
             try {
                 scene.addCameraAngleGroup(cameraAngleGroup);
-                NarrativeCraftFile.updateCameraAngleGroup(scene);
+                NarrativeCraftFile.updateCameraAngles(scene);
                 minecraft.setScreen(new CameraAngleScreen(scene));
             } catch (Exception e) {
                 scene.removeCameraAngleGroup(cameraAngleGroup);
@@ -78,7 +78,7 @@ public class EditScreenCameraAngleAdapter implements EditScreenAdapter<CameraAng
             try {
                 existing.setName(name);
                 existing.setDescription(description);
-                NarrativeCraftFile.updateCameraAngleGroup(scene);
+                NarrativeCraftFile.updateCameraAngles(scene);
                 minecraft.setScreen(new CameraAngleScreen(scene));
             } catch (Exception e) {
                 existing.setName(oldCameraAngleGroup.getName());

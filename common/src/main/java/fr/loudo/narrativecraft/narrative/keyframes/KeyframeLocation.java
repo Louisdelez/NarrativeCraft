@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.keyframes;
 
+import fr.loudo.narrativecraft.narrative.recording.Location;
 import net.minecraft.world.phys.Vec3;
 
 public class KeyframeLocation {
@@ -57,6 +58,10 @@ public class KeyframeLocation {
         x = vec3.x;
         y = vec3.y;
         z = vec3.z;
+    }
+
+    public Location asLocation() {
+        return new Location(x, y, z, pitch, yaw, false);
     }
 
     public double getX() {

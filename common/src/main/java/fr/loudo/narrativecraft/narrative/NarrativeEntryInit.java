@@ -38,11 +38,9 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.character.CharacterModel;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
-import fr.loudo.narrativecraft.serialization.AnimationSerializer;
-import fr.loudo.narrativecraft.serialization.CharacterSerializer;
-import fr.loudo.narrativecraft.serialization.CutsceneSerializer;
-import fr.loudo.narrativecraft.serialization.SubsceneSerializer;
+import fr.loudo.narrativecraft.serialization.*;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -155,10 +153,13 @@ public class NarrativeEntryInit {
         File cameraAngleGroupsFile = NarrativeCraftFile.getCameraAngelGroupFile(scene);
         String content = Files.readString(cameraAngleGroupsFile.toPath());
         Type type = new TypeToken<List<CameraAngle>>() {}.getType();
-        List<CameraAngle> cameraAngleGroups = new Gson().fromJson(content, type);
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(CharacterStoryData.class, new CharacterStoryDataSerializer(scene))
+                .create();
+        List<CameraAngle> cameraAngleGroups = gson.fromJson(content, type);
         if (cameraAngleGroups == null) return;
         cameraAngleGroups.forEach(group -> group.setScene(scene));
-        scene.getCameraAngleGroups().addAll(cameraAngleGroups);
+        scene.getCameraAngles().addAll(cameraAngleGroups);
     }
 
     private static void initCharacters() throws Exception {

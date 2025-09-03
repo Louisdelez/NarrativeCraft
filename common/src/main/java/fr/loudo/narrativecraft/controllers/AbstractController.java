@@ -57,7 +57,7 @@ public abstract class AbstractController {
     }
 
     public void renderHUDInfo(GuiGraphics guiGraphics) {
-        if (playerSession.getCurrentCamera() != null) return;
+        if (playerSession.getCurrentCamera() != null || environment != Environment.DEVELOPMENT) return;
         Minecraft minecraft = Minecraft.getInstance();
         Font font = minecraft.font;
         int width = minecraft.getWindow().getGuiScaledWidth();

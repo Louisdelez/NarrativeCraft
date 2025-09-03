@@ -26,7 +26,7 @@ package fr.loudo.narrativecraft.screens.storyManager.animations;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
-import fr.loudo.narrativecraft.screens.animation.AnimationCharacterLinkScreen;
+import fr.loudo.narrativecraft.screens.components.ChooseCharacterScreen;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.components.StoryElementList;
 import fr.loudo.narrativecraft.screens.storyManager.StoryElementScreen;
@@ -95,12 +95,17 @@ public class AnimationsScreen extends StoryElementScreen {
     private Button createSettingsButton(Animation animation) {
 
         return Button.builder(ImageFontConstants.SETTINGS, button1 -> {
-                    AnimationCharacterLinkScreen screen =
-                            new AnimationCharacterLinkScreen(this, animation, characterStory -> {
+                    ChooseCharacterScreen screen = new ChooseCharacterScreen(
+                            this,
+                            Translation.message("screen.story_manager.link_animation_character")
+                                    .getString(),
+                            animation.getCharacter(),
+                            scene,
+                            characterStory -> {
                                 if (characterStory == null) {
                                     ScreenUtils.sendToast(
                                             Translation.message("global.error"),
-                                            Translation.message("animation.must_link_character"));
+                                            Translation.message("character.must_link_character"));
                                     return;
                                 }
                                 animation.setCharacter(characterStory);

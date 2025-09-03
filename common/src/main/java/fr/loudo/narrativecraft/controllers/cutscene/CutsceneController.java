@@ -45,20 +45,15 @@ import fr.loudo.narrativecraft.util.Translation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
 public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyframe, CutsceneKeyframeGroup> {
-
-    private final AtomicInteger keyframeGroupCounter = new AtomicInteger();
-    private final AtomicInteger keyframeCounter = new AtomicInteger();
 
     private final List<Playback> playbacks = new ArrayList<>();
     private final Cutscene cutscene;
@@ -90,7 +85,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         for (Playback playback : playbacks) {
             playback.tick();
         }
-        if (currentTick >= totalTick) {
+        if (currentTick >= totalTick && environment == Environment.DEVELOPMENT) {
             pause();
             if (Minecraft.getInstance().screen instanceof CutsceneControllerScreen screen) {
                 screen.getControllerButton().setMessage(screen.getPlayText());
@@ -117,6 +112,8 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
             playback.setPlaying(false);
             playbacks.add(playback);
         }
+        totalTick = calculateTotalTick();
+        if (environment != Environment.DEVELOPMENT) return;
         if (!keyframeGroups.isEmpty()) {
             selectedGroup = keyframeGroups.getFirst();
             KeyframeLocation keyframeLocation =
@@ -128,13 +125,12 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
             Location location = playbacks.getFirst().getAnimation().getFirstLocation();
             playerSession.getPlayer().teleportTo(location.x(), location.y(), location.z());
         }
-        totalTick = calculateTotalTick();
         if (!keyframeGroups.isEmpty()) {
             CutsceneKeyframeGroup keyframeGroup = keyframeGroups.getLast();
-            keyframeGroupCounter.set(keyframeGroup.getId());
+            keyframeGroupsCounter.set(keyframeGroup.getId());
             CutsceneKeyframe cutsceneKeyframe = getLastKeyframeLastGroup();
             if (cutsceneKeyframe == null) return;
-            keyframeCounter.set(keyframeGroup.getId());
+            keyframesCounter.set(keyframeGroup.getId());
             for (CutsceneKeyframeGroup keyframeGroup1 : keyframeGroups) {
                 keyframeGroup1.showKeyframes(playerSession.getPlayer());
             }
@@ -148,27 +144,26 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         for (Playback playback : playbacks) {
             playback.stop(true);
         }
-        if (environment == Environment.DEVELOPMENT) {
-            for (CutsceneKeyframeGroup keyframeGroup : keyframeGroups) {
-                keyframeGroup.hideKeyframes(playerSession.getPlayer());
-            }
-            List<CutsceneKeyframeGroup> oldData = cutscene.getKeyframeGroups();
-            if (save) {
-                cutscene.getKeyframeGroups().clear();
-                try {
-                    cutscene.getKeyframeGroups().addAll(keyframeGroups);
-                    NarrativeCraftFile.updateCutsceneFile(cutscene.getScene());
-                    playerSession.getPlayer().sendSystemMessage(Translation.message("controller.saved"));
-                } catch (IOException e) {
-                    cutscene.getKeyframeGroups().removeAll(keyframeGroups);
-                    cutscene.getKeyframeGroups().addAll(oldData);
-                    playerSession.getPlayer().sendSystemMessage(Translation.message("crash.global-message"));
-                    NarrativeCraftMod.LOGGER.error("Impossible to save the cutscene: ", e);
-                }
-            }
-        }
         playerSession.setController(null);
         playerSession.setCurrentCamera(null);
+        if (environment != Environment.DEVELOPMENT) return;
+        for (CutsceneKeyframeGroup keyframeGroup : keyframeGroups) {
+            keyframeGroup.hideKeyframes(playerSession.getPlayer());
+        }
+        List<CutsceneKeyframeGroup> oldData = cutscene.getKeyframeGroups();
+        if (save) {
+            cutscene.getKeyframeGroups().clear();
+            try {
+                cutscene.getKeyframeGroups().addAll(keyframeGroups);
+                NarrativeCraftFile.updateCutsceneFile(cutscene.getScene());
+                playerSession.getPlayer().sendSystemMessage(Translation.message("controller.saved"));
+            } catch (IOException e) {
+                cutscene.getKeyframeGroups().removeAll(keyframeGroups);
+                cutscene.getKeyframeGroups().addAll(oldData);
+                playerSession.getPlayer().sendSystemMessage(Translation.message("crash.global-message"));
+                NarrativeCraftMod.LOGGER.error("Impossible to save the cutscene: ", e);
+            }
+        }
     }
 
     @Override
@@ -210,7 +205,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
             keyframeGroup.showGroupText(playerSession.getPlayer());
         } else {
             // Re-assign automatically the group id if the user delete a keyframe group without any child
-            keyframeGroupCounter.decrementAndGet();
+            keyframeGroupsCounter.decrementAndGet();
             keyframeGroups.remove(keyframeGroup);
             for (int i = 0; i < keyframeGroups.size(); i++) {
                 CutsceneKeyframeGroup keyframeGroup1 = keyframeGroups.get(i);
@@ -245,7 +240,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
     public CutsceneKeyframeGroup createKeyframeGroup() {
         if (environment != Environment.DEVELOPMENT) return null;
         CutsceneKeyframe lastKeyframe = getLastKeyframeLastGroup();
-        CutsceneKeyframeGroup keyframeGroup = new CutsceneKeyframeGroup(keyframeGroupCounter.incrementAndGet());
+        CutsceneKeyframeGroup keyframeGroup = new CutsceneKeyframeGroup(keyframeGroupsCounter.incrementAndGet());
         selectedGroup = keyframeGroup;
         keyframeGroups.add(keyframeGroup);
         createKeyframe();
@@ -269,16 +264,13 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
 
     public CutsceneKeyframe createKeyframe() {
         if (environment != Environment.DEVELOPMENT) return null;
-        ServerPlayer player = playerSession.getPlayer();
-        KeyframeLocation location = new KeyframeLocation(
-                player.position().add(0, player.getEyeHeight(), 0), player.getXRot(), player.getYRot(), 0, 85.0f);
         int pathTime = 0;
         CutsceneKeyframe lastKeyframe = getLastKeyframeLastGroup();
         if (lastKeyframe != null && totalTick > 0) {
             pathTime = currentTick - lastKeyframe.getTick();
         }
-        CutsceneKeyframe keyframe =
-                new CutsceneKeyframe(keyframeCounter.incrementAndGet(), location, currentTick, 0, pathTime);
+        CutsceneKeyframe keyframe = new CutsceneKeyframe(
+                keyframesCounter.incrementAndGet(), getKeyframeLocationFromPlayer(), currentTick, 0, pathTime);
         if (totalTick > 0) {
             outer:
             for (CutsceneKeyframeGroup keyframeGroup : keyframeGroups) {
@@ -300,9 +292,9 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         }
         selectedGroup.addKeyframe(keyframe);
         keyframe.setParentGroup(selectedGroup.getKeyframes().getFirst().getId() == keyframe.getId());
-        keyframe.showKeyframe(player);
+        keyframe.showKeyframe(playerSession.getPlayer());
         keyframe.getCamera().setGlowingTag(true);
-        keyframe.updateEntityData(player);
+        keyframe.updateEntityData(playerSession.getPlayer());
         updateSelectedGroupGlow();
         return keyframe;
     }

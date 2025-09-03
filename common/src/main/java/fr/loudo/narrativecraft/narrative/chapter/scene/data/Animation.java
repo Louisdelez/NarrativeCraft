@@ -43,6 +43,10 @@ public class Animation extends SceneData {
         return actionsData.getFirst().getLocations().getFirst();
     }
 
+    public Location getLastLocation() {
+        return actionsData.getFirst().getLocations().getLast();
+    }
+
     public CharacterStory getCharacter() {
         return character;
     }

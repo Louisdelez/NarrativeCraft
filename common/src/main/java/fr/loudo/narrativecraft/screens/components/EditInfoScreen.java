@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.screens.storyManager.EditScreenAdapter;
 import fr.loudo.narrativecraft.util.ScreenUtils;
 import fr.loudo.narrativecraft.util.Translation;
+import fr.loudo.narrativecraft.util.Util;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -132,7 +133,7 @@ public class EditInfoScreen<T extends NarrativeEntry> extends Screen {
         nameBox = new ScreenUtils.LabelBox(
                 nameLabel, font, WIDGET_WIDTH, EDIT_BOX_NAME_HEIGHT, centerX, centerY, ScreenUtils.Align.VERTICAL);
         nameBox.getEditBox().setValue(name);
-        nameBox.getEditBox().setFilter(text -> text.matches("[a-zA-Z0-9 _-]*"));
+        nameBox.getEditBox().setFilter(text -> text.matches(Util.REGEX_NO_SPECIAL_CHARACTERS));
         this.addRenderableWidget(nameBox.getStringWidget());
         this.addRenderableWidget(nameBox.getEditBox());
 

@@ -23,7 +23,9 @@
 
 package fr.loudo.narrativecraft.screens.storyManager.cameraAngle;
 
+import fr.loudo.narrativecraft.controllers.cameraAngle.CameraAngleController;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
+import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.CameraAngle;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
@@ -70,26 +72,29 @@ public class CameraAngleScreen extends StoryElementScreen {
 
     @Override
     protected void addContents() {
-        List<StoryElementList.StoryEntryData> entries = scene.getCameraAngleGroups().stream()
-                .map(cameraAngleGroup -> {
-                    Button button = Button.builder(Component.literal(cameraAngleGroup.getName()), button1 -> {})
+        List<StoryElementList.StoryEntryData> entries = scene.getCameraAngles().stream()
+                .map(cameraAngle -> {
+                    Button button = Button.builder(Component.literal(cameraAngle.getName()), button1 -> {
+                                new CameraAngleController(Environment.DEVELOPMENT, minecraft.player, cameraAngle)
+                                        .startSession();
+                                minecraft.setScreen(null);
+                            })
                             .build();
-                    button.active = false;
 
                     return new StoryElementList.StoryEntryData(
                             button,
                             () -> {
                                 minecraft.setScreen(new EditInfoScreen<>(
-                                        this, cameraAngleGroup, new EditScreenCameraAngleAdapter(scene)));
+                                        this, cameraAngle, new EditScreenCameraAngleAdapter(scene)));
                             },
                             () -> {
                                 minecraft.setScreen(new CameraAngleScreen(scene));
                                 try {
-                                    scene.removeCameraAngleGroup(cameraAngleGroup);
-                                    NarrativeCraftFile.updateCameraAngleGroup(scene);
+                                    scene.removeCameraAngleGroup(cameraAngle);
+                                    NarrativeCraftFile.updateCameraAngles(scene);
                                     minecraft.setScreen(new CameraAngleScreen(scene));
                                 } catch (Exception e) {
-                                    scene.addCameraAngleGroup(cameraAngleGroup);
+                                    scene.addCameraAngleGroup(cameraAngle);
                                     fr.loudo.narrativecraft.util.Util.sendCrashMessage(minecraft.player, e);
                                 }
                             });

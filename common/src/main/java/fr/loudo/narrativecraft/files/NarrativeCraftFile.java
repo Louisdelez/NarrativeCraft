@@ -32,7 +32,9 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.serialization.AnimationSerializer;
+import fr.loudo.narrativecraft.serialization.CharacterStoryDataSerializer;
 import fr.loudo.narrativecraft.serialization.CutsceneSerializer;
 import fr.loudo.narrativecraft.serialization.SubsceneSerializer;
 import fr.loudo.narrativecraft.util.InkUtil;
@@ -306,13 +308,13 @@ public class NarrativeCraftFile {
         }
     }
 
-    public static void updateCameraAngleGroup(Scene scene) throws IOException {
+    public static void updateCameraAngles(Scene scene) throws IOException {
         File cameraAngelGroupFile = getCameraAngelGroupFile(scene);
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Subscene.class, new SubsceneSerializer(scene))
+                .registerTypeAdapter(CharacterStoryData.class, new CharacterStoryDataSerializer(scene))
                 .create();
         try (Writer writer = new BufferedWriter(new FileWriter(cameraAngelGroupFile))) {
-            gson.toJson(scene.getCameraAngleGroups(), writer);
+            gson.toJson(scene.getCameraAngles(), writer);
         }
     }
 

@@ -23,4 +23,33 @@
 
 package fr.loudo.narrativecraft.narrative.keyframes.cameraAngle;
 
-public class CameraAngleKeyframe {}
+import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
+import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+
+public class CameraAngleKeyframe extends Keyframe {
+
+    private String name;
+
+    public CameraAngleKeyframe(int id, KeyframeLocation keyframeLocation, String name) {
+        super(id, keyframeLocation);
+        this.name = name;
+    }
+
+    @Override
+    public void showKeyframe(ServerPlayer player) {
+        super.showKeyframe(player);
+        camera.setCustomName(Component.literal(name));
+        camera.setCustomNameVisible(true);
+        updateEntityData(player);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}

@@ -23,8 +23,6 @@
 
 package fr.loudo.narrativecraft.narrative.playback;
 
-import com.mojang.authlib.GameProfile;
-import fr.loudo.narrativecraft.mixin.accessor.PlayerAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.PlayerListAccessor;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
@@ -35,13 +33,10 @@ import fr.loudo.narrativecraft.narrative.recording.actions.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.util.FakePlayer;
 import fr.loudo.narrativecraft.util.Translation;
+import fr.loudo.narrativecraft.util.Util;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -65,7 +60,7 @@ public class Playback {
         this.animation = animation;
         this.level = level;
         this.environment = environment;
-        this.characterRuntime = new CharacterRuntime(animation.getCharacter(), this);
+        this.characterRuntime = new CharacterRuntime(animation.getCharacter(), masterEntity);
         this.isPlaying = false;
         this.hasEnded = false;
         this.isLooping = isLooping;
@@ -295,36 +290,8 @@ public class Playback {
             return;
         }
 
-        GameProfile gameProfile = new GameProfile(
-                UUID.randomUUID(), characterRuntime.getCharacterStory().getName());
-
-        if (BuiltInRegistries.ENTITY_TYPE.getId(
-                        characterRuntime.getCharacterStory().getEntityType())
-                == BuiltInRegistries.ENTITY_TYPE.getId(EntityType.PLAYER)) {
-            masterEntity = new FakePlayer((ServerLevel) level, gameProfile);
-            masterEntity.getEntityData().set(PlayerAccessor.getDATA_PLAYER_MODE_CUSTOMISATION(), (byte) 0b01111111);
-        } else {
-            masterEntity = (LivingEntity)
-                    characterRuntime.getCharacterStory().getEntityType().create(level, EntitySpawnReason.MOB_SUMMONED);
-            if (masterEntity instanceof Mob mob) mob.setNoAi(true);
-        }
-
+        masterEntity = Util.createEntityFromCharacter(characterRuntime.getCharacterStory(), level);
         moveEntitySilent(masterEntity, loc);
-
-        if (masterEntity instanceof FakePlayer fakePlayer) {
-            ((PlayerListAccessor) level.getServer().getPlayerList())
-                    .getPlayersByUUID()
-                    .put(fakePlayer.getUUID(), fakePlayer);
-            level.getServer()
-                    .getPlayerList()
-                    .broadcastAll(new ClientboundPlayerInfoUpdatePacket(
-                            ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
-            if (level instanceof ServerLevel serverLevel) {
-                serverLevel.addNewPlayer(fakePlayer);
-            }
-        } else {
-            level.addFreshEntity(masterEntity);
-        }
 
         entityPlaybacks.getFirst().setEntity(masterEntity);
         //        if(environnement == Environnement.PRODUCTION) {

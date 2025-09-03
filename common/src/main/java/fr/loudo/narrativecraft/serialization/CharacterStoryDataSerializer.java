@@ -27,37 +27,36 @@ import com.google.gson.*;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
+import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
-import fr.loudo.narrativecraft.narrative.recording.actions.Action;
+import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import java.lang.reflect.Type;
 
-public class AnimationSerializer implements JsonSerializer<Animation>, JsonDeserializer<Animation> {
+public class CharacterStoryDataSerializer
+        implements JsonSerializer<CharacterStoryData>, JsonDeserializer<CharacterStoryData> {
 
     private final String characterKey = "character_name";
     private final Scene scene;
 
-    public AnimationSerializer(Scene scene) {
+    public CharacterStoryDataSerializer(Scene scene) {
         this.scene = scene;
     }
 
     @Override
-    public JsonElement serialize(Animation animation, Type typeOfSrc, JsonSerializationContext context) {
-        JsonObject obj = new Gson().toJsonTree(animation).getAsJsonObject();
-        CharacterStory characterStory = animation.getCharacter();
+    public JsonElement serialize(
+            CharacterStoryData characterStoryData, Type type, JsonSerializationContext jsonSerializationContext) {
+        JsonObject obj = new Gson().toJsonTree(characterStoryData).getAsJsonObject();
+        CharacterStory characterStory = characterStoryData.getCharacterStory();
         if (characterStory == null) return obj;
         obj.addProperty(characterKey, characterStory.getName());
         return obj;
     }
 
     @Override
-    public Animation deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+    public CharacterStoryData deserialize(
+            JsonElement json, Type type, JsonDeserializationContext jsonDeserializationContext)
             throws JsonParseException {
-        Animation animation = new GsonBuilder()
-                .registerTypeAdapter(Action.class, new ActionSerializer())
-                .create()
-                .fromJson(json, Animation.class);
-        animation.setScene(scene);
+        CharacterStoryData characterStoryData = new GsonBuilder().create().fromJson(json, CharacterStoryData.class);
         CharacterManager characterManager = NarrativeCraftMod.getInstance().getCharacterManager();
         JsonObject jsonObject = json.getAsJsonObject();
         if (jsonObject.has(characterKey)) {
@@ -65,10 +64,10 @@ public class AnimationSerializer implements JsonSerializer<Animation>, JsonDeser
             CharacterStory characterStory = characterManager.getCharacterByName(characterName);
             if (characterStory == null) {
                 characterStory = scene.getNpcByName(characterName);
-                if (characterStory == null) return animation;
+                if (characterStory == null) return characterStoryData;
             }
-            animation.setCharacter(characterStory);
+            characterStoryData.setCharacterRuntime(new CharacterRuntime(characterStory, null));
         }
-        return animation;
+        return characterStoryData;
     }
 }

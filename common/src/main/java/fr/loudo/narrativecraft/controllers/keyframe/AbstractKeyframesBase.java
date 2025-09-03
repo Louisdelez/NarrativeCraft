@@ -42,12 +42,23 @@ public abstract class AbstractKeyframesBase<T extends Keyframe> extends Abstract
 
     @Override
     public T getNextKeyframe(T toKeyframe) {
-        return null;
+        for (int i = 0; i < keyframes.size() - 1; i++) {
+            if (keyframes.get(i).getId() == toKeyframe.getId()) {
+                return keyframes.get(i + 1);
+            }
+        }
+        return toKeyframe;
     }
 
     @Override
     public T getPreviousKeyframe(T fromKeyframe) {
-        return null;
+        for (int i = 0; i < keyframes.size(); i++) {
+            if (keyframes.get(i).getId() == fromKeyframe.getId()) {
+                if (i == 0) return fromKeyframe;
+                return keyframes.get(i - 1);
+            }
+        }
+        return fromKeyframe;
     }
 
     @Override
@@ -75,7 +86,10 @@ public abstract class AbstractKeyframesBase<T extends Keyframe> extends Abstract
     }
 
     @Override
-    public void removeKeyframe(T keyframe) {}
+    public void removeKeyframe(T keyframe) {
+        keyframes.remove(keyframe);
+        keyframe.hideKeyframe(playerSession.getPlayer());
+    }
 
     public List<T> getKeyframes() {
         return keyframes;

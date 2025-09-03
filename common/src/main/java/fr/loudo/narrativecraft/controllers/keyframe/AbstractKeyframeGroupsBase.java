@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.narrative.keyframes.KeyframeGroup;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -45,6 +46,7 @@ public abstract class AbstractKeyframeGroupsBase<T extends Keyframe, E extends K
         extends AbstractKeyframeController<T> {
 
     protected final List<E> keyframeGroups = new ArrayList<>();
+    protected final AtomicInteger keyframeGroupsCounter = new AtomicInteger();
 
     public AbstractKeyframeGroupsBase(Environment environment, Player player) {
         super(environment, player);

@@ -23,8 +23,6 @@
 
 package fr.loudo.narrativecraft.events;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -41,10 +39,8 @@ public class EntityRightClick {
             Entity entity,
             @Nullable EntityHitResult entityHitResult) {
 
-        if (level.isClientSide && NarrativeCraftMod.server != null) {
-            ServerPlayer serverPlayer = NarrativeCraftMod.server.getPlayerList().getPlayer(player.getUUID());
-            if (serverPlayer == null) return InteractionResult.PASS;
-            NarrativeCraftMod.server.execute(() -> OnEntityRightClick.entityRightClick(serverPlayer, entity));
+        if (level.isClientSide) {
+            OnEntityRightClick.entityRightClick(player, entity);
         }
 
         return InteractionResult.PASS;

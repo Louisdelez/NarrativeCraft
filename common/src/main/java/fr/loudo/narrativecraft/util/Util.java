@@ -23,11 +23,15 @@
 
 package fr.loudo.narrativecraft.util;
 
+import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.DynamicOps;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.mixin.accessor.PlayerAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.PlayerListAccessor;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -35,12 +39,15 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ProblemReporter;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
@@ -50,6 +57,7 @@ public class Util {
     public static final String REGEX_FLOAT = "^-?\\d*(\\.\\d*)?$";
     public static final String REGEX_FLOAT_ONLY_POSITIVE = "^\\d*(\\.\\d*)?$";
     public static final String REGEX_INT = "^\\d*$";
+    public static final String REGEX_NO_SPECIAL_CHARACTERS = "[a-zA-Z0-9 _-]*";
 
     public static String snakeCase(String value) {
         return String.join("_", value.toLowerCase().split(" "));
@@ -148,5 +156,35 @@ public class Util {
     public static boolean isSamePlayer(ServerPlayer player1, ServerPlayer player2) {
         if (player1 == null || player2 == null) return false;
         return player1.getUUID().equals(player2.getUUID());
+    }
+
+    public static LivingEntity createEntityFromCharacter(CharacterStory characterStory, Level level) {
+        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), characterStory.getName());
+
+        LivingEntity entity;
+        if (BuiltInRegistries.ENTITY_TYPE.getId(characterStory.getEntityType())
+                == BuiltInRegistries.ENTITY_TYPE.getId(EntityType.PLAYER)) {
+            entity = new FakePlayer((ServerLevel) level, gameProfile);
+            entity.getEntityData().set(PlayerAccessor.getDATA_PLAYER_MODE_CUSTOMISATION(), (byte) 0b01111111);
+        } else {
+            entity = (LivingEntity) characterStory.getEntityType().create(level, EntitySpawnReason.MOB_SUMMONED);
+            if (entity instanceof Mob mob) mob.setNoAi(true);
+        }
+
+        if (entity instanceof FakePlayer fakePlayer) {
+            ((PlayerListAccessor) level.getServer().getPlayerList())
+                    .getPlayersByUUID()
+                    .put(fakePlayer.getUUID(), fakePlayer);
+            level.getServer()
+                    .getPlayerList()
+                    .broadcastAll(new ClientboundPlayerInfoUpdatePacket(
+                            ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
+            if (level instanceof ServerLevel serverLevel) {
+                serverLevel.addNewPlayer(fakePlayer);
+            }
+        } else {
+            level.addFreshEntity(entity);
+        }
+        return entity;
     }
 }

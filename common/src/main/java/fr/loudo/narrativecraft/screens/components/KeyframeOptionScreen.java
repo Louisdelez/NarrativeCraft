@@ -51,7 +51,8 @@ public class KeyframeOptionScreen<T extends Keyframe, E extends AbstractKeyframe
     protected final int EDIT_BOX_HEIGHT = 15;
     protected final int BUTTON_HEIGHT = 20;
 
-    protected final List<EditBox> coordinatesBoxList;
+    protected final List<EditBox> coordinatesBoxList = new ArrayList<>();
+    protected final List<Button> littleButtons = new ArrayList<>();
     protected final ServerPlayer player;
     protected final PlayerSession playerSession;
     protected final T keyframe;
@@ -68,7 +69,6 @@ public class KeyframeOptionScreen<T extends Keyframe, E extends AbstractKeyframe
         this.keyframe = keyframe;
         this.player = playerSession.getPlayer();
         this.playerSession = playerSession;
-        this.coordinatesBoxList = new ArrayList<>();
         this.upDownValue = keyframe.getKeyframeLocation().getPitch();
         this.leftRightValue = keyframe.getKeyframeLocation().getYaw();
         this.rotationValue = keyframe.getKeyframeLocation().getRoll();
@@ -152,6 +152,7 @@ public class KeyframeOptionScreen<T extends Keyframe, E extends AbstractKeyframe
                     })
                     .bounds(currentX - (width / 2), INITIAL_POS_Y - 5, width, BUTTON_HEIGHT)
                     .build();
+            littleButtons.add(eyeClosed);
             this.addRenderableWidget(eyeClosed);
             return;
         }
@@ -161,6 +162,7 @@ public class KeyframeOptionScreen<T extends Keyframe, E extends AbstractKeyframe
                 })
                 .bounds(currentX - (width / 2), INITIAL_POS_Y - 5, width, BUTTON_HEIGHT)
                 .build();
+        littleButtons.add(closeButton);
         T nextKeyframe = keyframeController.getNextKeyframe(keyframe);
         if (nextKeyframe.getId() != keyframe.getId()) {
             currentX -= INITIAL_POS_X + gap;
@@ -181,6 +183,7 @@ public class KeyframeOptionScreen<T extends Keyframe, E extends AbstractKeyframe
                     })
                     .bounds(currentX - (width / 2), INITIAL_POS_Y - 5, width, BUTTON_HEIGHT)
                     .build();
+            littleButtons.add(leftKeyframeButton);
             this.addRenderableWidget(leftKeyframeButton);
         }
         this.addRenderableWidget(closeButton);
@@ -190,6 +193,7 @@ public class KeyframeOptionScreen<T extends Keyframe, E extends AbstractKeyframe
                 })
                 .bounds(currentX - (width / 2), INITIAL_POS_Y - 5, width, BUTTON_HEIGHT)
                 .build();
+        littleButtons.add(eyeOpen);
         this.addRenderableWidget(eyeOpen);
     }
 
