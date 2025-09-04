@@ -24,18 +24,29 @@
 package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 
 public class OnHudRender {
-    public static void controllerHudInfo(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+    public static void controllerHudInfo(GuiGraphics guiGraphics) {
         PlayerSession playerSession = NarrativeCraftMod.getInstance()
                 .getPlayerSessionManager()
                 .getSessionByPlayer(Minecraft.getInstance().player);
         if (playerSession == null) return;
         if (playerSession.getController() == null) return;
         playerSession.getController().renderHUDInfo(guiGraphics);
+    }
+
+    public static void inkActionRender(GuiGraphics guiGraphics, float partialTick) {
+        PlayerSession playerSession = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getSessionByPlayer(Minecraft.getInstance().player);
+        if (playerSession == null) return;
+        for (InkAction inkAction : playerSession.getInkActions()) {
+            if (inkAction.getSide() != InkAction.Side.CLIENT) continue;
+            inkAction.render(guiGraphics, partialTick);
+        }
     }
 }

@@ -84,6 +84,15 @@ public class Scene extends NarrativeEntry {
         return false;
     }
 
+    public Cutscene getCutsceneByName(String name) {
+        for (Cutscene cutscene : cutscenes) {
+            if (cutscene.getName().equalsIgnoreCase(name)) {
+                return cutscene;
+            }
+        }
+        return null;
+    }
+
     public boolean cutsceneExists(String name) {
         for (Cutscene cutscene : cutscenes) {
             if (cutscene.getName().equalsIgnoreCase(name)) {
@@ -111,9 +120,18 @@ public class Scene extends NarrativeEntry {
         cameraAngles.remove(cameraAngleGroup);
     }
 
+    public CameraAngle getCameraAngleByName(String name) {
+        for (CameraAngle cameraAngle : cameraAngles) {
+            if (cameraAngle.getName().equalsIgnoreCase(name)) {
+                return cameraAngle;
+            }
+        }
+        return null;
+    }
+
     public boolean cameraAngleExists(String name) {
-        for (CameraAngle cameraAngleGroup : cameraAngles) {
-            if (cameraAngleGroup.getName().equalsIgnoreCase(name)) {
+        for (CameraAngle cameraAngle : cameraAngles) {
+            if (cameraAngle.getName().equalsIgnoreCase(name)) {
                 return true;
             }
         }

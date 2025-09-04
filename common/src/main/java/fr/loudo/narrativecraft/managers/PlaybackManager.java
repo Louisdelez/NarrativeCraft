@@ -34,7 +34,7 @@ import net.minecraft.world.entity.Entity;
 
 public class PlaybackManager {
 
-    public static final AtomicInteger ids = new AtomicInteger();
+    public static final AtomicInteger ID_INCREMENTER = new AtomicInteger();
     private final List<Playback> playbacks = new ArrayList<>();
 
     public List<Playback> getPlaybacksPlaying() {
@@ -47,7 +47,7 @@ public class PlaybackManager {
 
     public Playback createAndStart(Animation animation, Environment env, PlayerSession session) {
         Playback playback = new Playback(
-                ids.incrementAndGet(), animation, session.getPlayer().level(), env, false);
+                ID_INCREMENTER.incrementAndGet(), animation, session.getPlayer().level(), env, false);
         playback.start();
         this.addPlayback(playback);
         return playback;
@@ -69,6 +69,15 @@ public class PlaybackManager {
     public Playback getPlayback(int id) {
         for (Playback playback : playbacks) {
             if (playback.getId() == id) {
+                return playback;
+            }
+        }
+        return null;
+    }
+
+    public Playback getPlayback(String animationName) {
+        for (Playback playback : playbacks) {
+            if (playback.getAnimation().getName().equalsIgnoreCase(animationName)) {
                 return playback;
             }
         }

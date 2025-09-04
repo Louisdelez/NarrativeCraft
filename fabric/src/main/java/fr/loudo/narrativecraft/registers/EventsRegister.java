@@ -46,6 +46,7 @@ public class EventsRegister {
         ClientTickEvents.END_CLIENT_TICK.register(PressKeyListener::onPressKey);
         ServerTickEvents.END_SERVER_TICK.register(RecordingTickHandler::tick);
         ServerTickEvents.END_SERVER_TICK.register(PlaybackTickHandler::tick);
+        ServerTickEvents.END_SERVER_TICK.register(OnServerTick::tick);
 
         ServerPlayerEvents.AFTER_RESPAWN.register(RespawnEvent::onRespawn);
         PlayerBlockBreakEvents.AFTER.register(BlockBreakEvent::onBlockBreak);

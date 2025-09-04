@@ -93,7 +93,7 @@ public class PlaybackCommand {
             return 0;
         }
         Playback playback = new Playback(
-                PlaybackManager.ids.incrementAndGet(),
+                PlaybackManager.ID_INCREMENTER.incrementAndGet(),
                 animation,
                 context.getSource().getLevel(),
                 Environment.RECORDING,
@@ -101,7 +101,7 @@ public class PlaybackCommand {
         playback.start();
         context.getSource()
                 .sendSuccess(() -> Translation.message("playback.animation.play", animation.getName()), false);
-        NarrativeCraftMod.getInstance().getPlaybackManager().addPlayback(playback);
+        playerSession.getPlaybackManager().addPlayback(playback);
         return Command.SINGLE_SUCCESS;
     }
 
@@ -119,7 +119,7 @@ public class PlaybackCommand {
             return 0;
         }
         subscene.start(context.getSource().getLevel(), Environment.RECORDING, false);
-        NarrativeCraftMod.getInstance().getPlaybackManager().getPlaybacks().addAll(subscene.getPlaybacks());
+        playerSession.getPlaybackManager().getPlaybacks().addAll(subscene.getPlaybacks());
         context.getSource().sendSuccess(() -> Translation.message("playback.subscene.play", subscene.getName()), false);
         return Command.SINGLE_SUCCESS;
     }
@@ -137,8 +137,7 @@ public class PlaybackCommand {
                             playerSession.getScene().getName()));
             return 0;
         }
-        List<Playback> playbacks =
-                NarrativeCraftMod.getInstance().getPlaybackManager().getAnimationsByNamePlaying(animationName);
+        List<Playback> playbacks = playerSession.getPlaybackManager().getAnimationsByNamePlaying(animationName);
         if (playbacks.isEmpty()) {
             context.getSource()
                     .sendFailure(Translation.message(
@@ -182,7 +181,10 @@ public class PlaybackCommand {
     }
 
     private static int stopAllPlayback(CommandContext<CommandSourceStack> context) {
-        PlaybackManager playbackManager = NarrativeCraftMod.getInstance().getPlaybackManager();
+        PlayerSession playerSession =
+                CommandUtil.getSession(context, context.getSource().getPlayer());
+        if (playerSession == null) return 0;
+        PlaybackManager playbackManager = playerSession.getPlaybackManager();
         if (playbackManager.getPlaybacksPlaying().isEmpty()) {
             context.getSource().sendFailure(Translation.message("playbacks.not_playing"));
             return 0;
@@ -219,8 +221,7 @@ public class PlaybackCommand {
                 .getSessionByPlayer(context.getSource().getPlayer());
         if (playerSession == null) return builder.buildFuture();
         List<Animation> animationPlaying = new ArrayList<>();
-        for (Playback playback :
-                NarrativeCraftMod.getInstance().getPlaybackManager().getAnimationsByNamePlaying()) {
+        for (Playback playback : playerSession.getPlaybackManager().getAnimationsByNamePlaying()) {
             animationPlaying.add(playback.getAnimation());
         }
         return CommandUtil.getNamesNarrativeEntrySuggestion(builder, animationPlaying);

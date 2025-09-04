@@ -23,7 +23,6 @@
 
 package fr.loudo.narrativecraft.narrative.recording;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
@@ -31,6 +30,7 @@ import fr.loudo.narrativecraft.narrative.recording.actions.ActionsData;
 import fr.loudo.narrativecraft.narrative.recording.actions.GameModeAction;
 import fr.loudo.narrativecraft.narrative.recording.actions.RidingAction;
 import fr.loudo.narrativecraft.narrative.recording.actions.modsListeners.ModsListenerImpl;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,21 +52,23 @@ public class Recording {
 
     private final List<Entity> trackedEntities = new ArrayList<>();
     private final List<RecordingData> recordingDataList = new ArrayList<>();
+    private final PlayerSession playerSession;
     private List<Subscene> subscenesPlaying = new ArrayList<>();
     private RecordingData entityRecorderData;
     private boolean isRecording;
     private int tick;
 
-    public Recording(LivingEntity entity) {
+    public Recording(LivingEntity entity, PlayerSession playerSession) {
         tick = 0;
         entityRecorderData = new RecordingData(entity, this);
         entityRecorderData.setSavingTrack(true);
         entityRecorderData.getActionsData().setEntityIdRecording(ids.incrementAndGet());
         isRecording = false;
+        this.playerSession = playerSession;
     }
 
-    public Recording(LivingEntity entity, List<Subscene> subscenes) {
-        this(entity);
+    public Recording(LivingEntity entity, PlayerSession playerSession, List<Subscene> subscenes) {
+        this(entity, playerSession);
         subscenesPlaying = subscenes;
     }
 
@@ -149,7 +151,7 @@ public class Recording {
         }
 
         for (RecordingData recordingData : recordingDataList) {
-            if (NarrativeCraftMod.getInstance().getPlaybackManager().entityInPlayback(recordingData.getEntity())) {
+            if (playerSession.getPlaybackManager().entityInPlayback(recordingData.getEntity())) {
                 recordingData.setSavingTrack(false);
             }
             recordingData.getActionsData().addLocation();

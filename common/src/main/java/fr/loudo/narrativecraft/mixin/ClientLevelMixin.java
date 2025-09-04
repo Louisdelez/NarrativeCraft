@@ -21,26 +21,31 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.playback.PlaybackTickHandler;
-import fr.loudo.narrativecraft.narrative.recording.RecordingTickHandler;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.story.inkAction.ChangeDayTimeInkAction;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mod(NarrativeCraftMod.MOD_ID)
-public class ServerTickEventNeoForge {
-
-    public ServerTickEventNeoForge(IEventBus eventBus) {
-        NeoForge.EVENT_BUS.addListener(ServerTickEventNeoForge::onServerTick);
-    }
-
-    public static void onServerTick(ServerTickEvent.Post event) {
-        RecordingTickHandler.tick(event.getServer());
-        PlaybackTickHandler.tick(event.getServer());
-        OnServerTick.tick(event.getServer());
+@Mixin(ClientLevel.ClientLevelData.class)
+public class ClientLevelMixin {
+    @Inject(method = "getDayTime", at = @At("HEAD"), cancellable = true)
+    private void narrativecraft$fakeTime(CallbackInfoReturnable<Long> cir) {
+        PlayerSession playerSession = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getSessionByPlayer(Minecraft.getInstance().player);
+        if (playerSession == null) return;
+        for (InkAction inkAction : playerSession.getInkActions()) {
+            if (inkAction instanceof ChangeDayTimeInkAction changeDayTimeInkAction) {
+                cir.setReturnValue(changeDayTimeInkAction.getCurrentTick());
+            }
+        }
     }
 }

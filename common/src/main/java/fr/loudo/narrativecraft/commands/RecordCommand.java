@@ -28,12 +28,9 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.managers.PlaybackManager;
 import fr.loudo.narrativecraft.managers.RecordingManager;
-import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
-import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.recording.Recording;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.screens.components.ChooseCharacterScreen;
@@ -74,26 +71,7 @@ public class RecordCommand {
                         .then(Commands.literal("save")
                                 .then(Commands.argument("animation_name", StringArgumentType.string())
                                         .executes(context -> saveRecording(
-                                                context, StringArgumentType.getString(context, "animation_name")))))
-                        .then(Commands.literal("test").executes(context -> {
-                            Animation animation = NarrativeCraftMod.getInstance()
-                                    .getChapterManager()
-                                    .getChapters()
-                                    .getFirst()
-                                    .getScenes()
-                                    .getFirst()
-                                    .getAnimations()
-                                    .getFirst();
-                            Playback playback = new Playback(
-                                    PlaybackManager.ids.incrementAndGet(),
-                                    animation,
-                                    context.getSource().getLevel(),
-                                    Environment.RECORDING,
-                                    false);
-                            playback.start();
-                            NarrativeCraftMod.getInstance().getPlaybackManager().addPlayback(playback);
-                            return 1;
-                        }))));
+                                                context, StringArgumentType.getString(context, "animation_name")))))));
     }
 
     private static int startRecording(CommandContext<CommandSourceStack> context) {
@@ -111,7 +89,7 @@ public class RecordCommand {
 
         Recording recording = recordingManager.getRecording(player);
         if (recording == null) {
-            recording = new Recording(context.getSource().getPlayer());
+            recording = new Recording(context.getSource().getPlayer(), playerSession);
         }
         recording.start();
         recordingManager.addRecording(recording);
@@ -149,7 +127,7 @@ public class RecordCommand {
         if (subsceneNameList.length == subsceneToPlay.size()) {
             Recording recording = recordingManager.getRecording(player);
             if (recording == null) {
-                recording = new Recording(context.getSource().getPlayer(), subsceneToPlay);
+                recording = new Recording(context.getSource().getPlayer(), playerSession, subsceneToPlay);
             }
             recording.start();
             recordingManager.addRecording(recording);

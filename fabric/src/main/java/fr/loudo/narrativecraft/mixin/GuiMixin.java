@@ -36,6 +36,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class GuiMixin {
     @Inject(method = "render", at = @At("HEAD"))
     private void onRender(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
-        OnHudRender.controllerHudInfo(guiGraphics, deltaTracker);
+        OnHudRender.controllerHudInfo(guiGraphics);
+        OnHudRender.inkActionRender(guiGraphics, deltaTracker.getGameTimeDeltaPartialTick(true));
     }
 }

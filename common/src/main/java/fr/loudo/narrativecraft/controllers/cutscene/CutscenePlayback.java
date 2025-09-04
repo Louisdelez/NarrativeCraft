@@ -66,6 +66,7 @@ public class CutscenePlayback {
 
     public void play() {
         isPlaying = true;
+        cutsceneController.setPlaying(true);
     }
 
     public void stop() {

@@ -33,6 +33,7 @@ public class NarrativeCraftFabric implements ModInitializer {
     @Override
     public void onInitialize() {
 
+        NarrativeCraftMod.commonInit();
         CommandsRegister.register();
         EventsRegister.register();
         ModKeysRegister.register();

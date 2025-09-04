@@ -26,7 +26,9 @@ package fr.loudo.narrativecraft.events;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryInit;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 
 public class OnLifecycle {
 
@@ -38,6 +40,11 @@ public class OnLifecycle {
     }
 
     public static void serverStop(MinecraftServer server) {
-        NarrativeCraftMod.getInstance().getPlaybackManager().stopAll();
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            PlayerSession playerSession =
+                    NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
+            if (playerSession == null) continue;
+            playerSession.getPlaybackManager().stopAll();
+        }
     }
 }

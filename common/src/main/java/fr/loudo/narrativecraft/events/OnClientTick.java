@@ -24,8 +24,11 @@
 package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 
 public class OnClientTick {
@@ -38,5 +41,12 @@ public class OnClientTick {
         if (playerSession.getController() instanceof CutsceneController controller) {
             controller.getCutscenePlayback().tick();
         }
+        List<InkAction> toRemove = new ArrayList<>();
+        for (InkAction inkAction : playerSession.getInkActions()) {
+            if (inkAction.getSide() != InkAction.Side.CLIENT) continue;
+            if (!inkAction.isRunning()) toRemove.add(inkAction);
+            inkAction.tick();
+        }
+        playerSession.getInkActions().removeAll(toRemove);
     }
 }

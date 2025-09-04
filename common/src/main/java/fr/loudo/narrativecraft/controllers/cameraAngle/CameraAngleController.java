@@ -54,7 +54,7 @@ public class CameraAngleController extends AbstractKeyframesBase<CameraAngleKeyf
         this.cameraAngle = cameraAngle;
         hudMessage = Translation.message("controller.camera_angle.hud").getString();
         characterStoryDataList.addAll(cameraAngle.getCharacterStoryDataList());
-        keyframes.addAll(cameraAngle.getCameraAngles());
+        keyframes.addAll(cameraAngle.getCameraAngleKeyframes());
     }
 
     public CameraAngleKeyframe createKeyframe(String name) {
@@ -113,17 +113,17 @@ public class CameraAngleController extends AbstractKeyframesBase<CameraAngleKeyf
         playerSession.setController(null);
         if (environment != Environment.DEVELOPMENT) return;
         if (save) {
-            List<CameraAngleKeyframe> oldCameraAngles = cameraAngle.getCameraAngles();
+            List<CameraAngleKeyframe> oldCameraAngles = cameraAngle.getCameraAngleKeyframes();
             List<CharacterStoryData> oldCharacterStoryData = cameraAngle.getCharacterStoryDataList();
-            cameraAngle.getCameraAngles().clear();
+            cameraAngle.getCameraAngleKeyframes().clear();
             cameraAngle.getCharacterStoryDataList().clear();
             try {
-                cameraAngle.getCameraAngles().addAll(keyframes);
+                cameraAngle.getCameraAngleKeyframes().addAll(keyframes);
                 cameraAngle.getCharacterStoryDataList().addAll(characterStoryDataList);
                 NarrativeCraftFile.updateCameraAngles(cameraAngle.getScene());
                 playerSession.getPlayer().sendSystemMessage(Translation.message("controller.saved"));
             } catch (IOException e) {
-                cameraAngle.getCameraAngles().addAll(oldCameraAngles);
+                cameraAngle.getCameraAngleKeyframes().addAll(oldCameraAngles);
                 cameraAngle.getCharacterStoryDataList().addAll(oldCharacterStoryData);
                 playerSession.getPlayer().sendSystemMessage(Translation.message("crash.global-message"));
                 NarrativeCraftMod.LOGGER.error("Impossible to save the camera angle: ", e);

@@ -21,26 +21,37 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.api.inkAction;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.playback.PlaybackTickHandler;
-import fr.loudo.narrativecraft.narrative.recording.RecordingTickHandler;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-@Mod(NarrativeCraftMod.MOD_ID)
-public class ServerTickEventNeoForge {
+public class InkActionUtil {
 
-    public ServerTickEventNeoForge(IEventBus eventBus) {
-        NeoForge.EVENT_BUS.addListener(ServerTickEventNeoForge::onServerTick);
+    public static final Pattern NAME_PATTERN = Pattern.compile("\"([^\"]+)\"|(\\S+)");
+
+    public static List<String> getArguments(String command) {
+        Matcher matcher = NAME_PATTERN.matcher(command);
+        List<String> arguments = new ArrayList<>();
+        while (matcher.find()) {
+            arguments.add(matcher.group(1) != null ? matcher.group(1) : matcher.group(2));
+        }
+        return arguments;
     }
 
-    public static void onServerTick(ServerTickEvent.Post event) {
-        RecordingTickHandler.tick(event.getServer());
-        PlaybackTickHandler.tick(event.getServer());
-        OnServerTick.tick(event.getServer());
+    public static double getSecondsFromTimeValue(double seconds, String timeValue) {
+        double originalSeconds = seconds;
+        if (timeValue.contains("second")) {
+            seconds = originalSeconds;
+        } else if (timeValue.contains("minute")) {
+            seconds *= 60.0;
+        } else if (timeValue.contains("hour")) {
+            seconds *= 60.0 * 2;
+        } else {
+            seconds = -1;
+        }
+        return seconds;
     }
 }

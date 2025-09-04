@@ -33,10 +33,12 @@ import net.neoforged.neoforge.common.NeoForge;
 public class HudRenderEvent {
 
     public HudRenderEvent(IEventBus eventBus) {
-        NeoForge.EVENT_BUS.addListener(HudRenderEvent::onWorldRender);
+        NeoForge.EVENT_BUS.addListener(HudRenderEvent::onHudRender);
     }
 
-    private static void onWorldRender(RenderGuiEvent.Post event) {
-        OnHudRender.controllerHudInfo(event.getGuiGraphics(), event.getPartialTick());
+    private static void onHudRender(RenderGuiEvent.Post event) {
+        OnHudRender.controllerHudInfo(event.getGuiGraphics());
+        OnHudRender.inkActionRender(
+                event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaPartialTick(true));
     }
 }

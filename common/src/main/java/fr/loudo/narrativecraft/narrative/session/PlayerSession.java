@@ -23,17 +23,23 @@
 
 package fr.loudo.narrativecraft.narrative.session;
 
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.controllers.AbstractController;
+import fr.loudo.narrativecraft.managers.PlaybackManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.recording.Location;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 public class PlayerSession {
 
     private final ServerPlayer player;
+    private final PlaybackManager playbackManager = new PlaybackManager();
+    private final List<InkAction> inkActions = new ArrayList<>();
     private AbstractController controller;
     private KeyframeLocation currentCamera;
     private Chapter chapter;
@@ -47,6 +53,15 @@ public class PlayerSession {
         this.player = player;
         this.chapter = chapter;
         this.scene = scene;
+    }
+
+    public void addInkAction(InkAction inkAction) {
+        if (inkActions.contains(inkAction)) return;
+        inkActions.add(inkAction);
+    }
+
+    public void removeInkAction(InkAction inkAction) {
+        inkActions.remove(inkAction);
     }
 
     public boolean isSamePlayer(Player player) {
@@ -69,6 +84,14 @@ public class PlayerSession {
 
     public ServerPlayer getPlayer() {
         return player;
+    }
+
+    public PlaybackManager getPlaybackManager() {
+        return playbackManager;
+    }
+
+    public List<InkAction> getInkActions() {
+        return inkActions;
     }
 
     public Chapter getChapter() {

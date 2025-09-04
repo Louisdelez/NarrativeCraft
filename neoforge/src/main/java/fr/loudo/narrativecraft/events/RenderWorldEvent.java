@@ -43,7 +43,7 @@ public class RenderWorldEvent {
         Matrix4fStack matrix4fstack = RenderSystem.getModelViewStack();
         matrix4fstack.pushMatrix();
         matrix4fstack.mul(event.getModelViewMatrix());
-        OnRenderWorld.renderWorld(new PoseStack());
+        OnRenderWorld.renderWorld(new PoseStack(), event.getPartialTick().getGameTimeDeltaPartialTick(true));
         matrix4fstack.popMatrix();
     }
 }

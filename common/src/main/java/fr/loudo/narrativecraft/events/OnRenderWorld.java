@@ -25,12 +25,13 @@ package fr.loudo.narrativecraft.events;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import net.minecraft.server.level.ServerPlayer;
 
 public class OnRenderWorld {
-    public static void renderWorld(PoseStack poseStack) {
+    public static void renderWorld(PoseStack poseStack, float partialTick) {
         if (NarrativeCraftMod.server == null) return;
         for (ServerPlayer player : NarrativeCraftMod.server.getPlayerList().getPlayers()) {
             PlayerSession playerSession =
@@ -38,6 +39,10 @@ public class OnRenderWorld {
             if (playerSession == null) return;
             if (playerSession.getController() instanceof CutsceneController controller) {
                 controller.drawLinesBetweenKeyframes(poseStack);
+            }
+            for (InkAction inkAction : playerSession.getInkActions()) {
+                if (inkAction.getSide() != InkAction.Side.CLIENT) continue;
+                inkAction.partialTick(partialTick);
             }
         }
     }

@@ -32,18 +32,27 @@ import java.util.List;
 
 public class CameraAngle extends SceneData {
 
-    private List<CameraAngleKeyframe> cameraAngles = new ArrayList<>();
+    private List<CameraAngleKeyframe> cameraAngleKeyframes = new ArrayList<>();
     private List<CharacterStoryData> characterStoryDataList = new ArrayList<>();
 
     public CameraAngle(String name, String description, Scene scene) {
         super(name, description, scene);
     }
 
-    public List<CameraAngleKeyframe> getCameraAngles() {
-        if (cameraAngles == null) {
-            cameraAngles = new ArrayList<>();
+    public CameraAngleKeyframe getCameraAngleKeyframeByName(String name) {
+        for (CameraAngleKeyframe cameraAngleKeyframe : cameraAngleKeyframes) {
+            if (cameraAngleKeyframe.getName().equalsIgnoreCase(name)) {
+                return cameraAngleKeyframe;
+            }
         }
-        return cameraAngles;
+        return null;
+    }
+
+    public List<CameraAngleKeyframe> getCameraAngleKeyframes() {
+        if (cameraAngleKeyframes == null) {
+            cameraAngleKeyframes = new ArrayList<>();
+        }
+        return cameraAngleKeyframes;
     }
 
     public List<CharacterStoryData> getCharacterStoryDataList() {

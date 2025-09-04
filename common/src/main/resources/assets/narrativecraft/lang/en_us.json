@@ -68,11 +68,15 @@
   "narrativecraft.subscene.playing": "Playing subscene %s of scene %s...",
 
   "narrativecraft.cutscene.already_exists": "Cutscene %s already exists in scene %s",
+  "narrativecraft.cutscene.no_exists": "Cutscene %s does not exists in scene %s",
 
   "narrativecraft.camera_angle.already_exists": "Camera angle %s already exists in %s.",
+  "narrativecraft.camera_angle.no_exists": "Camera angle %s does not exists in %s.",
+  "narrativecraft.camera_angle.keyframe_no_exists": "Camera angle keyframe %s does not exists in %s.",
   "narrativecraft.camera_angle.name_no_empty": "The name cannot be empty.",
 
   "narrativecraft.character.already_exists": "Character %s already exists in the story.",
+  "narrativecraft.character.no_exists": "Character %s does not exists.",
   "narrativecraft.character.must_link_character": "You must choose a character.",
   "narrativecraft.character.change_pose": "Change character pose",
 
@@ -136,5 +140,14 @@
   "narrativecraft.screen.keyframe_option.transition_delay": "Transition delay:",
   "narrativecraft.screen.keyframe_option.speed": "Speed:",
   "narrativecraft.screen.keyframe_option.keyframe_group": "Group %d",
-  "narrativecraft.screen.keyframe_option.keyframe_id": "Keyframe ID #%d"
+  "narrativecraft.screen.keyframe_option.keyframe_id": "Keyframe ID #%d",
+
+  "narrativecraft.ink_action.validation.miss_argument": "Miss required argument [%s]",
+  "narrativecraft.ink_action.validation.wrong_argument": "Wrong argument: %s",
+  "narrativecraft.ink_action.validation.wrong_time_value": "Only second(s), minute(s) and hour(s) are allowed.",
+  "narrativecraft.ink_action.validation.wrong_easing_value": "Only %s easing are allowed.",
+  "narrativecraft.ink_action.validation.boolean": "%s is not a valid boolean.",
+  "narrativecraft.ink_action.validation.number": "%s is not a valid number.",
+  "narrativecraft.ink_action.validation.color": "%s is not a valid color.",
+  "narrativecraft.ink_action.validation.not_validated": "Can't run ink action %s because he is not validated."
 }

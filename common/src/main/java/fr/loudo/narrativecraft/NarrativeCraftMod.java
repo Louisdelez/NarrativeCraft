@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft;
 
 import fr.loudo.narrativecraft.managers.*;
+import fr.loudo.narrativecraft.register.InkActionRegister;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,10 @@ public class NarrativeCraftMod {
 
     public static NarrativeCraftMod getInstance() {
         return instance;
+    }
+
+    public static void commonInit() {
+        InkActionRegister.register();
     }
 
     public CharacterManager getCharacterManager() {

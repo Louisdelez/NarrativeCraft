@@ -26,30 +26,20 @@ package fr.loudo.narrativecraft.narrative.playback;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
 public class PlaybackTickHandler {
     public static void tick(MinecraftServer server) {
-        List<Playback> playbacks =
-                NarrativeCraftMod.getInstance().getPlaybackManager().getPlaybacks();
-        List<Playback> toRemove = new ArrayList<>();
-        for (Playback playback : playbacks) {
-            if (playback.hasEnded()) {
-                toRemove.add(playback);
-            }
-            playback.tick();
-        }
-        NarrativeCraftMod.getInstance().getPlaybackManager().getPlaybacks().removeAll(toRemove);
-
-        // Playback from controllers are separated from playback manager,
-        // in order to not be interfered from other players stopping playbacks.
         for (ServerPlayer serverPlayer : server.getPlayerList().getPlayers()) {
             PlayerSession playerSession =
                     NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(serverPlayer);
             if (playerSession == null) return;
+            for (Playback playback : playerSession.getPlaybackManager().getPlaybacks()) {
+                playback.tick();
+            }
+            // Playback from controllers are separated from playback manager,
+            // in order to not be interfered from other players stopping playbacks.
             if (playerSession.getController() instanceof CutsceneController controller) {
                 controller.tick();
             }

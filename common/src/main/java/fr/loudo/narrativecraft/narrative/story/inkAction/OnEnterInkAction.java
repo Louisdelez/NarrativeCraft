@@ -21,26 +21,27 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.narrative.story.inkAction;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.playback.PlaybackTickHandler;
-import fr.loudo.narrativecraft.narrative.recording.RecordingTickHandler;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
+import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
+import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import java.util.List;
 
-@Mod(NarrativeCraftMod.MOD_ID)
-public class ServerTickEventNeoForge {
-
-    public ServerTickEventNeoForge(IEventBus eventBus) {
-        NeoForge.EVENT_BUS.addListener(ServerTickEventNeoForge::onServerTick);
+// TODO: Complete
+public class OnEnterInkAction extends InkAction {
+    public OnEnterInkAction(String id, Side side, String syntax, CommandMatcher matcher) {
+        super(id, side, syntax, matcher);
     }
 
-    public static void onServerTick(ServerTickEvent.Post event) {
-        RecordingTickHandler.tick(event.getServer());
-        PlaybackTickHandler.tick(event.getServer());
-        OnServerTick.tick(event.getServer());
+    @Override
+    protected InkActionResult doValidate(List<String> arguments, Scene scene) {
+        return null;
+    }
+
+    @Override
+    protected InkActionResult doExecute(PlayerSession playerSession) {
+        return null;
     }
 }

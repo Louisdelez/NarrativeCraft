@@ -28,6 +28,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 
 public class RenderWorldEvent {
     public static void renderWorld(WorldRenderContext worldRenderContext) {
-        OnRenderWorld.renderWorld(new PoseStack());
+        OnRenderWorld.renderWorld(
+                new PoseStack(), worldRenderContext.tickCounter().getGameTimeDeltaPartialTick(true));
     }
 }

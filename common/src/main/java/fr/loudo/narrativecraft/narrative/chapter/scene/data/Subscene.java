@@ -44,8 +44,8 @@ public class Subscene extends SceneData {
     public void start(Level level, Environment environment, boolean looping) {
         playbacks = getPlaybacks();
         for (Animation animation : animations) {
-            Playback playback =
-                    new Playback(PlaybackManager.ids.incrementAndGet(), animation, level, environment, looping);
+            Playback playback = new Playback(
+                    PlaybackManager.ID_INCREMENTER.incrementAndGet(), animation, level, environment, looping);
             playback.start();
             playbacks.add(playback);
         }

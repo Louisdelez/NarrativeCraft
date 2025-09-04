@@ -103,7 +103,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         }
         for (Animation animation : cutscene.getAnimations()) {
             Playback playback = new Playback(
-                    PlaybackManager.ids.incrementAndGet(),
+                    PlaybackManager.ID_INCREMENTER.incrementAndGet(),
                     animation,
                     playerSession.getPlayer().level(),
                     environment,

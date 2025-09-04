@@ -21,26 +21,31 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.api.inkAction;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.playback.PlaybackTickHandler;
-import fr.loudo.narrativecraft.narrative.recording.RecordingTickHandler;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
 
-@Mod(NarrativeCraftMod.MOD_ID)
-public class ServerTickEventNeoForge {
+public class InkActionRegistry {
+    private static final Map<String, Supplier<InkAction>> ACTIONS = new HashMap<>();
 
-    public ServerTickEventNeoForge(IEventBus eventBus) {
-        NeoForge.EVENT_BUS.addListener(ServerTickEventNeoForge::onServerTick);
+    public static void register(Supplier<InkAction> supplier) {
+        ACTIONS.put(supplier.get().id, supplier);
     }
 
-    public static void onServerTick(ServerTickEvent.Post event) {
-        RecordingTickHandler.tick(event.getServer());
-        PlaybackTickHandler.tick(event.getServer());
-        OnServerTick.tick(event.getServer());
+    public static InkAction get(String id) {
+        Supplier<InkAction> supplier = ACTIONS.get(id);
+        return supplier != null ? supplier.get() : null;
+    }
+
+    public static InkAction findByCommand(String command) {
+        for (Supplier<InkAction> supplier : ACTIONS.values()) {
+            InkAction inkAction = supplier.get();
+            if (inkAction.getMatcher().matches(command)) {
+                return inkAction;
+            }
+        }
+        return null;
     }
 }
