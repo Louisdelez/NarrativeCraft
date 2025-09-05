@@ -31,7 +31,8 @@ public record InkActionResult(
         OK,
         IGNORED,
         BLOCK,
-        ERROR
+        ERROR,
+        WARN
     }
 
     public static InkActionResult ok() {
@@ -60,6 +61,14 @@ public record InkActionResult(
 
     public static InkActionResult error(String message) {
         return new InkActionResult(Status.ERROR, message);
+    }
+
+    public static InkActionResult warn(Component message) {
+        return new InkActionResult(Status.WARN, message.getString());
+    }
+
+    public static InkActionResult warn(String message) {
+        return new InkActionResult(Status.WARN, message);
     }
 
     public boolean isError() {

@@ -87,9 +87,13 @@ public class InkActionRegister {
                 () -> new SaveInkAction("save", InkAction.Side.SERVER, "save", command -> command.equals("save")));
         InkActionRegistry.register(() -> new SoundInkAction(
                 "sound",
-                InkAction.Side.SERVER,
+                InkAction.Side.CLIENT,
                 "<song|sfx> <start|stop> %namespace:category.name% [%volume> %pitch% [loop=<true|false>] [<fadein|fadeout> %time%]]",
-                command -> command.startsWith("subscene start") || command.startsWith("subscene stop")));
+                command -> command.startsWith("song start")
+                        || command.startsWith("sfx start")
+                        || command.startsWith("song stop")
+                        || command.startsWith("sfx stop")
+                        || command.equals("sound stop all")));
         InkActionRegistry.register(() -> new SubsceneInkAction(
                 "subscene",
                 InkAction.Side.SERVER,
@@ -97,7 +101,7 @@ public class InkActionRegister {
                 command -> command.startsWith("subscene start") || command.startsWith("subscene stop")));
         InkActionRegistry.register(() -> new WeatherInkAction(
                 "weather",
-                InkAction.Side.CLIENT,
+                InkAction.Side.SERVER,
                 "weather set <clear, rain, thunder>",
                 command -> command.startsWith("weather set")));
     }

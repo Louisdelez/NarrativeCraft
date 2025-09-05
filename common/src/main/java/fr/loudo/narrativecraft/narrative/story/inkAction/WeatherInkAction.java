@@ -28,11 +28,10 @@ import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.util.Translation;
+import java.util.List;
 import net.minecraft.network.protocol.game.ClientboundGameEventPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-
-import java.util.List;
 
 public class WeatherInkAction extends InkAction {
 
@@ -69,28 +68,31 @@ public class WeatherInkAction extends InkAction {
         boolean isSinglePlayer = level.getServer().isSingleplayer();
         switch (weather) {
             case "clear" -> {
-                if (instantly && isSinglePlayer) {
+                if (instantly || !isSinglePlayer) {
                     connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.STOP_RAINING, 0.0F));
                     connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.RAIN_LEVEL_CHANGE, 0.0F));
-                    connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.THUNDER_LEVEL_CHANGE, 0.0F));
+                    connection.send(
+                            new ClientboundGameEventPacket(ClientboundGameEventPacket.THUNDER_LEVEL_CHANGE, 0.0F));
                 } else {
                     level.setWeatherParameters(999999, 0, false, false);
                 }
             }
             case "rain" -> {
-                if (instantly && isSinglePlayer) {
+                if (instantly || !isSinglePlayer) {
                     connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.START_RAINING, 0.0F));
                     connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.RAIN_LEVEL_CHANGE, 1.0F));
-                    connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.THUNDER_LEVEL_CHANGE, 0.0F));
+                    connection.send(
+                            new ClientboundGameEventPacket(ClientboundGameEventPacket.THUNDER_LEVEL_CHANGE, 0.0F));
                 } else {
                     level.setWeatherParameters(0, 999999, true, false);
                 }
             }
             case "thunder" -> {
-                if (instantly && isSinglePlayer) {
+                if (instantly || !isSinglePlayer) {
                     connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.START_RAINING, 0.0F));
                     connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.RAIN_LEVEL_CHANGE, 1.0F));
-                    connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.THUNDER_LEVEL_CHANGE, 1.0F));
+                    connection.send(
+                            new ClientboundGameEventPacket(ClientboundGameEventPacket.THUNDER_LEVEL_CHANGE, 1.0F));
                 } else {
                     level.setWeatherParameters(0, 999999, true, true);
                 }

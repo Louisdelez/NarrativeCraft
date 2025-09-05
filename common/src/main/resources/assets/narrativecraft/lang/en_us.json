@@ -149,5 +149,6 @@
   "narrativecraft.ink_action.validation.boolean": "%s is not a valid boolean.",
   "narrativecraft.ink_action.validation.number": "%s is not a valid number.",
   "narrativecraft.ink_action.validation.color": "%s is not a valid color.",
+  "narrativecraft.ink_action.validation.sound": "%s %s is not registered, it will not play on runtime.",
   "narrativecraft.ink_action.validation.not_validated": "Can't run ink action %s because he is not validated."
 }
