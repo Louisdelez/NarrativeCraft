@@ -27,21 +27,78 @@ import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.util.Translation;
+import net.minecraft.network.protocol.game.ClientboundGameEventPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+
 import java.util.List;
 
-// TODO: complete
 public class WeatherInkAction extends InkAction {
+
+    private String weather;
+    private boolean instantly;
+
     public WeatherInkAction(String id, Side side, String syntax, CommandMatcher matcher) {
         super(id, side, syntax, matcher);
     }
 
     @Override
     protected InkActionResult doValidate(List<String> arguments, Scene scene) {
-        return null;
+        if (arguments.size() == 1) {
+            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "clear, rain or thunder"));
+        }
+        weather = arguments.get(1);
+        if (!weather.equals("clear") && !weather.equals("rain") && !weather.equals("thunder")) {
+            return InkActionResult.error(Translation.message(WRONG_ARGUMENT_TEXT, "Only clear, rain or thunder"));
+        }
+        if (arguments.size() > 2) {
+            try {
+                instantly = Boolean.parseBoolean(arguments.get(2));
+            } catch (Exception e) {
+                return InkActionResult.error(Translation.message(NOT_VALID_BOOLEAN, arguments.get(2)));
+            }
+        }
+        return InkActionResult.ok();
     }
 
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
-        return null;
+        ServerLevel level = playerSession.getPlayer().level();
+        ServerGamePacketListenerImpl connection = playerSession.getPlayer().connection;
+        boolean isSinglePlayer = level.getServer().isSingleplayer();
+        switch (weather) {
+            case "clear" -> {
+                if (instantly && isSinglePlayer) {
+                    connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.STOP_RAINING, 0.0F));
+                    connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.RAIN_LEVEL_CHANGE, 0.0F));
+                    connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.THUNDER_LEVEL_CHANGE, 0.0F));
+                } else {
+                    level.setWeatherParameters(999999, 0, false, false);
+                }
+            }
+            case "rain" -> {
+                if (instantly && isSinglePlayer) {
+                    connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.START_RAINING, 0.0F));
+                    connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.RAIN_LEVEL_CHANGE, 1.0F));
+                    connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.THUNDER_LEVEL_CHANGE, 0.0F));
+                } else {
+                    level.setWeatherParameters(0, 999999, true, false);
+                }
+            }
+            case "thunder" -> {
+                if (instantly && isSinglePlayer) {
+                    connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.START_RAINING, 0.0F));
+                    connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.RAIN_LEVEL_CHANGE, 1.0F));
+                    connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.THUNDER_LEVEL_CHANGE, 1.0F));
+                } else {
+                    level.setWeatherParameters(0, 999999, true, true);
+                }
+            }
+            case null, default -> {
+                return InkActionResult.error("Weather value is not correct.");
+            }
+        }
+        return InkActionResult.ok();
     }
 }
