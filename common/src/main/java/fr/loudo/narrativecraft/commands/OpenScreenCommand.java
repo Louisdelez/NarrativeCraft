@@ -26,11 +26,22 @@ package fr.loudo.narrativecraft.commands;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.inkAction.InkActionRegistry;
+import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
+import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer3D;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.story.inkAction.SoundInkAction;
 import fr.loudo.narrativecraft.network.OpenChaptersScreenPacket;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.util.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 
 public class OpenScreenCommand {
 
@@ -41,7 +52,67 @@ public class OpenScreenCommand {
                         .then(Commands.literal("story_manager").executes(OpenScreenCommand::openStoryManager))
                         .then(Commands.literal("character_manager").executes(OpenScreenCommand::openCharacterManager))
                         .then(Commands.literal("story_options").executes(OpenScreenCommand::openStoryOptions))
-                        .then(Commands.literal("main_screen").executes(OpenScreenCommand::openMainScreen))));
+                        .then(Commands.literal("main_screen").executes(OpenScreenCommand::openMainScreen))
+                        .then(Commands.literal("dialog").executes(OpenScreenCommand::dialog))
+                        .then(Commands.literal("dialogUpdate").executes(OpenScreenCommand::updateDialog))
+                        .then(Commands.literal("dialogStop").executes(OpenScreenCommand::stopDialog))
+                        .then(Commands.literal("test2").executes(OpenScreenCommand::test2))));
+    }
+
+    private static int dialog(CommandContext<CommandSourceStack> context) {
+        PlayerSession playerSession = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getSessionByPlayer(context.getSource().getPlayer());
+        CharacterStory characterStory = NarrativeCraftMod.getInstance().getCharacterManager().getCharacterStories().getFirst();
+        LivingEntity entity = Util.createEntityFromCharacter(characterStory, context.getSource().getLevel());
+        Vec3 pos = context.getSource().getPosition();
+        entity.teleportTo(pos.x, pos.y, pos.z);
+        CharacterRuntime characterRuntime = new CharacterRuntime(characterStory, entity);
+        DialogRenderer3D dialogRenderer3D = new DialogRenderer3D(
+                characterRuntime,
+                new Vec3(0, 0.8, 0),
+                50,
+                40,
+                5,
+                5,
+                0.8F,
+                0,
+                10,
+                0,
+                -1,
+                false
+        );
+        dialogRenderer3D.start();
+        playerSession.setDialogRenderer(dialogRenderer3D);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int updateDialog(CommandContext<CommandSourceStack> context) {
+        PlayerSession playerSession = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getSessionByPlayer(context.getSource().getPlayer());
+        DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
+        dialogRenderer.setWidth(30);
+        dialogRenderer.update();
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int stopDialog(CommandContext<CommandSourceStack> context) {
+        PlayerSession playerSession = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getSessionByPlayer(context.getSource().getPlayer());
+        DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
+        dialogRenderer.stop();
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int test2(CommandContext<CommandSourceStack> context) {
+        PlayerSession playerSession = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getSessionByPlayer(context.getSource().getPlayer());
+        SoundInkAction soundInkAction = (SoundInkAction) InkActionRegistry.get("sound");
+        soundInkAction.validateAndExecute("sound stop all", playerSession);
+        return Command.SINGLE_SUCCESS;
     }
 
     private static int openStoryOptions(CommandContext<CommandSourceStack> context) {

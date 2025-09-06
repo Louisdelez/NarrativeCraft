@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft;
 
 import fr.loudo.narrativecraft.managers.*;
 import fr.loudo.narrativecraft.register.InkActionRegister;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,7 @@ public class NarrativeCraftMod {
 
     public static boolean firstTime = false;
     public static MinecraftServer server;
+    public static RenderType dialogBackgroundRenderType;
 
     private final CharacterManager characterManager = new CharacterManager();
     private final PlayerSessionManager playerSessionManager = new PlayerSessionManager();

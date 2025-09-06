@@ -1,0 +1,282 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package fr.loudo.narrativecraft.narrative.dialog;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
+import fr.loudo.narrativecraft.util.Easing;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.core.Direction;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix4f;
+
+public class DialogRenderer3D extends DialogRenderer {
+
+    private final Vec3 dialogOffset;
+    private CharacterRuntime characterRuntime;
+    private Vec3 dialogPosition;
+
+    public DialogRenderer3D(
+            CharacterRuntime characterRuntime,
+            Vec3 dialogOffset,
+            float width,
+            float height,
+            float paddingX,
+            float paddingY,
+            float scale,
+            float letterSpacing,
+            float gap,
+            int backgroundColor,
+            int textColor,
+            boolean noSkip) {
+        super(
+                width,
+                height,
+                paddingX,
+                paddingY,
+                scale,
+                letterSpacing,
+                gap,
+                backgroundColor,
+                textColor,
+                noSkip);
+        this.characterRuntime = characterRuntime;
+        this.dialogOffset = dialogOffset;
+    }
+
+    @Override
+    public void tick() {
+        if (dialogPosition == null) return;
+        super.tick();
+    }
+
+    private void updateDialogPosition() {
+        Entity serverEntity = characterRuntime.getEntity();
+        if (serverEntity != null) {
+            Entity entity =
+                    minecraft.level.getEntity(characterRuntime.getEntity().getId());
+            if (entity != null) {
+                dialogPosition = entity.position().add(0, entity.getEyeHeight(), 0);
+            }
+        }
+    }
+
+    @Override
+    public void render(PoseStack poseStack, float partialTick) {
+        updateDialogPosition();
+        if (dialogPosition == null) return;
+
+        Vec3 position = dialogPosition;
+        position = translateToRelativeApplyOffset(position);
+        float originalScale = scale;
+        if (currentTick < totalTick && (dialogStarting ||dialogStopping)) {
+            double t = t(partialTick);
+            t = Easing.EASE_OUT.interpolate(t);
+            double opacity = 1.0;
+            if (dialogStarting) {
+                originalScale = (float) Mth.lerp(t, 0.0, scale);
+                opacity = Mth.lerp(t, 0.0, 1.0);
+                position = getDialogInterpolatedAppearPosition(t);
+            } else if (dialogStopping) {
+                originalScale = (float) Mth.lerp(t, scale, 0);
+                opacity = Mth.lerp(t, 1.0, 0.0);
+                position = getDialogInterpolatedDisappearPosition(t);
+            }
+            backgroundColor = ARGB.color((int) (opacity * 255.0), backgroundColor);
+            position = translateToRelative(position);
+        }
+        if (currentTick == totalTick) {
+            if (dialogStopping && !dialogStarting) dialogStopping = false;
+            if (dialogStarting && !dialogStopping) dialogStarting = false;
+        }
+        poseStack.translate(position.x, position.y, position.z);
+        poseStack.mulPose(minecraft.getEntityRenderDispatcher().cameraOrientation());
+        poseStack.scale(originalScale * 0.025F, -originalScale * 0.025F, originalScale * 0.025F);
+
+        renderDialogBackground(poseStack, partialTick);
+
+        minecraft.renderBuffers().bufferSource().endBatch(NarrativeCraftMod.dialogBackgroundRenderType);
+    }
+
+    private Vec3 getDialogInterpolatedAppearPosition(double t) {
+        double x, y, z;
+        x = Mth.lerp(t, dialogPosition.x, dialogPosition.x + dialogOffset.x);
+        y = Mth.lerp(t, dialogPosition.y, dialogPosition.y + dialogOffset.y);
+        z = Mth.lerp(t, dialogPosition.z, dialogPosition.z + dialogOffset.z);
+        return new Vec3(x, y, z);
+    }
+
+    private Vec3 getDialogInterpolatedDisappearPosition(double t) {
+        double x, y, z;
+        x = Mth.lerp(t, dialogPosition.x + dialogOffset.x, dialogPosition.x);
+        y = Mth.lerp(t, dialogPosition.y + dialogOffset.y, dialogPosition.y);
+        z = Mth.lerp(t, dialogPosition.z + dialogOffset.z, dialogPosition.z);
+        return new Vec3(x, y, z);
+    }
+
+    private void renderDialogBackground(PoseStack poseStack, float partialTick) {
+        MultiBufferSource.BufferSource bufferSource = minecraft.renderBuffers().bufferSource();
+        VertexConsumer vertexConsumer = bufferSource.getBuffer(NarrativeCraftMod.dialogBackgroundRenderType);
+        Matrix4f matrix4f = poseStack.last().pose();
+        
+        Side side = dialogOffsetSide();
+        double diffY = translateToRelative(dialogPosition).y - translateToRelativeApplyOffset(dialogPosition).y;
+
+        float originalWidth = width;
+        float originalHeight = height;
+        if (currentTick < totalTick && !dialogStarting && !dialogStopping) {
+            double t = t(partialTick);
+            originalWidth = (float) Mth.lerp(t, oldWidth, width);
+            originalHeight = (float) Mth.lerp(t, oldHeight, height);
+        } else {
+            oldWidth = width;
+            oldHeight = height;
+        }
+
+        switch (side) {
+            case UP -> {
+                vertexConsumer.addVertex(matrix4f, -originalWidth, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                vertexConsumer.addVertex(matrix4f, originalWidth, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                vertexConsumer.addVertex(matrix4f, originalWidth, -originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                vertexConsumer.addVertex(matrix4f, -originalWidth, -originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+            }
+            case RIGHT -> {
+                if(diffY < 0) {
+                    vertexConsumer.addVertex(matrix4f, 0, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer.addVertex(matrix4f, 0, originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer.addVertex(matrix4f, originalWidth * 2, originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer.addVertex(matrix4f, originalWidth * 2, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                } else if(diffY > 0) {
+                    vertexConsumer.addVertex(matrix4f, 0, -originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer.addVertex(matrix4f, 0, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer.addVertex(matrix4f, originalWidth * 2, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer.addVertex(matrix4f, originalWidth * 2, -originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                } else {
+                    vertexConsumer.addVertex(matrix4f, 0, -originalHeight / 2, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer.addVertex(matrix4f, 0, originalHeight / 2, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer.addVertex(matrix4f, originalWidth * 2, originalHeight / 2, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer.addVertex(matrix4f, originalWidth * 2, -originalHeight / 2, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                }
+            }
+            case LEFT -> {
+                if(diffY < 0) {
+                    vertexConsumer.addVertex(matrix4f, -originalWidth * 2, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer.addVertex(matrix4f, -originalWidth * 2, originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer.addVertex(matrix4f, 0, originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer.addVertex(matrix4f, 0, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                } else if(diffY > 0) {
+                    vertexConsumer.addVertex(matrix4f, 0, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer.addVertex(matrix4f, 0, -originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer.addVertex(matrix4f, -originalWidth * 2, -originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer.addVertex(matrix4f, -originalWidth * 2, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                } else {
+                    vertexConsumer.addVertex(matrix4f, 0, originalHeight / 2, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer.addVertex(matrix4f, 0, -originalHeight / 2, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer.addVertex(matrix4f, -originalWidth * 2, -originalHeight / 2, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer.addVertex(matrix4f, -originalWidth * 2, originalHeight / 2, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                }
+            }
+            case DOWN -> {
+                vertexConsumer.addVertex(matrix4f, -originalWidth, originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                vertexConsumer.addVertex(matrix4f, originalWidth, originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                vertexConsumer.addVertex(matrix4f, originalWidth, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                vertexConsumer.addVertex(matrix4f, -originalWidth, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+            }
+        }
+    }
+
+    private Side dialogOffsetSide() {
+        Vec3 dialogPos = translateToRelative(dialogPosition);
+        Vec3 dialogPosOffset = translateToRelativeApplyOffset(dialogPosition);
+
+        double offsetX = 0;
+        double offsetY = dialogPosOffset.y - dialogPos.y;
+
+        Direction direction = minecraft.player.getDirection();
+
+        if (direction == Direction.EAST) {
+            offsetX = dialogPosOffset.z - dialogPos.z;
+        } else if (direction == Direction.WEST) {
+            offsetX = dialogPos.z - dialogPosOffset.z;
+        } else if (direction == Direction.NORTH) {
+            offsetX = dialogPosOffset.x - dialogPos.x;
+        } else if (direction == Direction.SOUTH) {
+            offsetX = dialogPos.x - dialogPosOffset.x;
+        }
+
+        if (offsetY >= 0 && offsetX >= -0.2 && offsetX <= 0.2) {
+            return Side.UP;
+        } else if (offsetY <= 0 && offsetX >= -0.2 && offsetX <= 0.2) {
+            return Side.DOWN;
+        } else if (offsetX <= 0.2) {
+            return Side.LEFT;
+        } else if (offsetX >= 0.2) {
+            return Side.RIGHT;
+        }
+        return Side.UP;
+    }
+
+    private Vec3 translateToRelative(Vec3 worldPos) {
+        Vec3 camPos = minecraft.gameRenderer.getMainCamera().getPosition();
+        return new Vec3(
+                worldPos.x - camPos.x,
+                worldPos.y - camPos.y,
+                worldPos.z - camPos.z
+        );
+    }
+
+    private Vec3 translateToRelativeApplyOffset(Vec3 position) {
+        position = translateToRelative(position);
+        double offsetX = 0;
+        double offsetZ = 0;
+        switch (minecraft.player.getDirection()) {
+            case EAST -> offsetZ = dialogOffset.x();
+            case WEST -> offsetZ = -dialogOffset.x();
+            case SOUTH -> offsetX = -dialogOffset.x();
+            case NORTH -> offsetX = dialogOffset.x();
+        }
+        return new Vec3(position.x + offsetX, position.y + dialogOffset.y, position.z + offsetZ);
+    }
+
+    public enum Side {
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT
+    }
+
+    public CharacterRuntime getCharacterRuntime() {
+        return characterRuntime;
+    }
+
+    public void setCharacterRuntime(CharacterRuntime characterRuntime) {
+        this.characterRuntime = characterRuntime;
+    }
+}

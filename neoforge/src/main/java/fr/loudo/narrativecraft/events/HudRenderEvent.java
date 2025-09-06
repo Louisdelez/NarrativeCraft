@@ -40,5 +40,6 @@ public class HudRenderEvent {
         OnHudRender.controllerHudInfo(event.getGuiGraphics());
         OnHudRender.inkActionRender(
                 event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaPartialTick(true));
+        OnHudRender.dialogRender(event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaPartialTick(true));
     }
 }

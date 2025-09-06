@@ -67,7 +67,7 @@ public class MinecraftCommandInkAction extends InkAction {
                         Translation.message(WRONG_ARGUMENT_TEXT, "Command can't be executed: " + commandError));
             }
         }
-        return null;
+        return InkActionResult.ok();
     }
 
     @Override

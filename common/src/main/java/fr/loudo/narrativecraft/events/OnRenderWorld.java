@@ -28,22 +28,23 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.client.Minecraft;
 
 public class OnRenderWorld {
     public static void renderWorld(PoseStack poseStack, float partialTick) {
-        if (NarrativeCraftMod.server == null) return;
-        for (ServerPlayer player : NarrativeCraftMod.server.getPlayerList().getPlayers()) {
-            PlayerSession playerSession =
-                    NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
-            if (playerSession == null) return;
-            if (playerSession.getController() instanceof CutsceneController controller) {
-                controller.drawLinesBetweenKeyframes(poseStack);
-            }
-            for (InkAction inkAction : playerSession.getInkActions()) {
-                if (inkAction.getSide() != InkAction.Side.CLIENT) continue;
-                inkAction.partialTick(partialTick);
-            }
+        PlayerSession playerSession = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getSessionByPlayer(Minecraft.getInstance().player);
+        if (playerSession == null) return;
+        if (playerSession.getController() instanceof CutsceneController controller) {
+            controller.drawLinesBetweenKeyframes(poseStack);
+        }
+        if (playerSession.getDialogRenderer() != null) {
+            playerSession.getDialogRenderer().render(poseStack, partialTick);
+        }
+        for (InkAction inkAction : playerSession.getInkActions()) {
+            if (inkAction.getSide() != InkAction.Side.CLIENT) continue;
+            inkAction.partialTick(partialTick);
         }
     }
 }

@@ -49,4 +49,14 @@ public class OnHudRender {
             inkAction.render(guiGraphics, partialTick);
         }
     }
+
+    public static void dialogRender(GuiGraphics guiGraphics, float partialTick) {
+        PlayerSession playerSession = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getSessionByPlayer(Minecraft.getInstance().player);
+        if (playerSession == null) return;
+        if (playerSession.getDialogRenderer() != null) {
+            playerSession.getDialogRenderer().render(guiGraphics, partialTick);
+        }
+    }
 }

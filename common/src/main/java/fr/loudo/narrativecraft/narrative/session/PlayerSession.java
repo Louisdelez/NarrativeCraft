@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.managers.PlaybackManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.recording.Location;
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ public class PlayerSession {
     private final PlaybackManager playbackManager = new PlaybackManager();
     private final List<InkAction> inkActions = new ArrayList<>();
     private AbstractController controller;
+    private DialogRenderer dialogRenderer;
     private KeyframeLocation currentCamera;
     private Chapter chapter;
     private Scene scene;
@@ -92,6 +94,14 @@ public class PlayerSession {
 
     public List<InkAction> getInkActions() {
         return inkActions;
+    }
+
+    public DialogRenderer getDialogRenderer() {
+        return dialogRenderer;
+    }
+
+    public void setDialogRenderer(DialogRenderer dialogRenderer) {
+        this.dialogRenderer = dialogRenderer;
     }
 
     public Chapter getChapter() {

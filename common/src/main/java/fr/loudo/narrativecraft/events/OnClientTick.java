@@ -41,6 +41,9 @@ public class OnClientTick {
         if (playerSession.getController() instanceof CutsceneController controller) {
             controller.getCutscenePlayback().tick();
         }
+        if (playerSession.getDialogRenderer() != null) {
+            playerSession.getDialogRenderer().tick();
+        }
         List<InkAction> toRemove = new ArrayList<>();
         for (InkAction inkAction : playerSession.getInkActions()) {
             if (inkAction.getSide() != InkAction.Side.CLIENT) continue;
