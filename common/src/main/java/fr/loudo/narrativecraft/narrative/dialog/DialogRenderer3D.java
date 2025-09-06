@@ -27,6 +27,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
+import fr.loudo.narrativecraft.narrative.dialog.geometric.DialogTail;
 import fr.loudo.narrativecraft.util.Easing;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -40,6 +41,7 @@ import org.joml.Matrix4f;
 public class DialogRenderer3D extends DialogRenderer {
 
     private final Vec3 dialogOffset;
+    private final DialogTail dialogTail;
     private CharacterRuntime characterRuntime;
     private Vec3 dialogPosition;
 
@@ -69,6 +71,7 @@ public class DialogRenderer3D extends DialogRenderer {
                 noSkip);
         this.characterRuntime = characterRuntime;
         this.dialogOffset = dialogOffset;
+        dialogTail = new DialogTail(this, 5, 10, 0);
     }
 
     @Override
@@ -121,6 +124,7 @@ public class DialogRenderer3D extends DialogRenderer {
         poseStack.scale(originalScale * 0.025F, -originalScale * 0.025F, originalScale * 0.025F);
 
         renderDialogBackground(poseStack, partialTick);
+        dialogTail.render(poseStack, partialTick, minecraft.renderBuffers().bufferSource(), minecraft.gameRenderer.getMainCamera());
 
         minecraft.renderBuffers().bufferSource().endBatch(NarrativeCraftMod.dialogBackgroundRenderType);
     }
@@ -151,10 +155,9 @@ public class DialogRenderer3D extends DialogRenderer {
 
         float originalWidth = width;
         float originalHeight = height;
-        if (currentTick < totalTick && !dialogStarting && !dialogStopping) {
-            double t = t(partialTick);
-            originalWidth = (float) Mth.lerp(t, oldWidth, width);
-            originalHeight = (float) Mth.lerp(t, oldHeight, height);
+        if (isAnimating() && !dialogStarting && !dialogStopping) {
+            originalWidth = getInterpolatedWidth(partialTick);
+            originalHeight = getInterpolatedHeight(partialTick);
         } else {
             oldWidth = width;
             oldHeight = height;
@@ -243,7 +246,7 @@ public class DialogRenderer3D extends DialogRenderer {
         return Side.UP;
     }
 
-    private Vec3 translateToRelative(Vec3 worldPos) {
+    public Vec3 translateToRelative(Vec3 worldPos) {
         Vec3 camPos = minecraft.gameRenderer.getMainCamera().getPosition();
         return new Vec3(
                 worldPos.x - camPos.x,
@@ -252,7 +255,7 @@ public class DialogRenderer3D extends DialogRenderer {
         );
     }
 
-    private Vec3 translateToRelativeApplyOffset(Vec3 position) {
+    public Vec3 translateToRelativeApplyOffset(Vec3 position) {
         position = translateToRelative(position);
         double offsetX = 0;
         double offsetZ = 0;
@@ -278,5 +281,17 @@ public class DialogRenderer3D extends DialogRenderer {
 
     public void setCharacterRuntime(CharacterRuntime characterRuntime) {
         this.characterRuntime = characterRuntime;
+    }
+
+    public Vec3 getDialogOffset() {
+        return dialogOffset;
+    }
+
+    public Vec3 getDialogPosition() {
+        return dialogPosition;
+    }
+
+    public Vec3 getDialogPositionWithOffset() {
+        return dialogPosition.add(dialogOffset.x, dialogPosition.y, dialogPosition.z);
     }
 }

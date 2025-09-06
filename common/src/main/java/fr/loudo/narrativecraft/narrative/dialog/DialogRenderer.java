@@ -27,6 +27,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.Mth;
 
 public class DialogRenderer {
 
@@ -90,6 +91,18 @@ public class DialogRenderer {
         dialogStopping = true;
         totalTick = (int) (dialogAppearTime * 20.0);
         currentTick = 0;
+    }
+
+    public boolean isAnimating() {
+        return currentTick < totalTick;
+    }
+
+    public float getInterpolatedWidth(float partialTick) {
+        return (float) Mth.lerp(t(partialTick), oldWidth, width);
+    }
+
+    public float getInterpolatedHeight(float partialTick) {
+        return (float) Mth.lerp(t(partialTick), oldHeight, height);
     }
 
     protected double t(float partialTick) {
