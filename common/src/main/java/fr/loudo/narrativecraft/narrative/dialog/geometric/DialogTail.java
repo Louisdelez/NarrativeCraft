@@ -14,49 +14,73 @@ import org.joml.Vector3f;
 
 public class DialogTail {
 
-    private final DialogRenderer3D dialogRenderer;
+    private final DialogRenderer3D dialog;
     private float width, height, offset;
 
-    public DialogTail(DialogRenderer3D dialogRenderer, float width, float height, float offset) {
-        this.dialogRenderer = dialogRenderer;
+    public DialogTail(DialogRenderer3D dialog, float width, float height, float offset) {
+        this.dialog = dialog;
         this.width = width;
         this.height = height;
         this.offset = offset;
     }
 
     public void render(PoseStack poseStack, float partialTick, MultiBufferSource.BufferSource bufferSource, Camera camera) {
-        Direction direction = getDirection(camera);
+
+        TailDirection tailDirection = TailDirection.TOP;
+        if (dialog.getDialogOffset().x > 0) {
+            tailDirection = TailDirection.LEFT;
+        } else if (dialog.getDialogOffset().x < 0) {
+            tailDirection = TailDirection.RIGHT;
+        } else if (dialog.getDialogOffset().y > 0) {
+            tailDirection = TailDirection.BOTTOM;
+        }
+
         Vec2 tailOffset = getTailOffset(camera);
+
         poseStack.pushPose();
         float tailOffsetX = 0;
         float tailOffsetY = 0;
-        
-        if(direction == Direction.TOP || direction == Direction.BOTTOM) {
-            tailOffsetX = Math.clamp(tailOffset.x, -dialogRenderer.getWidth() + width / 2, dialogRenderer.getWidth() - width / 2);
+        if(tailDirection == TailDirection.TOP || tailDirection == TailDirection.BOTTOM) {
+            tailOffsetX = Math.clamp(tailOffset.x, -dialog.getTotalWidth() + width / 2, dialog.getTotalWidth() - width / 2);
         }
 
-        if(direction == Direction.RIGHT) {
-            if (dialogRenderer.isAnimating()) {
-                tailOffsetX = dialogRenderer.getInterpolatedWidth(partialTick);
+        if(tailDirection == TailDirection.RIGHT) {
+            if (dialog.isAnimating()) {
+                tailOffsetX = dialog.getInterpolatedWidth(partialTick);
             } else {
-                tailOffsetX = dialogRenderer.getWidth();
+                tailOffsetX = dialog.getTotalWidth();
             }
         }
 
-        if(direction == Direction.LEFT) {
-            if (dialogRenderer.isAnimating()) {
-                tailOffsetX = -dialogRenderer.getInterpolatedWidth(partialTick);
+        if(tailDirection == TailDirection.LEFT) {
+            if (dialog.isAnimating()) {
+                tailOffsetX = -dialog.getInterpolatedWidth(partialTick);
             } else {
-                tailOffsetX = -dialogRenderer.getWidth();
+                tailOffsetX = -dialog.getTotalWidth();
             }
         }
 
-        if(direction == Direction.RIGHT || direction == Direction.LEFT) {
-            tailOffsetY = Math.clamp(tailOffset.y, -dialogRenderer.getHeight() + width / 2, -width / 2);
-            if(tailOffset.y < -dialogRenderer.getHeight() + width / 2) {
-                direction = Direction.valueOf(direction.name() + "_UP_CORNER");
-            } else if(tailOffset.y > dialogRenderer.getHeight() + width / 2) {
-                direction = Direction.valueOf(direction.name() + "_DOWN_CORNER");
+        if (tailDirection == TailDirection.RIGHT || tailDirection == TailDirection.LEFT) {
+            float halfHeight = dialog.getTotalHeight() / 2f;
+
+            float minY = -halfHeight + width / 2f;
+            float maxY =  halfHeight - width / 2f;
+
+            if (tailOffset.y < minY) {
+                tailDirection = TailDirection.valueOf(tailDirection.name() + "_UP_CORNER");
+                tailOffsetY = minY;
+            }
+            else if (tailOffset.y > maxY) {
+                tailDirection = TailDirection.valueOf(tailDirection.name() + "_DOWN_CORNER");
+                tailOffsetY = maxY;
+            }
+            else {
+                tailOffsetY = tailOffset.y;
+            }
+            if (tailDirection.name().contains("RIGHT") || dialog.getDialogOffset().y < 0) {
+                tailOffsetY += 5.5F;
+            } else if (tailDirection.name().contains("LEFT") || dialog.getDialogOffset().y > 0){
+                tailOffsetY -= dialog.getTotalHeight() / 2.0F;
             }
         }
 
@@ -68,7 +92,7 @@ public class DialogTail {
         float topRight = -width / 2 + offset;
         float topLeft = width / 2 + offset;
 
-        switch (direction) {
+        switch (tailDirection) {
             case TOP -> drawTailTop(matrix4f, vertexConsumer, topRight, topLeft);
             case BOTTOM -> drawTailBottom(matrix4f, vertexConsumer, topRight, topLeft);
             case RIGHT -> drawTailRight(matrix4f, vertexConsumer);
@@ -79,102 +103,88 @@ public class DialogTail {
             case LEFT_DOWN_CORNER -> drawTailDownLeftCorner(matrix4f, vertexConsumer);
         }
 
-        bufferSource.endBatch(NarrativeCraftMod.dialogBackgroundRenderType);
+        bufferSource.endBatch();
         poseStack.popPose();
-
+        
     }
 
-    private Vec2 getTailOffset(Camera camera) {
-        Vec3 entityPos = dialogRenderer.translateToRelative(dialogRenderer.getDialogPosition());
-        Vec3 dialogPos = dialogRenderer.translateToRelativeApplyOffset(dialogRenderer.getDialogPosition());
+    Vec2 getTailOffset(Camera camera) {
+        Vec3 entityPos = dialog.translateToRelative(dialog.getDialogPosition());
+        Vec3 dialogPos = dialog.translateToRelativeApplyOffset(dialog.getDialogPosition());
         Vec3 toDialog = dialogPos.subtract(entityPos);
 
-        Vector3f leftVec = camera.getLeftVector();
-        Vec3 camRight = new Vec3(leftVec.x(), leftVec.y(), leftVec.z());
-        Vector3f upVec = camera.getUpVector();
-        Vec3 camUp = new Vec3(upVec.x(), upVec.y(), upVec.z());
+        // Vecteurs caméra
+        Vec3 camRight = new Vec3(camera.getLeftVector()).scale(-1); // right = -left
+        Vec3 camUp = new Vec3(camera.getUpVector());
 
-        return new Vec2((float) (toDialog.dot(camRight) / dialogRenderer.getScale()), (float) (toDialog.dot(camUp) / dialogRenderer.getScale()));
+        float scale = dialog.getScale() * 0.025F;
+
+        return new Vec2(
+                (float) (toDialog.dot(camRight) / scale),
+                (float) (toDialog.dot(camUp) / scale)
+        );
     }
 
-    private Direction getDirection(Camera camera) {
-        Vec3 entityPos = dialogRenderer.translateToRelative(dialogRenderer.getDialogPosition());
-        Vec3 dialogPos = dialogRenderer.translateToRelativeApplyOffset(dialogRenderer.getDialogPosition());
-        Vec3 delta = entityPos.subtract(dialogPos);
-
-        Vector3f camUp = camera.getUpVector();
-        Vector3f camLeft = camera.getLeftVector();
-
-        Vec3 up = new Vec3(camUp.x(), camUp.y(), camUp.z());
-        Vec3 left = new Vec3(camLeft.x(), camLeft.y(), camLeft.z());
-
-        double verticalProjection = delta.dot(up);
-        double horizontalProjection = delta.dot(left);
-
-        if (Math.abs(verticalProjection) > Math.abs(horizontalProjection)) {
-            return verticalProjection > 0 ? Direction.TOP : Direction.BOTTOM;
-        } else {
-            return horizontalProjection > 0 ? Direction.LEFT : Direction.RIGHT;
-        }
-    }
-
-    enum Direction {
+    enum TailDirection {
         TOP, BOTTOM, LEFT, LEFT_UP_CORNER, LEFT_DOWN_CORNER, RIGHT, RIGHT_UP_CORNER, RIGHT_DOWN_CORNER
     }
 
     void drawTailTop(Matrix4f matrix4f, VertexConsumer vertexConsumer, float topRight, float topLeft) {
-        vertexConsumer.addVertex(matrix4f, 0, -dialogRenderer.getHeight() - height, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, -topRight, -dialogRenderer.getHeight(), 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, -topLeft, -dialogRenderer.getHeight(), 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, -topRight, -dialogRenderer.getHeight(), 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, 0, -dialog.getHeight() - height, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, -topRight, -dialog.getHeight(), 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, -topLeft, -dialog.getHeight(), 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, -topRight, -dialog.getHeight(), 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
     }
 
     void drawTailBottom(Matrix4f matrix4f, VertexConsumer vertexConsumer, float topRight, float topLeft) {
-        vertexConsumer.addVertex(matrix4f, -topRight, 0, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, -topLeft, 0, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, 0, height, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, -topRight, 0, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, -topRight, 0, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, -topLeft, 0, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, 0, height, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, -topRight, 0, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
     }
 
     void drawTailLeft(Matrix4f matrix4f, VertexConsumer vertexConsumer) {
-        vertexConsumer.addVertex(matrix4f, -height, 0, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, 0, -width / 2, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, 0, width / 2, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, 0, -width / 2, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, -height, 0, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, 0, -width / 2, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, 0, width / 2, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, 0, -width / 2, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
     }
 
     void drawTailRight(Matrix4f matrix4f, VertexConsumer vertexConsumer) {
-        vertexConsumer.addVertex(matrix4f, height, 0, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, 0, width / 2, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, 0, -width / 2, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, 0, width / 2, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, height, 0, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, 0, width / 2, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, 0, -width / 2, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, 0, width / 2, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
     }
 
     void drawTailUpRightCorner(Matrix4f matrix4f, VertexConsumer vertexConsumer) {
-        vertexConsumer.addVertex(matrix4f, height / 2, -4, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, -width,  -width / 2, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, 0, width / 2, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, height / 2, -4, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, height / 2, -4, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, -width,  -width / 2, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, 0, width / 2, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, height / 2, -4, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
     }
 
     void drawTailDownRightCorner(Matrix4f matrix4f, VertexConsumer vertexConsumer) {
-        vertexConsumer.addVertex(matrix4f, height / 2, 4, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, 0,  -width / 2, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, -width, width / 2, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, height / 2, 4, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, height / 2, 4, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, 0,  -width / 2, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, -width, width / 2, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, height / 2, 4, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
     }
 
     void drawTailUpLeftCorner(Matrix4f matrix4f, VertexConsumer vertexConsumer) {
-        vertexConsumer.addVertex(matrix4f, -height / 2, -4, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, 0,  width / 2, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, width, -width / 2, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, -height / 2, -4, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, -height / 2, -4, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, 0,  width / 2, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, width, -width / 2, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, -height / 2, -4, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
     }
 
     void drawTailDownLeftCorner(Matrix4f matrix4f, VertexConsumer vertexConsumer) {
-        vertexConsumer.addVertex(matrix4f, -height / 2, 4, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, width,  width / 2, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, width, -width * 2, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, -height / 2, 4, 0).setColor(dialogRenderer.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, -height / 2, 4, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, width,  width / 2, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, width, -width * 2, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, -height / 2, 4, 0).setColor(dialog.getBackgroundColor()).setLight(LightTexture.FULL_BRIGHT);
     }
+
+
+
 }

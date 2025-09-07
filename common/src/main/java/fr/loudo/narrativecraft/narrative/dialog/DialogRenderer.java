@@ -24,6 +24,8 @@
 package fr.loudo.narrativecraft.narrative.dialog;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import fr.loudo.narrativecraft.narrative.dialog.animation.DialogScrollText;
+import fr.loudo.narrativecraft.util.Easing;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.ARGB;
@@ -34,38 +36,42 @@ public class DialogRenderer {
     protected final Minecraft minecraft;
     protected final double dialogTransitionTime = 0.5;
     protected final double dialogAppearTime = 0.2;
-    protected float width, oldWidth, height, oldHeight, paddingX, paddingY, scale, letterSpacing, gap;
+    protected final DialogScrollText dialogScrollText;
+    protected String text;
+    protected float width, totalWidth, oldWidth, height, totalHeight, oldHeight, paddingX, paddingY, scale, letterSpacing, gap;
     protected int backgroundColor, textColor, currentTick, totalTick;
     protected boolean noSkip, dialogStarting, dialogStopping;
 
-    public DialogRenderer(
-            float width,
-            float height,
-            float paddingX,
-            float paddingY,
-            float scale,
-            float letterSpacing,
-            float gap,
-            int backgroundColor,
-            int textColor,
-            boolean noSkip) {
+    public DialogRenderer(String text, float width, float paddingX, float paddingY, float scale, float letterSpacing, float gap, int backgroundColor, int textColor, boolean noSkip) {
+        this.text = text;
         this.width = width;
-        this.height = height;
         this.paddingX = paddingX;
         this.paddingY = paddingY;
         this.scale = scale;
         this.letterSpacing = letterSpacing;
         this.gap = gap;
-        this.backgroundColor = ARGB.color(255, backgroundColor);
+        this.backgroundColor = backgroundColor;
         this.textColor = textColor;
         this.noSkip = noSkip;
         minecraft = Minecraft.getInstance();
+        dialogScrollText = new DialogScrollText(this, minecraft);
+        initMeasures();
+        dialogScrollText.reset();
+    }
+
+    private void initMeasures() {
+        height = minecraft.font.lineHeight * dialogScrollText.getLines().size();
+        totalHeight = height + (dialogScrollText.getLines().size() - 1) * gap + paddingY * 2;
+        totalWidth = (minecraft.font.width(dialogScrollText.getLongerTextLine())
+                + (dialogScrollText.getLongerTextLine().length() - 1) * letterSpacing
+                + paddingX * 2) / 2.0F;
     }
 
     public void tick() {
         if (currentTick <= totalTick) {
             currentTick++;
         }
+        dialogScrollText.tick();
     }
 
     public void render(PoseStack poseStack, float partialTick) {}
@@ -98,11 +104,11 @@ public class DialogRenderer {
     }
 
     public float getInterpolatedWidth(float partialTick) {
-        return (float) Mth.lerp(t(partialTick), oldWidth, width);
+        return (float) Mth.lerp(Easing.SMOOTH.interpolate(t(partialTick)), oldWidth, totalWidth);
     }
 
     public float getInterpolatedHeight(float partialTick) {
-        return (float) Mth.lerp(t(partialTick), oldHeight, height);
+        return (float) Mth.lerp(Easing.SMOOTH.interpolate(t(partialTick)), oldHeight, totalHeight);
     }
 
     protected double t(float partialTick) {
@@ -113,12 +119,23 @@ public class DialogRenderer {
         return dialogTransitionTime;
     }
 
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
     public float getWidth() {
         return width;
     }
 
     public void setWidth(float width) {
         this.width = width;
+        dialogScrollText.setText(text);
+        initMeasures();
+        dialogScrollText.reset();
     }
 
     public float getHeight() {
@@ -127,6 +144,16 @@ public class DialogRenderer {
 
     public void setHeight(float height) {
         this.height = height;
+        initMeasures();
+    }
+
+    public float getTotalHeight() {
+        return totalHeight;
+    }
+
+    public float getTotalWidth() {
+        return totalWidth;
+
     }
 
     public float getPaddingX() {

@@ -23,7 +23,9 @@
     "CameraMixin",
     "ClientLevelMixin",
     "GameRendererMixin",
-    "KeyboardHandlerMixin"
+    "KeyboardHandlerMixin",
+    "accessor.FontAccessor",
+    "invoker.FontInvoker"
   ],
   "server": [],
   "injectors": {

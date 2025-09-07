@@ -46,10 +46,10 @@ public class DialogRenderer3D extends DialogRenderer {
     private Vec3 dialogPosition;
 
     public DialogRenderer3D(
+            String text,
             CharacterRuntime characterRuntime,
             Vec3 dialogOffset,
             float width,
-            float height,
             float paddingX,
             float paddingY,
             float scale,
@@ -59,8 +59,8 @@ public class DialogRenderer3D extends DialogRenderer {
             int textColor,
             boolean noSkip) {
         super(
+                text,
                 width,
-                height,
                 paddingX,
                 paddingY,
                 scale,
@@ -124,7 +124,25 @@ public class DialogRenderer3D extends DialogRenderer {
         poseStack.scale(originalScale * 0.025F, -originalScale * 0.025F, originalScale * 0.025F);
 
         renderDialogBackground(poseStack, partialTick);
+
+        Side side = dialogOffsetSide();
+        double diffY = translateToRelativeApplyOffset(dialogPosition).y - translateToRelative(dialogPosition).y;
+
+        switch (side) {
+            case RIGHT -> poseStack.translate(totalWidth, diffY < 0 ? getHeight() : 0, 0);
+            case LEFT -> poseStack.translate(-totalWidth, diffY < 0 ? getHeight() : 0, 0);
+            case DOWN -> poseStack.translate(0, getHeight(), 0);
+        }
+
         dialogTail.render(poseStack, partialTick, minecraft.renderBuffers().bufferSource(), minecraft.gameRenderer.getMainCamera());
+
+        if(diffY == 0) {
+            switch (side) {
+                case RIGHT, LEFT -> poseStack.translate(0, getHeight() / 2, 0);
+            }
+        }
+
+        dialogScrollText.render(poseStack, minecraft.renderBuffers().bufferSource());
 
         minecraft.renderBuffers().bufferSource().endBatch(NarrativeCraftMod.dialogBackgroundRenderType);
     }
@@ -151,16 +169,16 @@ public class DialogRenderer3D extends DialogRenderer {
         Matrix4f matrix4f = poseStack.last().pose();
         
         Side side = dialogOffsetSide();
-        double diffY = translateToRelative(dialogPosition).y - translateToRelativeApplyOffset(dialogPosition).y;
+        double diffY = translateToRelativeApplyOffset(dialogPosition).y - translateToRelative(dialogPosition).y;
 
-        float originalWidth = width;
-        float originalHeight = height;
+        float originalWidth = totalWidth;
+        float originalHeight = totalHeight;
         if (isAnimating() && !dialogStarting && !dialogStopping) {
             originalWidth = getInterpolatedWidth(partialTick);
             originalHeight = getInterpolatedHeight(partialTick);
         } else {
-            oldWidth = width;
-            oldHeight = height;
+            oldWidth = totalWidth;
+            oldHeight = totalHeight;
         }
 
         switch (side) {

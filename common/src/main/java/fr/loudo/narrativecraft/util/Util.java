@@ -24,21 +24,27 @@
 package fr.loudo.narrativecraft.util;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.blaze3d.font.GlyphInfo;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.DynamicOps;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.mixin.accessor.FontAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.PlayerAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.PlayerListAccessor;
+import fr.loudo.narrativecraft.mixin.invoker.FontInvoker;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import java.util.UUID;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.font.FontSet;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -186,5 +192,13 @@ public class Util {
             level.addFreshEntity(entity);
         }
         return entity;
+    }
+
+    public static float getLetterWidth(int letterCode, Minecraft minecraft) {
+        Style style = Style.EMPTY;
+        FontSet fontset = ((FontInvoker) minecraft.font).callGetFontSet(style.getFont());
+        GlyphInfo glyph = fontset.getGlyphInfo(letterCode, ((FontAccessor) minecraft.font).getFilterFishyGlyphs());
+        boolean bold = style.isBold();
+        return glyph.getAdvance(bold);
     }
 }
