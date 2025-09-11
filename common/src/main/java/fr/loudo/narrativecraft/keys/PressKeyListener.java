@@ -24,9 +24,12 @@
 package fr.loudo.narrativecraft.keys;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.screens.storyManager.chapter.ChaptersScreen;
 import fr.loudo.narrativecraft.screens.storyManager.scene.ScenesMenuScreen;
+import fr.loudo.narrativecraft.util.Util;
 import net.minecraft.client.Minecraft;
 
 public class PressKeyListener {
@@ -36,6 +39,7 @@ public class PressKeyListener {
             if (!minecraft.player.hasPermissions(2)) return;
             PlayerSession playerSession =
                     NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
+            if (playerSession == null) return;
             if (playerSession.isSessionSet()) {
                 minecraft.setScreen(new ScenesMenuScreen(playerSession.getScene()));
             } else {
@@ -45,8 +49,30 @@ public class PressKeyListener {
         ModKeys.handleKeyPress(ModKeys.OPEN_CONTROLLER_SCREEN, () -> {
             PlayerSession playerSession =
                     NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
+            if (playerSession == null) return;
             if (playerSession.getController() == null) return;
             minecraft.setScreen(playerSession.getController().getControllerScreen());
+        });
+        ModKeys.handleKeyPress(ModKeys.NEXT_DIALOG, () -> {
+            PlayerSession playerSession =
+                    NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
+            if (playerSession == null) return;
+            DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
+            if (dialogRenderer == null) return;
+            if (dialogRenderer.isAnimating()) return;
+            if (!dialogRenderer.getDialogScrollText().isFinished()) {
+                dialogRenderer.getDialogScrollText().forceFinish();
+                return;
+            }
+            if (playerSession.getStoryHandler() == null) return;
+            StoryHandler storyHandler = playerSession.getStoryHandler();
+            try {
+                storyHandler.next();
+            } catch (Exception e) {
+                storyHandler.stop();
+                NarrativeCraftMod.LOGGER.error("Can't continue the story: ", e);
+                Util.sendCrashMessage(minecraft.player, e);
+            }
         });
     }
 }

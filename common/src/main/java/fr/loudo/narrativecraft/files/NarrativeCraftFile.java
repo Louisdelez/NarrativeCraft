@@ -172,6 +172,15 @@ public class NarrativeCraftFile {
         directoryToBeDeleted.delete();
     }
 
+    public static String storyContent() throws IOException {
+        return Files.readString(getStoryFile().toPath());
+    }
+
+    public static File getStoryFile() {
+        File buildFolder = createDirectory(mainDirectory, BUILD_DIRECTORY_NAME);
+        return new File(buildFolder, STORY_FILE_NAME);
+    }
+
     public static void createChapterDirectory(Chapter chapter) throws IOException {
         File chapterFolder = createDirectory(chaptersDirectory, String.valueOf(chapter.getIndex()));
         createDirectory(chapterFolder.getAbsoluteFile(), SCENES_DIRECTORY_NAME);

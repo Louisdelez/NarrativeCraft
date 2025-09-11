@@ -35,12 +35,13 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
 public class DialogRenderer3D extends DialogRenderer {
 
-    private final Vec3 dialogOffset;
+    private final Vec2 dialogOffset;
     private final DialogTail dialogTail;
     private CharacterRuntime characterRuntime;
     private Vec3 dialogPosition;
@@ -48,7 +49,7 @@ public class DialogRenderer3D extends DialogRenderer {
     public DialogRenderer3D(
             String text,
             CharacterRuntime characterRuntime,
-            Vec3 dialogOffset,
+            Vec2 dialogOffset,
             float width,
             float paddingX,
             float paddingY,
@@ -58,17 +59,7 @@ public class DialogRenderer3D extends DialogRenderer {
             int backgroundColor,
             int textColor,
             boolean noSkip) {
-        super(
-                text,
-                width,
-                paddingX,
-                paddingY,
-                scale,
-                letterSpacing,
-                gap,
-                backgroundColor,
-                textColor,
-                noSkip);
+        super(text, width, paddingX, paddingY, scale, letterSpacing, gap, backgroundColor, textColor, noSkip);
         this.characterRuntime = characterRuntime;
         this.dialogOffset = dialogOffset;
         dialogTail = new DialogTail(this, 5, 10, 0);
@@ -99,21 +90,25 @@ public class DialogRenderer3D extends DialogRenderer {
         Vec3 position = dialogPosition;
         position = translateToRelativeApplyOffset(position);
         float originalScale = scale;
-        if (currentTick < totalTick && (dialogStarting ||dialogStopping)) {
+        if (currentTick < totalTick) {
             double t = t(partialTick);
-            t = Easing.EASE_OUT.interpolate(t);
-            double opacity = 1.0;
-            if (dialogStarting) {
-                originalScale = (float) Mth.lerp(t, 0.0, scale);
-                opacity = Mth.lerp(t, 0.0, 1.0);
-                position = getDialogInterpolatedAppearPosition(t);
-            } else if (dialogStopping) {
-                originalScale = (float) Mth.lerp(t, scale, 0);
-                opacity = Mth.lerp(t, 1.0, 0.0);
-                position = getDialogInterpolatedDisappearPosition(t);
+            t = Easing.SMOOTH.interpolate(t);
+            if (dialogStarting || dialogStopping) {
+                double opacity;
+                if (dialogStarting) {
+                    originalScale = (float) Mth.lerp(t, 0.0, scale);
+                    opacity = Mth.lerp(t, 0.0, 1.0);
+                    position = getDialogInterpolatedAppearPosition(t);
+                } else {
+                    originalScale = (float) Mth.lerp(t, scale, 0);
+                    opacity = Mth.lerp(t, 1.0, 0.0);
+                    position = getDialogInterpolatedDisappearPosition(t);
+                }
+                backgroundColor = ARGB.color((int) (opacity * 255.0), backgroundColor);
+                position = translateToRelative(position);
+            } else {
+                originalScale = (float) Mth.lerp(t, oldScale, scale);
             }
-            backgroundColor = ARGB.color((int) (opacity * 255.0), backgroundColor);
-            position = translateToRelative(position);
         }
         if (currentTick == totalTick) {
             if (dialogStopping && !dialogStarting) dialogStopping = false;
@@ -134,15 +129,23 @@ public class DialogRenderer3D extends DialogRenderer {
             case DOWN -> poseStack.translate(0, getHeight(), 0);
         }
 
-        dialogTail.render(poseStack, partialTick, minecraft.renderBuffers().bufferSource(), minecraft.gameRenderer.getMainCamera());
+        dialogTail.render(
+                poseStack,
+                partialTick,
+                minecraft.renderBuffers().bufferSource(),
+                minecraft.gameRenderer.getMainCamera());
 
-        if(diffY == 0) {
+        if (diffY == 0) {
             switch (side) {
                 case RIGHT, LEFT -> poseStack.translate(0, getHeight() / 2, 0);
             }
         }
 
         dialogScrollText.render(poseStack, minecraft.renderBuffers().bufferSource());
+        if (dialogScrollText.isFinished()) {
+            dialogArrowSkip.start();
+        }
+        dialogArrowSkip.render(poseStack, minecraft.renderBuffers().bufferSource(), partialTick);
 
         minecraft.renderBuffers().bufferSource().endBatch(NarrativeCraftMod.dialogBackgroundRenderType);
     }
@@ -151,7 +154,7 @@ public class DialogRenderer3D extends DialogRenderer {
         double x, y, z;
         x = Mth.lerp(t, dialogPosition.x, dialogPosition.x + dialogOffset.x);
         y = Mth.lerp(t, dialogPosition.y, dialogPosition.y + dialogOffset.y);
-        z = Mth.lerp(t, dialogPosition.z, dialogPosition.z + dialogOffset.z);
+        z = Mth.lerp(t, dialogPosition.z, dialogPosition.z);
         return new Vec3(x, y, z);
     }
 
@@ -159,7 +162,7 @@ public class DialogRenderer3D extends DialogRenderer {
         double x, y, z;
         x = Mth.lerp(t, dialogPosition.x + dialogOffset.x, dialogPosition.x);
         y = Mth.lerp(t, dialogPosition.y + dialogOffset.y, dialogPosition.y);
-        z = Mth.lerp(t, dialogPosition.z + dialogOffset.z, dialogPosition.z);
+        z = Mth.lerp(t, dialogPosition.z, dialogPosition.z);
         return new Vec3(x, y, z);
     }
 
@@ -167,7 +170,7 @@ public class DialogRenderer3D extends DialogRenderer {
         MultiBufferSource.BufferSource bufferSource = minecraft.renderBuffers().bufferSource();
         VertexConsumer vertexConsumer = bufferSource.getBuffer(NarrativeCraftMod.dialogBackgroundRenderType);
         Matrix4f matrix4f = poseStack.last().pose();
-        
+
         Side side = dialogOffsetSide();
         double diffY = translateToRelativeApplyOffset(dialogPosition).y - translateToRelative(dialogPosition).y;
 
@@ -179,56 +182,153 @@ public class DialogRenderer3D extends DialogRenderer {
         } else {
             oldWidth = totalWidth;
             oldHeight = totalHeight;
+            oldScale = scale;
         }
 
         switch (side) {
             case UP -> {
-                vertexConsumer.addVertex(matrix4f, -originalWidth, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                vertexConsumer.addVertex(matrix4f, originalWidth, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                vertexConsumer.addVertex(matrix4f, originalWidth, -originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                vertexConsumer.addVertex(matrix4f, -originalWidth, -originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                vertexConsumer
+                        .addVertex(matrix4f, -originalWidth, 0, 0)
+                        .setColor(backgroundColor)
+                        .setLight(LightTexture.FULL_BRIGHT);
+                vertexConsumer
+                        .addVertex(matrix4f, originalWidth, 0, 0)
+                        .setColor(backgroundColor)
+                        .setLight(LightTexture.FULL_BRIGHT);
+                vertexConsumer
+                        .addVertex(matrix4f, originalWidth, -originalHeight, 0)
+                        .setColor(backgroundColor)
+                        .setLight(LightTexture.FULL_BRIGHT);
+                vertexConsumer
+                        .addVertex(matrix4f, -originalWidth, -originalHeight, 0)
+                        .setColor(backgroundColor)
+                        .setLight(LightTexture.FULL_BRIGHT);
             }
             case RIGHT -> {
-                if(diffY < 0) {
-                    vertexConsumer.addVertex(matrix4f, 0, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                    vertexConsumer.addVertex(matrix4f, 0, originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                    vertexConsumer.addVertex(matrix4f, originalWidth * 2, originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                    vertexConsumer.addVertex(matrix4f, originalWidth * 2, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                } else if(diffY > 0) {
-                    vertexConsumer.addVertex(matrix4f, 0, -originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                    vertexConsumer.addVertex(matrix4f, 0, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                    vertexConsumer.addVertex(matrix4f, originalWidth * 2, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                    vertexConsumer.addVertex(matrix4f, originalWidth * 2, -originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                if (diffY < 0) {
+                    vertexConsumer
+                            .addVertex(matrix4f, 0, 0, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer
+                            .addVertex(matrix4f, 0, originalHeight, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer
+                            .addVertex(matrix4f, originalWidth * 2, originalHeight, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer
+                            .addVertex(matrix4f, originalWidth * 2, 0, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
+                } else if (diffY > 0) {
+                    vertexConsumer
+                            .addVertex(matrix4f, 0, -originalHeight, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer
+                            .addVertex(matrix4f, 0, 0, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer
+                            .addVertex(matrix4f, originalWidth * 2, 0, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer
+                            .addVertex(matrix4f, originalWidth * 2, -originalHeight, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
                 } else {
-                    vertexConsumer.addVertex(matrix4f, 0, -originalHeight / 2, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                    vertexConsumer.addVertex(matrix4f, 0, originalHeight / 2, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                    vertexConsumer.addVertex(matrix4f, originalWidth * 2, originalHeight / 2, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                    vertexConsumer.addVertex(matrix4f, originalWidth * 2, -originalHeight / 2, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer
+                            .addVertex(matrix4f, 0, -originalHeight / 2, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer
+                            .addVertex(matrix4f, 0, originalHeight / 2, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer
+                            .addVertex(matrix4f, originalWidth * 2, originalHeight / 2, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer
+                            .addVertex(matrix4f, originalWidth * 2, -originalHeight / 2, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
                 }
             }
             case LEFT -> {
-                if(diffY < 0) {
-                    vertexConsumer.addVertex(matrix4f, -originalWidth * 2, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                    vertexConsumer.addVertex(matrix4f, -originalWidth * 2, originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                    vertexConsumer.addVertex(matrix4f, 0, originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                    vertexConsumer.addVertex(matrix4f, 0, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                } else if(diffY > 0) {
-                    vertexConsumer.addVertex(matrix4f, 0, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                    vertexConsumer.addVertex(matrix4f, 0, -originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                    vertexConsumer.addVertex(matrix4f, -originalWidth * 2, -originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                    vertexConsumer.addVertex(matrix4f, -originalWidth * 2, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                if (diffY < 0) {
+                    vertexConsumer
+                            .addVertex(matrix4f, -originalWidth * 2, 0, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer
+                            .addVertex(matrix4f, -originalWidth * 2, originalHeight, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer
+                            .addVertex(matrix4f, 0, originalHeight, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer
+                            .addVertex(matrix4f, 0, 0, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
+                } else if (diffY > 0) {
+                    vertexConsumer
+                            .addVertex(matrix4f, 0, 0, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer
+                            .addVertex(matrix4f, 0, -originalHeight, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer
+                            .addVertex(matrix4f, -originalWidth * 2, -originalHeight, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer
+                            .addVertex(matrix4f, -originalWidth * 2, 0, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
                 } else {
-                    vertexConsumer.addVertex(matrix4f, 0, originalHeight / 2, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                    vertexConsumer.addVertex(matrix4f, 0, -originalHeight / 2, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                    vertexConsumer.addVertex(matrix4f, -originalWidth * 2, -originalHeight / 2, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                    vertexConsumer.addVertex(matrix4f, -originalWidth * 2, originalHeight / 2, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer
+                            .addVertex(matrix4f, 0, originalHeight / 2, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer
+                            .addVertex(matrix4f, 0, -originalHeight / 2, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer
+                            .addVertex(matrix4f, -originalWidth * 2, -originalHeight / 2, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
+                    vertexConsumer
+                            .addVertex(matrix4f, -originalWidth * 2, originalHeight / 2, 0)
+                            .setColor(backgroundColor)
+                            .setLight(LightTexture.FULL_BRIGHT);
                 }
             }
             case DOWN -> {
-                vertexConsumer.addVertex(matrix4f, -originalWidth, originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                vertexConsumer.addVertex(matrix4f, originalWidth, originalHeight, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                vertexConsumer.addVertex(matrix4f, originalWidth, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
-                vertexConsumer.addVertex(matrix4f, -originalWidth, 0, 0).setColor(backgroundColor).setLight(LightTexture.FULL_BRIGHT);
+                vertexConsumer
+                        .addVertex(matrix4f, -originalWidth, originalHeight, 0)
+                        .setColor(backgroundColor)
+                        .setLight(LightTexture.FULL_BRIGHT);
+                vertexConsumer
+                        .addVertex(matrix4f, originalWidth, originalHeight, 0)
+                        .setColor(backgroundColor)
+                        .setLight(LightTexture.FULL_BRIGHT);
+                vertexConsumer
+                        .addVertex(matrix4f, originalWidth, 0, 0)
+                        .setColor(backgroundColor)
+                        .setLight(LightTexture.FULL_BRIGHT);
+                vertexConsumer
+                        .addVertex(matrix4f, -originalWidth, 0, 0)
+                        .setColor(backgroundColor)
+                        .setLight(LightTexture.FULL_BRIGHT);
             }
         }
     }
@@ -266,11 +366,7 @@ public class DialogRenderer3D extends DialogRenderer {
 
     public Vec3 translateToRelative(Vec3 worldPos) {
         Vec3 camPos = minecraft.gameRenderer.getMainCamera().getPosition();
-        return new Vec3(
-                worldPos.x - camPos.x,
-                worldPos.y - camPos.y,
-                worldPos.z - camPos.z
-        );
+        return new Vec3(worldPos.x - camPos.x, worldPos.y - camPos.y, worldPos.z - camPos.z);
     }
 
     public Vec3 translateToRelativeApplyOffset(Vec3 position) {
@@ -278,10 +374,10 @@ public class DialogRenderer3D extends DialogRenderer {
         double offsetX = 0;
         double offsetZ = 0;
         switch (minecraft.player.getDirection()) {
-            case EAST -> offsetZ = dialogOffset.x();
-            case WEST -> offsetZ = -dialogOffset.x();
-            case SOUTH -> offsetX = -dialogOffset.x();
-            case NORTH -> offsetX = dialogOffset.x();
+            case EAST -> offsetZ = dialogOffset.x;
+            case WEST -> offsetZ = -dialogOffset.x;
+            case SOUTH -> offsetX = -dialogOffset.x;
+            case NORTH -> offsetX = dialogOffset.x;
         }
         return new Vec3(position.x + offsetX, position.y + dialogOffset.y, position.z + offsetZ);
     }
@@ -301,7 +397,7 @@ public class DialogRenderer3D extends DialogRenderer {
         this.characterRuntime = characterRuntime;
     }
 
-    public Vec3 getDialogOffset() {
+    public Vec2 getDialogOffset() {
         return dialogOffset;
     }
 

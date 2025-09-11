@@ -24,10 +24,7 @@
 package fr.loudo.narrativecraft.registers;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.commands.OpenScreenCommand;
-import fr.loudo.narrativecraft.commands.PlaybackCommand;
-import fr.loudo.narrativecraft.commands.PlayerSessionCommand;
-import fr.loudo.narrativecraft.commands.RecordCommand;
+import fr.loudo.narrativecraft.commands.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
@@ -45,7 +42,7 @@ public class CommandsRegister {
         RecordCommand.register(event.getDispatcher());
         PlaybackCommand.register(event.getDispatcher());
         OpenScreenCommand.register(event.getDispatcher());
-        //        StoryCommand.register(event.getDispatcher());
+        StoryCommand.register(event.getDispatcher());
         //        LinkCommand.register(event.getDispatcher());
     }
 }

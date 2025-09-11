@@ -102,7 +102,7 @@ public class InkActionRegister {
         InkActionRegistry.register(() -> new WeatherInkAction(
                 "weather",
                 InkAction.Side.SERVER,
-                "weather set <clear, rain, thunder>",
-                command -> command.startsWith("weather set")));
+                "weather <clear, rain, thunder>",
+                command -> command.startsWith("weather")));
     }
 }

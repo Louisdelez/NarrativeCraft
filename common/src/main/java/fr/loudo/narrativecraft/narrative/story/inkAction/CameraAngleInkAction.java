@@ -25,15 +25,23 @@ package fr.loudo.narrativecraft.narrative.story.inkAction;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
+import fr.loudo.narrativecraft.controllers.cameraAngle.CameraAngleController;
+import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.CameraAngle;
+import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
+import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.keyframes.cameraAngle.CameraAngleKeyframe;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.util.Translation;
+import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.Entity;
 
 public class CameraAngleInkAction extends InkAction {
 
+    private CameraAngle cameraAngle;
     private CameraAngleKeyframe keyframe;
 
     public CameraAngleInkAction(String id, Side side, String syntax, CommandMatcher matcher) {
@@ -49,7 +57,7 @@ public class CameraAngleInkAction extends InkAction {
             return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Camera angle child name missing"));
         }
         String parentName = arguments.get(1);
-        CameraAngle cameraAngle = scene.getCameraAngleByName(parentName);
+        cameraAngle = scene.getCameraAngleByName(parentName);
         if (cameraAngle == null) {
             return InkActionResult.error(Translation.message("camera_angle.no_exists", parentName, scene.getName()));
         }
@@ -63,7 +71,28 @@ public class CameraAngleInkAction extends InkAction {
 
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
+        if (!(playerSession.getController() instanceof CameraAngleController)) {
+            // Remove characters that exists in the story
+            List<CharacterRuntime> toRemove = new ArrayList<>();
+            for (CharacterStoryData characterStoryData : cameraAngle.getCharacterStoryDataList()) {
+                for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+                    if (characterStoryData
+                            .getCharacterStory()
+                            .getName()
+                            .equalsIgnoreCase(
+                                    characterRuntime.getCharacterStory().getName())) {
+                        characterRuntime.getEntity().remove(Entity.RemovalReason.KILLED);
+                        toRemove.add(characterRuntime);
+                    }
+                }
+            }
+            playerSession.getCharacterRuntimes().removeAll(toRemove);
+            CameraAngleController controller =
+                    new CameraAngleController(Environment.PRODUCTION, playerSession.getPlayer(), cameraAngle);
+            controller.startSession();
+        }
         playerSession.setCurrentCamera(keyframe.getKeyframeLocation());
+        Minecraft.getInstance().options.hideGui = true;
         return InkActionResult.ok();
     }
 }

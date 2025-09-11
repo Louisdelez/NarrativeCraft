@@ -41,6 +41,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
 public class OpenScreenCommand {
@@ -63,25 +64,17 @@ public class OpenScreenCommand {
         PlayerSession playerSession = NarrativeCraftMod.getInstance()
                 .getPlayerSessionManager()
                 .getSessionByPlayer(context.getSource().getPlayer());
-        CharacterStory characterStory = NarrativeCraftMod.getInstance().getCharacterManager().getCharacterStories().getFirst();
-        LivingEntity entity = Util.createEntityFromCharacter(characterStory, context.getSource().getLevel());
+        CharacterStory characterStory = NarrativeCraftMod.getInstance()
+                .getCharacterManager()
+                .getCharacterStories()
+                .getFirst();
+        LivingEntity entity = Util.createEntityFromCharacter(
+                characterStory, context.getSource().getLevel());
         Vec3 pos = context.getSource().getPosition();
         entity.teleportTo(pos.x, pos.y, pos.z);
         CharacterRuntime characterRuntime = new CharacterRuntime(characterStory, entity);
         DialogRenderer3D dialogRenderer3D = new DialogRenderer3D(
-                characterRuntime,
-                new Vec3(0, 0.8, 0),
-                50,
-                40,
-                5,
-                5,
-                0.8F,
-                0,
-                10,
-                0,
-                -1,
-                false
-        );
+                "Oh, hello!", characterRuntime, new Vec2(0, 0.8F), 90, 5, 10, 0.6F, 0, 0, 0, -1, false);
         dialogRenderer3D.start();
         playerSession.setDialogRenderer(dialogRenderer3D);
         return Command.SINGLE_SUCCESS;
@@ -92,7 +85,7 @@ public class OpenScreenCommand {
                 .getPlayerSessionManager()
                 .getSessionByPlayer(context.getSource().getPlayer());
         DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
-        dialogRenderer.setWidth(30);
+        dialogRenderer.setWidth(25);
         dialogRenderer.update();
         return Command.SINGLE_SUCCESS;
     }

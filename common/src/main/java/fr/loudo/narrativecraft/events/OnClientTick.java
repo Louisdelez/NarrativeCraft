@@ -45,8 +45,8 @@ public class OnClientTick {
             playerSession.getDialogRenderer().tick();
         }
         List<InkAction> toRemove = new ArrayList<>();
-        for (InkAction inkAction : playerSession.getInkActions()) {
-            if (inkAction.getSide() != InkAction.Side.CLIENT) continue;
+        List<InkAction> inkActionsClient = playerSession.getClientSideInkActions();
+        for (InkAction inkAction : inkActionsClient) {
             if (!inkAction.isRunning()) toRemove.add(inkAction);
             inkAction.tick();
         }

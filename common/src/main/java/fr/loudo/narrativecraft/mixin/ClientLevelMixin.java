@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.inkAction.ChangeDayTimeInkAction;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import org.spongepowered.asm.mixin.Mixin;
@@ -42,7 +43,8 @@ public class ClientLevelMixin {
                 .getPlayerSessionManager()
                 .getSessionByPlayer(Minecraft.getInstance().player);
         if (playerSession == null) return;
-        for (InkAction inkAction : playerSession.getInkActions()) {
+        List<InkAction> inkActionsClient = playerSession.getClientSideInkActions();
+        for (InkAction inkAction : inkActionsClient) {
             if (inkAction instanceof ChangeDayTimeInkAction changeDayTimeInkAction) {
                 cir.setReturnValue(changeDayTimeInkAction.getCurrentTick());
             }

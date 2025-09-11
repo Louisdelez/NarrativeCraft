@@ -29,6 +29,8 @@ import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
+import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframe;
+import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframeGroup;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
@@ -66,12 +68,20 @@ public class CutsceneInkAction extends InkAction {
 
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
-        if (playerSession.getController() != null) {
-            playerSession.getController().stopSession(false);
-        }
         controller = new CutsceneController(Environment.PRODUCTION, playerSession.getPlayer(), cutscene);
         controller.startSession();
-        controller.getCutscenePlayback().play();
+        if (controller.getKeyframeGroups().isEmpty()) {
+            return InkActionResult.error("Cutscene " + cutscene.getName() + " has not keyframes ! Can't be played.");
+        }
+        CutsceneKeyframeGroup keyframeGroup = controller.getKeyframeGroups().getFirst();
+        CutsceneKeyframe keyframeA = keyframeGroup.getKeyframes().getFirst();
+        CutsceneKeyframe keyframeB;
+        if (keyframeGroup.getKeyframes().size() > 1) {
+            keyframeB = keyframeGroup.getKeyframes().get(1);
+        } else {
+            keyframeB = keyframeA;
+        }
+        controller.getCutscenePlayback().setupAndPlay(keyframeA, keyframeB);
         return InkActionResult.block();
     }
 }

@@ -40,6 +40,7 @@ import fr.loudo.narrativecraft.util.Util;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -83,6 +84,10 @@ public class CameraAngleController extends AbstractKeyframesBase<CameraAngleKeyf
     public void startSession() {
         stopCurrentSession();
         playerSession.setController(this);
+        for (CharacterStoryData characterStoryData : characterStoryDataList) {
+            characterStoryData.spawn(playerSession.getPlayer().level(), environment);
+            playerSession.getCharacterRuntimes().add(characterStoryData.getCharacterRuntime());
+        }
         if (environment != Environment.DEVELOPMENT) return;
         Location location = null;
         if (!characterStoryDataList.isEmpty()) {
@@ -97,21 +102,20 @@ public class CameraAngleController extends AbstractKeyframesBase<CameraAngleKeyf
         for (CameraAngleKeyframe cameraAngleKeyframe : keyframes) {
             cameraAngleKeyframe.showKeyframe(playerSession.getPlayer());
         }
-        for (CharacterStoryData characterStoryData : characterStoryDataList) {
-            characterStoryData.spawn(playerSession.getPlayer().level(), environment);
-        }
     }
 
     @Override
     public void stopSession(boolean save) {
+        for (CharacterStoryData characterStoryData : characterStoryDataList) {
+            characterStoryData.kill();
+            playerSession.getCharacterRuntimes().remove(characterStoryData.getCharacterRuntime());
+        }
+        playerSession.setController(null);
+        Minecraft.getInstance().options.hideGui = false;
+        if (environment != Environment.DEVELOPMENT) return;
         for (CameraAngleKeyframe cameraAngleKeyframe : keyframes) {
             cameraAngleKeyframe.hideKeyframe(playerSession.getPlayer());
         }
-        for (CharacterStoryData characterStoryData : characterStoryDataList) {
-            characterStoryData.kill();
-        }
-        playerSession.setController(null);
-        if (environment != Environment.DEVELOPMENT) return;
         if (save) {
             List<CameraAngleKeyframe> oldCameraAngles = cameraAngle.getCameraAngleKeyframes();
             List<CharacterStoryData> oldCharacterStoryData = cameraAngle.getCharacterStoryDataList();

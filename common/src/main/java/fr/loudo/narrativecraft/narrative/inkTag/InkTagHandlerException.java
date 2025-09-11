@@ -21,31 +21,12 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.narrative.inkTag;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
-import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
-import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import java.util.List;
-import net.minecraft.client.Minecraft;
 
-public class OnRenderWorld {
-    public static void renderWorld(PoseStack poseStack, float partialTick) {
-        PlayerSession playerSession = NarrativeCraftMod.getInstance()
-                .getPlayerSessionManager()
-                .getSessionByPlayer(Minecraft.getInstance().player);
-        if (playerSession == null) return;
-        if (playerSession.getController() instanceof CutsceneController controller) {
-            controller.drawLinesBetweenKeyframes(poseStack);
-        }
-        if (playerSession.getDialogRenderer() != null) {
-            playerSession.getDialogRenderer().render(poseStack, partialTick);
-        }
-        List<InkAction> inkActionsClient = playerSession.getClientSideInkActions();
-        for (InkAction inkAction : inkActionsClient) {
-            inkAction.partialTick(partialTick);
-        }
+public class InkTagHandlerException extends RuntimeException {
+    public InkTagHandlerException(Class<? extends InkAction> inkActionClass, String message) {
+        super("Tag " + inkActionClass.getSimpleName() + " cannot be executed! " + message);
     }
 }

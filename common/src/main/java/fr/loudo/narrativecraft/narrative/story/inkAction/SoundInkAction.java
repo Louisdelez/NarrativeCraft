@@ -76,6 +76,12 @@ public class SoundInkAction extends InkAction {
     }
 
     @Override
+    public void stop() {
+        if (soundManager == null || simpleSoundInstance == null) return;
+        soundManager.stop(simpleSoundInstance);
+    }
+
+    @Override
     protected InkActionResult doValidate(List<String> arguments, Scene scene) {
         Minecraft minecraft = Minecraft.getInstance();
         soundManager = minecraft.getSoundManager();

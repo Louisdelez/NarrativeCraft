@@ -91,21 +91,21 @@ public class BorderInkAction extends InkAction {
                 return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(2)));
             }
             try {
-                down = Integer.parseInt(arguments.get(1));
+                down = Integer.parseInt(arguments.get(3));
             } catch (NumberFormatException e) {
                 return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(3)));
             }
             try {
-                left = Integer.parseInt(arguments.get(1));
+                left = Integer.parseInt(arguments.get(4));
             } catch (NumberFormatException e) {
                 return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(4)));
             }
-            return InkActionResult.ok();
-        }
-        try {
-            color = Integer.parseInt(arguments.get(6), 16);
-        } catch (NumberFormatException e) {
-            return InkActionResult.error(Translation.message(NOT_VALID_COLOR, arguments.get(6)));
+        } else {
+            try {
+                color = Integer.parseInt(arguments.get(6), 16);
+            } catch (NumberFormatException e) {
+                return InkActionResult.error(Translation.message(NOT_VALID_COLOR, arguments.get(6)));
+            }
         }
         opacity = 1.0;
         if (arguments.size() > 6) {

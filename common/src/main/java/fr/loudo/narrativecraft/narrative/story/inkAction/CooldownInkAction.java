@@ -69,6 +69,9 @@ public class CooldownInkAction extends InkAction {
         if (waitSeconds == -1.0) {
             return InkActionResult.error(Translation.message(WRONG_TIME_VALUE));
         }
+        if (waitSeconds > 2) {
+            waitSeconds -= 1;
+        }
         totalTick = waitSeconds * 20;
         return InkActionResult.ok();
     }

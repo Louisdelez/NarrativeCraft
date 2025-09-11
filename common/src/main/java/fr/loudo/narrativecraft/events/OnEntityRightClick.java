@@ -42,9 +42,10 @@ public class OnEntityRightClick {
 
         if (playerSession.getController() instanceof CameraAngleController controller) {
             CharacterStoryData characterStoryData = controller.getCharacterStoryDataFromEntity(entity);
-            if (characterStoryData == null) return;
-            CharacterOptionsScreen screen = new CharacterOptionsScreen(null, controller, characterStoryData);
-            Minecraft.getInstance().setScreen(screen);
+            if (characterStoryData != null) {
+                CharacterOptionsScreen screen = new CharacterOptionsScreen(null, controller, characterStoryData);
+                Minecraft.getInstance().setScreen(screen);
+            }
         }
         if (playerSession.getController() instanceof KeyframeControllerInterface<?> controller) {
             Keyframe keyframe = controller.getKeyframeByEntity(entity);

@@ -37,11 +37,12 @@ public class OnEnterInkAction extends InkAction {
 
     @Override
     protected InkActionResult doValidate(List<String> arguments, Scene scene) {
-        return null;
+        return InkActionResult.ok();
     }
 
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
-        return null;
+        isRunning = false;
+        return InkActionResult.ok();
     }
 }

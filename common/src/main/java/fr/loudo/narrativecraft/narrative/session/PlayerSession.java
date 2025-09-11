@@ -28,10 +28,15 @@ import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.managers.PlaybackManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
+import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandler;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.recording.Location;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -41,20 +46,25 @@ public class PlayerSession {
     private final ServerPlayer player;
     private final PlaybackManager playbackManager = new PlaybackManager();
     private final List<InkAction> inkActions = new ArrayList<>();
+    private final List<CharacterRuntime> characterRuntimes = new ArrayList<>();
+    private final InkTagHandler inkTagHandler;
     private AbstractController controller;
     private DialogRenderer dialogRenderer;
     private KeyframeLocation currentCamera;
+    private StoryHandler storyHandler;
     private Chapter chapter;
     private Scene scene;
 
     public PlayerSession(ServerPlayer player) {
         this.player = player;
+        inkTagHandler = new InkTagHandler(this);
     }
 
     public PlayerSession(ServerPlayer player, Chapter chapter, Scene scene) {
         this.player = player;
         this.chapter = chapter;
         this.scene = scene;
+        inkTagHandler = new InkTagHandler(this);
     }
 
     public void addInkAction(InkAction inkAction) {
@@ -96,6 +106,45 @@ public class PlayerSession {
         return inkActions;
     }
 
+    // I know this code sucks, but I don't know why it sometimes does ConcurrentModificationException bruh...
+
+    public List<InkAction> getClientSideInkActions() {
+        try {
+            return inkActions.stream()
+                    .filter(inkAction -> inkAction.getSide() != null && inkAction.getSide() == InkAction.Side.CLIENT)
+                    .toList();
+        } catch (ConcurrentModificationException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public List<InkAction> getServerSideInkActions() {
+        try {
+            return inkActions.stream()
+                    .filter(inkAction -> inkAction.getSide() != null && inkAction.getSide() == InkAction.Side.SERVER)
+                    .toList();
+        } catch (ConcurrentModificationException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public InkTagHandler getInkTagHandler() {
+        return inkTagHandler;
+    }
+
+    public CharacterRuntime getCharacterRuntimeByCharacter(CharacterStory characterStory) {
+        for (CharacterRuntime characterRuntime : characterRuntimes) {
+            if (characterRuntime.getCharacterStory().getName().equalsIgnoreCase(characterStory.getName())) {
+                return characterRuntime;
+            }
+        }
+        return null;
+    }
+
+    public List<CharacterRuntime> getCharacterRuntimes() {
+        return characterRuntimes;
+    }
+
     public DialogRenderer getDialogRenderer() {
         return dialogRenderer;
     }
@@ -130,6 +179,14 @@ public class PlayerSession {
 
     public KeyframeLocation getCurrentCamera() {
         return currentCamera;
+    }
+
+    public StoryHandler getStoryHandler() {
+        return storyHandler;
+    }
+
+    public void setStoryHandler(StoryHandler storyHandler) {
+        this.storyHandler = storyHandler;
     }
 
     public void setCurrentCamera(KeyframeLocation currentCamera) {

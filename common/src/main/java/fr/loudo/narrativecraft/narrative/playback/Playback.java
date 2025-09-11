@@ -114,6 +114,7 @@ public class Playback {
         //            NarrativeCraftMod.getInstance().getCharacterManager().reloadSkin(character);
         //        }
         for (PlaybackData playbackData1 : entityPlaybacks) {
+            playbackData1.reset();
             actionListener(playbackData1);
         }
     }
@@ -291,6 +292,7 @@ public class Playback {
         }
 
         masterEntity = Util.createEntityFromCharacter(characterRuntime.getCharacterStory(), level);
+        characterRuntime.setEntity(masterEntity);
         moveEntitySilent(masterEntity, loc);
 
         entityPlaybacks.getFirst().setEntity(masterEntity);
@@ -398,6 +400,10 @@ public class Playback {
 
     public LivingEntity getMasterEntity() {
         return masterEntity;
+    }
+
+    public CharacterRuntime getCharacterRuntime() {
+        return characterRuntime;
     }
 
     public CharacterStory getCharacter() {

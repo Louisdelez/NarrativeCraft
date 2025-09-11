@@ -37,8 +37,8 @@ public class OnServerTick {
             PlayerSession playerSession =
                     NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
             List<InkAction> toRemove = new ArrayList<>();
-            for (InkAction inkAction : playerSession.getInkActions()) {
-                if (inkAction.getSide() != InkAction.Side.SERVER) continue;
+            List<InkAction> inkActionsServer = playerSession.getServerSideInkActions();
+            for (InkAction inkAction : inkActionsServer) {
                 if (!inkAction.isRunning()) toRemove.add(inkAction);
                 inkAction.tick();
             }

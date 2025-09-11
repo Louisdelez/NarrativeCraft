@@ -82,9 +82,6 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         }
         if (!isPlaying) return;
         currentTick++;
-        for (Playback playback : playbacks) {
-            playback.tick();
-        }
         if (currentTick >= totalTick && environment == Environment.DEVELOPMENT) {
             pause();
             if (Minecraft.getInstance().screen instanceof CutsceneControllerScreen screen) {
@@ -113,6 +110,10 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
             playbacks.add(playback);
         }
         totalTick = calculateTotalTick();
+        for (Playback playback : playbacks) {
+            playerSession.getCharacterRuntimes().add(playback.getCharacterRuntime());
+        }
+        playerSession.getPlaybackManager().getPlaybacks().addAll(playbacks);
         if (environment != Environment.DEVELOPMENT) return;
         if (!keyframeGroups.isEmpty()) {
             selectedGroup = keyframeGroups.getFirst();
@@ -142,10 +143,20 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
     @Override
     public void stopSession(boolean save) {
         for (Playback playback : playbacks) {
-            playback.stop(true);
+            playback.stop(environment == Environment.DEVELOPMENT);
+            if (environment == Environment.DEVELOPMENT) { // Characters not killed on PRODUCTION when cutscene end.
+                playerSession.getCharacterRuntimes().remove(playback.getCharacterRuntime());
+            }
         }
         playerSession.setController(null);
-        playerSession.setCurrentCamera(null);
+        Minecraft.getInstance().options.hideGui = false;
+        if (environment == Environment.DEVELOPMENT) {
+            playerSession.setCurrentCamera(null);
+        } else if (environment == Environment.PRODUCTION) {
+            playerSession.setCurrentCamera(
+                    keyframeGroups.getLast().getKeyframes().getLast().getKeyframeLocation());
+        }
+        playerSession.getPlaybackManager().getPlaybacks().removeAll(playbacks);
         if (environment != Environment.DEVELOPMENT) return;
         for (CutsceneKeyframeGroup keyframeGroup : keyframeGroups) {
             keyframeGroup.hideKeyframes(playerSession.getPlayer());
@@ -300,7 +311,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
     }
 
     public void drawLinesBetweenKeyframes(PoseStack poseStack) {
-        if (playerSession.getCurrentCamera() != null) return;
+        if (playerSession.getCurrentCamera() != null || environment != Environment.DEVELOPMENT) return;
         Minecraft client = Minecraft.getInstance();
         Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
         Vec3 cameraPos = camera.getPosition();

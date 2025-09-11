@@ -61,6 +61,7 @@ public class CutscenePlayback {
         cutsceneController.setPlaying(true);
         segmentTick = 0;
         totalTick = keyframeA.getTick();
+        Minecraft.getInstance().options.hideGui = true;
         play();
     }
 
@@ -71,7 +72,6 @@ public class CutscenePlayback {
 
     public void stop() {
         isPlaying = false;
-        cutsceneController.setPlaying(false);
     }
 
     public void tick() {

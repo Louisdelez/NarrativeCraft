@@ -46,25 +46,23 @@ public class NarrativeCraftFabric implements ModInitializer {
         ModKeysRegister.register();
 
         RenderPipeline pipeline = RenderPipelines.register(RenderPipeline.builder(RenderPipelines.TEXT_SNIPPET)
-                        .withLocation("pipeline/text_background_see_through")
-                        .withVertexShader("core/rendertype_text_background_see_through")
-                        .withFragmentShader("core/rendertype_text_background_see_through")
-                        .withDepthWrite(false)
-                        .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-                        .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
-                        .build()
-                );
+                .withLocation("pipeline/text_background_see_through")
+                .withVertexShader("core/rendertype_text_background_see_through")
+                .withFragmentShader("core/rendertype_text_background_see_through")
+                .withDepthWrite(false)
+                .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+                .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
+                .build());
 
-                NarrativeCraftMod.dialogBackgroundRenderType = RenderType.create(
-                        "narrativecraft_dialog_background",
-                        1536,
-                        false,
-                        true,
-                        pipeline,
-                        RenderType.CompositeState.builder()
-
-         .setTextureState(RenderStateShard.NO_TEXTURE).setLightmapState(RenderStateShard.LIGHTMAP).createCompositeState(false)
-                );
-
+        NarrativeCraftMod.dialogBackgroundRenderType = RenderType.create(
+                "narrativecraft_dialog_background",
+                1536,
+                false,
+                true,
+                pipeline,
+                RenderType.CompositeState.builder()
+                        .setTextureState(RenderStateShard.NO_TEXTURE)
+                        .setLightmapState(RenderStateShard.LIGHTMAP)
+                        .createCompositeState(false));
     }
 }

@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.events;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 
@@ -44,8 +45,8 @@ public class OnHudRender {
                 .getPlayerSessionManager()
                 .getSessionByPlayer(Minecraft.getInstance().player);
         if (playerSession == null) return;
-        for (InkAction inkAction : playerSession.getInkActions()) {
-            if (inkAction.getSide() != InkAction.Side.CLIENT) continue;
+        List<InkAction> inkActionsClient = playerSession.getClientSideInkActions();
+        for (InkAction inkAction : inkActionsClient) {
             inkAction.render(guiGraphics, partialTick);
         }
     }

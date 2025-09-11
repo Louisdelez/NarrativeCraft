@@ -24,11 +24,11 @@
 package fr.loudo.narrativecraft.narrative.dialog;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import fr.loudo.narrativecraft.narrative.dialog.animation.DialogArrowSkip;
 import fr.loudo.narrativecraft.narrative.dialog.animation.DialogScrollText;
 import fr.loudo.narrativecraft.util.Easing;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 
 public class DialogRenderer {
@@ -37,12 +37,34 @@ public class DialogRenderer {
     protected final double dialogTransitionTime = 0.5;
     protected final double dialogAppearTime = 0.2;
     protected final DialogScrollText dialogScrollText;
+    protected final DialogArrowSkip dialogArrowSkip;
     protected String text;
-    protected float width, totalWidth, oldWidth, height, totalHeight, oldHeight, paddingX, paddingY, scale, letterSpacing, gap;
+    protected float width,
+            totalWidth,
+            oldWidth,
+            height,
+            totalHeight,
+            oldHeight,
+            paddingX,
+            paddingY,
+            oldScale,
+            scale,
+            letterSpacing,
+            gap;
     protected int backgroundColor, textColor, currentTick, totalTick;
     protected boolean noSkip, dialogStarting, dialogStopping;
 
-    public DialogRenderer(String text, float width, float paddingX, float paddingY, float scale, float letterSpacing, float gap, int backgroundColor, int textColor, boolean noSkip) {
+    public DialogRenderer(
+            String text,
+            float width,
+            float paddingX,
+            float paddingY,
+            float scale,
+            float letterSpacing,
+            float gap,
+            int backgroundColor,
+            int textColor,
+            boolean noSkip) {
         this.text = text;
         this.width = width;
         this.paddingX = paddingX;
@@ -55,16 +77,17 @@ public class DialogRenderer {
         this.noSkip = noSkip;
         minecraft = Minecraft.getInstance();
         dialogScrollText = new DialogScrollText(this, minecraft);
+        dialogArrowSkip = new DialogArrowSkip(this, 2.5F, 2.5F, -5f, -10f, -1);
         initMeasures();
         dialogScrollText.reset();
     }
 
     private void initMeasures() {
         height = minecraft.font.lineHeight * dialogScrollText.getLines().size();
-        totalHeight = height + (dialogScrollText.getLines().size() - 1) * gap + paddingY * 2;
-        totalWidth = (minecraft.font.width(dialogScrollText.getLongerTextLine())
-                + (dialogScrollText.getLongerTextLine().length() - 1) * letterSpacing
-                + paddingX * 2) / 2.0F;
+        totalHeight = height + (dialogScrollText.getLines().size() - 1) * gap + 2 * paddingY;
+        float widthLongestLine = (minecraft.font.width(dialogScrollText.getLongerTextLine())
+                + (dialogScrollText.getLongerTextLine().length() - 1) * letterSpacing);
+        totalWidth = (widthLongestLine / 2) + 2 * paddingX;
     }
 
     public void tick() {
@@ -72,6 +95,7 @@ public class DialogRenderer {
             currentTick++;
         }
         dialogScrollText.tick();
+        dialogArrowSkip.tick();
     }
 
     public void render(PoseStack poseStack, float partialTick) {}
@@ -83,6 +107,7 @@ public class DialogRenderer {
         dialogStopping = false;
         totalTick = (int) (dialogTransitionTime * 20.0);
         currentTick = 0;
+        dialogArrowSkip.stop();
     }
 
     public void start() {
@@ -90,6 +115,7 @@ public class DialogRenderer {
         dialogStopping = false;
         totalTick = (int) (dialogAppearTime * 20.0);
         currentTick = 0;
+        dialogArrowSkip.stop();
     }
 
     public void stop() {
@@ -97,10 +123,15 @@ public class DialogRenderer {
         dialogStopping = true;
         totalTick = (int) (dialogAppearTime * 20.0);
         currentTick = 0;
+        dialogArrowSkip.stop();
     }
 
     public boolean isAnimating() {
         return currentTick < totalTick;
+    }
+
+    public DialogScrollText getDialogScrollText() {
+        return dialogScrollText;
     }
 
     public float getInterpolatedWidth(float partialTick) {
@@ -125,6 +156,9 @@ public class DialogRenderer {
 
     public void setText(String text) {
         this.text = text;
+        dialogScrollText.setText(text);
+        initMeasures();
+        dialogScrollText.reset();
     }
 
     public float getWidth() {
@@ -153,7 +187,6 @@ public class DialogRenderer {
 
     public float getTotalWidth() {
         return totalWidth;
-
     }
 
     public float getPaddingX() {

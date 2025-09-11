@@ -65,12 +65,12 @@ public abstract class CameraMixin {
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
         if (playerSession == null) return;
-        if (playerSession.getCurrentCamera() == null) return;
-        KeyframeLocation location = playerSession.getCurrentCamera();
         if (playerSession.getController() instanceof CutsceneController controller) {
             controller.getCutscenePlayback().cameraInterpolation(partialTick);
         }
 
+        if (playerSession.getCurrentCamera() == null) return;
+        KeyframeLocation location = playerSession.getCurrentCamera();
         this.setPosition(location.getX(), location.getY(), location.getZ());
         this.setRotation(location.getYaw(), location.getPitch());
         this.rotation.rotateZ(-(float) Math.toRadians(location.getRoll()));

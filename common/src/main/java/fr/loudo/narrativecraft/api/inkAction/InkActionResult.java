@@ -74,4 +74,12 @@ public record InkActionResult(
     public boolean isError() {
         return status == Status.ERROR;
     }
+
+    public boolean isOk() {
+        return status == Status.OK;
+    }
+
+    public boolean isBlock() {
+        return status == Status.BLOCK;
+    }
 }

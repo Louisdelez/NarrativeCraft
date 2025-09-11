@@ -62,6 +62,8 @@ public abstract class InkAction {
 
     public void render(GuiGraphics guiGraphics, float partialTick) {}
 
+    public void stop() {}
+
     public final InkActionResult validate(String command, Scene scene) {
         this.command = command;
         InkActionResult result = doValidate(InkActionUtil.getArguments(command), scene);
