@@ -23,25 +23,44 @@
 
 package fr.loudo.narrativecraft.mixin;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.story.inkAction.ShakeScreenInkAction;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
     @Inject(method = "getFov", at = @At("RETURN"), cancellable = true)
-    public void getZoomLevel(CallbackInfoReturnable<Float> callbackInfo) {
+    public void narrativecraft$getZoomLevel(CallbackInfoReturnable<Float> callbackInfo) {
         LocalPlayer player = Minecraft.getInstance().player;
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
         if (playerSession == null) return;
         if (playerSession.getCurrentCamera() == null) return;
         callbackInfo.setReturnValue(playerSession.getCurrentCamera().getFov());
+    }
+
+    @Inject(method = "bobView", at = @At("RETURN"))
+    public void narrativecraft$applyInkShakeScreen(PoseStack poseStack, float partialTicks, CallbackInfo ci) {
+        LocalPlayer player = Minecraft.getInstance().player;
+        PlayerSession playerSession =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
+        if (playerSession == null) return;
+        List<InkAction> inkActionsShake = playerSession.getClientSideInkActions().stream()
+                .filter(inkAction -> inkAction instanceof ShakeScreenInkAction)
+                .toList();
+        for (InkAction shakeScreenInkAction : inkActionsShake) {
+            shakeScreenInkAction.render(poseStack, partialTicks);
+        }
     }
 }

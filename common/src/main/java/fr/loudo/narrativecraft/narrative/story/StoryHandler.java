@@ -113,15 +113,28 @@ public class StoryHandler {
         return false;
     }
 
-    public void next() throws Exception {
-        if (story == null) throw new Exception("Story is not initialized!");
-        if (!story.canContinue() && story.getCurrentChoices().isEmpty()) {
+    public void next() {
+        try {
+            if (story == null) throw new Exception("Story is not initialized!");
+            if (!story.canContinue() && story.getCurrentChoices().isEmpty()) {
+                stop();
+                return;
+            }
+            dialogText = story.Continue();
+            playerSession.getInkTagHandler().getTagsToExecute().addAll(story.getCurrentTags());
+            DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
+            // Handles dialog stopping animation, to executes tags AFTER the animation disappeared.
+            // And for that, it checks if the new dialog character is the same as the old dialog (dialog renderer)
+            if (dialogRenderer == null || sameCharacterTalking(dialogText)) {
+                playerSession.getInkTagHandler().execute();
+            } else {
+                dialogRenderer.stop();
+            }
+        } catch (Exception e) {
             stop();
-            return;
+            NarrativeCraftMod.LOGGER.error("Can't continue the story: ", e);
+            Util.sendCrashMessage(minecraft.player, e);
         }
-        dialogText = story.Continue();
-        playerSession.getInkTagHandler().getTagsToExecute().addAll(story.getCurrentTags());
-        playerSession.getInkTagHandler().execute();
     }
 
     public void showCurrentDialog() {
@@ -158,11 +171,38 @@ public class StoryHandler {
         if (dialogRenderer == null) {
             dialogRenderer = getDialogRenderer(dialog, characterStory);
             playerSession.setDialogRenderer(dialogRenderer);
+            dialogRenderer.setRunDialogStopped(() -> {
+                // Runnable task to execute the stuff AFTER the stopping animation ended.
+                // If the next action is only a new dialog, then show the new dialog
+                // Or else, executes the tags, and after it show the dialog (inside ink tag handler)
+                playerSession.setDialogRenderer(null);
+                if (playerSession.getInkTagHandler().getTagsToExecute().isEmpty()) {
+                    showCurrentDialog();
+                } else {
+                    playerSession.getInkTagHandler().execute();
+                }
+            });
             dialogRenderer.start();
         } else {
             dialogRenderer.setText(dialog);
             dialogRenderer.update();
         }
+    }
+
+    private boolean sameCharacterTalking(String dialog) {
+        DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
+        if (dialog.isEmpty() || !(dialogRenderer instanceof DialogRenderer3D)) return true;
+        Pattern pattern = Pattern.compile("^(\\w+)\\s*:\\s*(.+)$\n");
+        Matcher matcher = pattern.matcher(dialog);
+        String characterName = "";
+        if (matcher.matches()) {
+            characterName = matcher.group(1).trim();
+        }
+        return ((DialogRenderer3D) dialogRenderer)
+                .getCharacterRuntime()
+                .getCharacterStory()
+                .getName()
+                .equalsIgnoreCase(characterName);
     }
 
     private DialogRenderer getDialogRenderer(String dialog, CharacterStory characterStory) {

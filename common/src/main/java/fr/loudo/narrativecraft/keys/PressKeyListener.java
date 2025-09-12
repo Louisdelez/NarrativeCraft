@@ -29,7 +29,6 @@ import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.screens.storyManager.chapter.ChaptersScreen;
 import fr.loudo.narrativecraft.screens.storyManager.scene.ScenesMenuScreen;
-import fr.loudo.narrativecraft.util.Util;
 import net.minecraft.client.Minecraft;
 
 public class PressKeyListener {
@@ -66,13 +65,7 @@ public class PressKeyListener {
             }
             if (playerSession.getStoryHandler() == null) return;
             StoryHandler storyHandler = playerSession.getStoryHandler();
-            try {
-                storyHandler.next();
-            } catch (Exception e) {
-                storyHandler.stop();
-                NarrativeCraftMod.LOGGER.error("Can't continue the story: ", e);
-                Util.sendCrashMessage(minecraft.player, e);
-            }
+            NarrativeCraftMod.server.execute(storyHandler::next);
         });
     }
 }

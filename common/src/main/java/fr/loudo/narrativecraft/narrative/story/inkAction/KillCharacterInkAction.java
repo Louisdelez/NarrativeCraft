@@ -23,25 +23,58 @@
 
 package fr.loudo.narrativecraft.narrative.story.inkAction;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
+import net.minecraft.world.entity.Entity;
 
-// TODO: complete
 public class KillCharacterInkAction extends InkAction {
+
+    private CharacterStory characterStory;
+
     public KillCharacterInkAction(String id, Side side, String syntax, CommandMatcher matcher) {
         super(id, side, syntax, matcher);
     }
 
     @Override
     protected InkActionResult doValidate(List<String> arguments, Scene scene) {
-        return null;
+        if (arguments.size() == 1) {
+            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Character name"));
+        }
+        String characterName = arguments.get(1);
+        characterStory = NarrativeCraftMod.getInstance().getCharacterManager().getCharacterByName(characterName);
+        if (characterStory == null) {
+            characterStory = scene.getNpcByName(characterName);
+        }
+        if (characterStory == null) {
+            return InkActionResult.error(
+                    Translation.message(WRONG_ARGUMENT_TEXT, "Character " + characterName + " does not exists."));
+        }
+        return InkActionResult.ok();
     }
 
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
-        return null;
+        StoryHandler storyHandler = playerSession.getStoryHandler();
+        if (storyHandler == null) return InkActionResult.ignored();
+        if (!storyHandler.characterInStory(characterStory)) {
+            return InkActionResult.ignored();
+        }
+        CharacterRuntime characterRuntimeToRemove = null;
+        for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+            if (characterRuntime.getCharacterStory().getName().equalsIgnoreCase(characterStory.getName())) {
+                characterRuntimeToRemove = characterRuntime;
+                characterRuntime.getEntity().remove(Entity.RemovalReason.KILLED);
+            }
+        }
+        playerSession.getCharacterRuntimes().remove(characterRuntimeToRemove);
+        return InkActionResult.ok();
     }
 }

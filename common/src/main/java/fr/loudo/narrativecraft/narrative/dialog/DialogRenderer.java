@@ -53,6 +53,7 @@ public class DialogRenderer {
             gap;
     protected int backgroundColor, textColor, currentTick, totalTick;
     protected boolean noSkip, dialogStarting, dialogStopping;
+    protected Runnable runDialogStopped;
 
     public DialogRenderer(
             String text,
@@ -91,8 +92,11 @@ public class DialogRenderer {
     }
 
     public void tick() {
-        if (currentTick <= totalTick) {
+        if (currentTick < totalTick) {
             currentTick++;
+        }
+        if (currentTick >= totalTick && dialogStopping) {
+            runDialogStopped.run();
         }
         dialogScrollText.tick();
         dialogArrowSkip.tick();
@@ -267,5 +271,13 @@ public class DialogRenderer {
 
     public void setDialogStopping(boolean dialogStopping) {
         this.dialogStopping = dialogStopping;
+    }
+
+    public Runnable getRunDialogStopped() {
+        return runDialogStopped;
+    }
+
+    public void setRunDialogStopped(Runnable runDialogStopped) {
+        this.runDialogStopped = runDialogStopped;
     }
 }

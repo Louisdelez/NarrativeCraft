@@ -82,7 +82,7 @@ public class InkActionRegister {
                 "kill %character_name%",
                 command -> command.startsWith("kill")));
         InkActionRegistry.register(() -> new OnEnterInkAction(
-                "kill_character", InkAction.Side.SERVER, "on enter", command -> command.equals("on enter")));
+                "enter", InkAction.Side.SERVER, "on enter", command -> command.equals("on enter")));
         InkActionRegistry.register(
                 () -> new SaveInkAction("save", InkAction.Side.SERVER, "save", command -> command.equals("save")));
         InkActionRegistry.register(() -> new SoundInkAction(
@@ -104,5 +104,10 @@ public class InkActionRegister {
                 InkAction.Side.SERVER,
                 "weather <clear, rain, thunder>",
                 command -> command.startsWith("weather")));
+        InkActionRegistry.register(() -> new ShakeScreenInkAction(
+                "shake_screen",
+                InkAction.Side.CLIENT,
+                "shake %strength% %decay_rate% %speed%",
+                command -> command.startsWith("shake")));
     }
 }

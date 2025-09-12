@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.api.inkAction;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.util.Translation;
@@ -61,6 +62,8 @@ public abstract class InkAction {
     public void partialTick(float partialTick) {}
 
     public void render(GuiGraphics guiGraphics, float partialTick) {}
+
+    public void render(PoseStack poseStack, float partialTick) {}
 
     public void stop() {}
 

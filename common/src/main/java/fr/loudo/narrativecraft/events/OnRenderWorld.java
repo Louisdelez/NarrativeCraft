@@ -46,6 +46,7 @@ public class OnRenderWorld {
         List<InkAction> inkActionsClient = playerSession.getClientSideInkActions();
         for (InkAction inkAction : inkActionsClient) {
             inkAction.partialTick(partialTick);
+            inkAction.render(poseStack, partialTick);
         }
     }
 }

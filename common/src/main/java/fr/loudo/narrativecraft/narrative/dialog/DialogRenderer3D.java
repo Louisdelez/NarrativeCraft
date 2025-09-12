@@ -141,11 +141,13 @@ public class DialogRenderer3D extends DialogRenderer {
             }
         }
 
-        dialogScrollText.render(poseStack, minecraft.renderBuffers().bufferSource());
-        if (dialogScrollText.isFinished()) {
-            dialogArrowSkip.start();
+        if (!dialogStopping) {
+            dialogScrollText.render(poseStack, minecraft.renderBuffers().bufferSource());
+            if (dialogScrollText.isFinished()) {
+                dialogArrowSkip.start();
+            }
+            dialogArrowSkip.render(poseStack, minecraft.renderBuffers().bufferSource(), partialTick);
         }
-        dialogArrowSkip.render(poseStack, minecraft.renderBuffers().bufferSource(), partialTick);
 
         minecraft.renderBuffers().bufferSource().endBatch(NarrativeCraftMod.dialogBackgroundRenderType);
     }
