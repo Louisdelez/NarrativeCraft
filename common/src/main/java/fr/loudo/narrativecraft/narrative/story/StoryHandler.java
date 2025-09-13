@@ -37,6 +37,7 @@ import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.screens.story.StoryChoicesScreen;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,6 +48,7 @@ import net.minecraft.world.phys.Vec2;
 public class StoryHandler {
 
     private final Minecraft minecraft = Minecraft.getInstance();
+    public static final String DIALOG_REGEX = "^(\\w+)\\s*:\\s*(.+?)\\s*$";
 
     private final PlayerSession playerSession;
     private final DialogData dialogData =
@@ -124,9 +126,18 @@ public class StoryHandler {
                 stop();
                 return;
             }
-            dialogText = story.Continue();
-            playerSession.getInkTagHandler().getTagsToExecute().addAll(story.getCurrentTags());
             DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
+            dialogText = story.Continue();
+            if (!story.getCurrentChoices().isEmpty()) {
+                dialogRenderer.stop();
+                dialogRenderer.setRunDialogStopped(() -> {
+                    playerSession.setDialogRenderer(null);
+                    StoryChoicesScreen choicesScreen = new StoryChoicesScreen(this, true);
+                    minecraft.setScreen(choicesScreen);
+                });
+                return;
+            }
+            playerSession.getInkTagHandler().getTagsToExecute().addAll(story.getCurrentTags());
             // Handles dialog stopping animation, to executes tags AFTER the animation disappeared.
             // And for that, it checks if the new dialog character is the same as the old dialog (dialog renderer)
             if (dialogRenderer == null || sameCharacterTalking(dialogText)) {
@@ -151,10 +162,14 @@ public class StoryHandler {
         }
     }
 
+    public Matcher getDialogMatcher(String dialog) {
+        Pattern pattern = Pattern.compile(DIALOG_REGEX);
+        return pattern.matcher(dialog);
+    }
+
     private void showDialog(String dialog) throws Exception {
         if (dialog.isEmpty()) return;
-        Pattern pattern = Pattern.compile("^(\\w+)\\s*:\\s*(.+)$\n");
-        Matcher matcher = pattern.matcher(dialog);
+        Matcher matcher = getDialogMatcher(dialog);
         CharacterStory characterStory = null;
         if (matcher.matches()) {
             String characterName = matcher.group(1).trim();
@@ -197,8 +212,7 @@ public class StoryHandler {
     private boolean sameCharacterTalking(String dialog) {
         DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
         if (dialog.isEmpty() || !(dialogRenderer instanceof DialogRenderer3D)) return true;
-        Pattern pattern = Pattern.compile("^(\\w+)\\s*:\\s*(.+)$\n");
-        Matcher matcher = pattern.matcher(dialog);
+        Matcher matcher = getDialogMatcher(dialog);
         String characterName = "";
         if (matcher.matches()) {
             characterName = matcher.group(1).trim();

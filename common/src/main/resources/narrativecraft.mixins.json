@@ -23,6 +23,7 @@
     "CameraMixin",
     "ClientLevelMixin",
     "GameRendererMixin",
+    "GuiTextRenderStateMixin",
     "KeyboardHandlerMixin",
     "accessor.FontAccessor",
     "invoker.FontInvoker"

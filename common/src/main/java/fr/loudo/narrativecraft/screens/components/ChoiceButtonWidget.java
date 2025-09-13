@@ -76,6 +76,10 @@ public class ChoiceButtonWidget extends AbstractButton {
         textEffectAnimation = new TextEffectAnimation(choiceString);
     }
 
+    public void tick() {
+        textEffectAnimation.tick();
+    }
+
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         int left = this.getX();

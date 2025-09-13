@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.screens.story;
 
 import com.bladecoder.ink.runtime.Choice;
 import com.mojang.blaze3d.platform.InputConstants;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.keys.ModKeys;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.screens.components.ChoiceButtonWidget;
@@ -41,11 +42,12 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 
 public class StoryChoicesScreen extends Screen {
-    private static final double APPEAR_TIME = 0.13;
+    private static final double APPEAR_TIME = 0.25;
     private static final int OFFSET = 10;
 
     private final List<Choice> choiceList;
     private final List<AnimatedChoice> animatedChoices;
+    private final List<ChoiceButtonWidget> choiceButtonWidgetList = new ArrayList<>();
     private final int totalTick;
     private StoryHandler storyHandler;
     private boolean initiated;
@@ -86,6 +88,9 @@ public class StoryChoicesScreen extends Screen {
         if (currentTick < totalTick) {
             currentTick++;
         }
+        for (ChoiceButtonWidget choiceButtonWidget : choiceButtonWidgetList) {
+            choiceButtonWidget.tick();
+        }
     }
 
     @Override
@@ -95,9 +100,18 @@ public class StoryChoicesScreen extends Screen {
             SoundEvent sound = SoundEvent.createVariableRangeEvent(soundRes);
             this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(sound, 1.0f, 1.0f));
         }
-        List<ChoiceButtonWidget> choiceButtonWidgetList = new ArrayList<>();
+        choiceButtonWidgetList.clear();
         for (Choice choice : choiceList) {
-            choiceButtonWidgetList.add(new ChoiceButtonWidget(choice, index -> {}));
+            choiceButtonWidgetList.add(new ChoiceButtonWidget(choice, index -> {
+                minecraft.setScreen(null);
+                try {
+                    storyHandler.getStory().chooseChoiceIndex(index);
+                    NarrativeCraftMod.server.execute(storyHandler::next);
+                } catch (Exception e) {
+                    NarrativeCraftMod.server.execute(storyHandler::stop);
+                    Util.sendCrashMessage(minecraft.player, e);
+                }
+            }));
         }
         int spacing = 10;
         int baseY = 60;
@@ -188,7 +202,7 @@ public class StoryChoicesScreen extends Screen {
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        t = (currentTick + partialTick) / totalTick;
+        t = Math.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
         for (AnimatedChoice ac : animatedChoices) {
             int newOpacity = (int) Mth.lerp(t, 5, 255);
             guiGraphics.pose().pushMatrix();

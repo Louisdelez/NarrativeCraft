@@ -150,9 +150,6 @@ public class DialogParametersInkAction extends InkAction {
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
         DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
-        if (dialogRenderer == null && parameterType != ParameterType.NO_SKIP) {
-            return InkActionResult.ok();
-        }
         StoryHandler storyHandler = playerSession.getStoryHandler();
 
         executeParameter(dialogRenderer, storyHandler);

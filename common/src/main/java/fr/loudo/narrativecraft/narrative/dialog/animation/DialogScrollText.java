@@ -91,6 +91,7 @@ public class DialogScrollText {
         Map<Integer, Vector2f> offsets = textEffectAnimation.getOffsets(partialTick);
         for (int i = 0; i < lettersRenderer.size(); i++) {
             LetterLocation letter = lettersRenderer.get(i);
+            if (!letter.render()) continue;
             float x = letter.x;
             float y = letter.y;
             if (dialogRenderer instanceof DialogRenderer3D dialogRenderer3D) {
@@ -159,11 +160,13 @@ public class DialogScrollText {
 
     private char addLetter() {
         char letter = lines.get(currentLine).charAt(currentCharIndex);
-        lettersRenderer.add(new LetterLocation(letter, currentX, currentY));
+        lettersRenderer.add(new LetterLocation(letter, currentX, currentY, true));
         currentTick = 0;
         currentX += Util.getLetterWidth(letter, minecraft) + dialogRenderer.getLetterSpacing();
         currentCharIndex++;
         if (currentCharIndex >= lines.get(currentLine).length()) {
+            lettersRenderer.add(new LetterLocation(
+                    ' ', currentX, currentY, false)); // Synchronize start and end index from text effects
             currentLine++;
             currentCharIndex = 0;
             currentX = -dialogRenderer.getTotalWidth() + dialogRenderer.getPaddingX() * 2;
@@ -183,5 +186,5 @@ public class DialogScrollText {
         return lines;
     }
 
-    private record LetterLocation(char letter, float x, float y) {}
+    private record LetterLocation(char letter, float x, float y, boolean render) {}
 }
