@@ -51,9 +51,9 @@ public class DialogRenderer {
             scale,
             letterSpacing,
             gap;
-    protected int backgroundColor, textColor, currentTick, totalTick;
-    protected boolean noSkip, dialogStarting, dialogStopping;
-    protected Runnable runDialogStopped;
+    protected int backgroundColor, textColor, currentTick, totalTick, totalTickAutoSkip;
+    protected boolean noSkip, dialogStarting, dialogStopping, dialogAutoSkip, dialogAutoSkipping;
+    protected Runnable runDialogStopped, runDialogAutoSkipped;
 
     public DialogRenderer(
             String text,
@@ -64,8 +64,7 @@ public class DialogRenderer {
             float letterSpacing,
             float gap,
             int backgroundColor,
-            int textColor,
-            boolean noSkip) {
+            int textColor) {
         this.text = text;
         this.width = width;
         this.paddingX = paddingX;
@@ -75,12 +74,24 @@ public class DialogRenderer {
         this.gap = gap;
         this.backgroundColor = backgroundColor;
         this.textColor = textColor;
-        this.noSkip = noSkip;
         minecraft = Minecraft.getInstance();
         dialogScrollText = new DialogScrollText(this, minecraft);
         dialogArrowSkip = new DialogArrowSkip(this, 2.5F, 2.5F, -5f, -10f, -1);
         initMeasures();
         dialogScrollText.reset();
+    }
+
+    public DialogRenderer(String text, DialogData dialogData) {
+        this(
+                text,
+                dialogData.getWidth(),
+                dialogData.getPaddingX(),
+                dialogData.getPaddingY(),
+                dialogData.getScale(),
+                dialogData.getLetterSpacing(),
+                dialogData.getGap(),
+                dialogData.getBackgroundColor(),
+                dialogData.getTextColor());
     }
 
     private void initMeasures() {
@@ -92,11 +103,15 @@ public class DialogRenderer {
     }
 
     public void tick() {
-        if (currentTick < totalTick) {
+        if (currentTick < totalTick || dialogAutoSkip && currentTick < totalTickAutoSkip) {
             currentTick++;
         }
-        if (currentTick >= totalTick && dialogStopping) {
-            runDialogStopped.run();
+        if (dialogStopping) {
+            if (currentTick >= totalTick) {
+                runDialogStopped.run();
+            }
+        } else if (dialogAutoSkip && dialogAutoSkipping && currentTick >= totalTickAutoSkip) {
+            runDialogAutoSkipped.run();
         }
         dialogScrollText.tick();
         dialogArrowSkip.tick();
@@ -112,6 +127,7 @@ public class DialogRenderer {
         totalTick = (int) (dialogTransitionTime * 20.0);
         currentTick = 0;
         dialogArrowSkip.stop();
+        dialogAutoSkipping = false;
     }
 
     public void start() {
@@ -120,6 +136,7 @@ public class DialogRenderer {
         totalTick = (int) (dialogAppearTime * 20.0);
         currentTick = 0;
         dialogArrowSkip.stop();
+        dialogAutoSkipping = false;
     }
 
     public void stop() {
@@ -128,6 +145,19 @@ public class DialogRenderer {
         totalTick = (int) (dialogAppearTime * 20.0);
         currentTick = 0;
         dialogArrowSkip.stop();
+        dialogAutoSkipping = false;
+    }
+
+    public void autoSkipAt(double seconds) {
+        if (seconds == 0.0) return;
+        dialogAutoSkip = true;
+        totalTickAutoSkip = (int) (seconds * 20.0);
+    }
+
+    public void stopAutoSkip() {
+        dialogAutoSkip = false;
+        dialogAutoSkipping = false;
+        totalTickAutoSkip = 0;
     }
 
     public boolean isAnimating() {
@@ -279,5 +309,17 @@ public class DialogRenderer {
 
     public void setRunDialogStopped(Runnable runDialogStopped) {
         this.runDialogStopped = runDialogStopped;
+    }
+
+    public void setRunDialogAutoSkipped(Runnable runDialogAutoSkipped) {
+        this.runDialogAutoSkipped = runDialogAutoSkipped;
+    }
+
+    public int getTotalTickAutoSkip() {
+        return totalTickAutoSkip;
+    }
+
+    public boolean isDialogAutoSkip() {
+        return dialogAutoSkip;
     }
 }

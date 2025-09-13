@@ -59,6 +59,7 @@ public class PressKeyListener {
             DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
             if (dialogRenderer == null) return;
             if (dialogRenderer.isAnimating()) return;
+            if (dialogRenderer.isNoSkip()) return;
             if (!dialogRenderer.getDialogScrollText().isFinished()) {
                 dialogRenderer.getDialogScrollText().forceFinish();
                 return;

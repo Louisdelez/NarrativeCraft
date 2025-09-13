@@ -41,7 +41,7 @@ import org.joml.Matrix4f;
 
 public class DialogRenderer3D extends DialogRenderer {
 
-    private final Vec2 dialogOffset;
+    private Vec2 dialogOffset;
     private final DialogTail dialogTail;
     private CharacterRuntime characterRuntime;
     private Vec3 dialogPosition;
@@ -57,11 +57,17 @@ public class DialogRenderer3D extends DialogRenderer {
             float letterSpacing,
             float gap,
             int backgroundColor,
-            int textColor,
-            boolean noSkip) {
-        super(text, width, paddingX, paddingY, scale, letterSpacing, gap, backgroundColor, textColor, noSkip);
+            int textColor) {
+        super(text, width, paddingX, paddingY, scale, letterSpacing, gap, backgroundColor, textColor);
         this.characterRuntime = characterRuntime;
         this.dialogOffset = dialogOffset;
+        dialogTail = new DialogTail(this, 5, 10, 0);
+    }
+
+    public DialogRenderer3D(String text, DialogData dialogData, CharacterRuntime characterRuntime) {
+        super(text, dialogData);
+        this.characterRuntime = characterRuntime;
+        this.dialogOffset = dialogData.getOffset();
         dialogTail = new DialogTail(this, 5, 10, 0);
     }
 
@@ -144,9 +150,15 @@ public class DialogRenderer3D extends DialogRenderer {
         if (!dialogStopping) {
             dialogScrollText.render(poseStack, minecraft.renderBuffers().bufferSource());
             if (dialogScrollText.isFinished()) {
+                if (!dialogAutoSkipping) {
+                    dialogAutoSkipping = true;
+                    currentTick = 0;
+                }
                 dialogArrowSkip.start();
             }
-            dialogArrowSkip.render(poseStack, minecraft.renderBuffers().bufferSource(), partialTick);
+            if (!noSkip) {
+                dialogArrowSkip.render(poseStack, minecraft.renderBuffers().bufferSource(), partialTick);
+            }
         }
 
         minecraft.renderBuffers().bufferSource().endBatch(NarrativeCraftMod.dialogBackgroundRenderType);
@@ -401,6 +413,10 @@ public class DialogRenderer3D extends DialogRenderer {
 
     public Vec2 getDialogOffset() {
         return dialogOffset;
+    }
+
+    public void setDialogOffset(Vec2 dialogOffset) {
+        this.dialogOffset = dialogOffset;
     }
 
     public Vec3 getDialogPosition() {

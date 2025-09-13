@@ -60,7 +60,11 @@ public class DialogScrollText {
         currentTick = 0;
         currentLine = 0;
         currentCharIndex = 0;
-        currentY = -dialogRenderer.getTotalHeight() + dialogRenderer.getPaddingY() * 2;
+        currentY = -dialogRenderer.getTotalHeight()
+                + dialogRenderer.getPaddingY()
+                + (minecraft.font.lineHeight / 2.0F)
+                + (dialogRenderer.getGap() / 2.0F)
+                + 0.7F;
         currentX = -dialogRenderer.getTotalWidth() + dialogRenderer.getPaddingX() * 2;
         lettersRenderer.clear();
     }
