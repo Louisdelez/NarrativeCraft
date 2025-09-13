@@ -32,6 +32,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.dialog.DialogData;
+import fr.loudo.narrativecraft.narrative.dialog.DialogEntityBobbing;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
@@ -48,7 +49,8 @@ public class StoryHandler {
     private final Minecraft minecraft = Minecraft.getInstance();
 
     private final PlayerSession playerSession;
-    private final DialogData dialogData = new DialogData(new Vec2(0, 0.8F), 90, 5, 5, 0.4F, 0, 0, 0, -1, false, false, 0.0);
+    private final DialogData dialogData =
+            new DialogData(new Vec2(0, 0.8F), 90, 5, 5, 0.4F, 0, 0, 0, -1, 2.9F, 2.15F, false, false, 0.0);
     private Story story;
     private String dialogText;
 
@@ -212,8 +214,10 @@ public class StoryHandler {
         CharacterRuntime characterRuntime = playerSession.getCharacterRuntimeByCharacter(characterStory);
         DialogRenderer dialogRenderer;
         if (characterRuntime != null) {
-            dialogRenderer =
-                    new DialogRenderer3D(dialog, dialogData, characterRuntime);
+            dialogRenderer = new DialogRenderer3D(dialog, characterStory.getName(), dialogData, characterRuntime);
+            DialogRenderer3D dialogRenderer3D = (DialogRenderer3D) dialogRenderer;
+            dialogRenderer3D.setDialogEntityBobbing(new DialogEntityBobbing(
+                    dialogRenderer3D, dialogData.getNoiseShakeSpeed(), dialogData.getNoiseShakeStrength()));
         } else {
             dialogRenderer = new DialogRenderer(dialog, dialogData); // TODO: 2d dialog
         }
@@ -224,5 +228,9 @@ public class StoryHandler {
 
     public DialogData getDialogData() {
         return dialogData;
+    }
+
+    public Story getStory() {
+        return story;
     }
 }

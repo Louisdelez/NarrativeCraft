@@ -36,7 +36,6 @@ import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.recording.Location;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.List;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -113,7 +112,7 @@ public class PlayerSession {
             return inkActions.stream()
                     .filter(inkAction -> inkAction.getSide() != null && inkAction.getSide() == InkAction.Side.CLIENT)
                     .toList();
-        } catch (ConcurrentModificationException e) {
+        } catch (Exception e) {
             return new ArrayList<>();
         }
     }
@@ -123,7 +122,7 @@ public class PlayerSession {
             return inkActions.stream()
                     .filter(inkAction -> inkAction.getSide() != null && inkAction.getSide() == InkAction.Side.SERVER)
                     .toList();
-        } catch (ConcurrentModificationException e) {
+        } catch (Exception e) {
             return new ArrayList<>();
         }
     }

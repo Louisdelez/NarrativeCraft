@@ -26,11 +26,10 @@ package fr.loudo.narrativecraft.narrative.dialog.animation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer3D;
+import fr.loudo.narrativecraft.narrative.story.text.ParsedDialog;
+import fr.loudo.narrativecraft.narrative.story.text.TextEffectAnimation;
 import fr.loudo.narrativecraft.util.Util;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -41,11 +40,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.FormattedCharSequence;
+import org.joml.Vector2f;
 
 public class DialogScrollText {
     private final DialogRenderer dialogRenderer;
     private final Minecraft minecraft;
     private final List<LetterLocation> lettersRenderer = new ArrayList<>();
+    private ParsedDialog parsedDialog;
+    private TextEffectAnimation textEffectAnimation;
     private List<String> lines = new ArrayList<>();
     private int currentTick, currentLine, currentCharIndex;
     private float currentX, currentY;
@@ -53,7 +55,8 @@ public class DialogScrollText {
     public DialogScrollText(DialogRenderer dialogRenderer, Minecraft minecraft) {
         this.dialogRenderer = dialogRenderer;
         this.minecraft = minecraft;
-        setText(dialogRenderer.getText());
+        parsedDialog = ParsedDialog.parse(dialogRenderer.getText());
+        setText(parsedDialog.cleanedText());
     }
 
     public void reset() {
@@ -67,6 +70,7 @@ public class DialogScrollText {
                 + 0.7F;
         currentX = -dialogRenderer.getTotalWidth() + dialogRenderer.getPaddingX() * 2;
         lettersRenderer.clear();
+        textEffectAnimation = new TextEffectAnimation(dialogRenderer.getText());
     }
 
     public void forceFinish() {
@@ -80,19 +84,27 @@ public class DialogScrollText {
             currentTick++;
             populateLetters();
         }
+        textEffectAnimation.tick();
     }
 
-    public void render(PoseStack poseStack, MultiBufferSource.BufferSource source) {
-        for (LetterLocation letter : lettersRenderer) {
+    public void render(PoseStack poseStack, MultiBufferSource.BufferSource source, float partialTick) {
+        Map<Integer, Vector2f> offsets = textEffectAnimation.getOffsets(partialTick);
+        for (int i = 0; i < lettersRenderer.size(); i++) {
+            LetterLocation letter = lettersRenderer.get(i);
+            float x = letter.x;
             float y = letter.y;
             if (dialogRenderer instanceof DialogRenderer3D dialogRenderer3D) {
                 if (dialogRenderer3D.getDialogOffset().y < 0) {
                     y += dialogRenderer3D.getTotalHeight() - dialogRenderer3D.getPaddingY();
                 }
             }
+            if (offsets.containsKey(i)) {
+                x += offsets.get(i).x;
+                y += offsets.get(i).y;
+            }
             minecraft.font.drawInBatch(
                     String.valueOf(letter.letter),
-                    letter.x,
+                    x,
                     y,
                     ARGB.color(255, dialogRenderer.getTextColor()),
                     false,

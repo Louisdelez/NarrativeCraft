@@ -227,7 +227,11 @@ public class DialogParametersInkAction extends InkAction {
                 });
                 break;
             case BOBBING:
-                // TODO: Implement bobbing
+                executeIfRenderer3D(dialogRenderer, renderer -> renderer.updateBobbing(value1, value2));
+                executeDialogData(storyHandler, dialogData -> {
+                    dialogData.setNoiseShakeSpeed(value1);
+                    dialogData.setNoiseShakeStrength(value2);
+                });
                 break;
         }
     }

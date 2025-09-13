@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.narrative.dialog;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.narrative.dialog.animation.DialogArrowSkip;
 import fr.loudo.narrativecraft.narrative.dialog.animation.DialogScrollText;
+import fr.loudo.narrativecraft.narrative.story.text.ParsedDialog;
 import fr.loudo.narrativecraft.util.Easing;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -190,7 +191,8 @@ public class DialogRenderer {
 
     public void setText(String text) {
         this.text = text;
-        dialogScrollText.setText(text);
+        ParsedDialog parsedDialog = ParsedDialog.parse(text);
+        dialogScrollText.setText(parsedDialog.cleanedText());
         initMeasures();
         dialogScrollText.reset();
     }
@@ -201,7 +203,8 @@ public class DialogRenderer {
 
     public void setWidth(float width) {
         this.width = width;
-        dialogScrollText.setText(text);
+        ParsedDialog parsedDialog = ParsedDialog.parse(text);
+        dialogScrollText.setText(parsedDialog.cleanedText());
         initMeasures();
         dialogScrollText.reset();
     }

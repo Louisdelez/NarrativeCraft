@@ -12,6 +12,7 @@
     "ServerPlayerFabricMixin"
   ],
   "client": [
+    "GuiGraphicsFabricMixin",
     "GuiMixin"
   ],
   "server": [],

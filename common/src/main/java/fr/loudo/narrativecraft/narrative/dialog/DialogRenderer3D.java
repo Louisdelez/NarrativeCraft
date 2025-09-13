@@ -41,13 +41,16 @@ import org.joml.Matrix4f;
 
 public class DialogRenderer3D extends DialogRenderer {
 
-    private Vec2 dialogOffset;
     private final DialogTail dialogTail;
+    private DialogEntityBobbing dialogEntityBobbing;
+    private Vec2 dialogOffset;
+    private String characterName;
     private CharacterRuntime characterRuntime;
     private Vec3 dialogPosition;
 
     public DialogRenderer3D(
             String text,
+            String characterName,
             CharacterRuntime characterRuntime,
             Vec2 dialogOffset,
             float width,
@@ -59,13 +62,16 @@ public class DialogRenderer3D extends DialogRenderer {
             int backgroundColor,
             int textColor) {
         super(text, width, paddingX, paddingY, scale, letterSpacing, gap, backgroundColor, textColor);
+        this.characterName = characterName;
         this.characterRuntime = characterRuntime;
         this.dialogOffset = dialogOffset;
         dialogTail = new DialogTail(this, 5, 10, 0);
     }
 
-    public DialogRenderer3D(String text, DialogData dialogData, CharacterRuntime characterRuntime) {
+    public DialogRenderer3D(
+            String text, String characterName, DialogData dialogData, CharacterRuntime characterRuntime) {
         super(text, dialogData);
+        this.characterName = characterName;
         this.characterRuntime = characterRuntime;
         this.dialogOffset = dialogData.getOffset();
         dialogTail = new DialogTail(this, 5, 10, 0);
@@ -74,6 +80,7 @@ public class DialogRenderer3D extends DialogRenderer {
     @Override
     public void tick() {
         if (dialogPosition == null) return;
+        dialogEntityBobbing.tick();
         super.tick();
     }
 
@@ -148,7 +155,8 @@ public class DialogRenderer3D extends DialogRenderer {
         }
 
         if (!dialogStopping) {
-            dialogScrollText.render(poseStack, minecraft.renderBuffers().bufferSource());
+            dialogEntityBobbing.partialTick(partialTick);
+            dialogScrollText.render(poseStack, minecraft.renderBuffers().bufferSource(), partialTick);
             if (dialogScrollText.isFinished()) {
                 if (!dialogAutoSkipping) {
                     dialogAutoSkipping = true;
@@ -162,6 +170,11 @@ public class DialogRenderer3D extends DialogRenderer {
         }
 
         minecraft.renderBuffers().bufferSource().endBatch(NarrativeCraftMod.dialogBackgroundRenderType);
+    }
+
+    public void updateBobbing(float value1, float value2) {
+        dialogEntityBobbing.setNoiseShakeSpeed(value1);
+        dialogEntityBobbing.setNoiseShakeStrength(value2);
     }
 
     private Vec3 getDialogInterpolatedAppearPosition(double t) {
@@ -425,5 +438,17 @@ public class DialogRenderer3D extends DialogRenderer {
 
     public Vec3 getDialogPositionWithOffset() {
         return dialogPosition.add(dialogOffset.x, dialogPosition.y, dialogPosition.z);
+    }
+
+    public String getCharacterName() {
+        return characterName;
+    }
+
+    public DialogEntityBobbing getDialogEntityBobbing() {
+        return dialogEntityBobbing;
+    }
+
+    public void setDialogEntityBobbing(DialogEntityBobbing dialogEntityBobbing) {
+        this.dialogEntityBobbing = dialogEntityBobbing;
     }
 }

@@ -73,8 +73,8 @@ public class OpenScreenCommand {
         Vec3 pos = context.getSource().getPosition();
         entity.teleportTo(pos.x, pos.y, pos.z);
         CharacterRuntime characterRuntime = new CharacterRuntime(characterStory, entity);
-        DialogRenderer3D dialogRenderer3D =
-                new DialogRenderer3D("Oh, hello!", characterRuntime, new Vec2(0, 0.8F), 90, 5, 10, 0.6F, 0, 0, 0, -1);
+        DialogRenderer3D dialogRenderer3D = new DialogRenderer3D(
+                "Oh, hello!", "", characterRuntime, new Vec2(0, 0.8F), 90, 5, 10, 0.6F, 0, 0, 0, -1);
         dialogRenderer3D.start();
         playerSession.setDialogRenderer(dialogRenderer3D);
         return Command.SINGLE_SUCCESS;
