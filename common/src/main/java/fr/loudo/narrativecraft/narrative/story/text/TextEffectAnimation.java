@@ -50,21 +50,29 @@ public class TextEffectAnimation {
         oldLetterOffsets.clear();
         oldLetterOffsets.putAll(letterOffsets);
 
-        letterOffsets.clear();
-
         for (DialogLetterEffect dialogLetterEffect : dialogLetterEffectList) {
             dialogLetterEffect.tick();
-            if (dialogLetterEffect.getAnimation() == DialogAnimationType.SHAKING
-                    && dialogLetterEffect.canApplyEffect()) {
+            if (dialogLetterEffect.getAnimation() == DialogAnimationType.SHAKING) {
 
                 for (int j = dialogLetterEffect.getStartIndex(); j < dialogLetterEffect.getEndIndex(); j++) {
                     RandomSource randomSource = RandomSource.create();
-                    float offsetX = Mth.randomBetween(
-                            randomSource, -dialogLetterEffect.getForce(), dialogLetterEffect.getForce());
-                    float offsetY = Mth.randomBetween(
-                            randomSource, -dialogLetterEffect.getForce(), dialogLetterEffect.getForce());
+                    float offsetX = 0;
+                    float offsetY = 0;
+                    if (dialogLetterEffect.canApplyEffect()) {
+                        offsetX = Mth.randomBetween(
+                                randomSource, -dialogLetterEffect.getForce(), dialogLetterEffect.getForce());
+                        offsetY = Mth.randomBetween(
+                                randomSource, -dialogLetterEffect.getForce(), dialogLetterEffect.getForce());
+                    } else if (letterOffsets.containsKey(j)) {
+                        offsetX = letterOffsets.get(j).x;
+                        offsetY = letterOffsets.get(j).y;
+                    }
                     letterOffsets.put(j, new Vector2f(offsetX, offsetY));
                     oldLetterOffsets.put(j, new Vector2f(offsetX, offsetY));
+                }
+
+                if (dialogLetterEffect.canApplyEffect()) {
+                    dialogLetterEffect.reset();
                 }
 
             } else if (dialogLetterEffect.getAnimation() == DialogAnimationType.WAVING) {

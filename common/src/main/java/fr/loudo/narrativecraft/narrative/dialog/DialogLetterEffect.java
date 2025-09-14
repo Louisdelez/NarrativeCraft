@@ -25,7 +25,8 @@ package fr.loudo.narrativecraft.narrative.dialog;
 
 public class DialogLetterEffect {
     private DialogAnimationType animation;
-    private int currentTick, totalTick;
+    private double time;
+    private int cooldownTick, totalTick;
     private float force;
     private int startIndex, endIndex;
 
@@ -34,16 +35,21 @@ public class DialogLetterEffect {
         this.force = force;
         this.startIndex = startIndex;
         this.endIndex = endIndex;
+        this.time = time;
         totalTick = (int) (time * 20.0);
     }
 
+    public void reset() {
+        cooldownTick = (int) (time * 20.0);
+    }
+
     public boolean canApplyEffect() {
-        return currentTick >= totalTick;
+        return cooldownTick == 0;
     }
 
     public void tick() {
-        if (currentTick < totalTick) {
-            currentTick++;
+        if (cooldownTick > 0) {
+            cooldownTick--;
         }
     }
 
@@ -73,6 +79,14 @@ public class DialogLetterEffect {
 
     public int getEndIndex() {
         return endIndex;
+    }
+
+    public int getCooldownTick() {
+        return cooldownTick;
+    }
+
+    public void setCooldownTick(int cooldownTick) {
+        this.cooldownTick = cooldownTick;
     }
 
     public int getTotalTick() {

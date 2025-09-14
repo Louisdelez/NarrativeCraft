@@ -31,10 +31,7 @@ import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
-import fr.loudo.narrativecraft.narrative.dialog.DialogData;
-import fr.loudo.narrativecraft.narrative.dialog.DialogEntityBobbing;
-import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
-import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer3D;
+import fr.loudo.narrativecraft.narrative.dialog.*;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.screens.story.StoryChoicesScreen;
@@ -186,11 +183,11 @@ public class StoryHandler {
             }
             dialog = matcher.group(2).trim() + "\n";
         }
+        DialogRenderer newDialogRenderer = getDialogRenderer(dialog, characterStory);
         DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
-        if (dialogRenderer == null) {
-            dialogRenderer = getDialogRenderer(dialog, characterStory);
-            playerSession.setDialogRenderer(dialogRenderer);
-            dialogRenderer.setRunDialogStopped(() -> {
+        if (dialogRenderer == null || newDialogRenderer.getClass() != dialogRenderer.getClass()) {
+            playerSession.setDialogRenderer(newDialogRenderer);
+            newDialogRenderer.setRunDialogStopped(() -> {
                 // Runnable task to execute the stuff AFTER the stopping animation ended.
                 // If the next action is only a new dialog, then show the new dialog
                 // Or else, executes the tags, and after it show the dialog (inside ink tag handler)
@@ -201,8 +198,8 @@ public class StoryHandler {
                     playerSession.getInkTagHandler().execute();
                 }
             });
-            dialogRenderer.setRunDialogAutoSkipped(this::next);
-            dialogRenderer.start();
+            newDialogRenderer.setRunDialogAutoSkipped(this::next);
+            newDialogRenderer.start();
         } else {
             dialogRenderer.setText(dialog);
             dialogRenderer.update();
@@ -211,7 +208,8 @@ public class StoryHandler {
 
     private boolean sameCharacterTalking(String dialog) {
         DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
-        if (dialog.isEmpty() || !(dialogRenderer instanceof DialogRenderer3D)) return true;
+        if (dialog.isEmpty()) return true;
+        if (!(dialogRenderer instanceof DialogRenderer3D)) return false;
         Matcher matcher = getDialogMatcher(dialog);
         String characterName = "";
         if (matcher.matches()) {
@@ -225,15 +223,15 @@ public class StoryHandler {
     }
 
     private DialogRenderer getDialogRenderer(String dialog, CharacterStory characterStory) {
-        CharacterRuntime characterRuntime = playerSession.getCharacterRuntimeByCharacter(characterStory);
         DialogRenderer dialogRenderer;
-        if (characterRuntime != null) {
+        if (characterStory != null) {
+            CharacterRuntime characterRuntime = playerSession.getCharacterRuntimeByCharacter(characterStory);
             dialogRenderer = new DialogRenderer3D(dialog, characterStory.getName(), dialogData, characterRuntime);
             DialogRenderer3D dialogRenderer3D = (DialogRenderer3D) dialogRenderer;
             dialogRenderer3D.setDialogEntityBobbing(new DialogEntityBobbing(
                     dialogRenderer3D, dialogData.getNoiseShakeSpeed(), dialogData.getNoiseShakeStrength()));
         } else {
-            dialogRenderer = new DialogRenderer(dialog, dialogData); // TODO: 2d dialog
+            dialogRenderer = new DialogRenderer2D(dialog, 350, 400, 90, 30, dialogData);
         }
         dialogRenderer.autoSkipAt(dialogData.getAutoSkipSeconds());
         dialogRenderer.setNoSkip(dialogData.isNoSkip());

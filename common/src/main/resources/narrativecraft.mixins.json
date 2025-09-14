@@ -12,6 +12,8 @@
     "LivingEntityMixin",
     "ServerLevelMixin",
     "ServerPlayerCommonMixin",
+    "accessor.AbstractBoatAccessor",
+    "accessor.AbstractHorseAccessor",
     "accessor.EntityAccessor",
     "accessor.LivingEntityAccessor",
     "accessor.PlayerAccessor",

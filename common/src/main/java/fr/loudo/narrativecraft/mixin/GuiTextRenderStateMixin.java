@@ -53,8 +53,8 @@ public class GuiTextRenderStateMixin implements IGuiTextAccessor {
             int color,
             boolean dropShadow,
             int backgroundColor) {
-        float finalX = (xFloat > 0) ? xFloat : x;
-        float finalY = (yFloat > 0) ? yFloat : y;
+        float finalX = (xFloat != 0) ? xFloat : x;
+        float finalY = (yFloat != 0) ? yFloat : y;
         return instance.prepareText(text, finalX, finalY, color, dropShadow, backgroundColor);
     }
 

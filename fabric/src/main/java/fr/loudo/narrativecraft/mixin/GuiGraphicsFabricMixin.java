@@ -25,10 +25,13 @@ package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.gui.ICustomGuiRender;
 import fr.loudo.narrativecraft.gui.IGuiTextAccessor;
+import fr.loudo.narrativecraft.gui.SkipArrow2dGui;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.render.state.GuiRenderState;
 import net.minecraft.client.gui.render.state.GuiTextRenderState;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.ARGB;
@@ -54,19 +57,15 @@ public abstract class GuiGraphicsFabricMixin implements ICustomGuiRender {
     private GuiGraphics.ScissorStack scissorStack;
 
     @Override
-    public void narrativecraft$drawnDialogSkip(float dialogWidth, float width, float height, float offsetX, int color) {
-        //        this.guiRenderState.submitGuiElement(
-        //                new SkipArrow2dGui(
-        //                        RenderPipelines.GUI,
-        //                        TextureSetup.noTexture(),
-        //                        new Matrix3x2f(this.pose),
-        //                        dialogWidth,
-        //                        width,
-        //                        height,
-        //                        offsetX,
-        //                        color,
-        //                        this.scissorStack.peek()
-        //                ));
+    public void narrativecraft$drawDialogSkip(float width, float height, int color) {
+        this.guiRenderState.submitGuiElement(new SkipArrow2dGui(
+                RenderPipelines.GUI,
+                TextureSetup.noTexture(),
+                new Matrix3x2f(pose),
+                width,
+                height,
+                color,
+                this.scissorStack.peek()));
     }
 
     @Override

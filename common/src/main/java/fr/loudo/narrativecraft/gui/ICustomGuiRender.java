@@ -26,7 +26,7 @@ package fr.loudo.narrativecraft.gui;
 import net.minecraft.client.gui.Font;
 
 public interface ICustomGuiRender {
-    void narrativecraft$drawnDialogSkip(float dialogWidth, float width, float height, float offsetX, int color);
+    void narrativecraft$drawDialogSkip(float width, float height, int color);
 
     void narrativecraft$drawStringFloat(String text, Font font, float x, float y, int color, boolean drawShadow);
 }

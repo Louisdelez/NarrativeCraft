@@ -35,10 +35,10 @@ import net.minecraft.util.Mth;
 public class DialogRenderer {
 
     protected final Minecraft minecraft;
-    protected final double dialogTransitionTime = 0.5;
-    protected final double dialogAppearTime = 0.2;
+    protected double dialogTransitionTime = 0.5;
+    protected double dialogAppearTime = 0.2;
     protected final DialogScrollText dialogScrollText;
-    protected final DialogArrowSkip dialogArrowSkip;
+    protected DialogArrowSkip dialogArrowSkip;
     protected String text;
     protected float width,
             totalWidth,

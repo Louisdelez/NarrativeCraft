@@ -50,6 +50,7 @@ public class DialogParametersInkAction extends InkAction {
             "gap",
             "letter_spacing",
             "no_skip",
+            "manual_skip",
             "auto_skip",
             "bobbing");
 
@@ -63,6 +64,7 @@ public class DialogParametersInkAction extends InkAction {
         GAP(1),
         LETTER_SPACING(1),
         NO_SKIP(0),
+        MANUAL_SKIP(0),
         AUTO_SKIP(1),
         BOBBING(2);
 
@@ -216,11 +218,26 @@ public class DialogParametersInkAction extends InkAction {
             case NO_SKIP:
                 executeDialogData(storyHandler, dialogData -> dialogData.setNoSkip(true));
                 break;
+            case MANUAL_SKIP:
+                executeIfRenderer(dialogRenderer, renderer -> renderer.setNoSkip(false));
+                executeDialogData(storyHandler, dialogData -> dialogData.setNoSkip(false));
+                break;
             case AUTO_SKIP:
-                executeIfRenderer(dialogRenderer, renderer -> renderer.autoSkipAt(value1));
+                executeIfRenderer(dialogRenderer, renderer -> {
+                    if (value1 > 0) {
+                        renderer.stopAutoSkip();
+                    } else {
+                        renderer.autoSkipAt(value1);
+                    }
+                });
                 executeDialogData(storyHandler, dialogData -> {
-                    dialogData.setDialogAutoSkip(true);
-                    dialogData.setAutoSkipSeconds(value1);
+                    if (value1 > 0) {
+                        dialogData.setDialogAutoSkip(true);
+                        dialogData.setAutoSkipSeconds(value1);
+                    } else {
+                        dialogData.setDialogAutoSkip(false);
+                        dialogData.setAutoSkipSeconds(0.0);
+                    }
                 });
                 break;
             case BOBBING:

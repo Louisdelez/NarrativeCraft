@@ -31,6 +31,7 @@ import fr.loudo.narrativecraft.api.inkAction.InkActionRegistry;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
+import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.inkAction.SoundInkAction;
@@ -55,6 +56,7 @@ public class OpenScreenCommand {
                         .then(Commands.literal("story_options").executes(OpenScreenCommand::openStoryOptions))
                         .then(Commands.literal("main_screen").executes(OpenScreenCommand::openMainScreen))
                         .then(Commands.literal("dialog").executes(OpenScreenCommand::dialog))
+                        .then(Commands.literal("dialog2d").executes(OpenScreenCommand::dialog2d))
                         .then(Commands.literal("dialogUpdate").executes(OpenScreenCommand::updateDialog))
                         .then(Commands.literal("dialogStop").executes(OpenScreenCommand::stopDialog))
                         .then(Commands.literal("test2").executes(OpenScreenCommand::test2))));
@@ -77,6 +79,25 @@ public class OpenScreenCommand {
                 "Oh, hello!", "", characterRuntime, new Vec2(0, 0.8F), 90, 5, 10, 0.6F, 0, 0, 0, -1);
         dialogRenderer3D.start();
         playerSession.setDialogRenderer(dialogRenderer3D);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int dialog2d(CommandContext<CommandSourceStack> context) {
+        PlayerSession playerSession = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getSessionByPlayer(context.getSource().getPlayer());
+        DialogRenderer2D dialogRenderer2D = new DialogRenderer2D(
+                "[shaking time=0.8 force=0.2]Lorem ipsum dolor sit amet, consectetur adipiscing elit.[/shaking]",
+                350,
+                400,
+                90,
+                30,
+                0,
+                0,
+                0,
+                -1);
+        dialogRenderer2D.start();
+        playerSession.setDialogRenderer(dialogRenderer2D);
         return Command.SINGLE_SUCCESS;
     }
 
