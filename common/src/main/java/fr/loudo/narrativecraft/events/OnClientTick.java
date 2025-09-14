@@ -51,5 +51,6 @@ public class OnClientTick {
             inkAction.tick();
         }
         playerSession.getInkActions().removeAll(toRemove);
+        playerSession.getStorySaveIconGui().tick();
     }
 }

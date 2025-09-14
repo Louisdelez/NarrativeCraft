@@ -27,6 +27,7 @@ import com.bladecoder.ink.runtime.Choice;
 import com.mojang.blaze3d.platform.InputConstants;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.keys.ModKeys;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.screens.components.ChoiceButtonWidget;
 import fr.loudo.narrativecraft.util.Util;
@@ -49,15 +50,17 @@ public class StoryChoicesScreen extends Screen {
     private final List<AnimatedChoice> animatedChoices;
     private final List<ChoiceButtonWidget> choiceButtonWidgetList = new ArrayList<>();
     private final int totalTick;
+    private PlayerSession playerSession;
     private StoryHandler storyHandler;
     private boolean initiated;
     private double t;
     private int currentTick;
 
-    public StoryChoicesScreen(StoryHandler storyHandler, boolean animate) {
+    public StoryChoicesScreen(PlayerSession playerSession, boolean animate) {
         super(Component.literal("Choice screen"));
-        this.storyHandler = storyHandler;
-        this.choiceList = storyHandler.getStory().getCurrentChoices();
+        this.playerSession = playerSession;
+        storyHandler = playerSession.getStoryHandler();
+        this.choiceList = playerSession.getStoryHandler().getStory().getCurrentChoices();
         this.animatedChoices = new ArrayList<>();
         initiated = !animate;
         totalTick = (int) (APPEAR_TIME * 20.0);
@@ -104,13 +107,7 @@ public class StoryChoicesScreen extends Screen {
         for (Choice choice : choiceList) {
             choiceButtonWidgetList.add(new ChoiceButtonWidget(choice, index -> {
                 minecraft.setScreen(null);
-                try {
-                    storyHandler.getStory().chooseChoiceIndex(index);
-                    NarrativeCraftMod.server.execute(storyHandler::next);
-                } catch (Exception e) {
-                    NarrativeCraftMod.server.execute(storyHandler::stop);
-                    Util.sendCrashMessage(minecraft.player, e);
-                }
+                NarrativeCraftMod.server.execute(() -> storyHandler.chooseChoiceAndNext(index));
             }));
         }
         int spacing = 10;

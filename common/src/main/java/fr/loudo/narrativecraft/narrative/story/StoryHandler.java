@@ -27,10 +27,12 @@ import com.bladecoder.ink.runtime.Story;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
+import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.dialog.*;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
@@ -48,7 +50,7 @@ public class StoryHandler {
     public static final String DIALOG_REGEX = "^(\\w+)\\s*:\\s*(.+?)\\s*$";
 
     private final PlayerSession playerSession;
-    private final DialogData dialogData =
+    private DialogData dialogData =
             new DialogData(new Vec2(0, 0.8F), 90, 5, 5, 0.4F, 0, 0, 0, -1, 2.9F, 2.15F, false, false, 0.0);
     private Story story;
     private String dialogText;
@@ -73,10 +75,18 @@ public class StoryHandler {
         return story != null;
     }
 
+    public boolean isFinished() {
+        return !story.canContinue() && story.getCurrentChoices().isEmpty();
+    }
+
     public void start() {
         playerSession.setStoryHandler(this);
         try {
             story = new Story(NarrativeCraftFile.storyContent());
+            if (playerSession.isSessionSet() && NarrativeCraftFile.saveExists()) {
+                loadSave();
+                return;
+            }
             next();
         } catch (Exception e) {
             stop();
@@ -137,25 +147,35 @@ public class StoryHandler {
         playerSession.getCharacterRuntimes().remove(toRemove);
     }
 
+    public void chooseChoiceAndNext(int choiceIndex) {
+        try {
+            story.chooseChoiceIndex(choiceIndex);
+            playerSession.setDialogRenderer(null);
+            next();
+            if (dialogText.isEmpty() && !isFinished()) {
+                throw new Exception("Empty dialog after a choice cannot be rendered!");
+            }
+        } catch (Exception e) {
+            stop();
+            NarrativeCraftMod.LOGGER.error("Can't choose the choice: ", e);
+            Util.sendCrashMessage(minecraft.player, e);
+        }
+    }
+
     public void next() {
         try {
             if (story == null) throw new Exception("Story is not initialized!");
-            if (!story.canContinue() && story.getCurrentChoices().isEmpty()) {
+            if (isFinished()) {
                 stop();
                 return;
             }
             DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
-            dialogText = story.Continue();
+            dialogText = story.Continue().trim();
+            playerSession.getInkTagHandler().getTagsToExecute().addAll(story.getCurrentTags());
             if (!story.getCurrentChoices().isEmpty()) {
-                dialogRenderer.stop();
-                dialogRenderer.setRunDialogStopped(() -> {
-                    playerSession.setDialogRenderer(null);
-                    StoryChoicesScreen choicesScreen = new StoryChoicesScreen(this, true);
-                    minecraft.setScreen(choicesScreen);
-                });
+                handleChoices();
                 return;
             }
-            playerSession.getInkTagHandler().getTagsToExecute().addAll(story.getCurrentTags());
             // Handles dialog stopping animation, to executes tags AFTER the animation disappeared.
             // And for that, it checks if the new dialog character is the same as the old dialog (dialog renderer)
             if (dialogRenderer == null || sameCharacterTalking(dialogText)) {
@@ -185,8 +205,63 @@ public class StoryHandler {
         return pattern.matcher(dialog);
     }
 
+    private void loadSave() throws Exception {
+        StorySave save = NarrativeCraftFile.saveContent();
+        if (save == null) throw new Exception("Chapter or scene cannot be found in save file");
+        story.getState().loadJson(save.getSaveData());
+        playerSession.setChapter(save.getChapter());
+        playerSession.setScene(save.getScene());
+        removeForbiddenTagLoadSave();
+        story.getCurrentTags().addAll(save.getTagsRunning());
+        playerSession.getInkTagHandler().getTagsToExecute().addAll(story.getCurrentTags());
+        for (CharacterStoryData characterStoryData : save.getCharacterStoryDataList()) {
+            characterStoryData.spawn(playerSession.getPlayer().level(), Environment.PRODUCTION);
+            playerSession.getCharacterRuntimes().add(characterStoryData.getCharacterRuntime());
+        }
+        dialogData = save.getDialogData();
+        dialogText = story.getCurrentText();
+        playerSession.setCurrentCamera(save.getCameraLocation());
+        playerSession.getInkTagHandler().execute();
+        if (!story.getCurrentChoices().isEmpty()) {
+            handleChoices();
+        }
+    }
+
+    private void removeForbiddenTagLoadSave() throws Exception {
+        story.getCurrentTags().remove("save");
+        story.getCurrentTags().remove("on enter");
+    }
+
+    private void handleChoices() {
+        DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
+        if (dialogRenderer != null) {
+            dialogRenderer.stop();
+            dialogRenderer.setRunDialogStopped(this::showChoices);
+        } else {
+            showChoices();
+        }
+    }
+
+    private void showChoices() {
+        playerSession.setDialogRenderer(null);
+        playerSession.getInkTagHandler().execute();
+        StoryChoicesScreen choicesScreen = new StoryChoicesScreen(playerSession, true);
+        minecraft.execute(() -> minecraft.setScreen(choicesScreen));
+    }
+
+    public void save() {
+        try {
+            StorySave save = new StorySave(playerSession);
+            NarrativeCraftFile.writeSave(save);
+            playerSession.getStorySaveIconGui().showSave();
+        } catch (Exception e) {
+            stop();
+            Util.sendCrashMessage(playerSession.getPlayer(), e);
+        }
+    }
+
     private void showDialog(String dialog) throws Exception {
-        if (dialog.isEmpty()) return;
+        if (dialog == null || dialog.isEmpty()) return;
         Matcher matcher = getDialogMatcher(dialog);
         CharacterStory characterStory = null;
         if (matcher.matches()) {

@@ -28,10 +28,9 @@ import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.SceneData;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import java.util.ArrayList;
 import java.util.List;
-
-import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import net.minecraft.world.level.Level;
 
 public class Subscene extends SceneData {

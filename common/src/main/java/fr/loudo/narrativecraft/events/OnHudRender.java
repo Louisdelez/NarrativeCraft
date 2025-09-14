@@ -60,4 +60,12 @@ public class OnHudRender {
             playerSession.getDialogRenderer().render(guiGraphics, partialTick);
         }
     }
+
+    public static void saveIconRender(GuiGraphics guiGraphics, float partialTick) {
+        PlayerSession playerSession = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getSessionByPlayer(Minecraft.getInstance().player);
+        if (playerSession == null) return;
+        playerSession.getStorySaveIconGui().render(guiGraphics, partialTick);
+    }
 }

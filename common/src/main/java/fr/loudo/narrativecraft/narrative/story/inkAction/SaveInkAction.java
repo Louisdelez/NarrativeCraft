@@ -23,13 +23,14 @@
 
 package fr.loudo.narrativecraft.narrative.story.inkAction;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import java.util.List;
 
-// TODO: Complete
 public class SaveInkAction extends InkAction {
     public SaveInkAction(String id, Side side, String syntax, CommandMatcher matcher) {
         super(id, side, syntax, matcher);
@@ -37,11 +38,15 @@ public class SaveInkAction extends InkAction {
 
     @Override
     protected InkActionResult doValidate(List<String> arguments, Scene scene) {
-        return null;
+        return InkActionResult.ok();
     }
 
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
-        return null;
+        StoryHandler storyHandler = playerSession.getStoryHandler();
+        if (storyHandler == null) return InkActionResult.ignored();
+        NarrativeCraftMod.server.execute(storyHandler::save);
+        isRunning = false;
+        return InkActionResult.ok();
     }
 }

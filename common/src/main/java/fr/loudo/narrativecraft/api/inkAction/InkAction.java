@@ -116,6 +116,10 @@ public abstract class InkAction {
         this.blockEndTask = blockEndTask;
     }
 
+    public String getCommand() {
+        return command;
+    }
+
     public enum Side {
         CLIENT,
         SERVER

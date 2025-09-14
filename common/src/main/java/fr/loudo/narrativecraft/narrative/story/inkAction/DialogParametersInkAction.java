@@ -160,6 +160,7 @@ public class DialogParametersInkAction extends InkAction {
             dialogRenderer.update();
         }
 
+        isRunning = false;
         return InkActionResult.ok();
     }
 

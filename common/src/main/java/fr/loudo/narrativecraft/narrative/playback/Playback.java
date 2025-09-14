@@ -78,7 +78,9 @@ public class Playback {
             start();
             return;
         }
-        if (needToRespawn(characterRuntime.getEntity().position(), animation.getLastLocation().asVec3())) {
+        if (needToRespawn(
+                characterRuntime.getEntity().position(),
+                animation.getLastLocation().asVec3())) {
             storyHandler.killCharacter(animation.getCharacter());
         } else {
             masterEntity = characterRuntime.getEntity();

@@ -29,7 +29,6 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import java.util.List;
 
-// TODO: Complete
 public class OnEnterInkAction extends InkAction {
     public OnEnterInkAction(String id, Side side, String syntax, CommandMatcher matcher) {
         super(id, side, syntax, matcher);

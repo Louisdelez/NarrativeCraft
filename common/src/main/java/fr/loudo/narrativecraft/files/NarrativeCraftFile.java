@@ -33,10 +33,8 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
-import fr.loudo.narrativecraft.serialization.AnimationSerializer;
-import fr.loudo.narrativecraft.serialization.CharacterStoryDataSerializer;
-import fr.loudo.narrativecraft.serialization.CutsceneSerializer;
-import fr.loudo.narrativecraft.serialization.SubsceneSerializer;
+import fr.loudo.narrativecraft.narrative.story.StorySave;
+import fr.loudo.narrativecraft.serialization.*;
 import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
@@ -172,8 +170,31 @@ public class NarrativeCraftFile {
         directoryToBeDeleted.delete();
     }
 
+    public static boolean saveExists() {
+        return new File(savesDirectory, SAVE_FILE_NAME).exists();
+    }
+
     public static String storyContent() throws IOException {
         return Files.readString(getStoryFile().toPath());
+    }
+
+    public static StorySave saveContent() throws IOException {
+        File saveFile = new File(savesDirectory, SAVE_FILE_NAME);
+        String saveContent = Files.readString(saveFile.toPath());
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(StorySave.class, new StorySaveSerializer())
+                .create();
+        return gson.fromJson(saveContent, StorySave.class);
+    }
+
+    public static void writeSave(StorySave save) throws IOException {
+        File saveFile = createFile(savesDirectory, SAVE_FILE_NAME);
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(StorySave.class, new StorySaveSerializer())
+                .create();
+        try (Writer writer = new BufferedWriter(new FileWriter(saveFile))) {
+            gson.toJson(save, writer);
+        }
     }
 
     public static File getStoryFile() {

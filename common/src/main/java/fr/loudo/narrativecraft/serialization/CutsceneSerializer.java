@@ -47,7 +47,6 @@ public class CutsceneSerializer implements JsonSerializer<Cutscene>, JsonDeseria
 
     @Override
     public JsonElement serialize(Cutscene cutscene, Type typeOfSrc, JsonSerializationContext context) {
-        ;
         JsonObject obj = new Gson().toJsonTree(cutscene).getAsJsonObject();
 
         JsonArray subscenesArray = new JsonArray();

@@ -93,6 +93,7 @@ public class CameraAngleInkAction extends InkAction {
         }
         playerSession.setCurrentCamera(keyframe.getKeyframeLocation());
         Minecraft.getInstance().options.hideGui = true;
+        isRunning = false;
         return InkActionResult.ok();
     }
 }

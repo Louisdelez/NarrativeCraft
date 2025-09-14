@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.narrative.session;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.controllers.AbstractController;
+import fr.loudo.narrativecraft.gui.StorySaveIconGui;
 import fr.loudo.narrativecraft.managers.PlaybackManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
@@ -47,6 +48,7 @@ public class PlayerSession {
     private final List<InkAction> inkActions = new ArrayList<>();
     private final List<CharacterRuntime> characterRuntimes = new ArrayList<>();
     private final InkTagHandler inkTagHandler;
+    private final StorySaveIconGui storySaveIconGui = new StorySaveIconGui(0.2, 0.9, 0.2);
     private AbstractController controller;
     private DialogRenderer dialogRenderer;
     private KeyframeLocation currentCamera;
@@ -190,5 +192,9 @@ public class PlayerSession {
 
     public void setCurrentCamera(KeyframeLocation currentCamera) {
         this.currentCamera = currentCamera;
+    }
+
+    public StorySaveIconGui getStorySaveIconGui() {
+        return storySaveIconGui;
     }
 }

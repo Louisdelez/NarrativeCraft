@@ -55,7 +55,7 @@ public class FadeInkAction extends InkAction {
             } else if (currentFadeState == FadeState.STAY) {
                 currentFadeState = FadeState.FADE_OUT;
                 totalTick = (int) (fadeOutSeconds * 20.0);
-            } else {
+            } else if (currentFadeState == FadeState.FADE_OUT) {
                 isRunning = false;
             }
         }

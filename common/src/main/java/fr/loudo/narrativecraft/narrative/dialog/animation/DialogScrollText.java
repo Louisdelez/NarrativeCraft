@@ -189,6 +189,7 @@ public class DialogScrollText {
     }
 
     private char addLetter() {
+        if (currentLine == lines.size()) return ' ';
         char letter = lines.get(currentLine).charAt(currentCharIndex);
         lettersRenderer.add(new LetterLocation(letter, currentX, currentY, true));
         currentTick = 0;

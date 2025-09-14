@@ -84,7 +84,7 @@ public class InkActionRegister {
         InkActionRegistry.register(() -> new OnEnterInkAction(
                 "enter", InkAction.Side.SERVER, "on enter", command -> command.equals("on enter")));
         InkActionRegistry.register(
-                () -> new SaveInkAction("save", InkAction.Side.SERVER, "save", command -> command.equals("save")));
+                () -> new SaveInkAction("save", InkAction.Side.CLIENT, "save", command -> command.equals("save")));
         InkActionRegistry.register(() -> new SoundInkAction(
                 "sound",
                 InkAction.Side.CLIENT,

@@ -59,7 +59,11 @@ public class InkTagHandler {
         tagsToExecute.removeAll(executed);
         StoryHandler storyHandler = playerSession.getStoryHandler();
         if (storyHandler != null && tagsToExecute.isEmpty() && result.isOk()) {
-            storyHandler.showCurrentDialog();
+            if (storyHandler.isFinished()) {
+                storyHandler.stop();
+            } else {
+                storyHandler.showCurrentDialog();
+            }
         }
     }
 
