@@ -116,6 +116,27 @@ public class StoryHandler {
         return false;
     }
 
+    public CharacterRuntime getCharacterRuntimeFromCharacter(CharacterStory characterStory) {
+        for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+            if (characterRuntime.getCharacterStory().getName().equals(characterStory.getName())) {
+                return characterRuntime;
+            }
+        }
+        return null;
+    }
+
+    public void killCharacter(CharacterStory characterStory) {
+        CharacterRuntime toRemove = null;
+        for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+            if (characterRuntime.getCharacterStory().getName().equals(characterStory.getName())) {
+                if (characterRuntime.getEntity() == null) continue;
+                characterRuntime.getEntity().remove(Entity.RemovalReason.KILLED);
+                toRemove = characterRuntime;
+            }
+        }
+        playerSession.getCharacterRuntimes().remove(toRemove);
+    }
+
     public void next() {
         try {
             if (story == null) throw new Exception("Story is not initialized!");

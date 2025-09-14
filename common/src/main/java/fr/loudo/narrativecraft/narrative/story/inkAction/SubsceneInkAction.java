@@ -27,9 +27,11 @@ import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 
@@ -101,7 +103,12 @@ public class SubsceneInkAction extends InkAction {
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
         if (action.equals("start")) {
-            subscene.start(playerSession.getPlayer().level(), Environment.PRODUCTION, isLooping);
+            StoryHandler storyHandler = playerSession.getStoryHandler();
+            if (storyHandler != null) {
+                subscene.start(playerSession.getPlayer().level(), Environment.PRODUCTION, false, storyHandler);
+            } else {
+                subscene.start(playerSession.getPlayer().level(), Environment.PRODUCTION, false);
+            }
             for (Playback playback : subscene.getPlaybacks()) {
                 playback.setUnique(isUnique);
             }

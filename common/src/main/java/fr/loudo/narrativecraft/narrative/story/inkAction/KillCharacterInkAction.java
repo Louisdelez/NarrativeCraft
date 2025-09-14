@@ -67,14 +67,7 @@ public class KillCharacterInkAction extends InkAction {
         if (!storyHandler.characterInStory(characterStory)) {
             return InkActionResult.ignored();
         }
-        CharacterRuntime characterRuntimeToRemove = null;
-        for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
-            if (characterRuntime.getCharacterStory().getName().equalsIgnoreCase(characterStory.getName())) {
-                characterRuntimeToRemove = characterRuntime;
-                characterRuntime.getEntity().remove(Entity.RemovalReason.KILLED);
-            }
-        }
-        playerSession.getCharacterRuntimes().remove(characterRuntimeToRemove);
+        storyHandler.killCharacter(characterStory);
         return InkActionResult.ok();
     }
 }

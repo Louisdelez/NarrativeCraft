@@ -30,6 +30,8 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.SceneData;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import java.util.ArrayList;
 import java.util.List;
+
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import net.minecraft.world.level.Level;
 
 public class Subscene extends SceneData {
@@ -47,6 +49,20 @@ public class Subscene extends SceneData {
             Playback playback = new Playback(
                     PlaybackManager.ID_INCREMENTER.incrementAndGet(), animation, level, environment, looping);
             playback.start();
+            playbacks.add(playback);
+        }
+    }
+
+    public void start(Level level, Environment environment, boolean looping, StoryHandler storyHandler) {
+        playbacks = getPlaybacks();
+        for (Animation animation : animations) {
+            Playback playback = new Playback(
+                    PlaybackManager.ID_INCREMENTER.incrementAndGet(), animation, level, environment, looping);
+            if (storyHandler != null) {
+                playback.startFromStory(storyHandler);
+            } else {
+                playback.start();
+            }
             playbacks.add(playback);
         }
     }

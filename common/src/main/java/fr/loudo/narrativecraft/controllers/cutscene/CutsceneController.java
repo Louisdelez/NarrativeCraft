@@ -33,12 +33,14 @@ import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
+import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframeGroup;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.recording.Location;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.screens.controller.cutscene.CutsceneControllerScreen;
 import fr.loudo.narrativecraft.screens.controller.cutscene.CutsceneKeyframeOptionScreen;
 import fr.loudo.narrativecraft.util.Translation;
@@ -94,8 +96,13 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
     public void startSession() {
         stopCurrentSession();
         playerSession.setController(this);
+        StoryHandler storyHandler = playerSession.getStoryHandler();
         for (Subscene subscene : cutscene.getSubscenes()) {
-            subscene.start(playerSession.getPlayer().level(), environment, false);
+            if (storyHandler != null) {
+                subscene.start(playerSession.getPlayer().level(), environment, false, storyHandler);
+            } else {
+                subscene.start(playerSession.getPlayer().level(), environment, false);
+            }
             playbacks.addAll(subscene.getPlaybacks());
         }
         for (Animation animation : cutscene.getAnimations()) {
@@ -105,7 +112,11 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
                     playerSession.getPlayer().level(),
                     environment,
                     false);
-            playback.start();
+            if (storyHandler != null) {
+                playback.startFromStory(storyHandler);
+            } else {
+                playback.start();
+            }
             playback.setPlaying(false);
             playbacks.add(playback);
         }

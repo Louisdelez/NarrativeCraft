@@ -30,6 +30,7 @@ import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.recording.Location;
 import fr.loudo.narrativecraft.narrative.recording.actions.*;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.util.FakePlayer;
 import fr.loudo.narrativecraft.util.Translation;
@@ -67,6 +68,24 @@ public class Playback {
         this.isUnique = false;
     }
 
+    public void startFromStory(StoryHandler storyHandler) {
+        if (storyHandler == null) {
+            start();
+            return;
+        }
+        CharacterRuntime characterRuntime = storyHandler.getCharacterRuntimeFromCharacter(this.getCharacter());
+        if (characterRuntime == null || characterRuntime.getEntity() == null) {
+            start();
+            return;
+        }
+        if (needToRespawn(characterRuntime.getEntity().position(), animation.getLastLocation().asVec3())) {
+            storyHandler.killCharacter(animation.getCharacter());
+        } else {
+            masterEntity = characterRuntime.getEntity();
+        }
+        start();
+    }
+
     public void start() {
 
         if (animation.getCharacter() == null) {
@@ -75,17 +94,6 @@ public class Playback {
                     .displayClientMessage(Translation.message("animation.no_character_linked"), false);
             return;
         }
-
-        //        if(environnement == Environnement.PRODUCTION) {
-        //            StoryHandler storyHandler = NarrativeCraftMod.getInstance().getStoryHandler();
-        //            if(storyHandler.characterInStory(character)) {
-        //                if(needToRespawn(character.getEntity().position(), animation.getFirstLocation().asVec3())) {
-        //                    storyHandler.removeCharacter(character);
-        //                } else {
-        //                    masterEntity = character.getEntity();
-        //                }
-        //            }
-        //        }
 
         globalTick = 0;
         isPlaying = true;
@@ -110,9 +118,6 @@ public class Playback {
             entityPlaybacks.add(playbackData1);
         }
 
-        //        if (environnement == Environnement.DEVELOPMENT) {
-        //            NarrativeCraftMod.getInstance().getCharacterManager().reloadSkin(character);
-        //        }
         for (PlaybackData playbackData1 : entityPlaybacks) {
             playbackData1.reset();
             actionListener(playbackData1);
@@ -129,15 +134,6 @@ public class Playback {
 
         boolean allEnded = entityPlaybacks.stream().allMatch(PlaybackData::hasEnded);
         if (allEnded) {
-            //            if (environnement == Environnement.DEVELOPMENT) {
-            //                PlayerSession playerSession = NarrativeCraftMod.getInstance().getPlayerSession();
-            //                if (!(playerSession.getKeyframeControllerBase() instanceof CutsceneController)) {
-            //                    finalizePlaybackCycle();
-            //                    return;
-            //                }
-            //            } else {
-            //                finalizePlaybackCycle();
-            //            }
             finalizePlaybackCycle();
         }
         for (PlaybackData playbackData : entityPlaybacks) {
@@ -175,7 +171,7 @@ public class Playback {
         }
     }
 
-    private boolean needToRespawn(Vec3 firstPos, Vec3 secondPos) {
+    public boolean needToRespawn(Vec3 firstPos, Vec3 secondPos) {
         return firstPos.distanceTo(secondPos) >= 0.8;
     }
 

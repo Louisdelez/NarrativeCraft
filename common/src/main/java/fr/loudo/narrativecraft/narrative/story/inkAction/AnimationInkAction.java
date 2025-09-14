@@ -31,6 +31,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 
@@ -105,6 +106,12 @@ public class AnimationInkAction extends InkAction {
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
         if (action.equals("start")) {
+            StoryHandler storyHandler = playerSession.getStoryHandler();
+            if (storyHandler != null) {
+                playback.startFromStory(storyHandler);
+            } else {
+                playback.start();
+            }
             playback = new Playback(
                     PlaybackManager.ID_INCREMENTER.incrementAndGet(),
                     animation,
