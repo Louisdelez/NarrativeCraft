@@ -27,10 +27,15 @@ import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
+import fr.loudo.narrativecraft.narrative.keyframes.keyframeTrigger.KeyframeTrigger;
+import fr.loudo.narrativecraft.util.Util;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 
@@ -43,8 +48,9 @@ import net.minecraft.world.level.GameType;
 public abstract class AbstractKeyframeController<T extends Keyframe> extends AbstractController
         implements KeyframeControllerInterface<T> {
 
-    protected GameType lastGameType;
+    protected final List<KeyframeTrigger> keyframeTriggers = new ArrayList<>();
     protected final AtomicInteger keyframesCounter = new AtomicInteger();
+    protected GameType lastGameType;
 
     public AbstractKeyframeController(Environment environment, Player player) {
         super(environment, player);
@@ -79,5 +85,32 @@ public abstract class AbstractKeyframeController<T extends Keyframe> extends Abs
         }
     }
 
+    public KeyframeTrigger getKeyframeTriggerByEntity(Entity entity) {
+        for (KeyframeTrigger keyframeTrigger : keyframeTriggers) {
+            if (Util.isSameEntity(entity, keyframeTrigger.getCamera())) {
+                return keyframeTrigger;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void addKeyframeTrigger(int tick, String commands) {
+        KeyframeTrigger keyframeTrigger = new KeyframeTrigger(
+                keyframesCounter.incrementAndGet(), tick, commands, getKeyframeLocationFromPlayer());
+        keyframeTrigger.showKeyframe(playerSession.getPlayer());
+        keyframeTriggers.add(keyframeTrigger);
+    }
+
+    @Override
+    public void removeKeyframeTrigger(KeyframeTrigger keyframeTrigger) {
+        keyframeTriggers.remove(keyframeTrigger);
+        keyframeTrigger.hideKeyframe(playerSession.getPlayer());
+    }
+
     public abstract Screen keyframeOptionScreen(Keyframe keyframe, boolean hide);
+
+    public List<KeyframeTrigger> getKeyframeTriggers() {
+        return keyframeTriggers;
+    }
 }

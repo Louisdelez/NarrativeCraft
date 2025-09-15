@@ -25,11 +25,13 @@ package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.controllers.cameraAngle.CameraAngleController;
-import fr.loudo.narrativecraft.controllers.keyframe.KeyframeControllerInterface;
+import fr.loudo.narrativecraft.controllers.keyframe.AbstractKeyframeController;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
+import fr.loudo.narrativecraft.narrative.keyframes.keyframeTrigger.KeyframeTrigger;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.screens.characters.CharacterOptionsScreen;
+import fr.loudo.narrativecraft.screens.keyframe.KeyframeTriggerScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -47,9 +49,14 @@ public class OnEntityRightClick {
                 Minecraft.getInstance().setScreen(screen);
             }
         }
-        if (playerSession.getController() instanceof KeyframeControllerInterface<?> controller) {
+        if (playerSession.getController() instanceof AbstractKeyframeController<?> controller) {
             Keyframe keyframe = controller.getKeyframeByEntity(entity);
             controller.setCamera(keyframe);
+            KeyframeTrigger keyframeTrigger = controller.getKeyframeTriggerByEntity(entity);
+            if (keyframeTrigger != null) {
+                KeyframeTriggerScreen screen = new KeyframeTriggerScreen(controller, keyframeTrigger);
+                Minecraft.getInstance().setScreen(screen);
+            }
         }
     }
 }

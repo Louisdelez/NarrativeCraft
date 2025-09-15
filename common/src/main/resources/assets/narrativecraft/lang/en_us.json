@@ -142,6 +142,8 @@
   "narrativecraft.screen.keyframe_option.keyframe_group": "Group %d",
   "narrativecraft.screen.keyframe_option.keyframe_id": "Keyframe ID #%d",
 
+  "narrativecraft.ink_action.no_exists": "This tag could not be recognized.",
+  "narrativecraft.ink_action.not_authorized": "Tag %s is not authorized.",
   "narrativecraft.ink_action.validation.miss_argument": "Miss required argument [%s]",
   "narrativecraft.ink_action.validation.wrong_argument": "Wrong argument: %s",
   "narrativecraft.ink_action.validation.wrong_time_value": "Only second(s), minute(s) and hour(s) are allowed.",

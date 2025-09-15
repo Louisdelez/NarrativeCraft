@@ -37,6 +37,7 @@ import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframeGroup;
+import fr.loudo.narrativecraft.narrative.keyframes.keyframeTrigger.KeyframeTrigger;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.recording.Location;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
@@ -71,6 +72,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         skipTickCount = 20;
         isPlaying = false;
         keyframeGroups.addAll(cutscene.getKeyframeGroups());
+        keyframeTriggers.addAll(cutscene.getKeyframeTriggers());
         cutscenePlayback = new CutscenePlayback(this, () -> {});
     }
 
@@ -148,6 +150,9 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
             selectedGroup.showGroupText(playerSession.getPlayer());
             updateSelectedGroupGlow();
         }
+        for (KeyframeTrigger keyframeTrigger : keyframeTriggers) {
+            keyframeTrigger.showKeyframe(playerSession.getPlayer());
+        }
     }
 
     @Override
@@ -172,18 +177,26 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
             keyframeGroup.hideKeyframes(playerSession.getPlayer());
         }
         List<CutsceneKeyframeGroup> oldData = cutscene.getKeyframeGroups();
+        List<KeyframeTrigger> oldKeyframeTriggers = cutscene.getKeyframeTriggers();
         if (save) {
             cutscene.getKeyframeGroups().clear();
+            cutscene.getKeyframeTriggers().clear();
             try {
                 cutscene.getKeyframeGroups().addAll(keyframeGroups);
+                cutscene.getKeyframeTriggers().addAll(keyframeTriggers);
                 NarrativeCraftFile.updateCutsceneFile(cutscene.getScene());
                 playerSession.getPlayer().sendSystemMessage(Translation.message("controller.saved"));
             } catch (IOException e) {
                 cutscene.getKeyframeGroups().removeAll(keyframeGroups);
                 cutscene.getKeyframeGroups().addAll(oldData);
+                cutscene.getKeyframeTriggers().removeAll(keyframeTriggers);
+                cutscene.getKeyframeTriggers().addAll(oldKeyframeTriggers);
                 playerSession.getPlayer().sendSystemMessage(Translation.message("crash.global-message"));
                 NarrativeCraftMod.LOGGER.error("Impossible to save the cutscene: ", e);
             }
+        }
+        for (KeyframeTrigger keyframeTrigger : keyframeTriggers) {
+            keyframeTrigger.hideKeyframe(playerSession.getPlayer());
         }
     }
 

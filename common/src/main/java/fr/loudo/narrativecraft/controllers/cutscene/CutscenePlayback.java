@@ -23,10 +23,14 @@
 
 package fr.loudo.narrativecraft.controllers.cutscene;
 
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
+import fr.loudo.narrativecraft.api.inkAction.InkActionRegistry;
+import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframeGroup;
+import fr.loudo.narrativecraft.narrative.keyframes.keyframeTrigger.KeyframeTrigger;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.screens.controller.cutscene.CutsceneKeyframeOptionScreen;
 import fr.loudo.narrativecraft.util.Easing;
@@ -72,6 +76,7 @@ public class CutscenePlayback {
 
     public void stop() {
         isPlaying = false;
+        playerSession.getInkActions().clear();
     }
 
     public void tick() {
@@ -86,6 +91,18 @@ public class CutscenePlayback {
         segmentTick++;
         if (segmentTick >= keyframeA.getStartDelayTick()) {
             totalTick++;
+        }
+        List<KeyframeTrigger> keyframeTriggers = cutsceneController.getKeyframeTriggers().stream()
+                .filter(trigger -> trigger.getTick() == totalTick)
+                .toList();
+        for (KeyframeTrigger keyframeTrigger : keyframeTriggers) {
+            for (String command : keyframeTrigger.getCommandsToList()) {
+                InkAction inkAction = InkActionRegistry.findByCommand(command);
+                if (inkAction == null) continue;
+                InkActionResult result = inkAction.validateAndExecute(command, playerSession);
+                if (!result.isOk()) continue;
+                playerSession.addInkAction(inkAction);
+            }
         }
     }
 

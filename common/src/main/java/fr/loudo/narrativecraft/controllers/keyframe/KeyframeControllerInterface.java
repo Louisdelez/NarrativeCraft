@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.controllers.keyframe;
 
 import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
+import fr.loudo.narrativecraft.narrative.keyframes.keyframeTrigger.KeyframeTrigger;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
@@ -41,4 +42,10 @@ public interface KeyframeControllerInterface<T extends Keyframe> {
     T getPreviousKeyframe(T fromKeyframe);
 
     T getKeyframeByEntity(Entity entity);
+
+    KeyframeTrigger getKeyframeTriggerByEntity(Entity entity);
+
+    void addKeyframeTrigger(int tick, String commands);
+
+    void removeKeyframeTrigger(KeyframeTrigger keyframeTrigger);
 }

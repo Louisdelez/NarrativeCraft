@@ -100,14 +100,14 @@ public class ChangeDayTimeInkAction extends InkAction {
         String timeValue = arguments.get(7);
         forSeconds = InkActionUtil.getSecondsFromTimeValue(forSeconds, timeValue);
         if (forSeconds == -1) {
-            return InkActionResult.error(Translation.message(WRONG_EASING_VALUE, Arrays.toString(Easing.values())));
+            return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, forSeconds));
         }
         easing = Easing.SMOOTH;
-        if (arguments.size() > 7) {
+        if (arguments.size() > 8) {
             try {
                 easing = Easing.valueOf(arguments.get(8).toUpperCase());
             } catch (IllegalArgumentException e) {
-                throw new RuntimeException(e);
+                return InkActionResult.error(Translation.message(WRONG_EASING_VALUE, Arrays.toString(Easing.values())));
             }
         }
         return InkActionResult.ok();

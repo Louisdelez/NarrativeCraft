@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.controllers.keyframe;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeGroup;
+import fr.loudo.narrativecraft.narrative.keyframes.keyframeTrigger.KeyframeTrigger;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.ArrayList;
 import java.util.List;
@@ -106,12 +107,18 @@ public abstract class AbstractKeyframeGroupsBase<T extends Keyframe, E extends K
         for (E keyframeGroup : keyframeGroups) {
             keyframeGroup.hideKeyframes(player);
         }
+        for (KeyframeTrigger keyframeTrigger : keyframeTriggers) {
+            keyframeTrigger.hideKeyframe(player);
+        }
     }
 
     @Override
     public void showKeyframes(ServerPlayer player) {
         for (E keyframeGroup : keyframeGroups) {
             keyframeGroup.showKeyframes(player);
+        }
+        for (KeyframeTrigger keyframeTrigger : keyframeTriggers) {
+            keyframeTrigger.showKeyframe(player);
         }
     }
 
