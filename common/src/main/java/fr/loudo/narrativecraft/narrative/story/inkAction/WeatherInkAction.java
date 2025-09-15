@@ -103,4 +103,9 @@ public class WeatherInkAction extends InkAction {
         }
         return InkActionResult.ok();
     }
+
+    @Override
+    public boolean needScene() {
+        return false;
+    }
 }

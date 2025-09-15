@@ -80,4 +80,9 @@ public class CooldownInkAction extends InkAction {
     protected InkActionResult doExecute(PlayerSession playerSession) {
         return InkActionResult.block();
     }
+
+    @Override
+    public boolean needScene() {
+        return false;
+    }
 }

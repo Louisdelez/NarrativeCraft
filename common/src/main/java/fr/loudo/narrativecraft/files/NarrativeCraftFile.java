@@ -33,6 +33,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
+import fr.loudo.narrativecraft.narrative.data.MainScreenData;
 import fr.loudo.narrativecraft.narrative.story.StorySave;
 import fr.loudo.narrativecraft.serialization.*;
 import fr.loudo.narrativecraft.util.InkUtil;
@@ -200,6 +201,27 @@ public class NarrativeCraftFile {
     public static File getStoryFile() {
         File buildFolder = createDirectory(mainDirectory, BUILD_DIRECTORY_NAME);
         return new File(buildFolder, STORY_FILE_NAME);
+    }
+
+    public static MainScreenData getMainScreenBackground() throws IOException {
+        File mainBackgroundScreenFile = createFile(dataDirectory, MAIN_SCREEN_BACKGROUND_FILE_NAME);
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(CharacterStoryData.class, new CharacterStoryDataSerializer(null))
+                .create();
+        String data = Files.readString(mainBackgroundScreenFile.toPath());
+        MainScreenData mainScreenData = gson.fromJson(data, MainScreenData.class);
+
+        return mainScreenData != null ? mainScreenData : new MainScreenData();
+    }
+
+    public static void updateMainScreenBackground(MainScreenData mainScreenData, Scene scene) throws IOException {
+        File mainBackgroundScreenFile = createFile(dataDirectory, MAIN_SCREEN_BACKGROUND_FILE_NAME);
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(CharacterStoryData.class, new CharacterStoryDataSerializer(scene))
+                .create();
+        try (Writer writer = new BufferedWriter(new FileWriter(mainBackgroundScreenFile))) {
+            gson.toJson(mainScreenData, writer);
+        }
     }
 
     public static void createChapterDirectory(Chapter chapter) throws IOException {

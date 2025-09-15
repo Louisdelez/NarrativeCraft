@@ -49,4 +49,9 @@ public class SaveInkAction extends InkAction {
         isRunning = false;
         return InkActionResult.ok();
     }
+
+    @Override
+    public boolean needScene() {
+        return false;
+    }
 }

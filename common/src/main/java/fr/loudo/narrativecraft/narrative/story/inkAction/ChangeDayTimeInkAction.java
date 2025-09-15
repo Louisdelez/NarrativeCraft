@@ -151,4 +151,9 @@ public class ChangeDayTimeInkAction extends InkAction {
     public long getCurrentTick() {
         return currentTick;
     }
+
+    @Override
+    public boolean needScene() {
+        return false;
+    }
 }

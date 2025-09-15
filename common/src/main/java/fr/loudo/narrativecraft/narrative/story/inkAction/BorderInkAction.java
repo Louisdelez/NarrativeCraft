@@ -130,4 +130,9 @@ public class BorderInkAction extends InkAction {
     protected InkActionResult doExecute(PlayerSession playerSession) {
         return InkActionResult.ok();
     }
+
+    @Override
+    public boolean needScene() {
+        return false;
+    }
 }

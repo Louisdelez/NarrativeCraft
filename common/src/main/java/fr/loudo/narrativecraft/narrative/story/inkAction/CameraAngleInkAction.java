@@ -96,4 +96,9 @@ public class CameraAngleInkAction extends InkAction {
         isRunning = false;
         return InkActionResult.ok();
     }
+
+    @Override
+    public boolean needScene() {
+        return true;
+    }
 }

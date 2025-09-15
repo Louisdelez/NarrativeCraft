@@ -124,4 +124,9 @@ public class FadeInkAction extends InkAction {
         STAY,
         FADE_OUT
     }
+
+    @Override
+    public boolean needScene() {
+        return false;
+    }
 }

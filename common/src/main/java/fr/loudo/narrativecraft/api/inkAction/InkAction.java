@@ -92,6 +92,8 @@ public abstract class InkAction {
 
     protected abstract InkActionResult doExecute(PlayerSession playerSession);
 
+    public abstract boolean needScene();
+
     public String getId() {
         return id;
     }

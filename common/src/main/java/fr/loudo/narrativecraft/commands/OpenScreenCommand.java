@@ -37,7 +37,9 @@ import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.inkAction.SoundInkAction;
 import fr.loudo.narrativecraft.network.OpenChaptersScreenPacket;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.screens.options.StoryOptionsScreen;
 import fr.loudo.narrativecraft.util.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
@@ -130,7 +132,8 @@ public class OpenScreenCommand {
     }
 
     private static int openStoryOptions(CommandContext<CommandSourceStack> context) {
-
+        StoryOptionsScreen screen = new StoryOptionsScreen();
+        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
         return Command.SINGLE_SUCCESS;
     }
 

@@ -27,10 +27,10 @@ import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionRegistry;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.controllers.keyframe.AbstractKeyframeController;
+import fr.loudo.narrativecraft.controllers.mainScreen.MainScreenController;
 import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.keyframeTrigger.KeyframeTrigger;
-import fr.loudo.narrativecraft.narrative.story.inkAction.OnEnterInkAction;
-import fr.loudo.narrativecraft.narrative.story.inkAction.SaveInkAction;
+import fr.loudo.narrativecraft.narrative.story.inkAction.*;
 import fr.loudo.narrativecraft.util.ScreenUtils;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.Arrays;
@@ -52,9 +52,6 @@ public class KeyframeTriggerScreen extends Screen {
     private final int globalWidth = 240;
 
     private int defaultTick;
-
-    private String tagError;
-    private String errorMessage;
 
     private ScreenUtils.LabelBox tickBox;
     private ScreenUtils.MultilineLabelBox commandBox;
@@ -150,6 +147,17 @@ public class KeyframeTriggerScreen extends Screen {
                         if (inkAction == null) {
                             showError(tagWidget, errorWidget, stringTag, Translation.message("ink_action.no_exists"));
                             return;
+                        }
+
+                        if (controller instanceof MainScreenController) {
+                            if (inkAction.needScene()) {
+                                showError(
+                                        tagWidget,
+                                        errorWidget,
+                                        stringTag,
+                                        Translation.message("ink_action.not_authorized", stringTag));
+                                return;
+                            }
                         }
 
                         InkActionResult result = inkAction.validate(

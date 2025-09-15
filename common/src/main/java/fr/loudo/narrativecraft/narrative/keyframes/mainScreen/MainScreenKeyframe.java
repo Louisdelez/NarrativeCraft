@@ -21,32 +21,14 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.story.inkAction;
+package fr.loudo.narrativecraft.narrative.keyframes.mainScreen;
 
-import fr.loudo.narrativecraft.api.inkAction.InkAction;
-import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
-import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
-import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import java.util.List;
+import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
+import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 
-public class OnEnterInkAction extends InkAction {
-    public OnEnterInkAction(String id, Side side, String syntax, CommandMatcher matcher) {
-        super(id, side, syntax, matcher);
-    }
+public class MainScreenKeyframe extends Keyframe {
 
-    @Override
-    protected InkActionResult doValidate(List<String> arguments, Scene scene) {
-        return InkActionResult.ok();
-    }
-
-    @Override
-    protected InkActionResult doExecute(PlayerSession playerSession) {
-        isRunning = false;
-        return InkActionResult.ok();
-    }
-
-    @Override
-    public boolean needScene() {
-        return false;
+    public MainScreenKeyframe(int id, KeyframeLocation keyframeLocation) {
+        super(id, keyframeLocation);
     }
 }

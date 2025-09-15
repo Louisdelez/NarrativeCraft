@@ -69,6 +69,7 @@ public class ChooseCharacterScreen extends GenericSelectionScreen<CharacterStory
 
     @Override
     protected void addCustomTitleButtons(LinearLayout layout) {
+        if (scene == null) return;
         layout.addChild(Button.builder(
                         characterType == CharacterType.NPC ? Component.literal("<- MAIN") : Component.literal("NPC ->"),
                         button -> {

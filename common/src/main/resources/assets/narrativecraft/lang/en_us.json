@@ -100,6 +100,10 @@
   "narrativecraft.controller.camera_angle.add_character": "Add character to %s",
   "narrativecraft.controller.camera_angle.template_character": "Add template character to %s",
 
+  "narrativecraft.controller.main_screen.hud": "Main Screen controller",
+  "narrativecraft.controller.main_screen.only_one_keyframe": "Only one keyframe authorized",
+  "narrativecraft.controller.main_screen.only_one_keyframe_trigger": "Only one keyframe trigger authorized",
+
   "narrativecraft.tooltip.character_entity_type": "Change entity type",
   "narrativecraft.tooltip.create_keyframe_group": "Create keyframe group",
   "narrativecraft.tooltip.create_keyframe": "Create keyframe",

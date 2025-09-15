@@ -268,4 +268,9 @@ public class DialogParametersInkAction extends InkAction {
         DialogData dialogData = storyHandler.getDialogData();
         action.accept(dialogData);
     }
+
+    @Override
+    public boolean needScene() {
+        return false;
+    }
 }

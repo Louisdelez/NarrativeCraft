@@ -116,4 +116,9 @@ public class SubsceneInkAction extends InkAction {
         }
         return isBlock ? InkActionResult.block() : InkActionResult.ok();
     }
+
+    @Override
+    public boolean needScene() {
+        return false;
+    }
 }

@@ -24,9 +24,9 @@
 package fr.loudo.narrativecraft.screens.characters;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.controllers.AbstractController;
-import fr.loudo.narrativecraft.controllers.cameraAngle.CameraAngleController;
+import fr.loudo.narrativecraft.controllers.keyframe.AbstractKeyframeController;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
+import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
 import fr.loudo.narrativecraft.screens.components.ButtonListScreen;
 import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.client.gui.components.Button;
@@ -37,11 +37,13 @@ import net.minecraft.network.chat.Component;
 
 public class CharacterOptionsScreen extends ButtonListScreen {
 
-    private final AbstractController controller;
+    private final AbstractKeyframeController<? extends Keyframe> controller;
     private final CharacterStoryData characterStoryData;
 
     public CharacterOptionsScreen(
-            Screen lastScreen, AbstractController controller, CharacterStoryData characterStoryData) {
+            Screen lastScreen,
+            AbstractKeyframeController<? extends Keyframe> controller,
+            CharacterStoryData characterStoryData) {
         super(lastScreen, Component.literal("Character options screen"));
         this.controller = controller;
         this.characterStoryData = characterStoryData;
@@ -49,35 +51,31 @@ public class CharacterOptionsScreen extends ButtonListScreen {
 
     @Override
     protected void addContents() {
-        if (controller instanceof CameraAngleController cameraAngleController) {
-            Button changeCharacterPoseButton = Button.builder(Translation.message("character.change_pose"), button -> {
-                        CharacterChangePoseScreen screen = new CharacterChangePoseScreen(this, characterStoryData);
-                        minecraft.setScreen(screen);
-                    })
-                    .build();
-            objectListScreen.addButton(changeCharacterPoseButton);
+        Button changeCharacterPoseButton = Button.builder(Translation.message("character.change_pose"), button -> {
+                    CharacterChangePoseScreen screen = new CharacterChangePoseScreen(this, characterStoryData);
+                    minecraft.setScreen(screen);
+                })
+                .build();
+        objectListScreen.addButton(changeCharacterPoseButton);
 
-            Button removeCharacterButton = Button.builder(Translation.message("global.remove"), button -> {
-                        ConfirmScreen confirm = new ConfirmScreen(
-                                b -> {
-                                    if (b) {
-                                        NarrativeCraftMod.server.execute(() -> {
-                                            characterStoryData.kill();
-                                            cameraAngleController
-                                                    .getCharacterStoryDataList()
-                                                    .remove(characterStoryData);
-                                        });
-                                    }
-                                    minecraft.setScreen(this);
-                                },
-                                Component.literal(""),
-                                Translation.message("global.confirm_delete"),
-                                CommonComponents.GUI_YES,
-                                CommonComponents.GUI_CANCEL);
-                        minecraft.setScreen(confirm);
-                    })
-                    .build();
-            objectListScreen.addButton(removeCharacterButton);
-        }
+        Button removeCharacterButton = Button.builder(Translation.message("global.remove"), button -> {
+                    ConfirmScreen confirm = new ConfirmScreen(
+                            b -> {
+                                if (b) {
+                                    NarrativeCraftMod.server.execute(() -> {
+                                        characterStoryData.kill();
+                                        controller.getCharacterStoryDataList().remove(characterStoryData);
+                                    });
+                                }
+                                minecraft.setScreen(null);
+                            },
+                            Component.literal(""),
+                            Translation.message("global.confirm_delete"),
+                            CommonComponents.GUI_YES,
+                            CommonComponents.GUI_CANCEL);
+                    minecraft.setScreen(confirm);
+                })
+                .build();
+        objectListScreen.addButton(removeCharacterButton);
     }
 }

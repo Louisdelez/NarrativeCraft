@@ -21,32 +21,37 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.story.inkAction;
+package fr.loudo.narrativecraft.narrative.data;
 
-import fr.loudo.narrativecraft.api.inkAction.InkAction;
-import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
-import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
-import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
+import fr.loudo.narrativecraft.narrative.keyframes.keyframeTrigger.KeyframeTrigger;
+import fr.loudo.narrativecraft.narrative.keyframes.mainScreen.MainScreenKeyframe;
+import java.util.ArrayList;
 import java.util.List;
 
-public class OnEnterInkAction extends InkAction {
-    public OnEnterInkAction(String id, Side side, String syntax, CommandMatcher matcher) {
-        super(id, side, syntax, matcher);
+public class MainScreenData {
+
+    private final List<CharacterStoryData> characterStoryDataList = new ArrayList<>();
+    private MainScreenKeyframe keyframe;
+    private KeyframeTrigger keyframeTrigger;
+
+    public MainScreenKeyframe getKeyframe() {
+        return keyframe;
     }
 
-    @Override
-    protected InkActionResult doValidate(List<String> arguments, Scene scene) {
-        return InkActionResult.ok();
+    public void setKeyframe(MainScreenKeyframe keyframe) {
+        this.keyframe = keyframe;
     }
 
-    @Override
-    protected InkActionResult doExecute(PlayerSession playerSession) {
-        isRunning = false;
-        return InkActionResult.ok();
+    public KeyframeTrigger getKeyframeTrigger() {
+        return keyframeTrigger;
     }
 
-    @Override
-    public boolean needScene() {
-        return false;
+    public void setKeyframeTrigger(KeyframeTrigger keyframeTrigger) {
+        this.keyframeTrigger = keyframeTrigger;
+    }
+
+    public List<CharacterStoryData> getCharacterStoryDataList() {
+        return characterStoryDataList;
     }
 }

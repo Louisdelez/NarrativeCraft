@@ -62,7 +62,7 @@ public class CharacterStoryDataSerializer
         if (jsonObject.has(characterKey)) {
             String characterName = jsonObject.get(characterKey).getAsString();
             CharacterStory characterStory = characterManager.getCharacterByName(characterName);
-            if (characterStory == null) {
+            if (characterStory == null && scene != null) {
                 characterStory = scene.getNpcByName(characterName);
                 if (characterStory == null) return characterStoryData;
             }

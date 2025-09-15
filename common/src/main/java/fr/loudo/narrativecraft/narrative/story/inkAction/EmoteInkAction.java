@@ -112,4 +112,9 @@ public class EmoteInkAction extends InkAction {
         }
         return null;
     }
+
+    @Override
+    public boolean needScene() {
+        return false;
+    }
 }

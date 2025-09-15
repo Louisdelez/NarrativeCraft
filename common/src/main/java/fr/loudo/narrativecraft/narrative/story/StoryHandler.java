@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.narrative.story;
 
 import com.bladecoder.ink.runtime.Story;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.Environment;
@@ -97,6 +98,9 @@ public class StoryHandler {
 
     public void stop() {
         playerSession.getInkTagHandler().stopAll();
+        for (InkAction inkAction : playerSession.getInkActions()) {
+            inkAction.stop();
+        }
         playerSession.getInkActions().clear();
         for (Playback playback : playerSession.getPlaybackManager().getPlaybacks()) {
             playback.stop(true);
@@ -340,5 +344,9 @@ public class StoryHandler {
 
     public Story getStory() {
         return story;
+    }
+
+    public String getDialogText() {
+        return dialogText;
     }
 }

@@ -36,19 +36,15 @@ import fr.loudo.narrativecraft.narrative.recording.Location;
 import fr.loudo.narrativecraft.screens.controller.cameraAngle.CameraAngleControllerScreen;
 import fr.loudo.narrativecraft.screens.controller.cameraAngle.CameraAngleOptionsScreen;
 import fr.loudo.narrativecraft.util.Translation;
-import fr.loudo.narrativecraft.util.Util;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 
 public class CameraAngleController extends AbstractKeyframesBase<CameraAngleKeyframe> {
 
     private final CameraAngle cameraAngle;
-    private final List<CharacterStoryData> characterStoryDataList = new ArrayList<>();
 
     public CameraAngleController(Environment environment, Player player, CameraAngle cameraAngle) {
         super(environment, player);
@@ -135,16 +131,6 @@ public class CameraAngleController extends AbstractKeyframesBase<CameraAngleKeyf
         }
     }
 
-    public CharacterStoryData getCharacterStoryDataFromEntity(Entity entity) {
-        for (CharacterStoryData characterStoryData : characterStoryDataList) {
-            if (Util.isSameEntity(
-                    entity, characterStoryData.getCharacterRuntime().getEntity())) {
-                return characterStoryData;
-            }
-        }
-        return null;
-    }
-
     @Override
     public Screen getControllerScreen() {
         return new CameraAngleControllerScreen(this);
@@ -152,10 +138,6 @@ public class CameraAngleController extends AbstractKeyframesBase<CameraAngleKeyf
 
     public CameraAngle getCameraAngle() {
         return cameraAngle;
-    }
-
-    public List<CharacterStoryData> getCharacterStoryDataList() {
-        return characterStoryDataList;
     }
 
     public List<CharacterStory> getCharacterStories() {

@@ -84,4 +84,9 @@ public class CutsceneInkAction extends InkAction {
         controller.getCutscenePlayback().setupAndPlay(keyframeA, keyframeB);
         return InkActionResult.block();
     }
+
+    @Override
+    public boolean needScene() {
+        return true;
+    }
 }

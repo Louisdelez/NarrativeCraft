@@ -127,4 +127,9 @@ public class AnimationInkAction extends InkAction {
         }
         return isBlock ? InkActionResult.block() : InkActionResult.ok();
     }
+
+    @Override
+    public boolean needScene() {
+        return true;
+    }
 }

@@ -202,4 +202,9 @@ public class SoundInkAction extends InkAction {
         SONG,
         SOUND
     }
+
+    @Override
+    public boolean needScene() {
+        return false;
+    }
 }

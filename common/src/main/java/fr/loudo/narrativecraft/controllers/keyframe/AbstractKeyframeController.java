@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.controllers.keyframe;
 
 import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.narrative.Environment;
+import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.keyframes.keyframeTrigger.KeyframeTrigger;
@@ -49,6 +50,7 @@ public abstract class AbstractKeyframeController<T extends Keyframe> extends Abs
         implements KeyframeControllerInterface<T> {
 
     protected final List<KeyframeTrigger> keyframeTriggers = new ArrayList<>();
+    protected final List<CharacterStoryData> characterStoryDataList = new ArrayList<>();
     protected final AtomicInteger keyframesCounter = new AtomicInteger();
     protected GameType lastGameType;
 
@@ -112,5 +114,19 @@ public abstract class AbstractKeyframeController<T extends Keyframe> extends Abs
 
     public List<KeyframeTrigger> getKeyframeTriggers() {
         return keyframeTriggers;
+    }
+
+    public CharacterStoryData getCharacterStoryDataFromEntity(Entity entity) {
+        for (CharacterStoryData characterStoryData : characterStoryDataList) {
+            if (Util.isSameEntity(
+                    entity, characterStoryData.getCharacterRuntime().getEntity())) {
+                return characterStoryData;
+            }
+        }
+        return null;
+    }
+
+    public List<CharacterStoryData> getCharacterStoryDataList() {
+        return characterStoryDataList;
     }
 }

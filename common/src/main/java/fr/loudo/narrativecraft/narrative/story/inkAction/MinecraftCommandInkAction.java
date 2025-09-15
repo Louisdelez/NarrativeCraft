@@ -96,4 +96,9 @@ public class MinecraftCommandInkAction extends InkAction {
                 player.getServer(),
                 player);
     }
+
+    @Override
+    public boolean needScene() {
+        return false;
+    }
 }

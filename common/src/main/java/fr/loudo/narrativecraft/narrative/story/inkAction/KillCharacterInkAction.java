@@ -48,7 +48,7 @@ public class KillCharacterInkAction extends InkAction {
         }
         String characterName = arguments.get(1);
         characterStory = NarrativeCraftMod.getInstance().getCharacterManager().getCharacterByName(characterName);
-        if (characterStory == null) {
+        if (characterStory == null && scene != null) {
             characterStory = scene.getNpcByName(characterName);
         }
         if (characterStory == null) {
@@ -67,5 +67,10 @@ public class KillCharacterInkAction extends InkAction {
         }
         storyHandler.killCharacter(characterStory);
         return InkActionResult.ok();
+    }
+
+    @Override
+    public boolean needScene() {
+        return false;
     }
 }
