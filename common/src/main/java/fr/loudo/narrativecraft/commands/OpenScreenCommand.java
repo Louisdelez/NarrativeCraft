@@ -37,6 +37,7 @@ import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.inkAction.SoundInkAction;
 import fr.loudo.narrativecraft.network.OpenChaptersScreenPacket;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.screens.mainScreen.MainScreen;
 import fr.loudo.narrativecraft.screens.options.StoryOptionsScreen;
 import fr.loudo.narrativecraft.util.Util;
 import net.minecraft.client.Minecraft;
@@ -150,8 +151,11 @@ public class OpenScreenCommand {
     }
 
     private static int openMainScreen(CommandContext<CommandSourceStack> context) {
-        //        MainScreen screen = new MainScreen(false, false);
-        //        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
+        PlayerSession playerSession = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getSessionByPlayer(context.getSource().getPlayer());
+        MainScreen screen = new MainScreen(playerSession, false, false);
+        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
         return Command.SINGLE_SUCCESS;
     }
 }

@@ -19,6 +19,7 @@
   "narrativecraft.global.cutscene": "Cutscene",
   "narrativecraft.global.cutscenes": "Cutscenes",
   "narrativecraft.global.interaction": "Interaction",
+  "narrativecraft.global.dev_env": "Welcome in the development environment! Have fun creating :p",
 
   "narrativecraft.file.main_ink_warning": "Main ink file, do not write here! If you need to write variables or functions, they have their own separated files.",
   "narrativecraft.file.vars_placeholder": "Write your variables here.",
@@ -145,6 +146,25 @@
   "narrativecraft.screen.keyframe_option.speed": "Speed:",
   "narrativecraft.screen.keyframe_option.keyframe_group": "Group %d",
   "narrativecraft.screen.keyframe_option.keyframe_id": "Keyframe ID #%d",
+
+  "narrativecraft.screen.main_screen.play": "Play",
+  "narrativecraft.screen.main_screen.new_game": "New Game",
+  "narrativecraft.screen.main_screen.new_game.confirm": "Are you sure? This will erase your save data.",
+  "narrativecraft.screen.main_screen.continue": "Continue",
+  "narrativecraft.screen.main_screen.select_screen": "Select scene",
+  "narrativecraft.screen.main_screen.options": "Options",
+  "narrativecraft.screen.main_screen.minecraft_options": "Minecraft options",
+  "narrativecraft.screen.main_screen.quit": "Quit",
+  "narrativecraft.screen.main_screen.loading": "Loading...",
+  "narrativecraft.screen.main_screen.dev_tip": "To exists this screen and go in development mode, press 5 times LEFT_CTRL",
+  "narrativecraft.screen.main_screen.pause.load_last_save": "Load last save",
+  "narrativecraft.screen.main_screen.pause.skip_cutscene": "Skip cutscene",
+  "narrativecraft.screen.main_screen.pause.leave": "Leave",
+  "narrativecraft.screen.main_screen.options.dialog_speed": "Text speed: %s",
+  "narrativecraft.screen.main_screen.options.auto_skip": "Auto-skip",
+
+  "narrativecraft.screen.chapter_manager.title": "Chapters List",
+  "narrativecraft.screen.scene_manager.title": "Scene list of chapter %d",
 
   "narrativecraft.ink_action.no_exists": "This tag could not be recognized.",
   "narrativecraft.ink_action.not_authorized": "Tag %s is not authorized.",

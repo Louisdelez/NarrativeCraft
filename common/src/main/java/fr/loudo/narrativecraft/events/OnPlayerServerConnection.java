@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.commands.RecordCommand;
+import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.items.CutsceneEditItems;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.managers.RecordingManager;
@@ -41,6 +42,8 @@ public class OnPlayerServerConnection {
     public static void playerJoin(ServerPlayer player) {
         if (player instanceof FakePlayer) return;
         initSession(player);
+        NarrativeCraftMod.getInstance().setNarrativeWorldOption(NarrativeCraftFile.loadWorldOptions());
+        NarrativeCraftMod.getInstance().setNarrativeClientOptions(NarrativeCraftFile.loadUserOptions());
         if (player.hasPermissions(2) && NarrativeEntryInit.hasError) {
             player.sendSystemMessage(Translation.message("crash.narrative-data").withStyle(ChatFormatting.RED));
         }

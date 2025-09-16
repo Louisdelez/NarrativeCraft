@@ -27,6 +27,7 @@
     "GameRendererMixin",
     "GuiTextRenderStateMixin",
     "KeyboardHandlerMixin",
+    "MinecraftCommonMixin",
     "accessor.FontAccessor",
     "invoker.FontInvoker"
   ],

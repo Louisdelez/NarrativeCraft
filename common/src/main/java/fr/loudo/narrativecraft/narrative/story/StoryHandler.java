@@ -55,9 +55,14 @@ public class StoryHandler {
             new DialogData(new Vec2(0, 0.8F), 90, 5, 5, 0.4F, 0, 0, 0, -1, 2.9F, 2.15F, false, false, 0.0);
     private Story story;
     private String dialogText;
+    private boolean loadScene;
 
     public StoryHandler(PlayerSession playerSession) {
         this.playerSession = playerSession;
+        Chapter firstChapter =
+                NarrativeCraftMod.getInstance().getChapterManager().getChapterByIndex(1);
+        playerSession.setChapter(firstChapter);
+        playerSession.setScene(firstChapter.getSortedSceneList().getFirst());
     }
 
     public StoryHandler(Chapter chapter, PlayerSession playerSession) {
@@ -70,6 +75,7 @@ public class StoryHandler {
         this.playerSession = playerSession;
         playerSession.setChapter(chapter);
         playerSession.setScene(scene);
+        loadScene = true;
     }
 
     public boolean isRunning() {
@@ -84,7 +90,7 @@ public class StoryHandler {
         playerSession.setStoryHandler(this);
         try {
             story = new Story(NarrativeCraftFile.storyContent());
-            if (playerSession.isSessionSet() && NarrativeCraftFile.saveExists()) {
+            if (NarrativeCraftFile.saveExists()) {
                 loadSave();
                 return;
             }
@@ -176,6 +182,7 @@ public class StoryHandler {
             DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
             dialogText = story.Continue().trim();
             playerSession.getInkTagHandler().getTagsToExecute().addAll(story.getCurrentTags());
+            playerSession.getInkTagHandler().getTagsToExecute().addAll(story.getCurrentTags());
             if (!story.getCurrentChoices().isEmpty()) {
                 handleChoices();
                 return;
@@ -213,6 +220,11 @@ public class StoryHandler {
         StorySave save = NarrativeCraftFile.saveContent();
         if (save == null) throw new Exception("Chapter or scene cannot be found in save file");
         story.getState().loadJson(save.getSaveData());
+        if (loadScene) {
+            story.choosePathString(playerSession.getScene().knotName());
+            next();
+            return;
+        }
         playerSession.setChapter(save.getChapter());
         playerSession.setScene(save.getScene());
         removeForbiddenTagLoadSave();
@@ -308,9 +320,10 @@ public class StoryHandler {
 
     private boolean sameCharacterTalking(String dialog) {
         DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
-        if (dialog.isEmpty()) return true;
-        if (!(dialogRenderer instanceof DialogRenderer3D)) return false;
         Matcher matcher = getDialogMatcher(dialog);
+        if (dialog.isEmpty()) return true;
+        if (dialogRenderer instanceof DialogRenderer2D && !matcher.matches()) return true;
+        if (!(dialogRenderer instanceof DialogRenderer3D)) return false;
         String characterName = "";
         if (matcher.matches()) {
             characterName = matcher.group(1).trim();

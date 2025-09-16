@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.files;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
@@ -35,6 +36,8 @@ import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.data.MainScreenData;
 import fr.loudo.narrativecraft.narrative.story.StorySave;
+import fr.loudo.narrativecraft.options.NarrativeClientOption;
+import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.serialization.*;
 import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Translation;
@@ -42,7 +45,9 @@ import fr.loudo.narrativecraft.util.Util;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
+import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
 
@@ -93,6 +98,7 @@ public class NarrativeCraftFile {
     public static final String MAIN_SCREEN_BACKGROUND_FILE_NAME = "main_screen_background" + EXTENSION_DATA_FILE;
     public static final String SKINS_FOLDER_NAME = "skins";
 
+    public static File rootDirectory;
     public static File mainDirectory;
     public static File chaptersDirectory;
     public static File characterDirectory;
@@ -108,6 +114,7 @@ public class NarrativeCraftFile {
                 !new File(server.getWorldPath(LevelResource.ROOT).toFile(), DIRECTORY_NAME).exists();
         NarrativeCraftFile.mainDirectory =
                 createDirectory(server.getWorldPath(LevelResource.ROOT).toFile(), DIRECTORY_NAME);
+        rootDirectory = createDirectory(Minecraft.getInstance().gameDirectory, DIRECTORY_NAME);
         chaptersDirectory = createDirectory(NarrativeCraftFile.mainDirectory, CHAPTERS_DIRECTORY_NAME);
         characterDirectory = createDirectory(NarrativeCraftFile.mainDirectory, CHARACTERS_DIRECTORY_NAME);
         savesDirectory = createDirectory(NarrativeCraftFile.mainDirectory, SAVES_DIRECTORY_NAME);
@@ -196,6 +203,11 @@ public class NarrativeCraftFile {
         try (Writer writer = new BufferedWriter(new FileWriter(saveFile))) {
             gson.toJson(save, writer);
         }
+    }
+
+    public static void removeSave() {
+        File saveFile = new File(savesDirectory, SAVE_FILE_NAME);
+        saveFile.delete();
     }
 
     public static File getStoryFile() {
@@ -524,5 +536,61 @@ public class NarrativeCraftFile {
     public static File getInkFile(Scene scene) {
         File sceneFile = getSceneFolder(scene);
         return createFile(sceneFile, Util.snakeCase(scene.getName()) + EXTENSION_SCRIPT_FILE);
+    }
+
+    public static void updateUserOptions(NarrativeClientOption narrativeClientOption) {
+        File userOptionsFile = createFile(rootDirectory, USER_OPTIONS_FILE_NAME);
+        try {
+            try (Writer writer = new BufferedWriter(new FileWriter(userOptionsFile))) {
+                new Gson().toJson(narrativeClientOption, writer);
+            } catch (IOException e) {
+                NarrativeCraftMod.LOGGER.error("Couldn't update user options! ", e);
+            }
+        } catch (JsonIOException e) {
+            NarrativeCraftMod.LOGGER.error("Couldn't update user options! ", e);
+        }
+    }
+
+    public static NarrativeClientOption loadUserOptions() {
+        File userOptionsFile = createFile(rootDirectory, USER_OPTIONS_FILE_NAME);
+        try {
+            String content = Files.readString(userOptionsFile.toPath());
+            if (content.isEmpty()) {
+                updateUserOptions(new NarrativeClientOption());
+            }
+            NarrativeClientOption option = new Gson().fromJson(content, NarrativeClientOption.class);
+            return Objects.requireNonNullElseGet(option, NarrativeClientOption::new);
+        } catch (IOException e) {
+            NarrativeCraftMod.LOGGER.error("Couldn't read user options! ", e);
+        }
+        return null;
+    }
+
+    public static void updateWorldOptions(NarrativeWorldOption narrativeWorldOption) {
+        File worldOptionsFile = createFile(rootDirectory, WORLD_OPTIONS_FILE_NAME);
+        try {
+            try (Writer writer = new BufferedWriter(new FileWriter(worldOptionsFile))) {
+                new Gson().toJson(narrativeWorldOption, writer);
+            } catch (IOException e) {
+                NarrativeCraftMod.LOGGER.error("Couldn't update world options! ", e);
+            }
+        } catch (JsonIOException e) {
+            NarrativeCraftMod.LOGGER.error("Couldn't update world options! ", e);
+        }
+    }
+
+    public static NarrativeWorldOption loadWorldOptions() {
+        File worldOptionFile = createFile(dataDirectory, WORLD_OPTIONS_FILE_NAME);
+        try {
+            String content = Files.readString(worldOptionFile.toPath());
+            if (content.isEmpty()) {
+                updateWorldOptions(new NarrativeWorldOption());
+            }
+            NarrativeWorldOption option = new Gson().fromJson(content, NarrativeWorldOption.class);
+            return Objects.requireNonNullElseGet(option, NarrativeWorldOption::new);
+        } catch (IOException e) {
+            NarrativeCraftMod.LOGGER.error("Couldn't read world options! ", e);
+        }
+        return null;
     }
 }

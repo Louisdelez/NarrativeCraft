@@ -1,0 +1,372 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package fr.loudo.narrativecraft.screens.mainScreen;
+
+import com.mojang.blaze3d.platform.InputConstants;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.controllers.AbstractController;
+import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
+import fr.loudo.narrativecraft.controllers.cutscene.CutscenePlayback;
+import fr.loudo.narrativecraft.controllers.mainScreen.MainScreenController;
+import fr.loudo.narrativecraft.files.NarrativeCraftFile;
+import fr.loudo.narrativecraft.narrative.Environment;
+import fr.loudo.narrativecraft.narrative.data.MainScreenData;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.narrative.story.StorySave;
+import fr.loudo.narrativecraft.options.NarrativeWorldOption;
+import fr.loudo.narrativecraft.screens.components.ChapterSelectorScreen;
+import fr.loudo.narrativecraft.screens.components.NarrativeCraftLogoRenderer;
+import fr.loudo.narrativecraft.screens.story.StoryChoicesScreen;
+import fr.loudo.narrativecraft.util.Translation;
+import fr.loudo.narrativecraft.util.Util;
+import java.io.IOException;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.ConfirmScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.ARGB;
+
+public class MainScreen extends Screen {
+
+    public static final ResourceLocation BACKGROUND_IMAGE =
+            ResourceLocation.withDefaultNamespace("textures/narrativecraft_mainscreen/background.png");
+    public static final ResourceLocation MUSIC =
+            ResourceLocation.withDefaultNamespace("narrativecraft_mainscreen.music");
+
+    public static final SimpleSoundInstance MUSIC_INSTANCE = new SimpleSoundInstance(
+            MainScreen.MUSIC,
+            SoundSource.MASTER,
+            0.7f,
+            1,
+            SoundInstance.createUnseededRandom(),
+            true,
+            0,
+            SoundInstance.Attenuation.NONE,
+            0.0F,
+            0.0F,
+            0.0F,
+            true);
+
+    private final NarrativeCraftLogoRenderer narrativeCraftLogo =
+            NarrativeCraftMod.getInstance().getNarrativeCraftLogoRenderer();
+    private final PlayerSession playerSession;
+    private final int buttonWidth = 100;
+    private final int buttonHeight = 20;
+
+    private final int initialX = 50;
+    private final int gap = 5;
+    private int initialY;
+
+    private int showDevBtnCount;
+    private Button devButton;
+
+    private final boolean finishedStory;
+    private final boolean pause;
+
+    private int userFloodedKeyboard;
+
+    public MainScreen(PlayerSession playerSession, boolean finishedStory, boolean pause) {
+        super(Component.literal("Main screen"));
+        this.finishedStory = finishedStory;
+        this.pause = pause;
+        this.playerSession = playerSession;
+        userFloodedKeyboard = 0;
+    }
+
+    private void playStory() {
+        this.onClose();
+        StoryHandler storyHandler = new StoryHandler(playerSession);
+        NarrativeCraftMod.server.execute(storyHandler::start);
+    }
+
+    @Override
+    public void onClose() {
+        super.onClose();
+        if (!pause) {
+            minecraft.getSoundManager().stop(MUSIC_INSTANCE);
+            if (playerSession.getController() != null) {
+                NarrativeCraftMod.server.execute(
+                        () -> playerSession.getController().stopSession(false));
+            }
+        } else {
+            StoryHandler storyHandler = playerSession.getStoryHandler();
+            if (storyHandler != null) {
+                if (!storyHandler.getStory().getCurrentChoices().isEmpty()) {
+                    StoryChoicesScreen choicesScreen =
+                            new StoryChoicesScreen(storyHandler.getStory().getCurrentChoices(), false);
+                    minecraft.setScreen(choicesScreen);
+                }
+            }
+        }
+        if (playerSession.getCurrentCamera() == null) {
+            minecraft.options.hideGui = false;
+        }
+    }
+
+    @Override
+    protected void init() {
+        boolean storyFinished = NarrativeCraftMod.getInstance().getNarrativeWorldOption().finishedStory;
+        minecraft.options.hideGui = true;
+        showDevBtnCount = 0;
+        StorySave save = null;
+        try {
+            save = NarrativeCraftFile.saveContent();
+        } catch (IOException ignored) {
+        }
+        boolean firstGame = save == null;
+        if (!pause && playerSession.getController() == null) {
+            try {
+                MainScreenData mainScreenData = NarrativeCraftFile.getMainScreenBackground();
+                MainScreenController mainScreenController =
+                        new MainScreenController(Environment.PRODUCTION, minecraft.player, mainScreenData);
+                NarrativeCraftMod.server.execute(mainScreenController::startSession);
+            } catch (Exception ignored) {
+            }
+        }
+
+        if (!pause) {
+            if (!minecraft.getSoundManager().isActive(MUSIC_INSTANCE)) {
+                minecraft.getSoundManager().play(MUSIC_INSTANCE);
+            }
+        }
+
+        int totalButtons = storyFinished ? 5 : 4;
+        if (pause) totalButtons = 5;
+        int totalHeight = buttonHeight * totalButtons + gap * (totalButtons - 1);
+        initialY = height / 2 - totalHeight / 2;
+        if (narrativeCraftLogo.logoExists()) initialY += narrativeCraftLogo.getImageHeight() / 2 + gap;
+        int startY = initialY;
+
+        Component playBtnComponent;
+        if (firstGame && !pause) {
+            playBtnComponent = Translation.message("screen.main_screen.play");
+        } else {
+            playBtnComponent = Translation.message("screen.main_screen.continue");
+        }
+        Button playButton = Button.builder(playBtnComponent, button -> {
+                    if (pause) {
+                        onClose();
+                    } else {
+                        playStory();
+                    }
+                })
+                .bounds(initialX, startY, buttonWidth, buttonHeight)
+                .build();
+        playButton.active = !NarrativeCraftMod.getInstance()
+                .getChapterManager()
+                .getChapters()
+                .isEmpty();
+        this.addRenderableWidget(playButton);
+
+        if (!firstGame && !pause) {
+            startY += buttonHeight + gap;
+            Button startNewGame = Button.builder(Translation.message("screen.main_screen.new_game"), button -> {
+                        ConfirmScreen confirmScreen = new ConfirmScreen(
+                                b -> {
+                                    if (b) {
+                                        NarrativeWorldOption option =
+                                                NarrativeCraftMod.getInstance().getNarrativeWorldOption();
+                                        NarrativeCraftFile.removeSave();
+                                        option.finishedStory = false;
+                                        NarrativeCraftFile.updateWorldOptions(option);
+                                        playStory();
+                                    } else {
+                                        minecraft.setScreen(this);
+                                    }
+                                },
+                                Component.literal(""),
+                                Translation.message("screen.main_screen.new_game.confirm"),
+                                CommonComponents.GUI_YES,
+                                CommonComponents.GUI_CANCEL);
+                        minecraft.setScreen(confirmScreen);
+                    })
+                    .bounds(initialX, startY, buttonWidth, buttonHeight)
+                    .build();
+            this.addRenderableWidget(startNewGame);
+        }
+
+        if (!pause) {
+            startY += buttonHeight + gap;
+            Button selectSceneButton = Button.builder(
+                            Translation.message("screen.main_screen.select_screen"), button -> {
+                                ChapterSelectorScreen screen = new ChapterSelectorScreen(playerSession, this);
+                                minecraft.setScreen(screen);
+                            })
+                    .bounds(initialX, startY, buttonWidth, buttonHeight)
+                    .build();
+            this.addRenderableWidget(selectSceneButton);
+        }
+
+        if (pause) {
+            startY += buttonHeight + gap;
+            Button loadLastSaveButton = Button.builder(
+                            Translation.message("screen.main_screen.pause.load_last_save"), button -> {
+                                minecraft.setScreen(null);
+                                StoryHandler storyHandler = new StoryHandler(playerSession);
+                                NarrativeCraftMod.server.execute(() -> {
+                                    storyHandler.stop();
+                                    storyHandler.start();
+                                });
+                            })
+                    .bounds(initialX, startY, buttonWidth, buttonHeight)
+                    .build();
+            this.addRenderableWidget(loadLastSaveButton);
+
+            AbstractController controller = playerSession.getController();
+            startY += buttonHeight + gap;
+            Button skipCutsceneButton = Button.builder(
+                            Translation.message("screen.main_screen.pause.skip_cutscene"), button -> {
+                                minecraft.setScreen(null);
+                                if (controller instanceof CutsceneController cutsceneController) {
+                                    CutscenePlayback cutscenePlayback = cutsceneController.getCutscenePlayback();
+                                    if (cutscenePlayback != null) {
+                                        cutscenePlayback.skip();
+                                    }
+                                }
+                            })
+                    .bounds(initialX, startY, buttonWidth, buttonHeight)
+                    .build();
+            skipCutsceneButton.active = controller instanceof CutsceneController && controller != null;
+            this.addRenderableWidget(skipCutsceneButton);
+        }
+
+        startY += buttonHeight + gap;
+        Button optionsButton = Button.builder(Translation.message("screen.main_screen.options"), button -> {
+                    MainScreenOptionsScreen screen = new MainScreenOptionsScreen(playerSession, this);
+                    minecraft.setScreen(screen);
+                })
+                .bounds(initialX, startY, buttonWidth, buttonHeight)
+                .build();
+        this.addRenderableWidget(optionsButton);
+
+        if (pause) {
+            startY += buttonHeight + gap;
+            Button quitButton = Button.builder(Translation.message("screen.main_screen.pause.leave"), button -> {
+                        NarrativeCraftMod.server.execute(() -> {
+                            playerSession.getStoryHandler().stop();
+                            MainScreen mainScreen = new MainScreen(playerSession, false, false);
+                            minecraft.execute(() -> minecraft.setScreen(mainScreen));
+                        });
+                    })
+                    .bounds(initialX, startY, buttonWidth, buttonHeight)
+                    .build();
+            this.addRenderableWidget(quitButton);
+        } else {
+            startY += buttonHeight + gap;
+            Button quitButton = Button.builder(Translation.message("screen.main_screen.quit"), button -> {
+                        Util.disconnectPlayer(minecraft);
+                    })
+                    .bounds(initialX, startY, buttonWidth, buttonHeight)
+                    .build();
+            this.addRenderableWidget(quitButton);
+        }
+
+        devButton = Button.builder(Component.literal("Dev Environment"), button -> {
+                    //            ServerPlayer serverPlayer = Utils.getServerPlayerByUUID(minecraft.player.getUUID());
+                    //            serverPlayer.setGameMode(GameType.CREATIVE);
+                    minecraft.player.displayClientMessage(Translation.message("global.dev_env"), false);
+                    this.onClose();
+                })
+                .bounds(width - buttonWidth - 10, buttonHeight, buttonWidth, buttonHeight)
+                .build();
+
+        if (finishedStory) {
+            // FinishedStoryScreen screen = new FinishedStoryScreen();
+            // minecraft.setScreen(screen);
+        }
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
+        if (narrativeCraftLogo.logoExists()) {
+            narrativeCraftLogo.render(guiGraphics, initialX, initialY - narrativeCraftLogo.getImageHeight() - gap - 5);
+        }
+        if (NarrativeCraftMod.getInstance().getChapterManager().getChapters().isEmpty() || userFloodedKeyboard > 20) {
+            guiGraphics.drawString(
+                    minecraft.font,
+                    Translation.message("screen.main_screen.dev_tip").getString(),
+                    guiGraphics.guiWidth() / 2
+                            - minecraft.font.width(Translation.message("screen.main_screen.dev_tip")) / 2,
+                    20,
+                    ARGB.colorFromFloat(1, 1, 1, 1));
+        }
+    }
+
+    @Override
+    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        if (pause) {
+            super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+            return;
+        }
+        if (playerSession.getController() != null) return;
+        if (Util.resourceExists(BACKGROUND_IMAGE)) {
+            guiGraphics.blit(
+                    RenderPipelines.GUI_TEXTURED,
+                    BACKGROUND_IMAGE,
+                    0,
+                    0,
+                    0,
+                    0,
+                    guiGraphics.guiWidth(),
+                    guiGraphics.guiHeight(),
+                    guiGraphics.guiWidth(),
+                    guiGraphics.guiHeight(),
+                    ARGB.colorFromFloat(1, 1, 1, 1));
+        } else {
+            guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), ARGB.colorFromFloat(1, 0, 0, 0));
+        }
+    }
+
+    @Override
+    protected void renderBlurredBackground(GuiGraphics guiGraphics) {}
+
+    @Override
+    public boolean isPauseScreen() {
+        return pause;
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (!pause) userFloodedKeyboard++;
+        if (keyCode == InputConstants.KEY_LCONTROL && !pause) {
+            showDevBtnCount++;
+            if (showDevBtnCount == 5) {
+                this.addRenderableWidget(devButton);
+            }
+        }
+        if (keyCode == InputConstants.KEY_ESCAPE && !pause) {
+            return false;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+}

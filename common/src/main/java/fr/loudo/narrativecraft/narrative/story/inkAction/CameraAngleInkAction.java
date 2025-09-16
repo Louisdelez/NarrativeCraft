@@ -57,6 +57,7 @@ public class CameraAngleInkAction extends InkAction {
             return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Camera angle child name missing"));
         }
         String parentName = arguments.get(1);
+        if (scene == null) return InkActionResult.ignored();
         cameraAngle = scene.getCameraAngleByName(parentName);
         if (cameraAngle == null) {
             return InkActionResult.error(Translation.message("camera_angle.no_exists", parentName, scene.getName()));

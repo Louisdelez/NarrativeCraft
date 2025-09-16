@@ -24,8 +24,12 @@
 package fr.loudo.narrativecraft;
 
 import fr.loudo.narrativecraft.managers.*;
+import fr.loudo.narrativecraft.options.NarrativeClientOption;
+import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.register.InkActionRegister;
+import fr.loudo.narrativecraft.screens.components.NarrativeCraftLogoRenderer;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +50,10 @@ public class NarrativeCraftMod {
     private final ChapterManager chapterManager = new ChapterManager();
     private final RecordingManager recordingManager = new RecordingManager();
     private final PlaybackManager playbackManager = new PlaybackManager();
+    private final NarrativeCraftLogoRenderer narrativeCraftLogoRenderer =
+            new NarrativeCraftLogoRenderer(ResourceLocation.withDefaultNamespace("textures/narrativecraft_logo.png"));
+    private NarrativeClientOption narrativeClientOptions = new NarrativeClientOption();
+    private NarrativeWorldOption narrativeWorldOption = new NarrativeWorldOption();
 
     public static NarrativeCraftMod getInstance() {
         return instance;
@@ -73,6 +81,26 @@ public class NarrativeCraftMod {
 
     public PlaybackManager getPlaybackManager() {
         return playbackManager;
+    }
+
+    public NarrativeCraftLogoRenderer getNarrativeCraftLogoRenderer() {
+        return narrativeCraftLogoRenderer;
+    }
+
+    public NarrativeClientOption getNarrativeClientOptions() {
+        return narrativeClientOptions;
+    }
+
+    public NarrativeWorldOption getNarrativeWorldOption() {
+        return narrativeWorldOption;
+    }
+
+    public void setNarrativeClientOptions(NarrativeClientOption narrativeClientOptions) {
+        this.narrativeClientOptions = narrativeClientOptions;
+    }
+
+    public void setNarrativeWorldOption(NarrativeWorldOption narrativeWorldOption) {
+        this.narrativeWorldOption = narrativeWorldOption;
     }
 
     public void clearManagers() {

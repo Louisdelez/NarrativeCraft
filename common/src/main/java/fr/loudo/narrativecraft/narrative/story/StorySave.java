@@ -61,32 +61,34 @@ public class StorySave {
         tagsRunning =
                 new ArrayList<>(inkActions.stream().map(InkAction::getCommand).toList());
         removeForbiddenTagLoadSave(tagsRunning);
-        for (Playback playback : playerSession.getPlaybackManager().getPlaybacks()) {
-            for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+        for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+            for (Playback playback : playerSession.getPlaybackManager().getPlaybacks()) {
                 if (playback.getCharacter()
                         .getName()
-                        .equalsIgnoreCase(characterRuntime.getCharacterStory().getName())) continue;
-                if (characterRuntime.getEntity() == null) continue;
-                Entity entity = characterRuntime.getEntity();
-                CharacterStoryData characterStoryData = new CharacterStoryData(
-                        characterRuntime.getCharacterStory(),
-                        new Location(
-                                entity.getX(),
-                                entity.getY(),
-                                entity.getZ(),
-                                entity.getXRot(),
-                                entity.getYRot(),
-                                entity.onGround()),
-                        false);
-                characterStoryData.setItems(characterRuntime.getEntity());
-                characterStoryData.setEntityByte(
-                        characterRuntime.getEntity().getEntityData().get(EntityAccessor.getDATA_SHARED_FLAGS_ID()));
-                characterStoryData.setLivingEntityByte(characterRuntime
-                        .getEntity()
-                        .getEntityData()
-                        .get(LivingEntityAccessor.getDATA_LIVING_ENTITY_FLAGS()));
-                characterStoryDataList.add(characterStoryData);
+                        .equalsIgnoreCase(characterRuntime.getCharacterStory().getName())) return;
+                if (characterRuntime.getEntity() == null) return;
             }
+            Entity entity = characterRuntime.getEntity();
+            CharacterStoryData characterStoryData = new CharacterStoryData(
+                    characterRuntime.getCharacterStory(),
+                    new Location(
+                            entity.getX(),
+                            entity.getY(),
+                            entity.getZ(),
+                            entity.getXRot(),
+                            entity.getYRot(),
+                            entity.onGround()),
+                    false);
+
+            characterStoryData.setPose(entity.getPose());
+            characterStoryData.setItems(characterRuntime.getEntity());
+            characterStoryData.setEntityByte(
+                    characterRuntime.getEntity().getEntityData().get(EntityAccessor.getDATA_SHARED_FLAGS_ID()));
+            characterStoryData.setLivingEntityByte(characterRuntime
+                    .getEntity()
+                    .getEntityData()
+                    .get(LivingEntityAccessor.getDATA_LIVING_ENTITY_FLAGS()));
+            characterStoryDataList.add(characterStoryData);
         }
     }
 

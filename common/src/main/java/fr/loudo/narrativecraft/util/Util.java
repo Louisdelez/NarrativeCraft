@@ -34,10 +34,17 @@ import fr.loudo.narrativecraft.mixin.accessor.PlayerAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.PlayerListAccessor;
 import fr.loudo.narrativecraft.mixin.invoker.FontInvoker;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Optional;
 import java.util.UUID;
+import javax.imageio.ImageIO;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.font.FontSet;
+import net.minecraft.client.gui.screens.PauseScreen;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -46,8 +53,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
@@ -194,11 +204,44 @@ public class Util {
         return entity;
     }
 
+    public static void disconnectPlayer(Minecraft minecraft) {
+        PauseScreen.disconnectFromWorld(minecraft, ClientLevel.DEFAULT_QUIT_MESSAGE);
+    }
+
     public static float getLetterWidth(int letterCode, Minecraft minecraft) {
         Style style = Style.EMPTY;
         FontSet fontset = ((FontInvoker) minecraft.font).callGetFontSet(style.getFont());
         GlyphInfo glyph = fontset.getGlyphInfo(letterCode, ((FontAccessor) minecraft.font).getFilterFishyGlyphs());
         boolean bold = style.isBold();
         return glyph.getAdvance(bold);
+    }
+
+    public static int[] getImageResolution(ResourceLocation resourceLocation) {
+        ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
+
+        Optional<Resource> resource = resourceManager.getResource(resourceLocation);
+        if (resource.isPresent()) {
+            try (InputStream stream = resource.get().open()) {
+                BufferedImage image = ImageIO.read(stream);
+                int width = image.getWidth();
+                int height = image.getHeight();
+
+                return new int[] {width, height};
+            } catch (IOException ignored) {
+            }
+        }
+        return null;
+    }
+
+    public static int getDynamicHeight(int[] resolution, int newWidth) {
+        float ratio = (float) resolution[1] / resolution[0];
+        return Math.round(ratio * newWidth);
+    }
+
+    public static boolean resourceExists(ResourceLocation resourceLocation) {
+        return Minecraft.getInstance()
+                .getResourceManager()
+                .getResource(resourceLocation)
+                .isPresent();
     }
 }

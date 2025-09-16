@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.controllers.cutscene;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionRegistry;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
@@ -32,6 +33,7 @@ import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframeGroup;
 import fr.loudo.narrativecraft.narrative.keyframes.keyframeTrigger.KeyframeTrigger;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.story.inkAction.FadeInkAction;
 import fr.loudo.narrativecraft.screens.controller.cutscene.CutsceneKeyframeOptionScreen;
 import fr.loudo.narrativecraft.util.Easing;
 import fr.loudo.narrativecraft.util.MathHelper;
@@ -72,6 +74,16 @@ public class CutscenePlayback {
     public void play() {
         isPlaying = true;
         cutsceneController.setPlaying(true);
+    }
+
+    public void skip() {
+        CutsceneKeyframe lastKeyframe =
+                cutsceneController.getKeyframeGroups().getLast().getKeyframes().getLast();
+        int lastTick = lastKeyframe.getTick() + lastKeyframe.getTransitionDelayTick();
+        NarrativeCraftMod.server.execute(() -> cutsceneController.changeTimePosition(lastTick - 1, false));
+        if (cutsceneController.getEnvironment() == Environment.PRODUCTION) {
+            playerSession.getInkActions().removeIf(inkAction -> inkAction instanceof FadeInkAction);
+        }
     }
 
     public void stop() {
