@@ -193,7 +193,6 @@ public class StoryHandler {
             DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
             dialogText = story.Continue().trim();
             playerSession.getInkTagHandler().getTagsToExecute().addAll(story.getCurrentTags());
-            playerSession.getInkTagHandler().getTagsToExecute().addAll(story.getCurrentTags());
             if (!story.getCurrentChoices().isEmpty()) {
                 handleChoices();
                 return;
@@ -286,6 +285,12 @@ public class StoryHandler {
         }
     }
 
+    public boolean isChangingScene() {
+        String currentKnot = story.getState().getCurrentKnot();
+        return currentKnot != null
+                && !currentKnot.equalsIgnoreCase(playerSession.getScene().knotName());
+    }
+
     private void showDialog(String dialog) throws Exception {
         if (dialog == null || dialog.isEmpty()) return;
         Matcher matcher = getDialogMatcher(dialog);
@@ -363,6 +368,10 @@ public class StoryHandler {
 
     public DialogData getDialogData() {
         return dialogData;
+    }
+
+    public void setDialogData(DialogData dialogData) {
+        this.dialogData = dialogData;
     }
 
     public Story getStory() {

@@ -23,11 +23,20 @@
 
 package fr.loudo.narrativecraft.narrative.story.inkAction;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
+import fr.loudo.narrativecraft.narrative.dialog.DialogData;
+import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import java.util.Arrays;
 import java.util.List;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec2;
 
 public class OnEnterInkAction extends InkAction {
     public OnEnterInkAction(String id, Side side, String syntax, CommandMatcher matcher) {
@@ -42,6 +51,38 @@ public class OnEnterInkAction extends InkAction {
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
         isRunning = false;
+        StoryHandler storyHandler = playerSession.getStoryHandler();
+        if (storyHandler == null) return InkActionResult.ignored();
+        String currentKnot = storyHandler.getStory().getState().getCurrentKnot();
+        if (currentKnot == null
+                || currentKnot.equalsIgnoreCase(playerSession.getScene().knotName())) return InkActionResult.ok();
+
+        String[] splitKnot = currentKnot.split("_");
+        int chapterIndex = Integer.parseInt(splitKnot[1]);
+        String sceneName = String.join(" ", Arrays.copyOfRange(splitKnot, 2, splitKnot.length));
+        Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getChapterByIndex(chapterIndex);
+        if (chapter == null) return InkActionResult.error("Chapter " + chapterIndex + " does not exists!");
+        Scene scene = chapter.getSceneByName(sceneName);
+        if (scene == null)
+            return InkActionResult.error("Scene " + sceneName + " of chapter " + chapterIndex + " does not exists!");
+        playerSession.setChapter(chapter);
+        playerSession.setScene(scene);
+        for (InkAction inkAction : playerSession.getInkActions()) {
+            inkAction.stop();
+        }
+        playerSession.getInkActions().clear();
+        for (Playback playback : playerSession.getPlaybackManager().getPlaybacks()) {
+            playback.stop(true);
+        }
+        for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+            if (characterRuntime.getEntity() == null) continue;
+            characterRuntime.getEntity().remove(Entity.RemovalReason.KILLED);
+        }
+        playerSession.getCharacterRuntimes().clear();
+        DialogData dialogData =
+                new DialogData(new Vec2(0, 0.8F), 90, 5, 5, 0.4F, 0, 0, 0, -1, 2.9F, 2.15F, false, false, 0.0);
+        storyHandler.setDialogData(dialogData);
+        storyHandler.save();
         return InkActionResult.ok();
     }
 

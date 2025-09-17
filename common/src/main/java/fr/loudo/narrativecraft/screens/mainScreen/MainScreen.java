@@ -62,7 +62,7 @@ public class MainScreen extends Screen {
     public static final ResourceLocation MUSIC =
             ResourceLocation.withDefaultNamespace("narrativecraft_mainscreen.music");
 
-    public static final SimpleSoundInstance MUSIC_INSTANCE = new SimpleSoundInstance(
+    public static SimpleSoundInstance musicInstance = new SimpleSoundInstance(
             MainScreen.MUSIC,
             SoundSource.MASTER,
             0.7f,
@@ -112,7 +112,7 @@ public class MainScreen extends Screen {
     public void onClose() {
         super.onClose();
         if (!pause) {
-            minecraft.getSoundManager().stop(MUSIC_INSTANCE);
+            minecraft.getSoundManager().stop(musicInstance);
             minecraft.options.hideGui = false;
             if (playerSession.getController() != null) {
                 NarrativeCraftMod.server.execute(
@@ -152,8 +152,10 @@ public class MainScreen extends Screen {
         }
 
         if (!pause) {
-            if (!minecraft.getSoundManager().isActive(MUSIC_INSTANCE)) {
-                minecraft.getSoundManager().play(MUSIC_INSTANCE);
+            if (!minecraft.getSoundManager().isActive(musicInstance)) {
+                minecraft.getSoundManager().play(musicInstance);
+            } else {
+                minecraft.getSoundManager().setVolume(musicInstance, 0.7F);
             }
         }
 
@@ -216,7 +218,11 @@ public class MainScreen extends Screen {
             startY += buttonHeight + gap;
             Button selectSceneButton = Button.builder(
                             Translation.message("screen.main_screen.select_screen"), button -> {
-                                ChapterSelectorScreen screen = new ChapterSelectorScreen(playerSession, this);
+                                minecraft.getSoundManager().stop(musicInstance);
+                                ChapterSelectorScreen screen = new ChapterSelectorScreen(
+                                        playerSession,
+                                        new MainScreenOptionsScreen(
+                                                playerSession, new MainScreen(playerSession, false, pause)));
                                 minecraft.setScreen(screen);
                             })
                     .bounds(initialX, startY, buttonWidth, buttonHeight)
@@ -259,7 +265,9 @@ public class MainScreen extends Screen {
 
         startY += buttonHeight + gap;
         Button optionsButton = Button.builder(Translation.message("screen.main_screen.options"), button -> {
-                    MainScreenOptionsScreen screen = new MainScreenOptionsScreen(playerSession, this);
+                    minecraft.getSoundManager().stop(musicInstance);
+                    MainScreenOptionsScreen screen =
+                            new MainScreenOptionsScreen(playerSession, new MainScreen(playerSession, false, pause));
                     minecraft.setScreen(screen);
                 })
                 .bounds(initialX, startY, buttonWidth, buttonHeight)
