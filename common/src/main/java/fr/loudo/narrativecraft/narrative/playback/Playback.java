@@ -243,7 +243,6 @@ public class Playback {
             globalTick = oldTick;
         }
         globalTick = newTick;
-        isPlaying = true;
         hasEnded = false;
     }
 

@@ -153,6 +153,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         for (KeyframeTrigger keyframeTrigger : keyframeTriggers) {
             keyframeTrigger.showKeyframe(playerSession.getPlayer());
         }
+        pause();
     }
 
     @Override

@@ -468,7 +468,7 @@ public class NarrativeCraftFile {
             }
             stringBuilder.append("\n");
         }
-        if (chapters.size() > 1) {
+        if (!chapters.isEmpty()) {
             stringBuilder.append("->").append(chapters.getFirst().knotName());
         }
         try (Writer writer = new BufferedWriter(new FileWriter(mainInkFile))) {
