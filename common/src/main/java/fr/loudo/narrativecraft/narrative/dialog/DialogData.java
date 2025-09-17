@@ -26,6 +26,9 @@ package fr.loudo.narrativecraft.narrative.dialog;
 import net.minecraft.world.phys.Vec2;
 
 public class DialogData {
+    public static DialogData globalDialogData =
+            new DialogData(new Vec2(0, 0.8F), 90, 5, 5, 0.8F, 0, 0, 0, -1, 2.9F, 2.15F, false, false, 0.0);
+
     private Vec2 offset;
     private float width, paddingX, paddingY, scale, letterSpacing, gap, noiseShakeSpeed, noiseShakeStrength;
     private int backgroundColor, textColor;
@@ -61,6 +64,23 @@ public class DialogData {
         this.noSkip = noSkip;
         this.dialogAutoSkip = dialogAutoSkip;
         this.autoSkipSeconds = autoSkipSeconds;
+    }
+
+    public DialogData(DialogData dialogData) {
+        offset = dialogData.offset;
+        width = dialogData.width;
+        paddingX = dialogData.paddingX;
+        paddingY = dialogData.paddingY;
+        scale = dialogData.scale;
+        letterSpacing = dialogData.letterSpacing;
+        gap = dialogData.gap;
+        backgroundColor = dialogData.backgroundColor;
+        textColor = dialogData.textColor;
+        noiseShakeSpeed = dialogData.noiseShakeSpeed;
+        noiseShakeStrength = dialogData.noiseShakeStrength;
+        noSkip = dialogData.noSkip;
+        dialogAutoSkip = dialogData.dialogAutoSkip;
+        autoSkipSeconds = dialogData.autoSkipSeconds;
     }
 
     public Vec2 getOffset() {

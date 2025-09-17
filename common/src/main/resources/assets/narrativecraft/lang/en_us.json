@@ -166,6 +166,16 @@
   "narrativecraft.screen.chapter_manager.title": "Chapters List",
   "narrativecraft.screen.scene_manager.title": "Scene list of chapter %d",
 
+  "narrativecraft.screen.story_options.title": "Story options",
+  "narrativecraft.screen.story_options.main_screen": "Main Screen Controller",
+  "narrativecraft.screen.story_options.dialog": "Dialog values",
+  "narrativecraft.screen.story_options.world_options": "World options",
+
+  "narrativecraft.screen.world_options.title": "World options",
+  "narrativecraft.screen.world_options.finished_story": "Finished Story: %s",
+  "narrativecraft.screen.world_options.show_main_screen": "Show Main Screen: %s",
+  "narrativecraft.screen.world_options.show_credits_screen": "Show Credits Screen: %s",
+
   "narrativecraft.ink_action.no_exists": "This tag could not be recognized.",
   "narrativecraft.ink_action.not_authorized": "Tag %s is not authorized.",
   "narrativecraft.ink_action.validation.miss_argument": "Miss required argument [%s]",

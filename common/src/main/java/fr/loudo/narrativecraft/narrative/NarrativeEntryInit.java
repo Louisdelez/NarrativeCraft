@@ -40,6 +40,7 @@ import fr.loudo.narrativecraft.narrative.character.CharacterModel;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
+import fr.loudo.narrativecraft.narrative.dialog.DialogData;
 import fr.loudo.narrativecraft.serialization.*;
 import java.io.File;
 import java.io.IOException;
@@ -56,6 +57,8 @@ public class NarrativeEntryInit {
         hasError = false;
         NarrativeCraftMod.getInstance().clearManagers();
         try {
+            NarrativeCraftFile.createGlobalDialogValues();
+            DialogData.globalDialogData = NarrativeCraftFile.getGlobalDialogValues();
             initCharacters();
             initChapters();
             NarrativeCraftFile.updateInkIncludes();

@@ -214,7 +214,7 @@ public class MainScreen extends Screen {
             this.addRenderableWidget(startNewGame);
         }
 
-        if (!pause) {
+        if (!pause && NarrativeCraftMod.getInstance().getNarrativeWorldOption().finishedStory) {
             startY += buttonHeight + gap;
             Button selectSceneButton = Button.builder(
                             Translation.message("screen.main_screen.select_screen"), button -> {

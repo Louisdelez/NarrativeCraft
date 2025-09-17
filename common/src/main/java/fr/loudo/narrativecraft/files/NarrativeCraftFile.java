@@ -35,6 +35,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.data.MainScreenData;
+import fr.loudo.narrativecraft.narrative.dialog.DialogData;
 import fr.loudo.narrativecraft.narrative.story.StorySave;
 import fr.loudo.narrativecraft.options.NarrativeClientOption;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
@@ -567,7 +568,7 @@ public class NarrativeCraftFile {
     }
 
     public static void updateWorldOptions(NarrativeWorldOption narrativeWorldOption) {
-        File worldOptionsFile = createFile(rootDirectory, WORLD_OPTIONS_FILE_NAME);
+        File worldOptionsFile = createFile(dataDirectory, WORLD_OPTIONS_FILE_NAME);
         try {
             try (Writer writer = new BufferedWriter(new FileWriter(worldOptionsFile))) {
                 new Gson().toJson(narrativeWorldOption, writer);
@@ -592,5 +593,26 @@ public class NarrativeCraftFile {
             NarrativeCraftMod.LOGGER.error("Couldn't read world options! ", e);
         }
         return null;
+    }
+
+    public static void createGlobalDialogValues() throws IOException {
+        File dialogFile = new File(dataDirectory, DIALOG_FILE_NAME);
+        if (dialogFile.exists()) return;
+        try (Writer writer = new BufferedWriter(new FileWriter(dialogFile))) {
+            new Gson().toJson(DialogData.globalDialogData, writer);
+        }
+    }
+
+    public static DialogData getGlobalDialogValues() throws IOException {
+        File dialogFile = createFile(dataDirectory, DIALOG_FILE_NAME);
+        String dialogContent = Files.readString(dialogFile.toPath());
+        return new Gson().fromJson(dialogContent, DialogData.class);
+    }
+
+    public static void updateGlobalDialogValues(DialogData dialogData) throws IOException {
+        File dialogFile = createFile(dataDirectory, DIALOG_FILE_NAME);
+        try (Writer writer = new BufferedWriter(new FileWriter(dialogFile))) {
+            new Gson().toJson(dialogData, writer);
+        }
     }
 }

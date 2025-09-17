@@ -45,7 +45,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.phys.Vec2;
 
 public class StoryHandler {
 
@@ -55,8 +54,7 @@ public class StoryHandler {
     public static final String DIALOG_REGEX = "^(\\w+)\\s*:\\s*(.+?)\\s*$";
 
     private final PlayerSession playerSession;
-    private DialogData dialogData =
-            new DialogData(new Vec2(0, 0.8F), 90, 5, 5, 0.4F, 0, 0, 0, -1, 2.9F, 2.15F, false, false, 0.0);
+    private DialogData dialogData = new DialogData(DialogData.globalDialogData);
     private Story story;
     private String dialogText;
     private boolean loadScene;

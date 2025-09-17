@@ -39,6 +39,7 @@ public class PressKeyListener {
             PlayerSession playerSession =
                     NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
             if (playerSession == null) return;
+            if (playerSession.getStoryHandler() != null) return;
             if (playerSession.isSessionSet()) {
                 minecraft.setScreen(new ScenesMenuScreen(playerSession.getScene()));
             } else {
@@ -49,6 +50,7 @@ public class PressKeyListener {
             PlayerSession playerSession =
                     NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
             if (playerSession == null) return;
+            if (playerSession.getStoryHandler() != null) return;
             if (playerSession.getController() == null) return;
             minecraft.setScreen(playerSession.getController().getControllerScreen());
         });

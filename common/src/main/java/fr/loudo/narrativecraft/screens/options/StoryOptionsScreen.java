@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.controllers.mainScreen.MainScreenController;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.data.MainScreenData;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.screens.components.StoryElementList;
 import fr.loudo.narrativecraft.screens.storyManager.StoryElementScreen;
 import fr.loudo.narrativecraft.util.ImageFontConstants;
@@ -40,8 +41,11 @@ import net.minecraft.client.gui.layouts.LinearLayout;
 
 public class StoryOptionsScreen extends StoryElementScreen {
 
-    public StoryOptionsScreen() {
+    private final PlayerSession playerSession;
+
+    public StoryOptionsScreen(PlayerSession playerSession) {
         super(Translation.message("screen.story_options.title"));
+        this.playerSession = playerSession;
     }
 
     @Override
@@ -76,20 +80,20 @@ public class StoryOptionsScreen extends StoryElementScreen {
                             onClose();
                         })
                         .build()));
-        //
-        //        entries.add(new StoryElementList.StoryEntryData(
-        //                Button.builder(Translation.message("screen.story_options.dialog"), button -> {
-        //                    DialogCustomScreen dialogCustomScreen = new DialogCustomScreen(this);
-        //                    minecraft.setScreen(dialogCustomScreen);
-        //                }).build()
-        //        ));
-        //
-        //        entries.add(new StoryElementList.StoryEntryData(
-        //                Button.builder(Translation.message("screen.story_options.world_options"), button -> {
-        //                    WorldOptionsScreen screen = new WorldOptionsScreen(this);
-        //                    minecraft.setScreen(screen);
-        //                }).build()
-        //        ));
+        entries.add(new StoryElementList.StoryEntryData(
+                Button.builder(Translation.message("screen.story_options.dialog"), button -> {
+                            DialogCustomOptionsScreen dialogCustomScreen =
+                                    new DialogCustomOptionsScreen(this, playerSession);
+                            minecraft.setScreen(dialogCustomScreen);
+                        })
+                        .build()));
+
+        entries.add(new StoryElementList.StoryEntryData(
+                Button.builder(Translation.message("screen.story_options.world_options"), button -> {
+                            WorldOptionsScreen screen = new WorldOptionsScreen(this);
+                            minecraft.setScreen(screen);
+                        })
+                        .build()));
 
         this.storyElementList = this.layout.addToContents(new StoryElementList(this.minecraft, this, entries, true));
     }
