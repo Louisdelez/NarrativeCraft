@@ -72,30 +72,37 @@ public class CameraAngleInkAction extends InkAction {
 
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
-        if (!(playerSession.getController() instanceof CameraAngleController)) {
-            // Remove characters that exists in the story
-            List<CharacterRuntime> toRemove = new ArrayList<>();
-            for (CharacterStoryData characterStoryData : cameraAngle.getCharacterStoryDataList()) {
-                for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
-                    if (characterStoryData
-                            .getCharacterStory()
-                            .getName()
-                            .equalsIgnoreCase(
-                                    characterRuntime.getCharacterStory().getName())) {
-                        characterRuntime.getEntity().remove(Entity.RemovalReason.KILLED);
-                        toRemove.add(characterRuntime);
-                    }
-                }
+        if (playerSession.getController() instanceof CameraAngleController cameraAngleController) {
+            playerSession.getInkActions().removeIf(inkAction -> inkAction instanceof CameraAngleInkAction);
+            if (!cameraAngleController.getCameraAngle().getName().equalsIgnoreCase(cameraAngle.getName())) {
+                clear(playerSession);
             }
-            playerSession.getCharacterRuntimes().removeAll(toRemove);
-            CameraAngleController controller =
-                    new CameraAngleController(Environment.PRODUCTION, playerSession.getPlayer(), cameraAngle);
-            controller.startSession();
+        } else if (!(playerSession.getController() instanceof CameraAngleController)) {
+            clear(playerSession);
         }
         playerSession.setCurrentCamera(keyframe.getKeyframeLocation());
         Minecraft.getInstance().options.hideGui = true;
-        isRunning = false;
         return InkActionResult.ok();
+    }
+
+    private void clear(PlayerSession playerSession) {
+        // Remove characters that exists in the story
+        List<CharacterRuntime> toRemove = new ArrayList<>();
+        for (CharacterStoryData characterStoryData : cameraAngle.getCharacterStoryDataList()) {
+            for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+                if (characterStoryData
+                        .getCharacterStory()
+                        .getName()
+                        .equalsIgnoreCase(characterRuntime.getCharacterStory().getName())) {
+                    characterRuntime.getEntity().remove(Entity.RemovalReason.KILLED);
+                    toRemove.add(characterRuntime);
+                }
+            }
+        }
+        playerSession.getCharacterRuntimes().removeAll(toRemove);
+        CameraAngleController controller =
+                new CameraAngleController(Environment.PRODUCTION, playerSession.getPlayer(), cameraAngle);
+        controller.startSession();
     }
 
     @Override

@@ -60,7 +60,7 @@ public class InkTagHandler {
         StoryHandler storyHandler = playerSession.getStoryHandler();
         if (storyHandler != null && tagsToExecute.isEmpty() && result.isOk()) {
             if (storyHandler.isFinished() && storyHandler.getDialogText().isEmpty()) {
-                storyHandler.stop();
+                storyHandler.stopAndFinishScreen();
             } else {
                 storyHandler.showCurrentDialog();
             }

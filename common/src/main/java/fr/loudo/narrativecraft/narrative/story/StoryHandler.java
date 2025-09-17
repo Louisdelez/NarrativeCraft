@@ -37,6 +37,8 @@ import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.dialog.*;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.options.NarrativeWorldOption;
+import fr.loudo.narrativecraft.screens.credits.CreditScreen;
 import fr.loudo.narrativecraft.screens.story.StoryChoicesScreen;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.regex.Matcher;
@@ -47,6 +49,8 @@ import net.minecraft.world.phys.Vec2;
 
 public class StoryHandler {
 
+    private NarrativeWorldOption narrativeWorldOption =
+            NarrativeCraftMod.getInstance().getNarrativeWorldOption();
     private final Minecraft minecraft = Minecraft.getInstance();
     public static final String DIALOG_REGEX = "^(\\w+)\\s*:\\s*(.+?)\\s*$";
 
@@ -127,6 +131,13 @@ public class StoryHandler {
         playerSession.setStoryHandler(null);
     }
 
+    public void stopAndFinishScreen() {
+        stop();
+        if (!narrativeWorldOption.showCreditsScreen) return;
+        CreditScreen creditScreen = new CreditScreen(playerSession, false, !narrativeWorldOption.finishedStory);
+        minecraft.execute(() -> minecraft.setScreen(creditScreen));
+    }
+
     public boolean characterInStory(CharacterStory characterStory) {
         for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
             if (characterRuntime.getCharacterStory().getName().equals(characterStory.getName())) {
@@ -176,7 +187,7 @@ public class StoryHandler {
         try {
             if (story == null) throw new Exception("Story is not initialized!");
             if (isFinished()) {
-                stop();
+                stopAndFinishScreen();
                 return;
             }
             DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
@@ -236,7 +247,6 @@ public class StoryHandler {
         }
         dialogData = save.getDialogData();
         dialogText = story.getCurrentText();
-        playerSession.setCurrentCamera(save.getCameraLocation());
         playerSession.getInkTagHandler().execute();
         if (!story.getCurrentChoices().isEmpty()) {
             handleChoices();

@@ -113,6 +113,7 @@ public class MainScreen extends Screen {
         super.onClose();
         if (!pause) {
             minecraft.getSoundManager().stop(MUSIC_INSTANCE);
+            minecraft.options.hideGui = false;
             if (playerSession.getController() != null) {
                 NarrativeCraftMod.server.execute(
                         () -> playerSession.getController().stopSession(false));
@@ -126,9 +127,6 @@ public class MainScreen extends Screen {
                     minecraft.setScreen(choicesScreen);
                 }
             }
-        }
-        if (playerSession.getCurrentCamera() == null) {
-            minecraft.options.hideGui = false;
         }
     }
 

@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.options.NarrativeClientOption;
+import fr.loudo.narrativecraft.screens.credits.CreditScreen;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.Locale;
 import net.minecraft.client.Minecraft;
@@ -104,8 +105,8 @@ public class MainScreenOptionsScreen extends OptionsSubScreen {
         StoryHandler storyHandler = playerSession.getStoryHandler();
         if (storyHandler == null || !storyHandler.isRunning()) {
             linearlayout.addChild(Button.builder(Component.literal("Credits"), button -> {
-                        //                CreditsScreen screen = new CreditsScreen(true, false);
-                        //                minecraft.setScreen(screen);
+                        CreditScreen creditScreen = new CreditScreen(playerSession, true, false);
+                        minecraft.setScreen(creditScreen);
                     })
                     .width(200)
                     .build());

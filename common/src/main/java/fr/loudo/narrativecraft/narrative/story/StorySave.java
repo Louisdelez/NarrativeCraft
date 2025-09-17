@@ -31,7 +31,6 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.dialog.DialogData;
-import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.recording.Location;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
@@ -42,7 +41,6 @@ import net.minecraft.world.entity.Entity;
 public class StorySave {
     private transient Chapter chapter;
     private transient Scene scene;
-    private final KeyframeLocation cameraLocation;
     private final String saveData;
     private final DialogData dialogData;
     private final List<String> tagsRunning;
@@ -53,7 +51,6 @@ public class StorySave {
         chapter = playerSession.getChapter();
         scene = playerSession.getScene();
         saveData = storyHandler.getStory().getState().toJson();
-        cameraLocation = playerSession.getCurrentCamera();
         dialogData = storyHandler.getDialogData();
         List<InkAction> inkActions = playerSession.getInkActions().stream()
                 .filter(InkAction::isRunning)
@@ -115,10 +112,6 @@ public class StorySave {
 
     public String getSaveData() {
         return saveData;
-    }
-
-    public KeyframeLocation getCameraLocation() {
-        return cameraLocation;
     }
 
     public DialogData getDialogData() {

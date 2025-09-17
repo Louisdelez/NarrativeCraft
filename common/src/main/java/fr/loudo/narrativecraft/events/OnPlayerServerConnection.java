@@ -32,9 +32,11 @@ import fr.loudo.narrativecraft.managers.RecordingManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryInit;
 import fr.loudo.narrativecraft.narrative.recording.Recording;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.screens.mainScreen.MainScreen;
 import fr.loudo.narrativecraft.util.FakePlayer;
 import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
 
 public class OnPlayerServerConnection {
@@ -48,6 +50,12 @@ public class OnPlayerServerConnection {
             player.sendSystemMessage(Translation.message("crash.narrative-data").withStyle(ChatFormatting.RED));
         }
         CutsceneEditItems.init(player.registryAccess());
+        PlayerSession playerSession =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
+        if (NarrativeCraftMod.getInstance().getNarrativeWorldOption().showMainScreen) {
+            MainScreen mainScreen = new MainScreen(playerSession, false, false);
+            Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(mainScreen));
+        }
     }
 
     public static void playerLeave(ServerPlayer player) {

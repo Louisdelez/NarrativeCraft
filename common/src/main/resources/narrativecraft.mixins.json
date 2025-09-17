@@ -28,8 +28,11 @@
     "GuiTextRenderStateMixin",
     "KeyboardHandlerMixin",
     "MinecraftCommonMixin",
+    "WinScreenMixin",
     "accessor.FontAccessor",
-    "invoker.FontInvoker"
+    "accessor.WinScreenAccessor",
+    "invoker.FontInvoker",
+    "invoker.WinScreenInvoker"
   ],
   "server": [],
   "injectors": {
