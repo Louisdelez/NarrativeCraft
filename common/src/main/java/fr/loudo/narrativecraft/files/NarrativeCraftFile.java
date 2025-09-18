@@ -441,6 +441,10 @@ public class NarrativeCraftFile {
         return createDirectory(chaptersDirectory, String.valueOf(chapter.getIndex()));
     }
 
+    public static File getChapterFolder(Chapter chapter) {
+        return createDirectory(chaptersDirectory, String.valueOf(chapter.getIndex()));
+    }
+
     public static File getScenesFolder(Chapter chapter) {
         return createDirectory(getChapterDirectory(chapter), "scenes");
     }
@@ -484,6 +488,14 @@ public class NarrativeCraftFile {
     public static File getSceneFolder(Scene scene) {
         File scenesFolder = createFile(getChapterDirectory(scene.getChapter()), SCENES_DIRECTORY_NAME);
         return createDirectory(scenesFolder, Util.snakeCase(scene.getName()));
+    }
+
+    public static File getScriptFile(Scene scene) {
+        return createFile(getSceneFolder(scene), Util.snakeCase(scene.getName()) + EXTENSION_SCRIPT_FILE);
+    }
+
+    public static File getScriptFile(Chapter chapter) {
+        return createFile(getChapterFolder(chapter), "chapter_" + chapter.getIndex() + EXTENSION_SCRIPT_FILE);
     }
 
     public static File getSubsceneFile(Scene scene) {

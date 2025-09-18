@@ -20,10 +20,14 @@
   "narrativecraft.global.cutscenes": "Cutscenes",
   "narrativecraft.global.interaction": "Interaction",
   "narrativecraft.global.dev_env": "Welcome in the development environment! Have fun creating :p",
+  "narrativecraft.global.line": "Line",
 
   "narrativecraft.file.main_ink_warning": "Main ink file, do not write here! If you need to write variables or functions, they have their own separated files.",
   "narrativecraft.file.vars_placeholder": "Write your variables here.",
   "narrativecraft.file.funcs_placeholder": "Write your functions here.",
+
+  "narrativecraft.story.stopped": "Story stopped.",
+  "narrativecraft.story.not_playing": "Story is not playing.",
 
   "narrativecraft.session.set": "Your session is now set to §lChapter %d §rand §lScene %s.",
   "narrativecraft.session.set_to_player": "Session is now set to §lChapter %d §rand §lScene %s for %s.",
@@ -186,5 +190,13 @@
   "narrativecraft.ink_action.validation.number": "%s is not a valid number.",
   "narrativecraft.ink_action.validation.color": "%s is not a valid color.",
   "narrativecraft.ink_action.validation.sound": "%s %s is not registered, it will not play on runtime.",
-  "narrativecraft.ink_action.validation.not_validated": "Can't run ink action %s because he is not validated."
+  "narrativecraft.ink_action.validation.not_validated": "Can't run ink action %s because he is not validated.",
+
+  "narrativecraft.validation.chapter_file_no_exists": "Chapter %s has no ink file, can't continue the validation.",
+  "narrativecraft.validation.scene_file_no_exists": "Scene %s of chapter %s has no ink file, can't continue the validation.",
+  "narrativecraft.validation.validating": "Validating...",
+  "narrativecraft.validation.found_errors": "Validation returned %s errors.",
+  "narrativecraft.validation.found_warns": "Validation returned %s warns.",
+  "narrativecraft.validation.validated": "Successfully passed validation.",
+  "narrativecraft.validation.quick_edit": "Click to quick edit"
 }

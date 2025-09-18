@@ -110,7 +110,7 @@ public class BorderInkAction extends InkAction {
         opacity = 1.0;
         if (arguments.size() > 6) {
             try {
-                opacity = Integer.parseInt(arguments.get(7));
+                opacity = Integer.parseInt(arguments.get(6));
                 if (opacity > 1) {
                     return InkActionResult.error(
                             Translation.message(WRONG_ARGUMENT_TEXT, "The opacity value is greater than 1"));
@@ -119,7 +119,7 @@ public class BorderInkAction extends InkAction {
                             Translation.message(WRONG_ARGUMENT_TEXT, "The opacity value is less than 0"));
                 }
             } catch (NumberFormatException e) {
-                return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(7)));
+                return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(6)));
             }
         }
         color = ARGB.color((int) (opacity * 255), color);

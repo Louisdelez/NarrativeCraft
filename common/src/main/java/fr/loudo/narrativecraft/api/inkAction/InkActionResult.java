@@ -75,6 +75,10 @@ public record InkActionResult(
         return status == Status.ERROR;
     }
 
+    public boolean isWarn() {
+        return status == Status.WARN;
+    }
+
     public boolean isOk() {
         return status == Status.OK;
     }

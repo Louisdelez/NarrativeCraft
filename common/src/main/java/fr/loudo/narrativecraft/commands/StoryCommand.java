@@ -35,11 +35,16 @@ import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.narrative.story.StoryValidation;
+import fr.loudo.narrativecraft.util.ErrorLine;
 import fr.loudo.narrativecraft.util.Translation;
+import fr.loudo.narrativecraft.util.Util;
+import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 
 public class StoryCommand {
 
@@ -47,7 +52,7 @@ public class StoryCommand {
         dispatcher.register(Commands.literal("nc")
                 .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
                 .then(Commands.literal("story")
-                        .then(Commands.literal("validate").executes(StoryCommand::executeValidateStory))
+                        .then(Commands.literal("validate").executes(StoryCommand::validateStory))
                         .then(Commands.literal("play")
                                 .then(Commands.argument("chapter_index", IntegerArgumentType.integer())
                                         .suggests(NarrativeCraftMod.getInstance()
@@ -68,36 +73,44 @@ public class StoryCommand {
     }
 
     private static int validateStory(CommandContext<CommandSourceStack> context) {
-
-        //        Minecraft minecraft = Minecraft.getInstance();
-        //        LocalPlayer localPlayer = minecraft.player;
-        //
-        //        List<ErrorLine> errorLineList = StoryHandler.validateStory();
-        //        for(ErrorLine errorLine : errorLineList) {
-        //            localPlayer.displayClientMessage(errorLine.toMessage(), false);
-        //        }
-        //
-        //        int errorSize = errorLineList.stream().filter(errorLine -> !errorLine.isWarn()).toList().size();
-        //        int warnSize = errorLineList.stream().filter(ErrorLine::isWarn).toList().size();
-        //        if(errorSize > 0) {
-        //            localPlayer.displayClientMessage((Translation.message("validation.found_errors",
-        // Component.literal(String.valueOf(errorSize)).withColor(ChatFormatting.GOLD.getColor())).withColor(ChatFormatting.RED.getColor())), false);
-        //        }
-        //        if(warnSize > 0) {
-        //            localPlayer.displayClientMessage((Translation.message("validation.found_warns",
-        // Component.literal(String.valueOf(warnSize)).withColor(ChatFormatting.GOLD.getColor())).withColor(ChatFormatting.YELLOW.getColor())), false);
-        //        }
-        //
-        //        return errorSize > 0 ? 0 : Command.SINGLE_SUCCESS;
-        return 1;
-    }
-
-    private static int executeValidateStory(CommandContext<CommandSourceStack> context) {
-
-        if (validateStory(context) == 0) return 0;
-        context.getSource()
-                .sendSystemMessage(
-                        Translation.message("validation.no_errors").withColor(ChatFormatting.GREEN.getColor()));
+        ServerPlayer player = context.getSource().getPlayer();
+        player.sendSystemMessage(Component.empty());
+        player.sendSystemMessage(Translation.message("validation.validating").withStyle(ChatFormatting.YELLOW));
+        try {
+            List<ErrorLine> results = StoryValidation.validate();
+            List<ErrorLine> warnLines =
+                    results.stream().filter(ErrorLine::isWarn).toList();
+            List<ErrorLine> errorLines =
+                    results.stream().filter(errorLine -> !errorLine.isWarn()).toList();
+            if (errorLines.isEmpty() && warnLines.isEmpty()) {
+                player.sendSystemMessage(
+                        Translation.message("validation.validated").withStyle(ChatFormatting.GREEN));
+                player.sendSystemMessage(Component.empty());
+                return Command.SINGLE_SUCCESS;
+            }
+            for (ErrorLine errorLine : results) {
+                player.sendSystemMessage(errorLine.toMessage());
+            }
+            if (!errorLines.isEmpty()) {
+                player.sendSystemMessage(Translation.message(
+                                "validation.found_errors",
+                                Component.literal(String.valueOf(errorLines.size()))
+                                        .withStyle(ChatFormatting.GOLD))
+                        .withStyle(ChatFormatting.RED));
+                player.sendSystemMessage(Component.empty());
+            }
+            if (!warnLines.isEmpty()) {
+                player.sendSystemMessage(Translation.message(
+                                "validation.found_warns",
+                                Component.literal(String.valueOf(warnLines.size()))
+                                        .withStyle(ChatFormatting.GOLD))
+                        .withStyle(ChatFormatting.YELLOW));
+            }
+            return errorLines.isEmpty() ? 1 : 0;
+        } catch (Exception e) {
+            Util.sendCrashMessage(player, e);
+        }
+        player.sendSystemMessage(Component.empty());
 
         return Command.SINGLE_SUCCESS;
     }
@@ -142,12 +155,12 @@ public class StoryCommand {
         if (playerSession == null) return 0;
         StoryHandler storyHandler = playerSession.getStoryHandler();
         if (storyHandler == null) {
-            context.getSource().sendFailure(Translation.message("story.load.no_story_playing"));
+            context.getSource().sendFailure(Translation.message("story.not_playing"));
             return 0;
         }
 
         storyHandler.stop();
-        context.getSource().sendSuccess(() -> Component.literal("Story stopped."), false);
+        context.getSource().sendSuccess(() -> Translation.message("story.stopped"), false);
 
         return Command.SINGLE_SUCCESS;
     }
