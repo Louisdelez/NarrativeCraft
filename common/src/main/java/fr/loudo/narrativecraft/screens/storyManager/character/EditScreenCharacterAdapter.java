@@ -26,6 +26,9 @@ package fr.loudo.narrativecraft.screens.storyManager.character;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.managers.CharacterManager;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.character.CharacterModel;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
@@ -35,6 +38,7 @@ import fr.loudo.narrativecraft.util.ScreenUtils;
 import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -152,12 +156,22 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
                 minecraft.setScreen(null);
             }
         } else {
+            List<Chapter> chapters =
+                    NarrativeCraftMod.getInstance().getChapterManager().getChapters();
             try {
                 NarrativeCraftFile.updateCharacterData(existing, newCharacter);
                 existing.setName(newCharacter.getName());
                 existing.setDescription(newCharacter.getDescription());
                 existing.setBirthDate(newCharacter.getBirthDate());
                 existing.setModel(newCharacter.getModel());
+                for (Chapter chapter : chapters) {
+                    for (Scene scene : chapter.getSortedSceneList()) {
+                        for (Animation animation : scene.getAnimations()) {
+                            NarrativeCraftFile.updateAnimationFile(animation);
+                        }
+                        NarrativeCraftFile.updateCameraAngles(scene);
+                    }
+                }
                 minecraft.setScreen(new CharactersScreen());
             } catch (Exception e) {
                 Util.sendCrashMessage(minecraft.player, e);

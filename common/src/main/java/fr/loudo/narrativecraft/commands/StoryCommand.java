@@ -141,6 +141,7 @@ public class StoryCommand {
             playerSession.getStoryHandler().stop();
         }
         StoryHandler storyHandler = new StoryHandler(chapter, scene, playerSession);
+        storyHandler.setDebugMode(debug);
         storyHandler.start();
 
         return Command.SINGLE_SUCCESS;

@@ -180,6 +180,9 @@
   "narrativecraft.screen.world_options.show_main_screen": "Show Main Screen: %s",
   "narrativecraft.screen.world_options.show_credits_screen": "Show Credits Screen: %s",
 
+  "narrativecraft.screen.crash.title": "Whoops! A crash occurred...",
+  "narrativecraft.screen.crash.message": "Reason: \n%s",
+
   "narrativecraft.ink_action.no_exists": "This tag could not be recognized.",
   "narrativecraft.ink_action.not_authorized": "Tag %s is not authorized.",
   "narrativecraft.ink_action.validation.miss_argument": "Miss required argument [%s]",

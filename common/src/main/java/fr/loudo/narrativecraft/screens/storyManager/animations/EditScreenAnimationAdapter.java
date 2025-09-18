@@ -23,12 +23,15 @@
 
 package fr.loudo.narrativecraft.screens.storyManager.animations;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.storyManager.EditScreenAdapter;
 import fr.loudo.narrativecraft.util.Util;
+import java.util.List;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
@@ -56,10 +59,18 @@ public class EditScreenAnimationAdapter implements EditScreenAdapter<Animation> 
             String description) {
         if (existing == null) return;
         Animation oldAnimation = new Animation(existing.getName(), scene);
+        List<Chapter> chapters =
+                NarrativeCraftMod.getInstance().getChapterManager().getChapters();
         try {
             existing.setName(name);
             existing.setDescription(description);
             NarrativeCraftFile.updateAnimationFile(oldAnimation, existing);
+            for (Chapter chapter : chapters) {
+                for (Scene scene : chapter.getSortedSceneList()) {
+                    NarrativeCraftFile.updateSubsceneFile(scene);
+                    NarrativeCraftFile.updateCutsceneFile(scene);
+                }
+            }
             minecraft.setScreen(new AnimationsScreen(scene));
         } catch (Exception e) {
             existing.setName(oldAnimation.getName());

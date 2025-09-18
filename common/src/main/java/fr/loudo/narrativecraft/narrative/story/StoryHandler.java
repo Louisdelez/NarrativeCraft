@@ -35,9 +35,11 @@ import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.dialog.*;
+import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandlerException;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
+import fr.loudo.narrativecraft.screens.components.CrashScreen;
 import fr.loudo.narrativecraft.screens.credits.CreditScreen;
 import fr.loudo.narrativecraft.screens.story.StoryChoicesScreen;
 import fr.loudo.narrativecraft.util.Util;
@@ -58,6 +60,7 @@ public class StoryHandler {
     private Story story;
     private String dialogText;
     private boolean loadScene;
+    private boolean debugMode;
 
     public StoryHandler(PlayerSession playerSession) {
         this.playerSession = playerSession;
@@ -92,15 +95,27 @@ public class StoryHandler {
         playerSession.setStoryHandler(this);
         try {
             story = new Story(NarrativeCraftFile.storyContent());
-            if (NarrativeCraftFile.saveExists()) {
+            story.onError = (s, errorType) -> {
+                stop();
+                if (!debugMode) {
+                    CrashScreen screen = new CrashScreen(playerSession, errorType + " " + s);
+                    minecraft.setScreen(screen);
+                }
+            };
+            if (NarrativeCraftFile.saveExists() && !debugMode) {
                 loadSave();
                 return;
             }
             next();
         } catch (Exception e) {
             stop();
-            NarrativeCraftMod.LOGGER.error("Can't start the story: ", e);
-            Util.sendCrashMessage(minecraft.player, e);
+            if (!debugMode && e instanceof InkTagHandlerException) {
+                CrashScreen screen = new CrashScreen(playerSession, e.getMessage());
+                minecraft.setScreen(screen);
+            } else {
+                NarrativeCraftMod.LOGGER.error("Can't start the story: ", e);
+                Util.sendCrashMessage(playerSession.getPlayer(), e);
+            }
         }
     }
 
@@ -204,8 +219,14 @@ public class StoryHandler {
             }
         } catch (Exception e) {
             stop();
-            NarrativeCraftMod.LOGGER.error("Can't continue the story: ", e);
             Util.sendCrashMessage(minecraft.player, e);
+            if (!debugMode && e instanceof InkTagHandlerException) {
+                CrashScreen screen = new CrashScreen(playerSession, e.getMessage());
+                minecraft.setScreen(screen);
+            } else {
+                NarrativeCraftMod.LOGGER.error("Can't continue the story: ", e);
+                Util.sendCrashMessage(playerSession.getPlayer(), e);
+            }
         }
     }
 
@@ -274,9 +295,11 @@ public class StoryHandler {
 
     public void save() {
         try {
-            StorySave save = new StorySave(playerSession);
-            NarrativeCraftFile.writeSave(save);
-            playerSession.getStorySaveIconGui().showSave();
+            if (!debugMode) {
+                StorySave save = new StorySave(playerSession);
+                NarrativeCraftFile.writeSave(save);
+            }
+            playerSession.getStorySaveIconGui().showSave(debugMode);
         } catch (Exception e) {
             stop();
             Util.sendCrashMessage(playerSession.getPlayer(), e);
@@ -317,10 +340,20 @@ public class StoryHandler {
                 // If the next action is only a new dialog, then show the new dialog
                 // Or else, executes the tags, and after it show the dialog (inside ink tag handler)
                 playerSession.setDialogRenderer(null);
-                if (playerSession.getInkTagHandler().getTagsToExecute().isEmpty()) {
-                    showCurrentDialog();
-                } else {
-                    playerSession.getInkTagHandler().execute();
+                try {
+                    if (playerSession.getInkTagHandler().getTagsToExecute().isEmpty()) {
+                        showCurrentDialog();
+                    } else {
+                        playerSession.getInkTagHandler().execute();
+                    }
+                } catch (Exception e) {
+                    stop();
+                    if (!debugMode && e instanceof InkTagHandlerException) {
+                        CrashScreen screen = new CrashScreen(playerSession, e.getMessage());
+                        minecraft.setScreen(screen);
+                    } else {
+                        Util.sendCrashMessage(playerSession.getPlayer(), e);
+                    }
                 }
             });
             newDialogRenderer.setRunDialogAutoSkipped(this::next);
@@ -378,5 +411,13 @@ public class StoryHandler {
 
     public String getDialogText() {
         return dialogText;
+    }
+
+    public boolean isDebugMode() {
+        return debugMode;
+    }
+
+    public void setDebugMode(boolean debugMode) {
+        this.debugMode = debugMode;
     }
 }

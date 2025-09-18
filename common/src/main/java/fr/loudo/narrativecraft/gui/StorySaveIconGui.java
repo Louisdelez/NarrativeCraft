@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.gui;
 import fr.loudo.narrativecraft.util.ImageFontConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 
@@ -36,6 +37,7 @@ public class StorySaveIconGui {
     private int currentTick, totalTickIn, totalTickStay, totalTickOut, totalTick;
     private State state = State.IN;
     private boolean saving;
+    private boolean debugMode;
 
     public StorySaveIconGui(double in, double stay, double out) {
         totalTickIn = (int) (in * 20.0);
@@ -65,7 +67,8 @@ public class StorySaveIconGui {
         }
     }
 
-    public void showSave() {
+    public void showSave(boolean debugMode) {
+        this.debugMode = debugMode;
         currentTick = 0;
         saving = true;
         state = State.IN;
@@ -87,6 +90,15 @@ public class StorySaveIconGui {
         int x = width - logoWidth - 30;
         int y = height - 30;
         guiGraphics.drawString(minecraft.font, logo, x, y, ARGB.color((int) (opacity * 255.0), 0xFFFFFF), false);
+        if (debugMode) {
+            guiGraphics.drawString(
+                    minecraft.font,
+                    Component.literal("Fake save (debug)"),
+                    x,
+                    y - minecraft.font.lineHeight - 10,
+                    ARGB.color((int) (opacity * 255.0), 0xFFFFFF),
+                    false);
+        }
     }
 
     enum State {

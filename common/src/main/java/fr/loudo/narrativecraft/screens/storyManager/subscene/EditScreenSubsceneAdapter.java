@@ -23,7 +23,9 @@
 
 package fr.loudo.narrativecraft.screens.storyManager.subscene;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
@@ -31,6 +33,7 @@ import fr.loudo.narrativecraft.screens.storyManager.EditScreenAdapter;
 import fr.loudo.narrativecraft.util.ScreenUtils;
 import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
+import java.util.List;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
@@ -74,11 +77,18 @@ public class EditScreenSubsceneAdapter implements EditScreenAdapter<Subscene> {
                 minecraft.setScreen(null);
             }
         } else {
+            List<Chapter> chapters =
+                    NarrativeCraftMod.getInstance().getChapterManager().getChapters();
             Subscene oldSubscene = new Subscene(existing.getName(), existing.getDescription(), scene);
             try {
                 existing.setName(name);
                 existing.setDescription(description);
                 NarrativeCraftFile.updateSubsceneFile(scene);
+                for (Chapter chapter : chapters) {
+                    for (Scene scene : chapter.getSortedSceneList()) {
+                        NarrativeCraftFile.updateCutsceneFile(scene);
+                    }
+                }
                 minecraft.setScreen(new SubscenesScreen(scene));
             } catch (Exception e) {
                 existing.setName(oldSubscene.getName());
