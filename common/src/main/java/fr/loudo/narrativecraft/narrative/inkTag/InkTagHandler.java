@@ -47,7 +47,10 @@ public class InkTagHandler {
             executed.add(tag);
             InkAction inkAction = InkActionRegistry.findByCommand(tag);
             if (inkAction == null) continue;
-            inkAction.setBlockEndTask(this::execute);
+            inkAction.setBlockEndTask(() -> {
+                inkAction.setRunning(false);
+                execute();
+            });
             result = inkAction.validate(tag, playerSession.getScene());
             if (result.isError()) {
                 throw new InkTagHandlerException(inkAction.getClass(), result.errorMessage());

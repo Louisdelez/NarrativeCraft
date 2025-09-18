@@ -66,7 +66,8 @@ public class CharacterStoryDataSerializer
                 characterStory = scene.getNpcByName(characterName);
                 if (characterStory == null) return characterStoryData;
             }
-            characterStoryData.setCharacterRuntime(new CharacterRuntime(characterStory, null));
+            characterStoryData.setCharacterRuntime(
+                    new CharacterRuntime(characterStory, characterStoryData.getSkinName(), null));
         }
         return characterStoryData;
     }

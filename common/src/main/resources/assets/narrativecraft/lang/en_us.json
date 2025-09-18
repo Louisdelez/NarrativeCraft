@@ -84,6 +84,7 @@
   "narrativecraft.character.no_exists": "Character %s does not exists.",
   "narrativecraft.character.must_link_character": "You must choose a character.",
   "narrativecraft.character.change_pose": "Change character pose",
+  "narrativecraft.character.change_skin": "Change character skin",
 
   "narrativecraft.controller.confirm_leaving": "Are you sure you want to leave without saving?",
   "narrativecraft.controller.saved": "Successfully saved!",

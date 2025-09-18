@@ -83,6 +83,7 @@ public class MainScreenController extends AbstractKeyframesBase<MainScreenKeyfra
         playerSession.setController(this);
         for (CharacterStoryData characterStoryData : characterStoryDataList) {
             characterStoryData.spawn(playerSession.getPlayer().level(), environment);
+            playerSession.getCharacterRuntimes().add(characterStoryData.getCharacterRuntime());
         }
         if (environment == Environment.PRODUCTION) {
             if (!keyframes.isEmpty()) {
@@ -123,6 +124,11 @@ public class MainScreenController extends AbstractKeyframesBase<MainScreenKeyfra
         for (CharacterStoryData characterStoryData : characterStoryDataList) {
             characterStoryData.kill();
         }
+        playerSession
+                .getCharacterRuntimes()
+                .removeAll(characterStoryDataList.stream()
+                        .map(CharacterStoryData::getCharacterRuntime)
+                        .toList());
         if (environment == Environment.PRODUCTION) {
             for (InkAction inkAction : playerSession.getInkActions()) {
                 inkAction.stop();
@@ -154,7 +160,14 @@ public class MainScreenController extends AbstractKeyframesBase<MainScreenKeyfra
                 mainScreenData.setKeyframe(oldKeyframe);
                 mainScreenData.setKeyframeTrigger(oldKeyframeTrigger);
                 mainScreenData.getCharacterStoryDataList().addAll(oldCharacterStoryData);
+                for (CharacterStoryData characterStoryData : mainScreenData.getCharacterStoryDataList()) {
+                    characterStoryData.setSkinName(characterStoryData.getOldSkinName());
+                }
                 Util.sendCrashMessage(playerSession.getPlayer(), e);
+            }
+        } else {
+            for (CharacterStoryData characterStoryData : mainScreenData.getCharacterStoryDataList()) {
+                characterStoryData.setSkinName(characterStoryData.getOldSkinName());
             }
         }
     }

@@ -303,8 +303,8 @@ public class MainScreen extends Screen {
                 .build();
 
         if (finishedStory) {
-             FinishedStoryScreen screen = new FinishedStoryScreen(playerSession);
-             minecraft.setScreen(screen);
+            FinishedStoryScreen screen = new FinishedStoryScreen(playerSession);
+            minecraft.setScreen(screen);
         }
     }
 

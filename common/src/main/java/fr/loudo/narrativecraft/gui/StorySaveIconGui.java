@@ -91,10 +91,11 @@ public class StorySaveIconGui {
         int y = height - 30;
         guiGraphics.drawString(minecraft.font, logo, x, y, ARGB.color((int) (opacity * 255.0), 0xFFFFFF), false);
         if (debugMode) {
+            Component message = Component.literal("Fake save (debug)");
             guiGraphics.drawString(
                     minecraft.font,
-                    Component.literal("Fake save (debug)"),
-                    x,
+                    message,
+                    x - minecraft.font.width(message) / 2 - 5,
                     y - minecraft.font.lineHeight - 10,
                     ARGB.color((int) (opacity * 255.0), 0xFFFFFF),
                     false);

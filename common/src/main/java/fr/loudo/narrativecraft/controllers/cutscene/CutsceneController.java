@@ -164,6 +164,10 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
     @Override
     public void stopSession(boolean save) {
         for (Playback playback : playbacks) {
+            if (playback.getCharacterRuntime().getEntity() == null
+                    || !playback.getCharacterRuntime().getEntity().isAlive()) {
+                playerSession.getCharacterRuntimes().remove(playback.getCharacterRuntime());
+            }
             playback.stop(environment == Environment.DEVELOPMENT);
             if (environment == Environment.DEVELOPMENT) { // Characters not killed on PRODUCTION when cutscene end.
                 playerSession.getCharacterRuntimes().remove(playback.getCharacterRuntime());
@@ -479,6 +483,9 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
 
     public void setPlaying(boolean playing) {
         isPlaying = playing;
+        for (Playback playback : playbacks) {
+            playback.setPlaying(playing);
+        }
     }
 
     public int getCurrentTick() {

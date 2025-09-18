@@ -29,6 +29,7 @@
     "KeyboardHandlerMixin",
     "MinecraftCommonMixin",
     "OptionsMixin",
+    "PlayerInfoMixin",
     "WinScreenMixin",
     "accessor.FontAccessor",
     "accessor.WinScreenAccessor",

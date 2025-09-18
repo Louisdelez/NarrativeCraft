@@ -27,11 +27,14 @@ import net.minecraft.world.entity.LivingEntity;
 
 public class CharacterRuntime {
     private final CharacterStory characterStory;
+    private final CharacterSkinController characterSkinController;
     private LivingEntity entity;
 
-    public CharacterRuntime(CharacterStory characterStory, LivingEntity entity) {
+    public CharacterRuntime(CharacterStory characterStory, String skinName, LivingEntity entity) {
         this.characterStory = characterStory;
         this.entity = entity;
+        characterSkinController = new CharacterSkinController(this, skinName);
+        characterSkinController.cacheSkins();
     }
 
     public CharacterStory getCharacterStory() {
@@ -44,5 +47,9 @@ public class CharacterRuntime {
 
     public void setEntity(LivingEntity entity) {
         this.entity = entity;
+    }
+
+    public CharacterSkinController getCharacterSkinController() {
+        return characterSkinController;
     }
 }

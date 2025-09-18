@@ -33,6 +33,7 @@ import java.util.List;
 public class Animation extends SceneData {
 
     private transient CharacterStory character;
+    private String skinName = "main.png";
     private List<ActionsData> actionsData;
 
     public Animation(String name, Scene scene) {
@@ -61,5 +62,13 @@ public class Animation extends SceneData {
 
     public void setActionsData(List<ActionsData> actionsData) {
         this.actionsData = actionsData;
+    }
+
+    public String getSkinName() {
+        return skinName;
+    }
+
+    public void setSkinName(String skinName) {
+        this.skinName = skinName;
     }
 }

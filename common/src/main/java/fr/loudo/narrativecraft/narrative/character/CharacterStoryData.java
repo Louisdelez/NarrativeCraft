@@ -53,16 +53,19 @@ public class CharacterStoryData {
     private byte entityByte;
     private byte livingEntityByte;
     private String skinName = "main.png";
+    private transient String oldSkinName = "main.png";
     private boolean isTemplate;
 
     public CharacterStoryData(CharacterStory characterStory, Location location, boolean isTemplate) {
-        this.characterRuntime = new CharacterRuntime(characterStory, null);
+        this.characterRuntime = new CharacterRuntime(characterStory, skinName, null);
         this.location = location;
         this.isTemplate = isTemplate;
     }
 
     public void spawn(Level level, Environment environment) {
         if (isTemplate && environment == Environment.PRODUCTION) return;
+        characterRuntime.getCharacterSkinController().setSkinName(skinName);
+        characterRuntime.getCharacterSkinController().cacheSkins();
         characterRuntime.setEntity(Util.createEntityFromCharacter(characterRuntime.getCharacterStory(), level));
         characterRuntime.getEntity().teleportTo(location.x(), location.y(), location.z());
         characterRuntime.getEntity().setXRot(location.pitch());
@@ -155,7 +158,13 @@ public class CharacterStoryData {
     }
 
     public void setSkinName(String skinName) {
+        oldSkinName = this.skinName;
         this.skinName = skinName;
+    }
+
+    public String getOldSkinName() {
+        if (oldSkinName == null) oldSkinName = "main.png";
+        return oldSkinName;
     }
 
     public boolean isTemplate() {

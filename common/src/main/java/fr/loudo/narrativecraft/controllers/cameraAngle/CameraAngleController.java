@@ -125,8 +125,15 @@ public class CameraAngleController extends AbstractKeyframesBase<CameraAngleKeyf
             } catch (IOException e) {
                 cameraAngle.getCameraAngleKeyframes().addAll(oldCameraAngles);
                 cameraAngle.getCharacterStoryDataList().addAll(oldCharacterStoryData);
+                for (CharacterStoryData characterStoryData : cameraAngle.getCharacterStoryDataList()) {
+                    characterStoryData.setSkinName(characterStoryData.getOldSkinName());
+                }
                 playerSession.getPlayer().sendSystemMessage(Translation.message("crash.global-message"));
                 NarrativeCraftMod.LOGGER.error("Impossible to save the camera angle: ", e);
+            }
+        } else {
+            for (CharacterStoryData characterStoryData : cameraAngle.getCharacterStoryDataList()) {
+                characterStoryData.setSkinName(characterStoryData.getOldSkinName());
             }
         }
     }

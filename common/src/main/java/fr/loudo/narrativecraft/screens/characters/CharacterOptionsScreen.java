@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.controllers.keyframe.AbstractKeyframeController;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
 import fr.loudo.narrativecraft.screens.components.ButtonListScreen;
+import fr.loudo.narrativecraft.screens.components.ChangeSkinLinkScreen;
 import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmScreen;
@@ -57,6 +58,14 @@ public class CharacterOptionsScreen extends ButtonListScreen {
                 })
                 .build();
         objectListScreen.addButton(changeCharacterPoseButton);
+
+        Button changeCharacterSkinButton = Button.builder(Translation.message("character.change_skin"), button -> {
+                    ChangeSkinLinkScreen screen = new ChangeSkinLinkScreen(
+                            this, characterStoryData.getCharacterRuntime(), characterStoryData::setSkinName);
+                    minecraft.setScreen(screen);
+                })
+                .build();
+        objectListScreen.addButton(changeCharacterSkinButton);
 
         Button removeCharacterButton = Button.builder(Translation.message("global.remove"), button -> {
                     ConfirmScreen confirm = new ConfirmScreen(

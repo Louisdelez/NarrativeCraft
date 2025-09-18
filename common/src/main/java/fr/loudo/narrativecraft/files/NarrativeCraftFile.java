@@ -45,10 +45,12 @@ import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
 import java.io.*;
 import java.nio.file.Files;
-import java.util.List;
-import java.util.Objects;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
 import java.util.regex.Matcher;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.DefaultPlayerSkin;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
 
@@ -413,12 +415,26 @@ public class NarrativeCraftFile {
 
     public static void createCharacterFolder(CharacterStory characterStory) throws IOException {
         File characterFolder = getCharacterFolder(characterStory);
-        createDirectory(characterFolder, SKINS_FOLDER_NAME);
+        File skinsFolder = createDirectory(characterFolder, SKINS_FOLDER_NAME);
         File dataFile = getDataFile(characterFolder);
+        File mainSkinFile = createFile(skinsFolder, "main.png");
+        PlayerSkin defaultPlayerSkin = DefaultPlayerSkin.get(UUID.randomUUID());
+        try (InputStream inputStream =
+                Minecraft.getInstance().getResourceManager().open(defaultPlayerSkin.texture())) {
+            Files.copy(inputStream, mainSkinFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException ignored) {
+        }
         Gson gson = new Gson();
         try (Writer writer = new BufferedWriter(new FileWriter(dataFile))) {
             gson.toJson(characterStory, writer);
         }
+    }
+
+    public static List<File> getSkinFiles(CharacterStory characterStory, Scene scene) {
+        File[] skinFiles = createDirectory(getCharacterFolder(characterStory), SKINS_FOLDER_NAME)
+                .listFiles();
+        if (skinFiles == null) return new ArrayList<>();
+        return Arrays.stream(skinFiles).toList();
     }
 
     public static void updateCharacterData(CharacterStory oldCharacter, CharacterStory newCharacter)

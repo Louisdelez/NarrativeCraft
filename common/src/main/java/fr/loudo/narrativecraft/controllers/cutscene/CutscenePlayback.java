@@ -88,6 +88,7 @@ public class CutscenePlayback {
 
     public void stop() {
         isPlaying = false;
+        cutsceneController.setPlaying(false);
         for (InkAction inkAction : playerSession.getInkActions()) {
             inkAction.stop();
         }

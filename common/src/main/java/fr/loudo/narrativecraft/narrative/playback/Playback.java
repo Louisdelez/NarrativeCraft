@@ -61,7 +61,7 @@ public class Playback {
         this.animation = animation;
         this.level = level;
         this.environment = environment;
-        this.characterRuntime = new CharacterRuntime(animation.getCharacter(), masterEntity);
+        this.characterRuntime = new CharacterRuntime(animation.getCharacter(), animation.getSkinName(), masterEntity);
         this.isPlaying = false;
         this.hasEnded = false;
         this.isLooping = isLooping;
@@ -293,12 +293,6 @@ public class Playback {
         moveEntitySilent(masterEntity, loc);
 
         entityPlaybacks.getFirst().setEntity(masterEntity);
-        //        if(environnement == Environnement.PRODUCTION) {
-        //            StoryHandler storyHandler = NarrativeCraftMod.getInstance().getStoryHandler();
-        //            if(storyHandler != null && storyHandler.isRunning()) {
-        //                storyHandler.addCharacter(character);
-        //            }
-        //        }
     }
 
     public int getMaxTick() {
@@ -317,12 +311,6 @@ public class Playback {
                 playbackData.getActionsData().reset(playbackData.getEntity());
                 playbackData.killEntity();
             }
-            //        if(environnement == Environnement.PRODUCTION) {
-            //            StoryHandler storyHandler = NarrativeCraftMod.getInstance().getStoryHandler();
-            //            if(storyHandler != null && storyHandler.isRunning()) {
-            //                storyHandler.removeCharacter(character);
-            //            }
-            //        }
         }
     }
 
