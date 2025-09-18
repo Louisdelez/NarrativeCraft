@@ -60,6 +60,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
     private final List<Playback> playbacks = new ArrayList<>();
     private final Cutscene cutscene;
     private final CutscenePlayback cutscenePlayback;
+    private Runnable onEnd;
 
     private boolean isPlaying;
     private int currentTick, skipTickCount;
@@ -90,6 +91,9 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
             if (Minecraft.getInstance().screen instanceof CutsceneControllerScreen screen) {
                 screen.getControllerButton().setMessage(screen.getPlayText());
             }
+        } else if (currentTick >= totalTick && environment == Environment.PRODUCTION) {
+            onEnd.run();
+            isPlaying = false;
         }
     }
 
@@ -97,6 +101,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
     public void startSession() {
         stopCurrentSession();
         playerSession.setController(this);
+        playbacks.clear();
         StoryHandler storyHandler = playerSession.getStoryHandler();
         for (Subscene subscene : cutscene.getSubscenes()) {
             if (storyHandler != null) {
@@ -515,5 +520,13 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
 
     public CutscenePlayback getCutscenePlayback() {
         return cutscenePlayback;
+    }
+
+    public Runnable getOnEnd() {
+        return onEnd;
+    }
+
+    public void setOnEnd(Runnable onEnd) {
+        this.onEnd = onEnd;
     }
 }

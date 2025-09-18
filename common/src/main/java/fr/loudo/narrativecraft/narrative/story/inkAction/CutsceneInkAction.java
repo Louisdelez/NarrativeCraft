@@ -45,15 +45,6 @@ public class CutsceneInkAction extends InkAction {
     }
 
     @Override
-    public void tick() {
-        if (!isRunning || controller == null) return;
-        if (controller.atMaxTick()) {
-            isRunning = false;
-            blockEndTask.run();
-        }
-    }
-
-    @Override
     protected InkActionResult doValidate(List<String> arguments, Scene scene) {
         if (arguments.size() < 3) {
             return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Cutscene name"));
@@ -82,6 +73,7 @@ public class CutsceneInkAction extends InkAction {
             keyframeB = keyframeA;
         }
         controller.getCutscenePlayback().setupAndPlay(keyframeA, keyframeB);
+        controller.setOnEnd(blockEndTask);
         return InkActionResult.block();
     }
 

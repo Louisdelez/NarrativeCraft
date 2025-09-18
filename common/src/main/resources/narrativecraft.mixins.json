@@ -28,6 +28,7 @@
     "GuiTextRenderStateMixin",
     "KeyboardHandlerMixin",
     "MinecraftCommonMixin",
+    "OptionsMixin",
     "WinScreenMixin",
     "accessor.FontAccessor",
     "accessor.WinScreenAccessor",

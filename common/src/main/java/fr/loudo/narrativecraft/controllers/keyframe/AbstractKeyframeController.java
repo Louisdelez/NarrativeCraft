@@ -33,6 +33,7 @@ import fr.loudo.narrativecraft.util.Util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.server.level.ServerPlayer;
@@ -67,6 +68,7 @@ public abstract class AbstractKeyframeController<T extends Keyframe> extends Abs
     @Override
     public void setCamera(Keyframe keyframe) {
         Minecraft minecraft = Minecraft.getInstance();
+        minecraft.options.setCameraType(CameraType.FIRST_PERSON);
         if (playerSession.getCurrentCamera() != null && keyframe == null) {
             playerSession.setCurrentCamera(null);
             playerSession.getPlayer().setGameMode(lastGameType);

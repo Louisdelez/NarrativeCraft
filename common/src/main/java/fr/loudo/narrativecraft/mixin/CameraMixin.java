@@ -75,7 +75,7 @@ public abstract class CameraMixin {
         this.setRotation(location.getYaw(), location.getPitch());
         this.rotation.rotateZ(-(float) Math.toRadians(location.getRoll()));
 
-        player.setPos(location.getPosition());
+        player.setPos(location.getPosition().add(0, 5, 0));
         player.setXRot(location.getPitch());
         player.setYRot(location.getYaw());
         player.setYHeadRot(location.getYaw());

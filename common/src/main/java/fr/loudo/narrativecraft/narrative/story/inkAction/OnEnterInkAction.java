@@ -59,9 +59,14 @@ public class OnEnterInkAction extends InkAction {
 
         String[] splitKnot = currentKnot.split("_");
         int chapterIndex = Integer.parseInt(splitKnot[1]);
-        String sceneName = String.join(" ", Arrays.copyOfRange(splitKnot, 2, splitKnot.length));
         Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getChapterByIndex(chapterIndex);
         if (chapter == null) return InkActionResult.error("Chapter " + chapterIndex + " does not exists!");
+        String sceneName;
+        if (splitKnot.length > 2) {
+            sceneName = String.join(" ", Arrays.copyOfRange(splitKnot, 2, splitKnot.length));
+        } else {
+            sceneName = chapter.getSortedSceneList().getFirst().getName();
+        }
         Scene scene = chapter.getSceneByName(sceneName);
         if (scene == null)
             return InkActionResult.error("Scene " + sceneName + " of chapter " + chapterIndex + " does not exists!");
