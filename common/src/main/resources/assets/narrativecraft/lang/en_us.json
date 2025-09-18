@@ -183,6 +183,9 @@
   "narrativecraft.screen.crash.title": "Whoops! A crash occurred...",
   "narrativecraft.screen.crash.message": "Reason: \n%s",
 
+  "narrativecraft.screen.finished_story.line_1": "Thanks for playing!",
+  "narrativecraft.screen.finished_story.line_2": "You can now select specific scenes",
+
   "narrativecraft.ink_action.no_exists": "This tag could not be recognized.",
   "narrativecraft.ink_action.not_authorized": "Tag %s is not authorized.",
   "narrativecraft.ink_action.validation.miss_argument": "Miss required argument [%s]",

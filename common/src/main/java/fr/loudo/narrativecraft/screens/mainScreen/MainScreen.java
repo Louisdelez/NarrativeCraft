@@ -37,6 +37,7 @@ import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.narrative.story.StorySave;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.screens.components.ChapterSelectorScreen;
+import fr.loudo.narrativecraft.screens.components.FinishedStoryScreen;
 import fr.loudo.narrativecraft.screens.components.NarrativeCraftLogoRenderer;
 import fr.loudo.narrativecraft.screens.story.StoryChoicesScreen;
 import fr.loudo.narrativecraft.util.Translation;
@@ -154,8 +155,6 @@ public class MainScreen extends Screen {
         if (!pause) {
             if (!minecraft.getSoundManager().isActive(musicInstance)) {
                 minecraft.getSoundManager().play(musicInstance);
-            } else {
-                minecraft.getSoundManager().setVolume(musicInstance, 0.7F);
             }
         }
 
@@ -297,8 +296,6 @@ public class MainScreen extends Screen {
         }
 
         devButton = Button.builder(Component.literal("Dev Environment"), button -> {
-                    //            ServerPlayer serverPlayer = Utils.getServerPlayerByUUID(minecraft.player.getUUID());
-                    //            serverPlayer.setGameMode(GameType.CREATIVE);
                     minecraft.player.displayClientMessage(Translation.message("global.dev_env"), false);
                     this.onClose();
                 })
@@ -306,8 +303,8 @@ public class MainScreen extends Screen {
                 .build();
 
         if (finishedStory) {
-            // FinishedStoryScreen screen = new FinishedStoryScreen();
-            // minecraft.setScreen(screen);
+             FinishedStoryScreen screen = new FinishedStoryScreen(playerSession);
+             minecraft.setScreen(screen);
         }
     }
 
