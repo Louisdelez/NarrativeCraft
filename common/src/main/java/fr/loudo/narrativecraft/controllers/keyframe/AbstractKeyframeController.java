@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.controllers.keyframe;
 
 import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.narrative.Environment;
+import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
@@ -116,6 +117,15 @@ public abstract class AbstractKeyframeController<T extends Keyframe> extends Abs
 
     public List<KeyframeTrigger> getKeyframeTriggers() {
         return keyframeTriggers;
+    }
+
+    public CharacterRuntime getCharacterFromEntity(Entity entity) {
+        for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+            if (Util.isSameEntity(entity, characterRuntime.getEntity())) {
+                return characterRuntime;
+            }
+        }
+        return null;
     }
 
     public CharacterStoryData getCharacterStoryDataFromEntity(Entity entity) {

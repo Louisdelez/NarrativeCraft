@@ -41,17 +41,6 @@ public class ChangeSkinLinkScreen extends OptionsSubScreen {
     private final CharacterRuntime characterRuntime;
     private final Consumer<String> stringCallback;
 
-    public ChangeSkinLinkScreen(CharacterRuntime characterRuntime, Consumer<String> stringCallback) {
-        super(
-                null,
-                Minecraft.getInstance().options,
-                Translation.message(
-                        "screen.change_skin_link.title",
-                        characterRuntime.getCharacterStory().getName()));
-        this.characterRuntime = characterRuntime;
-        this.stringCallback = stringCallback;
-    }
-
     public ChangeSkinLinkScreen(Screen lastScreen, CharacterRuntime characterRuntime, Consumer<String> stringCallback) {
         super(
                 lastScreen,

@@ -29,6 +29,8 @@ public class CharacterRuntime {
     private final CharacterStory characterStory;
     private final CharacterSkinController characterSkinController;
     private LivingEntity entity;
+    private String skinName;
+    private String oldSkinName;
 
     public CharacterRuntime(CharacterStory characterStory, String skinName, LivingEntity entity) {
         this.characterStory = characterStory;
@@ -51,5 +53,18 @@ public class CharacterRuntime {
 
     public CharacterSkinController getCharacterSkinController() {
         return characterSkinController;
+    }
+
+    public String getSkinName() {
+        return skinName;
+    }
+
+    public void setSkinName(String skinName) {
+        oldSkinName = this.skinName;
+        this.skinName = skinName;
+    }
+
+    public String getOldSkinName() {
+        return oldSkinName;
     }
 }

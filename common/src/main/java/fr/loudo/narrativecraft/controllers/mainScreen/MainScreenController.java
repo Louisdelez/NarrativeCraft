@@ -155,19 +155,25 @@ public class MainScreenController extends AbstractKeyframesBase<MainScreenKeyfra
                 mainScreenData.setKeyframeTrigger(keyframeTrigger);
                 mainScreenData.getCharacterStoryDataList().addAll(characterStoryDataList);
                 NarrativeCraftFile.updateMainScreenBackground(mainScreenData, playerSession.getScene());
+                for (CharacterStoryData characterStoryData : mainScreenData.getCharacterStoryDataList()) {
+                    characterStoryData.setSkinName(
+                            characterStoryData.getCharacterRuntime().getSkinName());
+                }
                 playerSession.getPlayer().sendSystemMessage(Translation.message("controller.saved"));
             } catch (IOException e) {
                 mainScreenData.setKeyframe(oldKeyframe);
                 mainScreenData.setKeyframeTrigger(oldKeyframeTrigger);
                 mainScreenData.getCharacterStoryDataList().addAll(oldCharacterStoryData);
                 for (CharacterStoryData characterStoryData : mainScreenData.getCharacterStoryDataList()) {
-                    characterStoryData.setSkinName(characterStoryData.getOldSkinName());
+                    characterStoryData.setSkinName(
+                            characterStoryData.getCharacterRuntime().getOldSkinName());
                 }
                 Util.sendCrashMessage(playerSession.getPlayer(), e);
             }
         } else {
             for (CharacterStoryData characterStoryData : mainScreenData.getCharacterStoryDataList()) {
-                characterStoryData.setSkinName(characterStoryData.getOldSkinName());
+                characterStoryData.setSkinName(
+                        characterStoryData.getCharacterRuntime().getOldSkinName());
             }
         }
     }

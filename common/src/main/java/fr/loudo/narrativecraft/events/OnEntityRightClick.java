@@ -25,7 +25,7 @@ package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.controllers.keyframe.AbstractKeyframeController;
-import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
+import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.keyframeTrigger.KeyframeTrigger;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
@@ -42,9 +42,9 @@ public class OnEntityRightClick {
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
 
         if (playerSession.getController() instanceof AbstractKeyframeController<?> controller) {
-            CharacterStoryData characterStoryData = controller.getCharacterStoryDataFromEntity(entity);
-            if (characterStoryData != null) {
-                CharacterOptionsScreen screen = new CharacterOptionsScreen(null, controller, characterStoryData);
+            CharacterRuntime characterRuntime = controller.getCharacterFromEntity(entity);
+            if (characterRuntime != null) {
+                CharacterOptionsScreen screen = new CharacterOptionsScreen(null, controller, characterRuntime);
                 Minecraft.getInstance().setScreen(screen);
             }
             Keyframe keyframe = controller.getKeyframeByEntity(entity);

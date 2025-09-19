@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.screens.characters;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.controllers.keyframe.AbstractKeyframeController;
+import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
 import fr.loudo.narrativecraft.screens.components.ButtonListScreen;
@@ -39,52 +40,61 @@ import net.minecraft.network.chat.Component;
 public class CharacterOptionsScreen extends ButtonListScreen {
 
     private final AbstractKeyframeController<? extends Keyframe> controller;
+    private final CharacterRuntime characterRuntime;
     private final CharacterStoryData characterStoryData;
 
     public CharacterOptionsScreen(
             Screen lastScreen,
             AbstractKeyframeController<? extends Keyframe> controller,
-            CharacterStoryData characterStoryData) {
+            CharacterRuntime characterRuntime) {
         super(lastScreen, Component.literal("Character options screen"));
         this.controller = controller;
-        this.characterStoryData = characterStoryData;
+        this.characterRuntime = characterRuntime;
+        characterStoryData = controller.getCharacterStoryDataFromEntity(characterRuntime.getEntity());
     }
 
     @Override
     protected void addContents() {
-        Button changeCharacterPoseButton = Button.builder(Translation.message("character.change_pose"), button -> {
-                    CharacterChangePoseScreen screen = new CharacterChangePoseScreen(this, characterStoryData);
-                    minecraft.setScreen(screen);
-                })
-                .build();
-        objectListScreen.addButton(changeCharacterPoseButton);
+
+        if (characterStoryData != null) {
+            Button changeCharacterPoseButton = Button.builder(Translation.message("character.change_pose"), button -> {
+                        CharacterChangePoseScreen screen = new CharacterChangePoseScreen(this, characterStoryData);
+                        minecraft.setScreen(screen);
+                    })
+                    .build();
+            objectListScreen.addButton(changeCharacterPoseButton);
+        }
 
         Button changeCharacterSkinButton = Button.builder(Translation.message("character.change_skin"), button -> {
-                    ChangeSkinLinkScreen screen = new ChangeSkinLinkScreen(
-                            this, characterStoryData.getCharacterRuntime(), characterStoryData::setSkinName);
+                    ChangeSkinLinkScreen screen =
+                            new ChangeSkinLinkScreen(this, characterRuntime, characterRuntime::setSkinName);
                     minecraft.setScreen(screen);
                 })
                 .build();
         objectListScreen.addButton(changeCharacterSkinButton);
 
-        Button removeCharacterButton = Button.builder(Translation.message("global.remove"), button -> {
-                    ConfirmScreen confirm = new ConfirmScreen(
-                            b -> {
-                                if (b) {
-                                    NarrativeCraftMod.server.execute(() -> {
-                                        characterStoryData.kill();
-                                        controller.getCharacterStoryDataList().remove(characterStoryData);
-                                    });
-                                }
-                                minecraft.setScreen(null);
-                            },
-                            Component.literal(""),
-                            Translation.message("global.confirm_delete"),
-                            CommonComponents.GUI_YES,
-                            CommonComponents.GUI_CANCEL);
-                    minecraft.setScreen(confirm);
-                })
-                .build();
-        objectListScreen.addButton(removeCharacterButton);
+        if (characterStoryData != null) {
+            Button removeCharacterButton = Button.builder(Translation.message("global.remove"), button -> {
+                        ConfirmScreen confirm = new ConfirmScreen(
+                                b -> {
+                                    if (b) {
+                                        NarrativeCraftMod.server.execute(() -> {
+                                            characterStoryData.kill();
+                                            controller
+                                                    .getCharacterStoryDataList()
+                                                    .remove(characterStoryData);
+                                        });
+                                    }
+                                    minecraft.setScreen(null);
+                                },
+                                Component.literal(""),
+                                Translation.message("global.confirm_delete"),
+                                CommonComponents.GUI_YES,
+                                CommonComponents.GUI_CANCEL);
+                        minecraft.setScreen(confirm);
+                    })
+                    .build();
+            objectListScreen.addButton(removeCharacterButton);
+        }
     }
 }

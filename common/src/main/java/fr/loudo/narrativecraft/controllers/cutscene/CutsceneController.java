@@ -195,14 +195,27 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
                 cutscene.getKeyframeGroups().addAll(keyframeGroups);
                 cutscene.getKeyframeTriggers().addAll(keyframeTriggers);
                 NarrativeCraftFile.updateCutsceneFile(cutscene.getScene());
+                for (Playback playback : playbacks) {
+                    playback.getAnimation()
+                            .setSkinName(playback.getCharacterRuntime().getSkinName());
+                }
                 playerSession.getPlayer().sendSystemMessage(Translation.message("controller.saved"));
             } catch (IOException e) {
                 cutscene.getKeyframeGroups().removeAll(keyframeGroups);
                 cutscene.getKeyframeGroups().addAll(oldData);
                 cutscene.getKeyframeTriggers().removeAll(keyframeTriggers);
                 cutscene.getKeyframeTriggers().addAll(oldKeyframeTriggers);
+                for (Playback playback : playbacks) {
+                    playback.getAnimation()
+                            .setSkinName(playback.getCharacterRuntime().getOldSkinName());
+                }
                 playerSession.getPlayer().sendSystemMessage(Translation.message("crash.global-message"));
                 NarrativeCraftMod.LOGGER.error("Impossible to save the cutscene: ", e);
+            }
+        } else {
+            for (Playback playback : playbacks) {
+                playback.getAnimation()
+                        .setSkinName(playback.getCharacterRuntime().getOldSkinName());
             }
         }
         for (KeyframeTrigger keyframeTrigger : keyframeTriggers) {
