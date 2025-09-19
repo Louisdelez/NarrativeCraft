@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
+import fr.loudo.narrativecraft.hud.StoryDebugHud;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
@@ -56,6 +57,7 @@ public class StoryHandler {
     public static final String DIALOG_REGEX = "^(\\w+)\\s*:\\s*(.+?)\\s*$";
 
     private final PlayerSession playerSession;
+    private final StoryDebugHud storyDebugHud;
     private DialogData dialogData = new DialogData(DialogData.globalDialogData);
     private Story story;
     private String dialogText;
@@ -68,12 +70,14 @@ public class StoryHandler {
                 NarrativeCraftMod.getInstance().getChapterManager().getChapterByIndex(1);
         playerSession.setChapter(firstChapter);
         playerSession.setScene(firstChapter.getSortedSceneList().getFirst());
+        storyDebugHud = new StoryDebugHud(playerSession);
     }
 
     public StoryHandler(Chapter chapter, PlayerSession playerSession) {
         this.playerSession = playerSession;
         playerSession.setChapter(chapter);
         playerSession.setScene(chapter.getSortedSceneList().getFirst());
+        storyDebugHud = new StoryDebugHud(playerSession);
     }
 
     public StoryHandler(Chapter chapter, Scene scene, PlayerSession playerSession) {
@@ -81,6 +85,7 @@ public class StoryHandler {
         playerSession.setChapter(chapter);
         playerSession.setScene(scene);
         loadScene = true;
+        storyDebugHud = new StoryDebugHud(playerSession);
     }
 
     public boolean isRunning() {
@@ -140,8 +145,9 @@ public class StoryHandler {
         playerSession.setCurrentCamera(null);
         playerSession.getCharacterRuntimes().clear();
         playerSession.setDialogRenderer(null);
-        playerSession.getInkTagHandler().getTagsToExecute().clear();
         playerSession.setStoryHandler(null);
+        playerSession.getInkTagHandler().getTagsToExecute().clear();
+        playerSession.setShowDebugHud(false);
     }
 
     public void stopAndFinishScreen() {
@@ -419,5 +425,9 @@ public class StoryHandler {
 
     public void setDebugMode(boolean debugMode) {
         this.debugMode = debugMode;
+    }
+
+    public StoryDebugHud getStoryDebugHud() {
+        return storyDebugHud;
     }
 }

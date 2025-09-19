@@ -43,5 +43,7 @@ public class HudRenderEvent {
         OnHudRender.dialogRender(event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaPartialTick(true));
         OnHudRender.saveIconRender(
                 event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaPartialTick(true));
+        OnHudRender.storyDebugRender(
+                event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaPartialTick(true));
     }
 }

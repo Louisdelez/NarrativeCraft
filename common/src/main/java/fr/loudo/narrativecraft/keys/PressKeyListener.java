@@ -75,5 +75,13 @@ public class PressKeyListener {
             StoryHandler storyHandler = playerSession.getStoryHandler();
             NarrativeCraftMod.server.execute(storyHandler::next);
         });
+        ModKeys.handleKeyPress(ModKeys.STORY_DEBUG, () -> {
+            PlayerSession playerSession =
+                    NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
+            if (playerSession == null) return;
+            StoryHandler storyHandler = playerSession.getStoryHandler();
+            if (storyHandler == null) return;
+            playerSession.setShowDebugHud(!playerSession.isShowDebugHud());
+        });
     }
 }

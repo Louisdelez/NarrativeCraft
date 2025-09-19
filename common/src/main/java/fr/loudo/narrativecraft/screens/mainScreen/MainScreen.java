@@ -235,8 +235,10 @@ public class MainScreen extends Screen {
                             Translation.message("screen.main_screen.pause.load_last_save"), button -> {
                                 minecraft.setScreen(null);
                                 StoryHandler storyHandler = new StoryHandler(playerSession);
+                                storyHandler.setDebugMode(
+                                        playerSession.getStoryHandler().isDebugMode());
                                 NarrativeCraftMod.server.execute(() -> {
-                                    storyHandler.stop();
+                                    playerSession.getStoryHandler().stop();
                                     storyHandler.start();
                                 });
                             })

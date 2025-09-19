@@ -73,6 +73,9 @@ public class SoundInkAction extends InkAction {
             volume = (float) Mth.lerp(t, 1.0, 0.0);
         }
         soundManager.setVolume(simpleSoundInstance, volume);
+        if (volume == 0.0 && action.equals("stop")) {
+            soundManager.stop(simpleSoundInstance);
+        }
     }
 
     @Override
@@ -181,12 +184,9 @@ public class SoundInkAction extends InkAction {
                 if (inkAction instanceof SoundInkAction soundInkAction) {
                     boolean matchAll =
                             name.equals("all") && (soundInkAction.type == this.type || this.type == Type.SOUND);
-                    boolean matchOne = !name.equals("all")
-                            && (soundInkAction.name.equals(name) || type != Type.SOUND)
-                            && totalTick == 0;
+                    boolean matchOne = !name.equals("all") && (soundInkAction.name.equals(name) || type != Type.SOUND);
                     if (matchAll || matchOne) {
                         soundInkAction.isRunning = false;
-                        soundManager.stop(soundInkAction.simpleSoundInstance);
                         if (!name.equals("all")) {
                             this.simpleSoundInstance = soundInkAction.simpleSoundInstance;
                         }

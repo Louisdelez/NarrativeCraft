@@ -26,9 +26,12 @@ package fr.loudo.narrativecraft.events;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import java.util.List;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.util.ARGB;
 
 public class OnHudRender {
     public static void controllerHudInfo(GuiGraphics guiGraphics) {
@@ -67,5 +70,21 @@ public class OnHudRender {
                 .getSessionByPlayer(Minecraft.getInstance().player);
         if (playerSession == null) return;
         playerSession.getStorySaveIconGui().render(guiGraphics, partialTick);
+    }
+
+    public static void storyDebugRender(GuiGraphics guiGraphics, float partialTick) {
+        PlayerSession playerSession = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getSessionByPlayer(Minecraft.getInstance().player);
+        if (playerSession == null) return;
+        StoryHandler storyHandler = playerSession.getStoryHandler();
+        if (storyHandler == null) return;
+        if (!storyHandler.isDebugMode()) return;
+        String debugText = "Debug mode";
+        Font font = Minecraft.getInstance().font;
+        guiGraphics.drawString(
+                font, debugText, guiGraphics.guiWidth() - font.width(debugText) - 5, 5, ARGB.color(255, 255, 255, 255));
+        if (!playerSession.isShowDebugHud()) return;
+        storyHandler.getStoryDebugHud().render(guiGraphics, partialTick);
     }
 }

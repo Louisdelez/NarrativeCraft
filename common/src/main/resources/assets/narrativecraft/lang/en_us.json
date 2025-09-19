@@ -1,4 +1,18 @@
 {
+  "key.screen.story.open": "Open Story Manager",
+  "key.categories.narrativecraft": "NarrativeCraft",
+  "key.animation.record.start": "Start Animation Recording",
+  "key.animation.record.stop": "Stop Animation Recording",
+  "key.cutscene.keyframes.create_group": "Create Keyframe Group",
+  "key.cutscene.keyframes.add_keyframe": "Add Keyframe",
+  "key.screen.keyframe_controller": "Keyframe Controller Screen Toggle",
+  "key.dialog.next": "Next Dialog",
+  "key.choice.1": "Select Choice 1",
+  "key.choice.2": "Select Choice 2",
+  "key.choice.3": "Select Choice 3",
+  "key.choice.4": "Select Choice 4",
+  "key.story_debug": "Story debug hud",
+
   "narrativecraft.crash.global-message": "An unexpected error occurred on NarrativeCraft mod.",
   "narrativecraft.crash.narrative-data": "An unexpected error occurred while initializing narrative data from the world.",
 

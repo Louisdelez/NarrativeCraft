@@ -55,6 +55,7 @@ public class PlayerSession {
     private StoryHandler storyHandler;
     private Chapter chapter;
     private Scene scene;
+    private boolean showDebugHud;
 
     public PlayerSession(ServerPlayer player) {
         this.player = player;
@@ -196,5 +197,13 @@ public class PlayerSession {
 
     public StorySaveIconGui getStorySaveIconGui() {
         return storySaveIconGui;
+    }
+
+    public boolean isShowDebugHud() {
+        return showDebugHud;
+    }
+
+    public void setShowDebugHud(boolean showDebugHud) {
+        this.showDebugHud = showDebugHud;
     }
 }

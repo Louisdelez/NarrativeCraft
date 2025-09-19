@@ -40,5 +40,6 @@ public class GuiMixin {
         OnHudRender.inkActionRender(guiGraphics, deltaTracker.getGameTimeDeltaPartialTick(true));
         OnHudRender.dialogRender(guiGraphics, deltaTracker.getGameTimeDeltaPartialTick(true));
         OnHudRender.saveIconRender(guiGraphics, deltaTracker.getGameTimeDeltaPartialTick(true));
+        OnHudRender.storyDebugRender(guiGraphics, deltaTracker.getGameTimeDeltaPartialTick(true));
     }
 }

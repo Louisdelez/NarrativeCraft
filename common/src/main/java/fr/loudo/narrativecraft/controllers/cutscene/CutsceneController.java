@@ -92,7 +92,9 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
                 screen.getControllerButton().setMessage(screen.getPlayText());
             }
         } else if (currentTick >= totalTick && environment == Environment.PRODUCTION) {
-            onEnd.run();
+            if (onEnd != null) {
+                onEnd.run();
+            }
             isPlaying = false;
         }
     }

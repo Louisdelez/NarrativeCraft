@@ -49,6 +49,7 @@ public class ModKeys {
     public static final KeyMapping SELECT_CHOICE_2 = registerKey("key.choice.2", InputConstants.KEY_2);
     public static final KeyMapping SELECT_CHOICE_3 = registerKey("key.choice.3", InputConstants.KEY_3);
     public static final KeyMapping SELECT_CHOICE_4 = registerKey("key.choice.4", InputConstants.KEY_4);
+    public static final KeyMapping STORY_DEBUG = registerKey("key.story_debug", InputConstants.KEY_F9);
 
     private static KeyMapping registerKey(String translationKey, int code) {
         KeyMapping key = new KeyMapping(
