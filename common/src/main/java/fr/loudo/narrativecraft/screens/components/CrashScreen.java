@@ -25,7 +25,6 @@ package fr.loudo.narrativecraft.screens.components;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.screens.mainScreen.MainScreen;
 import fr.loudo.narrativecraft.util.Translation;
@@ -38,7 +37,9 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
 
 public class CrashScreen extends Screen {
 
@@ -56,13 +57,12 @@ public class CrashScreen extends Screen {
 
     @Override
     public void onClose() {
-        StoryHandler storyHandler = playerSession.getStoryHandler();
-        if (storyHandler != null && !storyHandler.isDebugMode()) {
-            NarrativeWorldOption worldOption = NarrativeCraftMod.getInstance().getNarrativeWorldOption();
-            if (worldOption.showMainScreen) {
-                MainScreen mainScreen = new MainScreen(playerSession, false, false);
-                minecraft.setScreen(mainScreen);
-            }
+        NarrativeWorldOption worldOption = NarrativeCraftMod.getInstance().getNarrativeWorldOption();
+        if (worldOption.showMainScreen) {
+            MainScreen mainScreen = new MainScreen(playerSession, false, false);
+            minecraft.setScreen(mainScreen);
+        } else {
+            minecraft.setScreen(null);
         }
     }
 
@@ -92,16 +92,39 @@ public class CrashScreen extends Screen {
     }
 
     private void renderInside(GuiGraphics guiGraphics, int mouseX, int mouseY, int offsetX, int offsetY) {
-        int i = offsetX + 9 + 117;
-        guiGraphics.fill(offsetX + 9, offsetY + 18, offsetX + 9 + 234, offsetY + 18 + 113, -16777216);
-        List<String> lines = List.of(
-                Translation.message("screen.crash.message", message).getString().split("\n"));
-        int textPosY = offsetY + 18 + 56 - 4 - (minecraft.font.lineHeight * lines.size() + 2) / 2;
-        guiGraphics.drawCenteredString(
-                this.font, Translation.message("screen.crash.title").getString(), i, textPosY, -1);
-        for (String line : lines) {
-            textPosY += minecraft.font.lineHeight;
-            guiGraphics.drawCenteredString(this.font, line, i, textPosY, -1);
+        int boxX = offsetX + 9;
+        int boxY = offsetY + 18;
+        int boxWidth = 234;
+        int boxHeight = 113;
+
+        int centerX = boxX + boxWidth / 2;
+
+        guiGraphics.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight, -16777216);
+
+        String title = Translation.message("screen.crash.title").getString();
+        List<String> messageLines =
+                List.of(Translation.message("screen.crash.message").getString().split("\n"));
+        List<FormattedCharSequence> errorLines = minecraft.font.split(FormattedText.of(message), 200);
+
+        int totalLines = 1 + messageLines.size() + errorLines.size();
+
+        int totalTextHeight = totalLines * minecraft.font.lineHeight;
+
+        int startY = boxY + (boxHeight - totalTextHeight) / 2;
+
+        int currentY = startY;
+
+        guiGraphics.drawCenteredString(this.font, title, centerX, currentY, -1);
+        currentY += minecraft.font.lineHeight;
+
+        for (String line : messageLines) {
+            guiGraphics.drawCenteredString(this.font, line, centerX, currentY, -1);
+            currentY += minecraft.font.lineHeight;
+        }
+
+        for (FormattedCharSequence errorLine : errorLines) {
+            guiGraphics.drawCenteredString(this.font, errorLine, centerX, currentY, -1);
+            currentY += minecraft.font.lineHeight;
         }
     }
 

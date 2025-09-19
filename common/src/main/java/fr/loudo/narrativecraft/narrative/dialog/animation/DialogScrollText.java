@@ -99,11 +99,6 @@ public class DialogScrollText {
             if (!letter.render()) continue;
             float x = letter.x;
             float y = letter.y;
-            if (dialogRenderer instanceof DialogRenderer3D dialogRenderer3D) {
-                if (dialogRenderer3D.getDialogOffset().y < 0) {
-                    y += dialogRenderer3D.getTotalHeight() - dialogRenderer3D.getPaddingY();
-                }
-            }
             if (offsets.containsKey(i)) {
                 x += offsets.get(i).x;
                 y += offsets.get(i).y;

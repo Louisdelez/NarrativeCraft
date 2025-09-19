@@ -115,6 +115,7 @@ public class CutsceneKeyframeOptionScreen extends KeyframeOptionScreen<CutsceneK
                         } else {
                             cutscenePlayback.setupAndPlay(keyframe, cutsceneController.getNextKeyframe(keyframe));
                         }
+                        cutsceneController.setPlaying(true);
                         minecraft.setScreen(null);
                     }
                 })

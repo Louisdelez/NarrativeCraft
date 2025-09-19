@@ -49,6 +49,15 @@ public record ParsedDialog(String cleanedText, List<TextEffect> effects) {
             String paramString = matcher.group(2).trim();
             String innerText = matcher.group(3);
 
+            DialogAnimationType type;
+            try {
+                type = DialogAnimationType.valueOf(effectName.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                cleanText.append(dialogContent, matcher.start(), matcher.end());
+                currentIndex = matcher.end();
+                continue;
+            }
+
             int effectStart = cleanText.length();
             cleanText.append(innerText);
             int effectEnd = cleanText.length();
@@ -62,13 +71,6 @@ public record ParsedDialog(String cleanedText, List<TextEffect> effects) {
                         params.put(kv[0], kv[1]);
                     }
                 }
-            }
-
-            DialogAnimationType type;
-            try {
-                type = DialogAnimationType.valueOf(effectName.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                continue;
             }
 
             effects.add(new TextEffect(type, effectStart, effectEnd, params));

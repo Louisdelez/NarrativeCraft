@@ -52,7 +52,7 @@ public class TextEffectAnimation {
 
         for (DialogLetterEffect dialogLetterEffect : dialogLetterEffectList) {
             dialogLetterEffect.tick();
-            if (dialogLetterEffect.getAnimation() == DialogAnimationType.SHAKING) {
+            if (dialogLetterEffect.getAnimation() == DialogAnimationType.SHAKE) {
 
                 for (int j = dialogLetterEffect.getStartIndex(); j < dialogLetterEffect.getEndIndex(); j++) {
                     RandomSource randomSource = RandomSource.create();
@@ -75,7 +75,7 @@ public class TextEffectAnimation {
                     dialogLetterEffect.reset();
                 }
 
-            } else if (dialogLetterEffect.getAnimation() == DialogAnimationType.WAVING) {
+            } else if (dialogLetterEffect.getAnimation() == DialogAnimationType.WAVE) {
                 float waveSpacing = 0.2f;
                 double waveSpeed = (double) tickCounter / dialogLetterEffect.getTotalTick();
 

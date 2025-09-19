@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.hud;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -44,7 +45,7 @@ public class StoryDebugHud {
 
     public void render(GuiGraphics guiGraphics, float partialTick) {
         if (playerSession.getStoryHandler() == null) return;
-        List<InkAction> inkActions = playerSession.getInkActions();
+        List<InkAction> inkActions = new ArrayList<>(playerSession.getInkActions());
         int x = 5;
         int y = 5;
         int color = ARGB.color(255, 255, 255, 255);

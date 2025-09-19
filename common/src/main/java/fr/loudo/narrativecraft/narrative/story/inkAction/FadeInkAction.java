@@ -109,6 +109,15 @@ public class FadeInkAction extends InkAction {
                 return InkActionResult.error(Translation.message(NOT_VALID_COLOR, arguments.get(4)));
             }
         }
+        if (fadeInSeconds > 2) {
+            fadeInSeconds -= 1;
+        }
+        if (staySeconds > 2) {
+            staySeconds -= 1;
+        }
+        if (fadeOutSeconds > 2) {
+            fadeOutSeconds -= 1;
+        }
         return InkActionResult.ok();
     }
 

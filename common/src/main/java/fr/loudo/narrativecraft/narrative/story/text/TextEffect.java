@@ -45,11 +45,11 @@ public record TextEffect(DialogAnimationType type, int startIndex, int endIndex,
             }
 
             switch (effect.type()) {
-                case WAVING -> {
+                case WAVE -> {
                     time = time == -1 ? 0.3 : time;
                     force = force == -1 ? 1f : force;
                 }
-                case SHAKING -> {
+                case SHAKE -> {
                     time = time == -1 ? 0.05 : time;
                     force = force == -1 ? 0.35f : force;
                 }

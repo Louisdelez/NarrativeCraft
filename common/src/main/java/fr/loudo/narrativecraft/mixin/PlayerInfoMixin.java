@@ -29,6 +29,8 @@ import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.util.Util;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.resources.PlayerSkin;
@@ -53,7 +55,8 @@ public class PlayerInfoMixin {
                 .getPlayerSessionManager()
                 .getSessionByPlayer(Minecraft.getInstance().player);
         if (playerSession == null) return;
-        for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+        List<CharacterRuntime> characterRuntimes = new ArrayList<>(playerSession.getCharacterRuntimes());
+        for (CharacterRuntime characterRuntime : characterRuntimes) {
             if (characterRuntime.getEntity() == null) continue;
             if (!this.profile
                     .getName()

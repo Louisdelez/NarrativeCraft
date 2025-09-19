@@ -101,6 +101,7 @@ public class WeatherInkAction extends InkAction {
                 return InkActionResult.error("Weather value is not correct.");
             }
         }
+        playerSession.getInkActions().removeIf(inkAction -> inkAction instanceof WeatherInkAction);
         return InkActionResult.ok();
     }
 

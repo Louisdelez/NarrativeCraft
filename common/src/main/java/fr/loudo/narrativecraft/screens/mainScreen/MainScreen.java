@@ -35,14 +35,18 @@ import fr.loudo.narrativecraft.narrative.data.MainScreenData;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.narrative.story.StorySave;
+import fr.loudo.narrativecraft.narrative.story.StoryValidation;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.screens.components.ChapterSelectorScreen;
+import fr.loudo.narrativecraft.screens.components.CrashScreen;
 import fr.loudo.narrativecraft.screens.components.FinishedStoryScreen;
 import fr.loudo.narrativecraft.screens.components.NarrativeCraftLogoRenderer;
 import fr.loudo.narrativecraft.screens.story.StoryChoicesScreen;
+import fr.loudo.narrativecraft.util.ErrorLine;
 import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
 import java.io.IOException;
+import java.util.List;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmScreen;
@@ -106,7 +110,27 @@ public class MainScreen extends Screen {
     private void playStory() {
         this.onClose();
         StoryHandler storyHandler = new StoryHandler(playerSession);
-        NarrativeCraftMod.server.execute(storyHandler::start);
+        try {
+            List<ErrorLine> errorLines = StoryValidation.validate();
+            if (errorLines.stream().map(ErrorLine::isWarn).toList().isEmpty()) {
+                NarrativeCraftMod.server.execute(storyHandler::start);
+            } else {
+                NarrativeCraftMod.LOGGER.error(" ");
+                NarrativeCraftMod.LOGGER.error("Story can't start: ");
+                for (ErrorLine errorLine : errorLines) {
+                    NarrativeCraftMod.LOGGER.error(
+                            "{} {} {}", errorLine.getFileName(), errorLine.getLineText(), errorLine.getMessage());
+                }
+                NarrativeCraftMod.LOGGER.error(" ");
+                CrashScreen crashScreen = new CrashScreen(
+                        playerSession,
+                        Translation.message("validation.from_main_screen").getString());
+                minecraft.setScreen(crashScreen);
+            }
+        } catch (Exception e) {
+            CrashScreen crashScreen = new CrashScreen(playerSession, e.getMessage());
+            minecraft.setScreen(crashScreen);
+        }
     }
 
     @Override
@@ -218,10 +242,7 @@ public class MainScreen extends Screen {
             Button selectSceneButton = Button.builder(
                             Translation.message("screen.main_screen.select_screen"), button -> {
                                 minecraft.getSoundManager().stop(musicInstance);
-                                ChapterSelectorScreen screen = new ChapterSelectorScreen(
-                                        playerSession,
-                                        new MainScreenOptionsScreen(
-                                                playerSession, new MainScreen(playerSession, false, pause)));
+                                ChapterSelectorScreen screen = new ChapterSelectorScreen(playerSession, this);
                                 minecraft.setScreen(screen);
                             })
                     .bounds(initialX, startY, buttonWidth, buttonHeight)

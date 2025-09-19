@@ -57,7 +57,10 @@ public class InkTagHandler {
             }
             result = inkAction.execute(playerSession);
             playerSession.addInkAction(inkAction);
-            if (result.isBlock()) break;
+            if (result.isBlock()) {
+                tagsToExecute.removeAll(executed);
+                return;
+            }
         }
         tagsToExecute.removeAll(executed);
         StoryHandler storyHandler = playerSession.getStoryHandler();

@@ -73,7 +73,6 @@ public class CutscenePlayback {
 
     public void play() {
         isPlaying = true;
-        cutsceneController.setPlaying(true);
     }
 
     public void skip() {
@@ -88,11 +87,12 @@ public class CutscenePlayback {
 
     public void stop() {
         isPlaying = false;
-        cutsceneController.setPlaying(false);
-        for (InkAction inkAction : playerSession.getInkActions()) {
-            inkAction.stop();
+        if (cutsceneController.getEnvironment() == Environment.DEVELOPMENT) {
+            for (InkAction inkAction : playerSession.getInkActions()) {
+                inkAction.stop();
+            }
+            playerSession.getInkActions().clear();
         }
-        playerSession.getInkActions().clear();
     }
 
     public void tick() {
@@ -238,8 +238,6 @@ public class CutscenePlayback {
         if (cutsceneController.getEnvironment() == Environment.DEVELOPMENT) {
             CutsceneKeyframeOptionScreen screen = new CutsceneKeyframeOptionScreen(keyframeB, playerSession, false);
             Minecraft.getInstance().setScreen(screen);
-        } else if (cutsceneController.getEnvironment() == Environment.PRODUCTION) {
-            onCutsceneEnd.run();
         }
     }
 

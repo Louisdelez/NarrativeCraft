@@ -126,7 +126,10 @@ public class DialogRenderer {
         dialogStarting = false;
         dialogStopping = false;
         totalTick = (int) (dialogTransitionTime * 20.0);
-        currentTick = oldWidth == totalWidth && oldHeight == totalHeight && oldScale == scale ? totalTick : 0;
+        currentTick = oldWidth == totalWidth && oldHeight == totalHeight && oldScale == scale
+                        || this instanceof DialogRenderer2D
+                ? totalTick
+                : 0;
         dialogArrowSkip.stop();
         dialogAutoSkipping = false;
     }

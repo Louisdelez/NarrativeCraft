@@ -199,7 +199,7 @@
   "narrativecraft.screen.world_options.show_credits_screen": "Show Credits Screen: %s",
 
   "narrativecraft.screen.crash.title": "Whoops! A crash occurred...",
-  "narrativecraft.screen.crash.message": "Reason: \n%s",
+  "narrativecraft.screen.crash.message": "Reason:\n",
 
   "narrativecraft.screen.finished_story.line_1": "Thanks for playing!",
   "narrativecraft.screen.finished_story.line_2": "You can now select specific scenes",
@@ -224,5 +224,7 @@
   "narrativecraft.validation.found_errors": "Validation returned %s errors.",
   "narrativecraft.validation.found_warns": "Validation returned %s warns.",
   "narrativecraft.validation.validated": "Successfully passed validation.",
-  "narrativecraft.validation.quick_edit": "Click to quick edit"
+  "narrativecraft.validation.quick_edit": "Click to quick edit",
+  "narrativecraft.validation.on_enter_required": "\"# on enter\" tag is REQUIRED after the knot, or else the story can't continue correctly!",
+  "narrativecraft.validation.from_main_screen": "Story has errors and can't start. Check your minecraft logs and send it to the owner of the story"
 }

@@ -46,6 +46,7 @@ public class CutsceneInkAction extends InkAction {
 
     @Override
     public void tick() {
+        if (!isRunning) return;
         if (controller.atMaxTick()) {
             blockEndTask.run();
         }
@@ -79,6 +80,7 @@ public class CutsceneInkAction extends InkAction {
         } else {
             keyframeB = keyframeA;
         }
+        controller.setPlaying(true);
         controller.getCutscenePlayback().setupAndPlay(keyframeA, keyframeB);
         return InkActionResult.block();
     }

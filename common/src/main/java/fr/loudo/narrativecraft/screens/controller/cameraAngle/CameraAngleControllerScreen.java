@@ -130,6 +130,10 @@ public class CameraAngleControllerScreen extends Screen {
                                         .getCharacterStoryDataList()
                                         .add(characterStoryData);
                                 minecraft.setScreen(null);
+                                cameraAngleController
+                                        .getPlayerSession()
+                                        .getCharacterRuntimes()
+                                        .add(characterStoryData.getCharacterRuntime());
                             });
                     minecraft.setScreen(screen);
                 })

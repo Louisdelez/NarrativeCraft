@@ -101,12 +101,12 @@ public class StoryHandler {
         try {
             story = new Story(NarrativeCraftFile.storyContent());
             story.onError = (s, errorType) -> {
-                stop();
-                if (!debugMode) {
-                    CrashScreen screen = new CrashScreen(playerSession, errorType + " " + s);
-                    minecraft.setScreen(screen);
-                }
+                NarrativeCraftMod.server.execute(this::stop);
+                showCrash(new Exception(errorType + " " + s));
             };
+            if (loadScene) {
+                loadScene(playerSession.getScene());
+            }
             if (NarrativeCraftFile.saveExists() && !debugMode) {
                 loadSave();
                 return;
@@ -114,13 +114,7 @@ public class StoryHandler {
             next();
         } catch (Exception e) {
             stop();
-            if (!debugMode && e instanceof InkTagHandlerException) {
-                CrashScreen screen = new CrashScreen(playerSession, e.getMessage());
-                minecraft.setScreen(screen);
-            } else {
-                NarrativeCraftMod.LOGGER.error("Can't start the story: ", e);
-                Util.sendCrashMessage(playerSession.getPlayer(), e);
-            }
+            showCrash(e);
         }
     }
 
@@ -147,14 +141,16 @@ public class StoryHandler {
         playerSession.setDialogRenderer(null);
         playerSession.setStoryHandler(null);
         playerSession.getInkTagHandler().getTagsToExecute().clear();
-        playerSession.setShowDebugHud(false);
     }
 
     public void stopAndFinishScreen() {
         stop();
-        if (!narrativeWorldOption.showCreditsScreen) return;
-        CreditScreen creditScreen = new CreditScreen(playerSession, false, !narrativeWorldOption.finishedStory);
-        minecraft.execute(() -> minecraft.setScreen(creditScreen));
+        if (narrativeWorldOption.showCreditsScreen) {
+            CreditScreen creditScreen = new CreditScreen(playerSession, false, !narrativeWorldOption.finishedStory);
+            minecraft.execute(() -> minecraft.setScreen(creditScreen));
+        }
+        narrativeWorldOption.finishedStory = true;
+        NarrativeCraftFile.updateWorldOptions(narrativeWorldOption);
     }
 
     public boolean characterInStory(CharacterStory characterStory) {
@@ -225,14 +221,7 @@ public class StoryHandler {
             }
         } catch (Exception e) {
             stop();
-            Util.sendCrashMessage(minecraft.player, e);
-            if (!debugMode && e instanceof InkTagHandlerException) {
-                CrashScreen screen = new CrashScreen(playerSession, e.getMessage());
-                minecraft.setScreen(screen);
-            } else {
-                NarrativeCraftMod.LOGGER.error("Can't continue the story: ", e);
-                Util.sendCrashMessage(playerSession.getPlayer(), e);
-            }
+            showCrash(e);
         }
     }
 
@@ -241,8 +230,7 @@ public class StoryHandler {
             showDialog(dialogText);
         } catch (Exception e) {
             stop();
-            NarrativeCraftMod.LOGGER.error("Can't show current dialog: ", e);
-            Util.sendCrashMessage(minecraft.player, e);
+            showCrash(e);
         }
     }
 
@@ -256,8 +244,6 @@ public class StoryHandler {
         if (save == null) throw new Exception("Chapter or scene cannot be found in save file");
         story.getState().loadJson(save.getSaveData());
         if (loadScene) {
-            story.choosePathString(playerSession.getScene().knotName());
-            next();
             return;
         }
         playerSession.setChapter(save.getChapter());
@@ -275,6 +261,10 @@ public class StoryHandler {
         if (!story.getCurrentChoices().isEmpty()) {
             handleChoices();
         }
+    }
+
+    private void loadScene(Scene scene) throws Exception {
+        story.choosePathString(scene.knotName());
     }
 
     private void removeForbiddenTagLoadSave() throws Exception {
@@ -297,6 +287,16 @@ public class StoryHandler {
         playerSession.getInkTagHandler().execute();
         StoryChoicesScreen choicesScreen = new StoryChoicesScreen(playerSession, true);
         minecraft.execute(() -> minecraft.setScreen(choicesScreen));
+    }
+
+    private void showCrash(Exception exception) {
+        if (debugMode) {
+            NarrativeCraftMod.LOGGER.error("Error occurred on the story: ", exception);
+            Util.sendCrashMessage(playerSession.getPlayer(), exception);
+        } else {
+            CrashScreen screen = new CrashScreen(playerSession, exception.getMessage());
+            minecraft.execute(() -> minecraft.setScreen(screen));
+        }
     }
 
     public void save() {
@@ -356,7 +356,7 @@ public class StoryHandler {
                     stop();
                     if (!debugMode && e instanceof InkTagHandlerException) {
                         CrashScreen screen = new CrashScreen(playerSession, e.getMessage());
-                        minecraft.setScreen(screen);
+                        minecraft.execute(() -> minecraft.setScreen(screen));
                     } else {
                         Util.sendCrashMessage(playerSession.getPlayer(), e);
                     }

@@ -118,7 +118,6 @@ public class DialogRenderer3D extends DialogRenderer {
                     position = getDialogInterpolatedDisappearPosition(t);
                 }
                 backgroundColor = ARGB.color((int) (opacity * 255.0), backgroundColor);
-                position = translateToRelative(position);
             } else {
                 originalScale = (float) Mth.lerp(t, oldScale, scale);
             }
@@ -134,12 +133,16 @@ public class DialogRenderer3D extends DialogRenderer {
         renderDialogBackground(poseStack, partialTick);
 
         Side side = dialogOffsetSide();
-        double diffY = translateToRelativeApplyOffset(dialogPosition).y - translateToRelative(dialogPosition).y;
 
+        poseStack.pushPose();
         switch (side) {
-            case RIGHT -> poseStack.translate(totalWidth, diffY < 0 ? getHeight() : 0, 0);
-            case LEFT -> poseStack.translate(-totalWidth, diffY < 0 ? getHeight() : 0, 0);
-            case DOWN -> poseStack.translate(0, getHeight(), 0);
+            case RIGHT -> poseStack.translate(totalWidth, dialogOffset.y < 0 ? height / 2.0F : 0, 0);
+            case LEFT ->
+                poseStack.translate(
+                        -totalWidth,
+                        dialogOffset.y < 0 ? height / 2.0F - paddingY / 2.0F + 2 : -height / 2.0F - paddingY * 2 - 1,
+                        0);
+            case DOWN -> poseStack.translate(0, dialogOffset.x == 0 ? height : height / 2.0F + paddingY / 2.0F, 0);
         }
 
         dialogTail.render(
@@ -148,10 +151,19 @@ public class DialogRenderer3D extends DialogRenderer {
                 minecraft.renderBuffers().bufferSource(),
                 minecraft.gameRenderer.getMainCamera());
 
-        if (diffY == 0) {
+        poseStack.popPose();
+
+        if (dialogOffset.y == 0) {
             switch (side) {
-                case RIGHT, LEFT -> poseStack.translate(0, getHeight() / 2, 0);
+                case RIGHT, LEFT -> poseStack.translate(0, height / 2, 0);
             }
+        }
+
+        poseStack.pushPose();
+        switch (side) {
+            case RIGHT -> poseStack.translate(totalWidth, dialogOffset.y < 0 ? totalHeight : 0, 0);
+            case LEFT -> poseStack.translate(-totalWidth, dialogOffset.y < 0 ? totalHeight : 0, 0);
+            case DOWN -> poseStack.translate(0, totalHeight, 0);
         }
 
         if (!dialogStopping) {
@@ -169,6 +181,7 @@ public class DialogRenderer3D extends DialogRenderer {
             }
         }
 
+        poseStack.popPose();
         minecraft.renderBuffers().bufferSource().endBatch(NarrativeCraftMod.dialogBackgroundRenderType);
     }
 
@@ -179,17 +192,21 @@ public class DialogRenderer3D extends DialogRenderer {
 
     private Vec3 getDialogInterpolatedAppearPosition(double t) {
         double x, y, z;
-        x = Mth.lerp(t, dialogPosition.x, dialogPosition.x + dialogOffset.x);
-        y = Mth.lerp(t, dialogPosition.y, dialogPosition.y + dialogOffset.y);
-        z = Mth.lerp(t, dialogPosition.z, dialogPosition.z);
+        Vec3 dialogPos = translateToRelative(dialogPosition);
+        Vec3 dialogPositionOffsetApplied = translateToRelativeApplyOffset(dialogPosition);
+        x = Mth.lerp(t, dialogPos.x, dialogPositionOffsetApplied.x);
+        y = Mth.lerp(t, dialogPos.y, dialogPositionOffsetApplied.y);
+        z = Mth.lerp(t, dialogPos.z, dialogPositionOffsetApplied.z);
         return new Vec3(x, y, z);
     }
 
     private Vec3 getDialogInterpolatedDisappearPosition(double t) {
         double x, y, z;
-        x = Mth.lerp(t, dialogPosition.x + dialogOffset.x, dialogPosition.x);
-        y = Mth.lerp(t, dialogPosition.y + dialogOffset.y, dialogPosition.y);
-        z = Mth.lerp(t, dialogPosition.z, dialogPosition.z);
+        Vec3 dialogPos = translateToRelative(dialogPosition);
+        Vec3 dialogPositionOffsetApplied = translateToRelativeApplyOffset(dialogPosition);
+        x = Mth.lerp(t, dialogPositionOffsetApplied.x, dialogPos.x);
+        y = Mth.lerp(t, dialogPositionOffsetApplied.y, dialogPos.y);
+        z = Mth.lerp(t, dialogPositionOffsetApplied.z, dialogPos.z);
         return new Vec3(x, y, z);
     }
 

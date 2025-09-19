@@ -88,6 +88,15 @@ public class StoryValidation {
         String[] lines = Files.readString(scriptFile.toPath()).split("\n");
         for (int i = 0; i < lines.length; i++) {
             String rawLine = lines[i].trim();
+            if ((!rawLine.equals("# on enter") && !rawLine.equals("#on enter")) && i + 1 == 2 && chapter == null) {
+                errorLines.add(new ErrorLine(
+                        i + 1,
+                        null,
+                        scene,
+                        Translation.message("validation.on_enter_required").getString(),
+                        "",
+                        false));
+            }
             if (!rawLine.startsWith("#")) continue;
             Matcher matcher = tagPattern.matcher(rawLine);
             while (matcher.find()) {

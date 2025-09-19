@@ -46,7 +46,7 @@ public class SceneSelectorScreen extends ButtonListScreen {
 
     @Override
     protected void addContents() {
-        for (Scene scene : chapter.getScenes()) {
+        for (Scene scene : chapter.getSortedSceneList()) {
             Button button = Button.builder(Component.literal(scene.getName()), button1 -> {
                         StoryHandler storyHandler = new StoryHandler(chapter, scene, playerSession);
                         NarrativeCraftMod.server.execute(storyHandler::start);
