@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.screens.storyManager.chapter.ChaptersScreen;
 import fr.loudo.narrativecraft.screens.storyManager.scene.ScenesMenuScreen;
+import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.client.Minecraft;
 
 public class PressKeyListener {
@@ -40,6 +41,10 @@ public class PressKeyListener {
                     NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
             if (playerSession == null) return;
             if (playerSession.getStoryHandler() != null) return;
+            if (playerSession.getController() != null) {
+                playerSession.getPlayer().sendSystemMessage(Translation.message("session.controller_set"));
+                return;
+            }
             if (playerSession.isSessionSet()) {
                 minecraft.setScreen(new ScenesMenuScreen(playerSession.getScene()));
             } else {

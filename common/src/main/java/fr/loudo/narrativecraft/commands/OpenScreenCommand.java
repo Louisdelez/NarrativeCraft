@@ -32,6 +32,8 @@ import fr.loudo.narrativecraft.network.OpenChaptersScreenPacket;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.screens.mainScreen.MainScreen;
 import fr.loudo.narrativecraft.screens.options.StoryOptionsScreen;
+import fr.loudo.narrativecraft.screens.storyManager.character.CharactersScreen;
+import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -54,6 +56,10 @@ public class OpenScreenCommand {
                 .getPlayerSessionManager()
                 .getSessionByPlayer(context.getSource().getPlayer());
         if (playerSession.getStoryHandler() != null) return 0;
+        if (playerSession.getController() != null) {
+            playerSession.getPlayer().sendSystemMessage(Translation.message("session.controller_set"));
+            return 0;
+        }
         StoryOptionsScreen screen = new StoryOptionsScreen(playerSession);
         Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
         return Command.SINGLE_SUCCESS;
@@ -64,14 +70,25 @@ public class OpenScreenCommand {
         PlayerSession playerSession = NarrativeCraftMod.getInstance()
                 .getPlayerSessionManager()
                 .getSessionByPlayer(context.getSource().getPlayer());
+        if (playerSession.getController() != null) {
+            playerSession.getPlayer().sendSystemMessage(Translation.message("session.controller_set"));
+            return 0;
+        }
         if (playerSession.getStoryHandler() != null) return 0;
         Services.PACKET_SENDER.sendToPlayer(player, new OpenChaptersScreenPacket("", 13));
         return Command.SINGLE_SUCCESS;
     }
 
     private static int openCharacterManager(CommandContext<CommandSourceStack> context) {
-        //        CharactersScreen screen = new CharactersScreen();
-        //        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
+        PlayerSession playerSession = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getSessionByPlayer(context.getSource().getPlayer());
+        if (playerSession.getController() != null) {
+            playerSession.getPlayer().sendSystemMessage(Translation.message("session.controller_set"));
+            return 0;
+        }
+        CharactersScreen screen = new CharactersScreen(null);
+        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
         return Command.SINGLE_SUCCESS;
     }
 
@@ -80,6 +97,10 @@ public class OpenScreenCommand {
                 .getPlayerSessionManager()
                 .getSessionByPlayer(context.getSource().getPlayer());
         if (playerSession.getStoryHandler() != null) return 0;
+        if (playerSession.getController() != null) {
+            playerSession.getPlayer().sendSystemMessage(Translation.message("session.controller_set"));
+            return 0;
+        }
         MainScreen screen = new MainScreen(playerSession, false, false);
         Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
         return Command.SINGLE_SUCCESS;

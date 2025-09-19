@@ -26,11 +26,13 @@ package fr.loudo.narrativecraft.screens.storyManager.character;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.managers.CharacterManager;
+import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.screens.characters.CharacterEntityTypeScreen;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.components.StoryElementList;
 import fr.loudo.narrativecraft.screens.storyManager.StoryElementScreen;
+import fr.loudo.narrativecraft.screens.storyManager.scene.ScenesMenuScreen;
 import fr.loudo.narrativecraft.util.ImageFontConstants;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
@@ -39,15 +41,32 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 
 public class CharactersScreen extends StoryElementScreen {
-    public CharactersScreen() {
-        super(Component.literal("Characters"));
+
+    private final Scene scene;
+
+    public CharactersScreen(Scene scene) {
+        super(
+                scene == null
+                        ? Translation.message("screen.story_manager.characters")
+                        : Translation.message("screen.story_manager.npcs", scene.getName()));
+        this.scene = scene;
+    }
+
+    @Override
+    public void onClose() {
+        if (scene != null) {
+            minecraft.setScreen(new ScenesMenuScreen(scene));
+        } else {
+            super.onClose();
+        }
     }
 
     @Override
     protected void addTitle() {
         super.addTitle();
         initAddButton(button -> {
-            EditInfoScreen<CharacterStory> screen = new EditInfoScreen<>(this, null, new EditScreenCharacterAdapter());
+            EditInfoScreen<CharacterStory> screen =
+                    new EditInfoScreen<>(this, null, new EditScreenCharacterAdapter(scene));
             this.minecraft.setScreen(screen);
         });
         initFolderButton();
@@ -56,8 +75,10 @@ public class CharactersScreen extends StoryElementScreen {
     @Override
     protected void addContents() {
         CharacterManager characterManager = NarrativeCraftMod.getInstance().getCharacterManager();
+        List<CharacterStory> characterStories =
+                scene == null ? characterManager.getCharacterStories() : scene.getNpcs();
 
-        List<StoryElementList.StoryEntryData> entries = characterManager.getCharacterStories().stream()
+        List<StoryElementList.StoryEntryData> entries = characterStories.stream()
                 .map(character -> {
                     Button button = Button.builder(Component.literal(character.getName()), button1 -> {})
                             .build();
@@ -74,12 +95,17 @@ public class CharactersScreen extends StoryElementScreen {
                             List.of(entityTypeButton),
                             () -> {
                                 minecraft.setScreen(
-                                        new EditInfoScreen<>(this, character, new EditScreenCharacterAdapter()));
+                                        new EditInfoScreen<>(this, character, new EditScreenCharacterAdapter(scene)));
                             },
                             () -> {
-                                characterManager.removeCharacter(character);
-                                NarrativeCraftFile.deleteCharacterFolder(character);
-                                minecraft.setScreen(new CharactersScreen());
+                                if (scene == null) {
+                                    characterManager.removeCharacter(character);
+                                    NarrativeCraftFile.deleteCharacterFolder(character);
+                                } else {
+                                    scene.removeNpc(character);
+                                    NarrativeCraftFile.deleteCharacterFolder(character, scene);
+                                }
+                                minecraft.setScreen(new CharactersScreen(scene));
                             });
                 })
                 .toList();
@@ -89,6 +115,11 @@ public class CharactersScreen extends StoryElementScreen {
 
     @Override
     protected void openFolder() {
-        net.minecraft.Util.getPlatform().openPath(NarrativeCraftFile.characterDirectory.toPath());
+        if (scene == null) {
+            net.minecraft.Util.getPlatform().openPath(NarrativeCraftFile.characterDirectory.toPath());
+        } else {
+            net.minecraft.Util.getPlatform()
+                    .openPath(NarrativeCraftFile.getNpcFolder(scene).toPath());
+        }
     }
 }

@@ -430,6 +430,22 @@ public class NarrativeCraftFile {
         }
     }
 
+    public static void createCharacterFolder(CharacterStory characterStory, Scene scene) throws IOException {
+        File characterFolder = getCharacterFolder(characterStory, scene);
+        File mainSkinFile = createFile(characterFolder, "main.png");
+        File dataFile = createFile(characterFolder, DATA_FILE_NAME);
+        PlayerSkin defaultPlayerSkin = DefaultPlayerSkin.get(UUID.randomUUID());
+        try (InputStream inputStream =
+                Minecraft.getInstance().getResourceManager().open(defaultPlayerSkin.texture())) {
+            Files.copy(inputStream, mainSkinFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException ignored) {
+        }
+        Gson gson = new Gson();
+        try (Writer writer = new BufferedWriter(new FileWriter(dataFile))) {
+            gson.toJson(characterStory, writer);
+        }
+    }
+
     public static List<File> getSkinFiles(CharacterStory characterStory, Scene scene) {
         File[] skinFiles = createDirectory(getCharacterFolder(characterStory), SKINS_FOLDER_NAME)
                 .listFiles();
@@ -449,8 +465,25 @@ public class NarrativeCraftFile {
         Files.move(oldCharacterFolder.toPath(), newCharacterFolder.toPath());
     }
 
+    public static void updateCharacterData(CharacterStory oldCharacter, CharacterStory newCharacter, Scene scene)
+            throws IOException {
+        File npcFolder = getNpcFolder(scene);
+        File dataFile = getDataFile(oldCharacter, scene);
+        Gson gson = new Gson();
+        try (Writer writer = new BufferedWriter(new FileWriter(dataFile))) {
+            gson.toJson(newCharacter, writer);
+        }
+        File oldCharacterFolder = new File(npcFolder, Util.snakeCase(oldCharacter.getName()));
+        File newCharacterFolder = new File(npcFolder, Util.snakeCase(newCharacter.getName()));
+        Files.move(oldCharacterFolder.toPath(), newCharacterFolder.toPath());
+    }
+
     public static void deleteCharacterFolder(CharacterStory characterStory) {
         deleteDirectory(getCharacterFolder(characterStory));
+    }
+
+    public static void deleteCharacterFolder(CharacterStory characterStory, Scene scene) {
+        deleteDirectory(getCharacterFolder(characterStory, scene));
     }
 
     public static File getChapterDirectory(Chapter chapter) {
@@ -463,6 +496,11 @@ public class NarrativeCraftFile {
 
     public static File getScenesFolder(Chapter chapter) {
         return createDirectory(getChapterDirectory(chapter), "scenes");
+    }
+
+    public static File getNpcFolder(Scene scene) {
+        File dataFolder = getDataFolder(scene);
+        return createDirectory(dataFolder, NPC_FOLDER_NAME);
     }
 
     public static void updateInkIncludes() throws IOException {
@@ -535,6 +573,10 @@ public class NarrativeCraftFile {
         return createDirectory(characterDirectory, Util.snakeCase(characterStory.getName()));
     }
 
+    public static File getCharacterFolder(CharacterStory characterStory, Scene scene) {
+        return createDirectory(getNpcFolder(scene), Util.snakeCase(characterStory.getName()));
+    }
+
     public static File getDataFile(Chapter chapter) {
         return getDataFile(getChapterDirectory(chapter));
     }
@@ -546,6 +588,10 @@ public class NarrativeCraftFile {
 
     public static File getDataFile(CharacterStory characterStory) {
         return createFile(getCharacterFolder(characterStory), DATA_FILE_NAME);
+    }
+
+    public static File getDataFile(CharacterStory characterStory, Scene scene) {
+        return createFile(getCharacterFolder(characterStory, scene), DATA_FILE_NAME);
     }
 
     public static File getDataFile(File file) {

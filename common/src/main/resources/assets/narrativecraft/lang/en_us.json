@@ -33,6 +33,7 @@
   "narrativecraft.session.set_to_player": "Session is now set to §lChapter %d §rand §lScene %s for %s.",
   "narrativecraft.session.not_set": "You don't have a session set.",
   "narrativecraft.session.player_not_set": "%s don't have a session set.",
+  "narrativecraft.session.controller_set": "You are in a controller, leave if you want to access it.",
   "narrativecraft.session.cleared": "Session cleared.",
 
   "narrativecraft.record.start.success": "Record started...",
@@ -127,6 +128,8 @@
   "narrativecraft.screen.story_manager.subscene_list": "Subscenes of scene %s",
   "narrativecraft.screen.story_manager.cutscene_list": "Cutscenes of scene %s",
   "narrativecraft.screen.story_manager.camera_angle_list": "Camera angles of scene %s",
+  "narrativecraft.screen.story_manager.characters": "Characters",
+  "narrativecraft.screen.story_manager.npcs": "Npcs of scene %s",
   "narrativecraft.screen.story_manager.link_animation_character": "Link animation to character",
   "narrativecraft.screen.story_manager.subscene_cutscene_link": "Link subscene to cutscene",
   "narrativecraft.screen.story_manager.animation_cutscene_link": "Link animation to cutscene",

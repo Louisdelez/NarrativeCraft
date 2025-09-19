@@ -109,6 +109,7 @@ public class NarrativeEntryInit {
             initSubscenes(scene);
             initCutscenes(scene);
             initCameraAngleGroups(scene);
+            initNpcs(scene);
             chapter.addScene(scene);
         }
     }
@@ -165,6 +166,24 @@ public class NarrativeEntryInit {
         scene.getCameraAngles().addAll(cameraAngleGroups);
     }
 
+    private static void initNpcs(Scene scene) throws Exception {
+        File[] npcsFolder = NarrativeCraftFile.getNpcFolder(scene).listFiles();
+        if (npcsFolder == null) return;
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(CharacterStory.class, new CharacterSerializer())
+                .create();
+        for (File characterFolder : npcsFolder) {
+            File dataFile = NarrativeCraftFile.getDataFile(characterFolder);
+            String dataContent = Files.readString(dataFile.toPath());
+            CharacterStory characterStory = gson.fromJson(dataContent, CharacterStory.class);
+            if (characterStory == null) {
+                throw new Exception(String.format(
+                        "NPC %s of scene %s couldn't be initialized", characterFolder.getName(), scene.getName()));
+            }
+            scene.addNpc(characterStory);
+        }
+    }
+
     private static void initCharacters() throws Exception {
         File[] charactersFolder = NarrativeCraftFile.characterDirectory.listFiles();
         if (charactersFolder == null) return;
@@ -176,7 +195,6 @@ public class NarrativeEntryInit {
             File dataFile = NarrativeCraftFile.getDataFile(characterFolder);
             String dataContent = Files.readString(dataFile.toPath());
             CharacterStory characterStory = gson.fromJson(dataContent, CharacterStory.class);
-            // TODO: init skins of character
             if (characterStory == null) {
                 throw new Exception(String.format("Character %s couldn't be initialized", characterFolder.getName()));
             }
