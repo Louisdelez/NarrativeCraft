@@ -1,10 +1,16 @@
 # NarrativeCraft
-<div align="center">
+
+<p align="center">
     Create your own stories, easily and freely, in Minecraft.
-</div>
-<div align="center">
-    <a href="https://discord.gg/E3zzNv79DN">Join the discord</a>
-</div>
+</p>
+
+<p align="center">
+  <img width="250" height="150" alt="join_disord" src="https://github.com/user-attachments/assets/075953b6-de64-4f55-a9c8-fb407e50458b" />
+   &nbsp;&nbsp;&nbsp;
+  <img width="250" height="150" alt="documentation" src="https://github.com/user-attachments/assets/7eaaca5f-52ef-4a5f-bb2d-9320ffc247b5" />
+</p>
+
+
 
 ## Concept
 Do you want to create your own Life is Strange game, or Until Then game, or any narrative game you can think of? NarrativeCraft is a tool that makes this possible with a plot twist: you don't need to know how to code, all thanks to the Ink narrative scripting system.
