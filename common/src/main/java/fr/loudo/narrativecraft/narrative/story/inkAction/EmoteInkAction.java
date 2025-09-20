@@ -32,6 +32,7 @@ import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.util.Translation;
 import io.github.kosmx.emotes.api.events.server.ServerEmoteAPI;
 import io.github.kosmx.emotes.common.tools.UUIDMap;
@@ -52,6 +53,7 @@ public class EmoteInkAction extends InkAction {
 
     @Override
     protected InkActionResult doValidate(List<String> arguments, Scene scene) {
+        if (!Services.PLATFORM.isModLoaded("emotecraft")) return InkActionResult.ignored();
         if (arguments.size() < 2) {
             return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Action, play or stop"));
         }
@@ -91,6 +93,7 @@ public class EmoteInkAction extends InkAction {
 
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
+        if (!Services.PLATFORM.isModLoaded("emotecraft")) return InkActionResult.ignored();
         StoryHandler storyHandler = playerSession.getStoryHandler();
         if (storyHandler == null) return InkActionResult.ignored();
         CharacterRuntime characterRuntime = storyHandler.getCharacterRuntimeFromCharacter(characterStory);

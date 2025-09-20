@@ -79,8 +79,12 @@ public record InkActionResult(
         return status == Status.WARN;
     }
 
+    public boolean isIgnore() {
+        return status == Status.IGNORED;
+    }
+
     public boolean isOk() {
-        return status == Status.OK;
+        return status == Status.OK || status == Status.IGNORED;
     }
 
     public boolean isBlock() {
