@@ -224,6 +224,7 @@ public class StoryHandler {
             } else {
                 dialogRenderer.stop();
             }
+            playerSession.clearKilledCharacters();
         } catch (Exception e) {
             stop();
             showCrash(e);

@@ -80,7 +80,7 @@ public class Playback {
         }
         if (needToRespawn(
                 characterRuntime.getEntity().position(),
-                animation.getLastLocation().asVec3())) {
+                animation.getFirstLocation().asVec3())) {
             storyHandler.killCharacter(animation.getCharacter());
         } else {
             masterEntity = characterRuntime.getEntity();
@@ -90,6 +90,7 @@ public class Playback {
 
     public void start() {
 
+        characterRuntime.getCharacterSkinController().cacheSkins();
         if (animation.getCharacter() == null) {
             Minecraft.getInstance()
                     .player

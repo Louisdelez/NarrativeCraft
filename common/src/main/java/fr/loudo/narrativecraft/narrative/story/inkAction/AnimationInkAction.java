@@ -52,10 +52,11 @@ public class AnimationInkAction extends InkAction {
             isRunning = false;
             return;
         }
-        isRunning = !playback.hasEnded();
         if (!isRunning && blockEndTask != null) {
             blockEndTask.run();
+            return;
         }
+        isRunning = !playback.hasEnded();
     }
 
     @Override
@@ -106,20 +107,22 @@ public class AnimationInkAction extends InkAction {
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
         if (action.equals("start")) {
-            StoryHandler storyHandler = playerSession.getStoryHandler();
-            if (storyHandler != null) {
-                playback.startFromStory(storyHandler);
-            } else {
-                playback.start();
-            }
             playback = new Playback(
                     PlaybackManager.ID_INCREMENTER.incrementAndGet(),
                     animation,
                     playerSession.getPlayer().level(),
                     Environment.PRODUCTION,
                     isLooping);
+            StoryHandler storyHandler = playerSession.getStoryHandler();
+            if (storyHandler != null) {
+                playback.startFromStory(storyHandler);
+            } else {
+                playback.start();
+            }
             playback.setUnique(isUnique);
             playerSession.getPlaybackManager().addPlayback(playback);
+            playerSession.getCharacterRuntimes().add(playback.getCharacterRuntime());
+            playerSession.clearKilledCharacters();
         } else if (action.equals("stop")) {
             Playback playback = playerSession.getPlaybackManager().getPlayback(animation.getName());
             if (playback == null) return InkActionResult.ignored();

@@ -135,12 +135,20 @@ public class PlayerSession {
     }
 
     public CharacterRuntime getCharacterRuntimeByCharacter(CharacterStory characterStory) {
+        clearKilledCharacters();
         for (CharacterRuntime characterRuntime : characterRuntimes) {
+            if (characterRuntime.getEntity() == null
+                    || !characterRuntime.getEntity().isAlive()) continue;
             if (characterRuntime.getCharacterStory().getName().equalsIgnoreCase(characterStory.getName())) {
                 return characterRuntime;
             }
         }
         return null;
+    }
+
+    public void clearKilledCharacters() {
+        characterRuntimes.removeIf(characterRuntime -> characterRuntime.getEntity() == null
+                || !characterRuntime.getEntity().isAlive());
     }
 
     public List<CharacterRuntime> getCharacterRuntimes() {
