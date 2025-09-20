@@ -1,209 +1,194 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.screens.components;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.Scene;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cameraAngle.CameraAngleGroup;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.Cutscene;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.subscene.Subscene;
-import fr.loudo.narrativecraft.screens.storyManager.chapters.ChaptersScreen;
-import fr.loudo.narrativecraft.screens.storyManager.characters.CharactersScreen;
-import fr.loudo.narrativecraft.screens.storyManager.scenes.ScenesScreen;
-import fr.loudo.narrativecraft.screens.storyManager.scenes.cameraAngles.CameraAnglesScreen;
-import fr.loudo.narrativecraft.screens.storyManager.scenes.cutscenes.CutscenesScreen;
-import fr.loudo.narrativecraft.screens.storyManager.scenes.subscenes.SubscenesScreen;
-import fr.loudo.narrativecraft.utils.ScreenUtils;
-import fr.loudo.narrativecraft.utils.Translation;
+import fr.loudo.narrativecraft.screens.storyManager.EditScreenAdapter;
+import fr.loudo.narrativecraft.util.ScreenUtils;
+import fr.loudo.narrativecraft.util.Translation;
+import fr.loudo.narrativecraft.util.Util;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
-public class EditInfoScreen extends Screen {
-
-    protected final int WIDGET_WIDTH = 190;
-    protected final int EDIT_BOX_NAME_HEIGHT = 20;
-    protected final int EDIT_BOX_DESCRIPTION_HEIGHT = 90;
-    protected final int BUTTON_HEIGHT = 20;
-    protected final int GAP = 5;
+public class EditInfoScreen<T extends NarrativeEntry> extends Screen {
+    public final int WIDGET_WIDTH = 190;
+    public final int EDIT_BOX_NAME_HEIGHT = 20;
+    public final int EDIT_BOX_DESCRIPTION_HEIGHT = 90;
+    public final int BUTTON_HEIGHT = 20;
+    public final int GAP = 5;
 
     protected String name, description;
     protected Button actionButton, backButton;
     protected ScreenUtils.LabelBox nameBox;
-    protected ScreenUtils.LabelBox placementBox;
     protected ScreenUtils.MultilineLabelBox descriptionBox;
     protected StringWidget titleWidget;
     protected Screen lastScreen;
-    protected NarrativeEntry narrativeEntry;
+    protected T narrativeEntry;
+    protected EditScreenAdapter<T> adapter;
 
-    public EditInfoScreen(Screen lastScreen) {
-        super(Component.literal("Edit info"));
-        this.name = "";
-        this.description = "";
-        this.lastScreen = lastScreen;
-    }
+    public Map<String, Object> extraFields = new HashMap<>();
 
-    public EditInfoScreen(Screen lastScreen, NarrativeEntry narrativeEntry) {
+    public List<String> descriptionPlaceholders = List.of(
+            "Once upon a time... In a wild... wild world...",
+            "Until then is the reason this mod exists!",
+            "Free palestine",
+            "You should try narrative games",
+            "Play Outer Wilds",
+            "This screen was boring to code.",
+            "I'm sure your creating a wonderful story!",
+            "Your gender is valid!",
+            "Easter egg message! No just kidding, not rare at all...",
+            "Play Until Then",
+            "Play Life Is Strange (NOT Double Exposure)",
+            "Do their placeholders have a meaning anymore?",
+            "Watch Frieren!",
+            "Play Signalis",
+            "The pain of your absence is sharp and haunting\nAnd i would give anything not to know it; anything but never knowing you at all, which would be worse",
+            "The amazing digital circus is the best animation out there");
+
+    /**
+     * Creates a new {@code EditInfoScreen}.
+     * <p>
+     * If {@code narrativeEntry} is {@code null}, a new entry will be created.
+     * Otherwise, the given entry will be edited.
+     * </p>
+     *
+     * @param lastScreen     the previous screen to return to after editing
+     * @param narrativeEntry the narrative entry to edit, or {@code null} to create a new one
+     * @param adapter        the adapter used to manage narrative data
+     */
+    public EditInfoScreen(Screen lastScreen, T narrativeEntry, EditScreenAdapter<T> adapter) {
         super(Component.literal("Edit info"));
-        this.name = narrativeEntry.getName();
-        this.description = narrativeEntry.getDescription();
+        this.name = narrativeEntry != null ? narrativeEntry.getName() : "";
+        this.description = narrativeEntry != null ? narrativeEntry.getDescription() : "";
         this.lastScreen = lastScreen;
         this.narrativeEntry = narrativeEntry;
+        this.adapter = adapter;
     }
 
     @Override
     protected void init() {
-        Component title = getScreenTitle();
-        Component buttonActionMessage = narrativeEntry == null ? Translation.message("screen.add.text") : Translation.message("screen.update.text");
+        extraFields.clear();
+        Component title = Component.empty();
         int titleX = this.width / 2 - this.font.width(title) / 2;
 
         int labelHeight = this.font.lineHeight + 5;
-
         int centerX = this.width / 2 - WIDGET_WIDTH / 2;
-        int centerY = this.height / 2 - (labelHeight + (EDIT_BOX_NAME_HEIGHT + GAP) + labelHeight + EDIT_BOX_DESCRIPTION_HEIGHT + (BUTTON_HEIGHT * 2)) / 2;
+        int centerY = this.height / 2
+                - (labelHeight
+                                + (EDIT_BOX_NAME_HEIGHT + GAP)
+                                + labelHeight
+                                + EDIT_BOX_DESCRIPTION_HEIGHT
+                                + (BUTTON_HEIGHT * 2))
+                        / 2;
 
-        if(narrativeEntry instanceof Scene) {
-            centerY -= (EDIT_BOX_NAME_HEIGHT + GAP) / 2;
+        if (adapter != null) {
+            adapter.initExtraFields(this, narrativeEntry);
+            for (Object object : extraFields.values()) {
+                if (object instanceof AbstractWidget widget) {
+                    centerY -= widget.getHeight() - GAP;
+                }
+            }
         }
+
         titleWidget = ScreenUtils.text(title, this.font, titleX, centerY - labelHeight);
         this.addRenderableWidget(titleWidget);
 
-        Component nameLabel = Translation.message("screen.story.name")
-                .append(Component.literal(" *").withStyle(style -> style.withColor(0xE62E37)));
+        Component nameLabel = Translation.message("global.name")
+                .append(Component.literal(" *").withStyle(style -> style.withColor(ChatFormatting.RED)));
 
         nameBox = new ScreenUtils.LabelBox(
-                nameLabel,
-                font,
-                WIDGET_WIDTH,
-                EDIT_BOX_NAME_HEIGHT,
-                centerX,
-                centerY,
-                ScreenUtils.Align.VERTICAL
-        );
+                nameLabel, font, WIDGET_WIDTH, EDIT_BOX_NAME_HEIGHT, centerX, centerY, ScreenUtils.Align.VERTICAL);
         nameBox.getEditBox().setValue(name);
-        nameBox.getEditBox().setFilter(text -> !text.matches(".*[\\\\/:*?\"<>|].*"));
+        nameBox.getEditBox().setFilter(text -> text.matches(Util.REGEX_NO_SPECIAL_CHARACTERS));
         this.addRenderableWidget(nameBox.getStringWidget());
         this.addRenderableWidget(nameBox.getEditBox());
 
         centerY += labelHeight + EDIT_BOX_NAME_HEIGHT + GAP;
+
         descriptionBox = new ScreenUtils.MultilineLabelBox(
-                Translation.message("screen.story.description"),
+                Translation.message("global.description"),
                 font,
                 WIDGET_WIDTH,
                 EDIT_BOX_DESCRIPTION_HEIGHT,
                 centerX,
                 centerY,
-                Component.literal("Once upon a time... In a wild... wild world... there were two wolf brothers, living in their home lair with their papa wolf...")
-        );
+                Component.literal(
+                        descriptionPlaceholders.get(new Random().nextInt(0, descriptionPlaceholders.size()))));
         descriptionBox.getMultiLineEditBox().setValue(description);
 
         this.addRenderableWidget(descriptionBox.getStringWidget());
         this.addRenderableWidget(descriptionBox.getMultiLineEditBox());
 
         centerY += labelHeight + EDIT_BOX_DESCRIPTION_HEIGHT + GAP;
-        if(narrativeEntry instanceof Scene scene) {
-            placementBox = new ScreenUtils.LabelBox(
-                    Translation.message("screen.story.placement"),
-                    minecraft.font,
-                    40,
-                    EDIT_BOX_NAME_HEIGHT,
-                    centerX,
-                    centerY,
-                    ScreenUtils.Align.HORIZONTAL
-            );
-            placementBox.getEditBox().setValue(String.valueOf(scene.getPlacement()));
-            placementBox.getEditBox().setFilter(string -> string.matches("^\\d*$"));
-            this.addRenderableWidget(placementBox.getEditBox());
-            this.addRenderableWidget(placementBox.getStringWidget());
-            centerY += placementBox.getEditBox().getHeight() + GAP;
+
+        adapter.renderExtraFields(this, narrativeEntry, centerX, centerY);
+        for (Object object : extraFields.values()) {
+            if (object instanceof AbstractWidget widget) {
+                centerY += widget.getHeight() + GAP;
+            }
         }
+
+        Component buttonActionMessage =
+                narrativeEntry == null ? Translation.message("global.add") : Translation.message("global.update");
         actionButton = Button.builder(buttonActionMessage, button -> {
-            String name = nameBox.getEditBox().getValue();
-            String desc = descriptionBox.getMultiLineEditBox().getValue();
-            int placement = 0;
-            if(narrativeEntry instanceof Scene scene) {
-                if(placementBox.getEditBox().getValue().isEmpty()) {
-                    placement = scene.getPlacement();
-                } else {
-                    placement = Math.max(1, Integer.parseInt(placementBox.getEditBox().getValue()));
-                }
-            }
-            if(name.isEmpty()) {
-                ScreenUtils.sendToast(Translation.message("global.error"), Translation.message("screen.story.name.required"));
-                return;
-            }
-            if(narrativeEntry == null && lastScreen instanceof ChaptersScreen) {
-                addChapterAction(name, desc);
-            }
-            if(narrativeEntry == null && lastScreen instanceof ScenesScreen) {
-                addSceneAction(name, desc);
-            }
-            if(narrativeEntry == null && lastScreen instanceof CutscenesScreen) {
-                addCutsceneAction(name, desc);
-            }
-            if(narrativeEntry == null && lastScreen instanceof SubscenesScreen) {
-                addSubsceneAction(name, desc);
-            }
-            if(narrativeEntry == null && lastScreen instanceof CameraAnglesScreen) {
-                addCameraAnglesAction(name, desc);
-            }
-            if(narrativeEntry != null) {
-                if(narrativeEntry instanceof Scene scene) {
-                    scene.update(name, desc, placement);
-                }
-                narrativeEntry.update(name, desc);
-            }
-        }).bounds(centerX, centerY, WIDGET_WIDTH, BUTTON_HEIGHT).build();
+                    if (nameBox.getEditBox().getValue().isEmpty()) {
+                        ScreenUtils.sendToast(
+                                Translation.message("global.error"), Translation.message("screen.edit_info.name_must"));
+                        return;
+                    }
+                    adapter.buildFromScreen(
+                            extraFields,
+                            this.minecraft,
+                            narrativeEntry,
+                            nameBox.getEditBox().getValue(),
+                            descriptionBox.getMultiLineEditBox().getValue());
+                })
+                .bounds(centerX, centerY, WIDGET_WIDTH, BUTTON_HEIGHT)
+                .build();
         this.addRenderableWidget(actionButton);
 
         centerY += BUTTON_HEIGHT + GAP;
-        backButton = Button.builder(CommonComponents.GUI_BACK, button -> {
-            this.minecraft.setScreen(lastScreen);
-        }).bounds(centerX, centerY, WIDGET_WIDTH, BUTTON_HEIGHT).build();
-        this.addRenderableWidget(backButton);
-    }
 
-    private Component getScreenTitle() {
-        Component title = Component.literal("");
-        if(narrativeEntry == null && lastScreen instanceof ChaptersScreen) {
-            title = Translation.message("screen.chapter_manager.add.title");
-        }
-        if(narrativeEntry == null && lastScreen instanceof ScenesScreen screen) {
-            title = Translation.message("screen.scene_manager.add.title", screen.getChapter().getIndex());
-        }
-        if(narrativeEntry == null && lastScreen instanceof CutscenesScreen screen) {
-            title = Translation.message("screen.cutscene_manager.add.title", screen.getScene().getName());
-        }
-        if(narrativeEntry == null && lastScreen instanceof SubscenesScreen screen) {
-            title = Translation.message("screen.subscene_manager.add.title", screen.getScene().getName());
-        }
-        if(narrativeEntry == null && lastScreen instanceof CameraAnglesScreen screen) {
-            title = Translation.message("screen.camera_angles_manager.add.title", screen.getScene().getName());
-        }
-        if(narrativeEntry == null && lastScreen instanceof CharactersScreen) {
-            title = Translation.message("screen.characters_manager.add.title");
-        }
-        if(narrativeEntry != null && narrativeEntry instanceof Chapter chapter) {
-            title = Translation.message("screen.chapter_manager.edit.title", chapter.getIndex());
-        }
-        if(narrativeEntry != null && narrativeEntry instanceof Scene scene) {
-            title = Translation.message("screen.scene_manager.edit.title", scene.getName(), scene.getChapter().getIndex());
-        }
-        if(narrativeEntry != null && narrativeEntry instanceof Cutscene cutscene) {
-            title = Translation.message("screen.cutscene_manager.edit.title", cutscene.getName(), cutscene.getScene().getName());
-        }
-        if(narrativeEntry != null && narrativeEntry instanceof Subscene subscene) {
-            title = Translation.message("screen.subscene_manager.edit.title", subscene.getName(), subscene.getScene().getName());
-        }
-        if(narrativeEntry != null && narrativeEntry instanceof CameraAngleGroup cameraAngleGroup) {
-            title = Translation.message("screen.camera_angles_manager.edit.title", cameraAngleGroup.getName(), cameraAngleGroup.getScene().getName());
-        }
-        if(narrativeEntry != null && lastScreen instanceof CharactersScreen charactersScreen) {
-            title = Translation.message("screen.characters_manager.edit.title");
-        }
-        return title;
+        backButton = Button.builder(CommonComponents.GUI_BACK, button -> {
+                    this.minecraft.setScreen(lastScreen);
+                })
+                .bounds(centerX, centerY, WIDGET_WIDTH, BUTTON_HEIGHT)
+                .build();
+        this.addRenderableWidget(backButton);
     }
 
     @Override
@@ -211,74 +196,8 @@ public class EditInfoScreen extends Screen {
         this.minecraft.setScreen(lastScreen);
     }
 
-    private void addChapterAction(String name, String description) {
-        if(!NarrativeCraftMod.getInstance().getChapterManager().addChapter(name, description)) {
-            ScreenUtils.sendToast(Translation.message("global.error"), Translation.message("screen.chapter_manager.add.failed"));
-            return;
-        }
-        ChaptersScreen screen = new ChaptersScreen();
-        this.minecraft.setScreen(screen);
+    @Override
+    public <T extends GuiEventListener & Renderable & NarratableEntry> T addRenderableWidget(T widget) {
+        return super.addRenderableWidget(widget);
     }
-
-    private void addSceneAction(String name, String description) {
-        Chapter chapter = ((ScenesScreen)lastScreen).getChapter();
-        if(chapter.sceneExists(name)) {
-            ScreenUtils.sendToast(Translation.message("global.error"), Translation.message("screen.scene_manager.add.already_exists"));
-            return;
-        }
-        Scene scene = new Scene(name, description, chapter);
-        if(!chapter.addScene(scene)) {
-            ScreenUtils.sendToast(Translation.message("global.error"), Translation.message("screen.scene_manager.add.failed"));
-            return;
-        }
-        ScenesScreen screen = new ScenesScreen(chapter);
-        this.minecraft.setScreen(screen);
-    }
-
-    private void addCutsceneAction(String name, String desc) {
-
-        Scene scene = ((CutscenesScreen)lastScreen).getScene();
-        if(scene.cutsceneExists(name)) {
-            ScreenUtils.sendToast(Translation.message("global.error"), Translation.message("screen.cutscene_manager.add.already_exists"));
-            return;
-        }
-        Cutscene cutscene = new Cutscene(scene, name, desc);
-        if(!scene.addCutscene(cutscene)) {
-            ScreenUtils.sendToast(Translation.message("global.error"), Translation.message("screen.cutscene_manager.add.failed", name));
-            return;
-        }
-        CutscenesScreen screen = new CutscenesScreen(scene);
-        this.minecraft.setScreen(screen);
-    }
-
-    private void addSubsceneAction(String name, String desc) {
-        Scene scene = ((SubscenesScreen)lastScreen).getScene();
-        if(scene.subsceneExists(name)) {
-            ScreenUtils.sendToast(Translation.message("global.error"), Translation.message("screen.subscene_manager.add.already_exists"));
-            return;
-        }
-        Subscene subscene = new Subscene(scene, name, desc);
-        if(!scene.addSubscene(subscene)) {
-            ScreenUtils.sendToast(Translation.message("global.error"), Translation.message("screen.subscene_manager.add.failed", name));
-            return;
-        }
-        SubscenesScreen screen = new SubscenesScreen(scene);
-        this.minecraft.setScreen(screen);
-    }
-
-    private void addCameraAnglesAction(String name, String desc) {
-        Scene scene = ((CameraAnglesScreen)lastScreen).getScene();
-        if(scene.cameraAnglesGroupExists(name)) {
-            ScreenUtils.sendToast(Translation.message("global.error"), Translation.message("screen.camera_angles_manager.add.already_exists"));
-            return;
-        }
-        CameraAngleGroup cameraAngleGroup = new CameraAngleGroup(scene, name, desc);
-        if(!scene.addCameraAnglesGroup(cameraAngleGroup)) {
-            ScreenUtils.sendToast(Translation.message("global.error"), Translation.message("screen.camera_angles_manager.add.failed", name));
-            return;
-        }
-        CameraAnglesScreen screen = new CameraAnglesScreen(scene);
-        this.minecraft.setScreen(screen);
-    }
-
 }

@@ -1,7 +1,29 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.narrative.story.text;
 
 import fr.loudo.narrativecraft.narrative.dialog.DialogAnimationType;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,21 +31,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public record ParsedDialog(String cleanedText, List<TextEffect> effects, String characterName) {
-    public static ParsedDialog parse(String rawText) {
-        String characterName = "";
-        String dialogContent = rawText;
-
-        String[] splitText = rawText.split(":", 2);
-        if(splitText.length == 2 && splitText[0].charAt(0) != ':') {
-            characterName = splitText[0].trim();
-            dialogContent = splitText[1].trim();
-        }
-        dialogContent = dialogContent.replace("::", ":");
-
-        if (dialogContent.startsWith("\"") && dialogContent.endsWith("\"")) {
-            dialogContent = dialogContent.substring(1, dialogContent.length() - 1);
-        }
+public record ParsedDialog(String cleanedText, List<TextEffect> effects) {
+    public static ParsedDialog parse(String dialogContent) {
 
         List<TextEffect> effects = new ArrayList<>();
         StringBuilder cleanText = new StringBuilder();
@@ -40,6 +49,15 @@ public record ParsedDialog(String cleanedText, List<TextEffect> effects, String 
             String paramString = matcher.group(2).trim();
             String innerText = matcher.group(3);
 
+            DialogAnimationType type;
+            try {
+                type = DialogAnimationType.valueOf(effectName.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                cleanText.append(dialogContent, matcher.start(), matcher.end());
+                currentIndex = matcher.end();
+                continue;
+            }
+
             int effectStart = cleanText.length();
             cleanText.append(innerText);
             int effectEnd = cleanText.length();
@@ -55,19 +73,11 @@ public record ParsedDialog(String cleanedText, List<TextEffect> effects, String 
                 }
             }
 
-            DialogAnimationType type;
-            try {
-                type = DialogAnimationType.valueOf(effectName.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                continue;
-            }
-
             effects.add(new TextEffect(type, effectStart, effectEnd, params));
             currentIndex = matcher.end();
         }
-        dialogContent = dialogContent.replace("\n", "");
         cleanText.append(dialogContent.substring(currentIndex));
 
-        return new ParsedDialog(cleanText.toString(), effects, characterName);
+        return new ParsedDialog(cleanText.toString(), effects);
     }
 }

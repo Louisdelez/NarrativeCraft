@@ -1,3 +1,26 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
@@ -10,15 +33,17 @@ import net.neoforged.neoforge.common.NeoForge;
 public class HudRenderEvent {
 
     public HudRenderEvent(IEventBus eventBus) {
-        NeoForge.EVENT_BUS.addListener(HudRenderEvent::onWorldRender);
+        NeoForge.EVENT_BUS.addListener(HudRenderEvent::onHudRender);
     }
 
-    private static void onWorldRender(RenderGuiEvent.Post event) {
-        OnHudRender.keyframeControllerBaseRender(event.getGuiGraphics(), event.getPartialTick());
-        OnHudRender.dialogHud(event.getGuiGraphics(), event.getPartialTick());
-        OnHudRender.borderHud(event.getGuiGraphics(), event.getPartialTick());
-        OnHudRender.fadeRender(event.getGuiGraphics(), event.getPartialTick());
-        OnHudRender.saveIconRender(event.getGuiGraphics(), event.getPartialTick());
+    private static void onHudRender(RenderGuiEvent.Post event) {
+        OnHudRender.controllerHudInfo(event.getGuiGraphics());
+        OnHudRender.inkActionRender(
+                event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaPartialTick(true));
+        OnHudRender.dialogRender(event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaPartialTick(true));
+        OnHudRender.saveIconRender(
+                event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaPartialTick(true));
+        OnHudRender.storyDebugRender(
+                event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaPartialTick(true));
     }
-
 }

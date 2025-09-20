@@ -1,14 +1,33 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.KeyframeControllerBase;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.CutscenePlayback;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.keyframes.Keyframe;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.keyframes.KeyframeCoordinate;
+import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
+import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import net.minecraft.client.Camera;
-import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
@@ -24,94 +43,41 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Camera.class)
 public abstract class CameraMixin {
 
-    @Shadow protected abstract void setPosition(double x, double y, double z);
+    @Shadow
+    protected abstract void setPosition(double x, double y, double z);
 
-    @Shadow protected abstract void setRotation(float yRot, float xRot);
+    @Shadow
+    protected abstract void setRotation(float yRot, float xRot);
 
-    @Shadow protected abstract float getMaxZoom(float maxZoom);
+    @Shadow
+    @Final
+    private Quaternionf rotation;
 
-    @Shadow @Final private Quaternionf rotation;
+    @Inject(method = "setup", at = @At("RETURN"))
+    private void narrativecraft$cameraSetup(
+            BlockGetter level,
+            Entity entity,
+            boolean detached,
+            boolean thirdPersonReverse,
+            float partialTick,
+            CallbackInfo ci) {
+        LocalPlayer player = Minecraft.getInstance().player;
+        PlayerSession playerSession =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
+        if (playerSession == null) return;
+        if (playerSession.getController() instanceof CutsceneController controller) {
+            controller.getCutscenePlayback().cameraInterpolation(partialTick);
+        }
 
-    @Inject(method = "setup", at = @At(value = "RETURN"))
-    private void update(BlockGetter level, Entity entity, boolean detached, boolean thirdPersonReverse, float partialTick, CallbackInfo ci) {
+        if (playerSession.getCurrentCamera() == null) return;
+        KeyframeLocation location = playerSession.getCurrentCamera();
+        this.setPosition(location.getX(), location.getY(), location.getZ());
+        this.setRotation(location.getYaw(), location.getPitch());
+        this.rotation.rotateZ(-(float) Math.toRadians(location.getRoll()));
 
-        LocalPlayer localPlayer = Minecraft.getInstance().player;
-        if (localPlayer == null) return;
-
-        PlayerSession playerSession = NarrativeCraftMod.getInstance().getPlayerSession();
-
-        keyframePreviewAction(playerSession);
-        cutscenePlaying(playerSession);
-        storyCurrentCamera();
-
-    }
-
-    private void keyframePreviewAction(PlayerSession playerSession) {
-
-        KeyframeControllerBase keyframeControllerBase = playerSession.getKeyframeControllerBase();
-        if (keyframeControllerBase == null) return;
-
-        Keyframe keyframePreview = keyframeControllerBase.getCurrentPreviewKeyframe();
-        if (keyframePreview == null) return;
-
-        Minecraft client = Minecraft.getInstance();
-        LocalPlayer localPlayer = client.player;
-
-        KeyframeCoordinate position = keyframePreview.getKeyframeCoordinate();
-        if(position == null) return;
-        localPlayer.setPos(position.getX(), position.getY() - localPlayer.getEyeHeight(), position.getZ());
-        localPlayer.setYRot(position.getYRot());
-        localPlayer.setYHeadRot(position.getYRot());
-        localPlayer.setXRot(position.getXRot());
-
-        this.setPosition(position.getX(), position.getY(), position.getZ());
-        this.setRotation(position.getYRot(), position.getXRot());
-        this.rotation.rotateZ(-(float) Math.toRadians(position.getZRot()));
-
-        client.options.setCameraType(CameraType.FIRST_PERSON);
-        client.options.hideGui = true;
-
-    }
-
-    private void cutscenePlaying(PlayerSession playerSession) {
-        Minecraft client = Minecraft.getInstance();
-        CutscenePlayback cutscenePlayback = playerSession.getCutscenePlayback();
-        if(cutscenePlayback == null) return;
-
-        LocalPlayer localPlayer = client.player;
-        KeyframeCoordinate position = cutscenePlayback.next();
-        if(position == null) return;
-        localPlayer.setPos(position.getX(), position.getY(), position.getZ());
-        localPlayer.setYRot(position.getYRot());
-        localPlayer.setXRot(position.getXRot());
-
-        this.setPosition(position.getX(), position.getY(), position.getZ());
-        this.setRotation(position.getYRot(), position.getXRot());
-        this.rotation.rotateZ(-(float) Math.toRadians(position.getZRot()));
-        client.options.setCameraType(CameraType.FIRST_PERSON);
-        client.options.hideGui = true;
-
-    }
-
-    private void storyCurrentCamera() {
-        Minecraft client = Minecraft.getInstance();
-        StoryHandler storyHandler = NarrativeCraftMod.getInstance().getStoryHandler();
-        if(storyHandler == null) return;
-
-        KeyframeCoordinate position = storyHandler.getPlayerSession().getSoloCam();
-        if(position == null) return;
-
-        LocalPlayer localPlayer = client.player;
-        localPlayer.setPos(position.getX(), position.getY() - localPlayer.getEyeHeight(), position.getZ());
-        localPlayer.setYRot(position.getYRot());
-        localPlayer.setYHeadRot(position.getYRot());
-        localPlayer.setXRot(position.getXRot());
-        this.setPosition(position.getX(), position.getY(), position.getZ());
-        this.setRotation(position.getYRot(), position.getXRot());
-        this.rotation.rotateZ(-(float) Math.toRadians(position.getZRot()));
-
-        client.options.setCameraType(CameraType.FIRST_PERSON);
-        client.options.hideGui = true;
-
+        player.setPos(location.getPosition().add(0, 5, 0));
+        player.setXRot(location.getPitch());
+        player.setYRot(location.getYaw());
+        player.setYHeadRot(location.getYaw());
     }
 }

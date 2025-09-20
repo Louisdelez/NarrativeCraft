@@ -1,108 +1,86 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.commands.RecordCommand;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.items.CutsceneEditItems;
-import fr.loudo.narrativecraft.keys.ModKeys;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.KeyframeControllerBase;
-import fr.loudo.narrativecraft.narrative.recordings.Recording;
+import fr.loudo.narrativecraft.managers.PlayerSessionManager;
+import fr.loudo.narrativecraft.managers.RecordingManager;
+import fr.loudo.narrativecraft.narrative.NarrativeEntryInit;
+import fr.loudo.narrativecraft.narrative.recording.Recording;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.screens.mainScreen.MainScreen;
-import fr.loudo.narrativecraft.utils.ConstantsLink;
-import fr.loudo.narrativecraft.utils.FakePlayer;
-import fr.loudo.narrativecraft.utils.Translation;
-import fr.loudo.narrativecraft.utils.Utils;
+import fr.loudo.narrativecraft.util.FakePlayer;
+import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.ChatFormatting;
-import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.ConfirmScreen;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
-
-import java.net.URI;
 
 public class OnPlayerServerConnection {
 
     public static void playerJoin(ServerPlayer player) {
-        if(player instanceof FakePlayer) return;
-        NarrativeCraftMod.playingOnIncompatibleWorld = false;
-        Minecraft minecraft = Minecraft.getInstance();
-        CutsceneEditItems.init(player.registryAccess());
+        if (player instanceof FakePlayer) return;
+        initSession(player);
         NarrativeCraftMod.getInstance().setNarrativeWorldOption(NarrativeCraftFile.loadWorldOptions());
         NarrativeCraftMod.getInstance().setNarrativeClientOptions(NarrativeCraftFile.loadUserOptions());
-        NarrativeWorldOption worldOption = NarrativeCraftMod.getInstance().getNarrativeWorldOption();
-        if(worldOption.stringMcVersion.isEmpty()) {
-            worldOption.stringMcVersion = SharedConstants.getCurrentVersion().name();
-            NarrativeCraftFile.updateWorldOptions(worldOption);
+        if (player.hasPermissions(2) && NarrativeEntryInit.hasError) {
+            player.sendSystemMessage(Translation.message("crash.narrative-data").withStyle(ChatFormatting.RED));
         }
-        if(NarrativeCraftMod.firstTime) {
-            MutableComponent inkyLink = Component.literal("Inky").withStyle(style ->
-                    style.withColor(ChatFormatting.YELLOW)
-                            .withUnderlined(true)
-                            .withClickEvent(new ClickEvent.OpenUrl(URI.create(ConstantsLink.INKY)))
-            );
-            MutableComponent docLink = Component.literal(ConstantsLink.DOCS).withStyle(style ->
-                    style.withUnderlined(true).
-                            withClickEvent(new ClickEvent.OpenUrl(URI.create(ConstantsLink.DOCS)))
-            );
-            MutableComponent discordLink = Component.literal("discord").withStyle(style ->
-                    style.withColor(ChatFormatting.BLUE)
-                            .withUnderlined(true)
-                            .withClickEvent(new ClickEvent.OpenUrl(URI.create(ConstantsLink.DISCORD)))
-            );
-            player.sendSystemMessage(Translation.message("user.first_time",
-                    ModKeys.OPEN_STORY_MANAGER.getDefaultKey().getDisplayName(),
-                    inkyLink,
-                    docLink,
-                    discordLink
-            ));
-        } else {
-            if(!NarrativeCraftFile.getStoryFile().exists()) return;
-            if(!SharedConstants.getCurrentVersion().name().equals(worldOption.stringMcVersion)) {
-                ConfirmScreen confirmScreen = new ConfirmScreen(b -> {
-                    if(b) {
-                        showMainScreen(worldOption, minecraft);
-                        NarrativeCraftMod.playingOnIncompatibleWorld = true;
-                    } else {
-                        Utils.disconnectPlayer(minecraft);
-                    }
-                }, Component.literal(""), Translation.message("screen.incompatible-version", worldOption.stringMcVersion, SharedConstants.getCurrentVersion().name()),
-                        CommonComponents.GUI_YES, CommonComponents.GUI_NO);
-                minecraft.execute(() -> Minecraft.getInstance().setScreen(confirmScreen));
-            } else {
-                showMainScreen(worldOption, minecraft);
-            }
-        }
-    }
-
-    private static void showMainScreen(NarrativeWorldOption worldOption, Minecraft minecraft) {
-        if(worldOption.showMainScreen) {
-            MainScreen mainScreen = new MainScreen(false, false);
-            minecraft.execute(() -> Minecraft.getInstance().setScreen(mainScreen));
+        CutsceneEditItems.init(player.registryAccess());
+        PlayerSession playerSession =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
+        if (NarrativeCraftMod.getInstance().getNarrativeWorldOption().showMainScreen) {
+            MainScreen mainScreen = new MainScreen(playerSession, false, false);
+            Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(mainScreen));
         }
     }
 
     public static void playerLeave(ServerPlayer player) {
-        if(player instanceof FakePlayer) return;
-        PlayerSession playerSession = NarrativeCraftMod.getInstance().getPlayerSession();
-        KeyframeControllerBase keyframeControllerBase = playerSession.getKeyframeControllerBase();
-        if(keyframeControllerBase != null) {
-            keyframeControllerBase.stopSession(true);
-        }
-        Recording recording = NarrativeCraftMod.getInstance().getRecordingHandler().getRecordingOfPlayer(player);
-        if(recording != null) {
+        if (player instanceof FakePlayer) return;
+        clearSession(player);
+        RecordCommand.playerTryingOverride.remove(player);
+        // If player is recording while leaving, then stop it and remove recording from manager.
+        RecordingManager recordingManager = NarrativeCraftMod.getInstance().getRecordingManager();
+        Recording recording = recordingManager.getRecording(player);
+        if (recording != null && recording.isRecording()) {
             recording.stop();
         }
-        StoryHandler storyHandler = NarrativeCraftMod.getInstance().getStoryHandler();
-        if(storyHandler != null) {
-            storyHandler.stop(true);
-        }
-        NarrativeCraftFile.updateWorldOptions(NarrativeCraftMod.getInstance().getNarrativeWorldOption());
+        recordingManager.removeRecording(recording);
     }
 
+    private static void initSession(ServerPlayer player) {
+        PlayerSession playerSession = new PlayerSession(player);
+        NarrativeCraftMod.getInstance().getPlayerSessionManager().addSession(playerSession);
+    }
+
+    private static void clearSession(ServerPlayer player) {
+        PlayerSessionManager playerSessionManager =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager();
+        PlayerSession playerSession = playerSessionManager.getSessionByPlayer(player);
+        if (playerSession == null) return;
+        playerSessionManager.removeSession(playerSession);
+    }
 }

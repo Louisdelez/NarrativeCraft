@@ -1,6 +1,31 @@
 plugins {
-    // see https://fabricmc.net/develop/ for new versions
-    id 'fabric-loom' version '1.11-SNAPSHOT' apply false
-    // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
-    id 'net.neoforged.moddev' version '2.0.105' apply false
+	id 'java'
+	// see https://fabricmc.net/develop/ for new versions
+	id 'fabric-loom' version '1.11-SNAPSHOT' apply false
+	// see https://projects.neoforged.net/neoforged/moddevgradle for new versions
+	id 'net.neoforged.moddev' version '2.0.105' apply false
+
+	id 'com.diffplug.spotless' version '7.2.1'
+}
+
+repositories {
+	mavenCentral()
+}
+
+spotless {
+	format 'misc', {
+		target '*.gradle', '.gitattributes', '.gitignore'
+
+		trimTrailingWhitespace()
+		leadingSpacesToTabs()
+		endWithNewline()
+	}
+	java {
+		target 'common/src/main/java/**/*.java',
+				'common/src/test/java/**/*.java',
+				'fabric/src/main/java/**/*.java',
+				'neoforge/src/main/java/**/*.java'
+		palantirJavaFormat()
+		licenseHeaderFile 'config/license-header.txt'
+	}
 }

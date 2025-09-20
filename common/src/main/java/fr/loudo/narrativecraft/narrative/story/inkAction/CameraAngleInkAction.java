@@ -1,103 +1,113 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.narrative.story.inkAction;
 
-import fr.loudo.narrativecraft.narrative.chapter.scenes.Scene;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cameraAngle.CameraAngle;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cameraAngle.CameraAngleController;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cameraAngle.CameraAngleGroup;
-import fr.loudo.narrativecraft.narrative.recordings.playback.Playback;
-import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.narrative.story.inkAction.enums.InkTagType;
-import fr.loudo.narrativecraft.narrative.story.inkAction.validation.ErrorLine;
-import fr.loudo.narrativecraft.utils.Translation;
-import fr.loudo.narrativecraft.utils.Utils;
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
+import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
+import fr.loudo.narrativecraft.controllers.cameraAngle.CameraAngleController;
+import fr.loudo.narrativecraft.narrative.Environment;
+import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.CameraAngle;
+import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
+import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
+import fr.loudo.narrativecraft.narrative.keyframes.cameraAngle.CameraAngleKeyframe;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.util.Translation;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.Entity;
 
 public class CameraAngleInkAction extends InkAction {
 
-    private String child;
+    private CameraAngle cameraAngle;
+    private CameraAngleKeyframe keyframe;
 
-    public CameraAngleInkAction(StoryHandler storyHandler, String command) {
-        super(storyHandler, InkTagType.CAMERA_ANGLE, command);
+    public CameraAngleInkAction(String id, Side side, String syntax, CommandMatcher matcher) {
+        super(id, side, syntax, matcher);
     }
 
     @Override
-    public InkActionResult execute() {
-        if(command.length < 3) {
-            return InkActionResult.error(this.getClass(), Translation.message("validation.camera_angle_missing_parent").getString());
+    protected InkActionResult doValidate(List<String> arguments, Scene scene) {
+        if (arguments.size() < 2) {
+            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Camera angle parent name missing"));
         }
-        storyHandler.getPlayerSession().setSoloCam(null);
-        name = InkAction.parseName(command, 2);
-        child = InkAction.parseName(command, command.length - 1);
-        CameraAngleGroup cameraAngleGroup = storyHandler.getPlayerSession().getScene().getCameraAnglesGroupByName(name);
-        if(cameraAngleGroup == null) {
-            return InkActionResult.error(this.getClass(), Translation.message("validation.camera_angle_parent", name).getString());
+        if (arguments.size() < 3) {
+            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Camera angle child name missing"));
         }
-        CameraAngle cameraAngle = cameraAngleGroup.getCameraAngleByName(child);
-        if(cameraAngle == null) {
-            return InkActionResult.error(this.getClass(), Translation.message("validation.camera_angle_child", child, name).getString());
+        String parentName = arguments.get(1);
+        if (scene == null) return InkActionResult.ignored();
+        cameraAngle = scene.getCameraAngleByName(parentName);
+        if (cameraAngle == null) {
+            return InkActionResult.error(Translation.message("camera_angle.no_exists", parentName, scene.getName()));
         }
-        executeCameraAngle(cameraAngleGroup, cameraAngle);
-        sendDebugDetails();
-        return InkActionResult.pass();
-    }
-
-    private void executeCameraAngle(CameraAngleGroup cameraAngleGroup, CameraAngle cameraAngle) {
-        CameraAngleController cameraAngleController = (CameraAngleController) storyHandler.getPlayerSession().getKeyframeControllerBase();
-        if(cameraAngleController == null) {
-            cameraAngleController = new CameraAngleController(cameraAngleGroup, Utils.getServerPlayerByUUID(Minecraft.getInstance().player.getUUID()), Playback.PlaybackType.PRODUCTION);
-            cameraAngleController.startSession();
-            storyHandler.getPlayerSession().setKeyframeControllerBase(cameraAngleController);
+        String childName = arguments.get(2);
+        keyframe = cameraAngle.getCameraAngleKeyframeByName(childName);
+        if (keyframe == null) {
+            return InkActionResult.error(Translation.message("camera_angle.keyframe_no_exists", childName, parentName));
         }
-        cameraAngleController.setCurrentPreviewKeyframe(cameraAngle);
+        return InkActionResult.ok();
     }
 
     @Override
-    void sendDebugDetails() {
-        if(storyHandler.isDebugMode()) {
-            Minecraft.getInstance().player.displayClientMessage(Translation.message("debug.camera_angle", name, child), false);
+    protected InkActionResult doExecute(PlayerSession playerSession) {
+        if (playerSession.getController() instanceof CameraAngleController cameraAngleController) {
+            playerSession.getInkActions().removeIf(inkAction -> inkAction instanceof CameraAngleInkAction);
+            if (!cameraAngleController.getCameraAngle().getName().equalsIgnoreCase(cameraAngle.getName())) {
+                clear(playerSession);
+            }
+        } else if (!(playerSession.getController() instanceof CameraAngleController)) {
+            clear(playerSession);
         }
+        playerSession.setCurrentCamera(keyframe.getKeyframeLocation());
+        Minecraft.getInstance().options.hideGui = true;
+        return InkActionResult.ok();
+    }
+
+    private void clear(PlayerSession playerSession) {
+        // Remove characters that exists in the story
+        List<CharacterRuntime> toRemove = new ArrayList<>();
+        for (CharacterStoryData characterStoryData : cameraAngle.getCharacterStoryDataList()) {
+            for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+                if (characterStoryData
+                        .getCharacterStory()
+                        .getName()
+                        .equalsIgnoreCase(characterRuntime.getCharacterStory().getName())) {
+                    if (characterRuntime.getEntity() == null) continue;
+                    characterRuntime.getEntity().remove(Entity.RemovalReason.KILLED);
+                    toRemove.add(characterRuntime);
+                }
+            }
+        }
+        playerSession.getCharacterRuntimes().removeAll(toRemove);
+        CameraAngleController controller =
+                new CameraAngleController(Environment.PRODUCTION, playerSession.getPlayer(), cameraAngle);
+        controller.startSession();
     }
 
     @Override
-    public ErrorLine validate(String[] command, int line, String lineText, Scene scene) {
-        if(command.length < 3) {
-            return new ErrorLine(
-                    line,
-                    scene,
-                    Translation.message("validation.camera_angle_missing_parent").getString(),
-                    lineText, false
-            );
-        }
-        if(command.length < 4) {
-            return new ErrorLine(
-                    line,
-                    scene,
-                    Translation.message("validation.camera_angle_missing_child").getString(),
-                    lineText, false
-            );
-        }
-        String parent = InkAction.parseName(command, 2);
-        String child = InkAction.parseName(command, command.length - 1);
-        CameraAngleGroup cameraAngleGroup = scene.getCameraAnglesGroupByName(parent);
-        if(cameraAngleGroup == null) {
-            return new ErrorLine(
-                    line,
-                    scene,
-                    Translation.message("validation.camera_angle_parent", parent).getString(),
-                    lineText, false
-            );
-        }
-        CameraAngle cameraAngle = cameraAngleGroup.getCameraAngleByName(child);
-        if(cameraAngle == null) {
-            return new ErrorLine(
-                    line,
-                    scene,
-                    Translation.message("validation.camera_angle_child", child, parent).getString(),
-                    lineText, false
-            );
-        }
-        return null;
+    public boolean needScene() {
+        return true;
     }
-
-
 }

@@ -1,915 +1,442 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.narrative.story;
 
 import com.bladecoder.ink.runtime.Story;
-import com.bladecoder.ink.runtime.StoryException;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
+import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
-import fr.loudo.narrativecraft.mixin.fields.PlayerListFields;
+import fr.loudo.narrativecraft.hud.StoryDebugHud;
+import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.Scene;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.keyframes.KeyframeCoordinate;
+import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
-import fr.loudo.narrativecraft.narrative.dialog.Dialog;
-import fr.loudo.narrativecraft.narrative.dialog.Dialog2d;
-import fr.loudo.narrativecraft.narrative.dialog.DialogData;
-import fr.loudo.narrativecraft.narrative.dialog.DialogImpl;
-import fr.loudo.narrativecraft.narrative.recordings.playback.Playback;
+import fr.loudo.narrativecraft.narrative.dialog.*;
+import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandlerException;
+import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.narrative.story.inkAction.InkAction;
-import fr.loudo.narrativecraft.narrative.story.inkAction.SongSfxInkAction;
-import fr.loudo.narrativecraft.narrative.story.inkAction.enums.InkTagType;
-import fr.loudo.narrativecraft.narrative.story.inkAction.validation.ErrorLine;
-import fr.loudo.narrativecraft.narrative.story.text.ParsedDialog;
+import fr.loudo.narrativecraft.options.NarrativeClientOption;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
-import fr.loudo.narrativecraft.platform.Services;
-import fr.loudo.narrativecraft.screens.choices.ChoicesScreen;
 import fr.loudo.narrativecraft.screens.components.CrashScreen;
-import fr.loudo.narrativecraft.screens.credits.CreditsScreen;
-import fr.loudo.narrativecraft.utils.FakePlayer;
-import fr.loudo.narrativecraft.utils.Translation;
-import fr.loudo.narrativecraft.utils.Utils;
-import net.minecraft.ChatFormatting;
-import net.minecraft.CrashReport;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.GameType;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import fr.loudo.narrativecraft.screens.credits.CreditScreen;
+import fr.loudo.narrativecraft.screens.story.StoryChoicesScreen;
+import fr.loudo.narrativecraft.util.Util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.Entity;
 
 public class StoryHandler {
 
-    private static final long AUTO_SKIP_MULTIPLIER = 80L;
-    private static final int FIRST_CHAPTER_INDEX = 1;
+    private final NarrativeWorldOption worldOption =
+            NarrativeCraftMod.getInstance().getNarrativeWorldOption();
+    private final NarrativeClientOption clientOption =
+            NarrativeCraftMod.getInstance().getNarrativeClientOptions();
+    private final Minecraft minecraft = Minecraft.getInstance();
+    public static final String DIALOG_REGEX = "^(\\w+)\\s*:\\s*(.+?)\\s*$";
 
     private final PlayerSession playerSession;
-    private final InkTagTranslators inkTagTranslators;
-
-    private Chapter chapterToLoad;
-    private Scene sceneToLoad;
-
-    private final List<CharacterStory> currentCharacters;
-    private final List<TypedSoundInstance> typedSoundInstanceList;
-    private final List<InkAction> inkActionList;
-
-    private StorySave save;
+    private final StoryDebugHud storyDebugHud;
+    private DialogData dialogData = new DialogData(DialogData.globalDialogData);
     private Story story;
-    private DialogData globalDialogValue;
+    private String dialogText;
+    private boolean loadScene, debugMode, firstLoad, hasError;
 
-    private String currentDialog;
-    private String currentCharacterTalking;
-    private DialogImpl currentDialogBox;
-
-    private KeyframeCoordinate currentKeyframeCoordinate;
-
-    private boolean debugMode;
-    private boolean isLoading;
-    private boolean isSaving;
-
-    public StoryHandler() {
-        this.playerSession = NarrativeCraftMod.getInstance().getPlayerSession();
-        this.currentCharacters = new ArrayList<>();
-        this.inkTagTranslators = new InkTagTranslators(this);
-        this.typedSoundInstanceList = new ArrayList<>();
-        this.inkActionList = new ArrayList<>();
-        this.save = NarrativeCraftFile.getSave();
-        this.isSaving = false;
+    public StoryHandler(PlayerSession playerSession) {
+        this.playerSession = playerSession;
+        Chapter firstChapter =
+                NarrativeCraftMod.getInstance().getChapterManager().getChapterByIndex(1);
+        playerSession.setChapter(firstChapter);
+        playerSession.setScene(firstChapter.getSortedSceneList().getFirst());
+        storyDebugHud = new StoryDebugHud(playerSession);
     }
 
-    public StoryHandler(Chapter chapter, Scene scene) {
-        this();
-        chapterToLoad = chapter;
-        sceneToLoad = scene;
+    public StoryHandler(Chapter chapter, PlayerSession playerSession) {
+        this.playerSession = playerSession;
+        playerSession.setChapter(chapter);
+        playerSession.setScene(chapter.getSortedSceneList().getFirst());
+        storyDebugHud = new StoryDebugHud(playerSession);
     }
 
-    public void start() {
-        Minecraft.getInstance().gui.getChat().clearMessages(true);
-        if (isChaptersEmpty()) return;
-
-        try {
-            initializeStory();
-            loadStoryState();
-
-            if (next() && !debugMode) {
-                NarrativeCraftFile.writeSave(this, true);
-            }
-        } catch (Exception e) {
-            crash(e, false);
-        }
-    }
-
-    public void stop(boolean force) {
-        if (!isRunning()) return;
-
-        if (!force) {
-            showCreditsScreen();
-        }
-
-        cleanup();
-    }
-
-    public boolean next() {
-        try {
-            if (shouldStopStory()) {
-                stop(false);
-                return false;
-            }
-
-            if (shouldShowChoices()) {
-                showChoices();
-                return false;
-            }
-
-            processStoryContent();
-            updatePlayerSession();
-            executeInkTags();
-            if(story == null) return false;
-
-            save = null;
-            handleSceneValidation();
-            updateCutsceneMode();
-
-        } catch (StoryException e) {
-            crash(createStoryException(e), true);
-            return false;
-        } catch (Exception e) {
-            crash(e, false);
-            return false;
-        }
-
-        return true;
-    }
-
-    public void crash(Exception exception, boolean creatorFault) {
-        stop(true);
-
-        String message = exception.getMessage();
-        if(NarrativeCraftMod.playingOnIncompatibleWorld) {
-            message += "\nThis crash happened on an incompatible version world";
-        }
-        CrashReport report = new CrashReport(message, exception);
-        if(!creatorFault) {
-            Minecraft.saveReport(NarrativeCraftFile.mainDirectory, report);
-        }
-
-        if (debugMode) {
-            handleDebugModeCrash(exception, creatorFault, report);
-        } else {
-            showCrashScreen(creatorFault, report);
-        }
-    }
-
-    public void showChoices() {
-        if (hasCurrentChoices()) {
-            endCurrentDialog();
-
-            ChoicesScreen choicesScreen = new ChoicesScreen(story.getCurrentChoices(), true);
-            Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(choicesScreen));
-        }
-    }
-
-    public void choiceChoiceIndex(int index) {
-        try {
-            story.chooseChoiceIndex(index);
-            story.getCurrentChoices().clear();
-            next();
-        } catch (Exception ignored) {}
-    }
-
-    public void showDialog() {
-        ParsedDialog parsed = ParsedDialog.parse(currentDialog);
-
-        validateCurrentDialog();
-
-        if (shouldReuseDialog(parsed)) {
-            reuseExistingDialog(parsed);
-        } else {
-            if (shouldEndCurrentDialog()) {
-                currentDialogBox.endDialog();
-                return;
-            }
-
-            createNewDialog(parsed);
-        }
-
-        if(currentDialogBox == null) return;
-        updateCurrentCharacterTalking(parsed.characterName());
-        configureAutoSkip();
-        currentDialogBox.getDialogAnimationScrollText().loadTextEffects(currentDialog);
-    }
-
-    public void addCharacter(CharacterStory characterStory) {
-        if (!characterInStory(characterStory)) {
-            currentCharacters.add(characterStory);
-        }
-    }
-
-    public void removeCharacter(CharacterStory characterStory) {
-        if (characterInStory(characterStory)) {
-            destroyCharacterEntity(characterStory);
-        }
-        currentCharacters.remove(characterStory);
-    }
-
-    public boolean characterInStory(CharacterStory characterStory) {
-        return currentCharacters.stream()
-                .anyMatch(character -> character.getName().equals(characterStory.getName()));
-    }
-
-    public CharacterStory getCharacter(String name) {
-        return currentCharacters.stream()
-                .filter(character -> character.getName().equalsIgnoreCase(name))
-                .findFirst()
-                .orElse(null);
-    }
-
-    public TypedSoundInstance playSound(SoundEvent sound, float volume, float pitch, boolean loop, SongSfxInkAction.SoundType soundType) {
-        TypedSoundInstance soundInstance = new TypedSoundInstance(
-                sound.location(), SoundSource.MASTER, volume, pitch, loop, soundType
-        );
-        typedSoundInstanceList.add(soundInstance);
-        Minecraft.getInstance().getSoundManager().play(soundInstance);
-        return soundInstance;
-    }
-
-    public void stopSound(SoundEvent sound) {
-        typedSoundInstanceList.stream()
-                .filter(instance -> matchesSoundEvent(instance, sound))
-                .forEach(instance -> Minecraft.getInstance().getSoundManager().stop(instance));
-    }
-
-    public void stopAllSoundByType(SongSfxInkAction.SoundType soundType) {
-        typedSoundInstanceList.stream()
-                .filter(instance -> instance.getSoundType() == soundType)
-                .forEach(instance -> Minecraft.getInstance().getSoundManager().stop(instance));
-    }
-
-    public void stopAllSound() {
-        typedSoundInstanceList.forEach(instance ->
-                Minecraft.getInstance().getSoundManager().stop(instance));
-    }
-
-    public static List<ErrorLine> validateStory() {
-        List<ErrorLine> errorLineList = new ArrayList<>();
-        Pattern inlineTagPattern = Pattern.compile("#[^#]*?(?=\\s*#|$)");
-        Pattern commentPattern = Pattern.compile("^\\s*//");
-
-        for (Chapter chapter : NarrativeCraftMod.getInstance().getChapterManager().getChapters()) {
-            for (Scene scene : chapter.getSceneList()) {
-                validateScene(scene, errorLineList, inlineTagPattern, commentPattern);
-            }
-        }
-
-        return errorLineList;
-    }
-
-    public void save(boolean newScene) {
-        if (!debugMode && NarrativeCraftFile.writeSave(this, newScene)) {
-            isSaving = true;
-            StorySave.startTimeSaveIcon = System.currentTimeMillis();
-        }
-    }
-
-    public static void changePlayerCutsceneMode(Playback.PlaybackType playbackType, boolean state) {
-        ServerPlayer serverPlayer = Utils.getServerPlayerByUUID(Minecraft.getInstance().player.getUUID());
-
-        if (state) {
-            serverPlayer.setGameMode(GameType.SPECTATOR);
-        } else {
-            GameType gameMode = (playbackType == Playback.PlaybackType.DEVELOPMENT)
-                    ? GameType.CREATIVE
-                    : GameType.ADVENTURE;
-            serverPlayer.setGameMode(gameMode);
-            Minecraft.getInstance().options.hideGui = false;
-        }
-    }
-
-    private boolean isChaptersEmpty() {
-        return NarrativeCraftMod.getInstance().getChapterManager().getChapters().isEmpty();
-    }
-
-    public void initChapterSceneSession() {
-        if (story.getState().getCurrentKnot() == null) return;
-
-        String[] chapterSceneName = story.getState().getCurrentKnot().split("_");
-        int chapterIndex = Integer.parseInt(chapterSceneName[1]);
-
-        List<String> splitSceneName = Arrays.stream(chapterSceneName)
-                .toList()
-                .subList(2, chapterSceneName.length);
-        String sceneName = String.join(" ", splitSceneName);
-
-        Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getChapterByIndex(chapterIndex);
-        Scene scene = chapter.getSceneByName(sceneName);
-
+    public StoryHandler(Chapter chapter, Scene scene, PlayerSession playerSession) {
+        this.playerSession = playerSession;
         playerSession.setChapter(chapter);
         playerSession.setScene(scene);
-    }
-
-    private void initializeStory() throws Exception {
-        stopExistingStoryHandler();
-        stopExistingKeyframeBase();
-        NarrativeCraftMod.getInstance().setStoryHandler(this);
-
-        inkActionList.clear();
-        globalDialogValue = new DialogData(DialogData.globalDialogData);
-
-        reloadCharacterSkins();
-        initStoryFromFile();
-    }
-
-    private void stopExistingStoryHandler() {
-        StoryHandler existingHandler = NarrativeCraftMod.getInstance().getStoryHandler();
-        if (existingHandler != null) {
-            existingHandler.stop(true);
-        }
-    }
-
-    private void stopExistingKeyframeBase() {
-        if(playerSession.getKeyframeControllerBase() != null) {
-            playerSession.getKeyframeControllerBase().stopSession(false);
-        }
-    }
-
-
-    private void reloadCharacterSkins() {
-        NarrativeCraftMod.getInstance().getCharacterManager().reloadSkins();
-
-        for (Chapter chapter : NarrativeCraftMod.getInstance().getChapterManager().getChapters()) {
-            for (Scene scene : chapter.getSceneList()) {
-                for (CharacterStory npc : scene.getNpcs()) {
-                    NarrativeCraftMod.getInstance().getCharacterManager().reloadSkin(npc);
-                }
-            }
-        }
-    }
-
-    private void initStoryFromFile() throws Exception, IOException {
-        String content = NarrativeCraftFile.getStoryContent();
-        story = new Story(content);
-    }
-
-    private void loadStoryState() throws Exception {
-        if (!debugMode && save != null && chapterToLoad == null && sceneToLoad == null) {
-            loadFromSave();
-        } else {
-            loadFromSession();
-        }
-    }
-
-    private void loadFromSave() throws Exception {
-        story.getState().loadJson(save.getInkSave());
-
-        if (playerSession.getScene() == null) {
-            loadPlayerSessionFromSave();
-            executeTagsFromSave();
-        }
-    }
-
-    private void loadPlayerSessionFromSave() {
-        PlayerSession playerSessionFromSave = save.getPlayerSession();
-        playerSession.setChapter(playerSessionFromSave.getChapter());
-        playerSession.setScene(playerSessionFromSave.getScene());
-    }
-
-    private void executeTagsFromSave() {
-        for (String tag : save.getTagList()) {
-            inkTagTranslators.executeTag(tag);
-        }
-    }
-
-    private void loadFromSession() throws Exception {
-        if (sceneToLoad != null) {
-            loadSpecificScene(sceneToLoad);
-        } else {
-            loadFirstScene();
-        }
-    }
-
-    private void loadSpecificScene(Scene loadScene) throws Exception {
-        story.choosePathString(NarrativeCraftFile.getChapterSceneSnakeCase(loadScene));
-        playerSession.setChapter(loadScene.getChapter());
-        playerSession.setScene(loadScene);
-        save = null;
-    }
-
-    private void loadFirstScene() {
-        if (save == null) {
-            Chapter firstChapter = getFirstChapter();
-            if (hasScenes(firstChapter)) {
-                Scene firstScene = firstChapter.getSortedSceneList().getFirst();
-                playerSession.setChapter(firstChapter);
-                playerSession.setScene(firstScene);
-            }
-        }
-    }
-
-    private Chapter getFirstChapter() {
-        return NarrativeCraftMod.getInstance().getChapterManager().getChapterByIndex(FIRST_CHAPTER_INDEX);
-    }
-
-    private boolean hasScenes(Chapter chapter) {
-        return !NarrativeCraftMod.getInstance().getChapterManager().getChapters().getFirst().getSceneList().isEmpty();
-    }
-
-    private boolean shouldStopStory() {
-        return !story.canContinue() && story.getCurrentChoices().isEmpty() && save == null;
-    }
-
-    private boolean shouldShowChoices() {
-        return !story.getCurrentChoices().isEmpty() && save == null;
-    }
-
-    private void processStoryContent() throws Exception {
-        if (save != null) {
-            processFromSave();
-        } else {
-            currentDialog = story.Continue();
-        }
-    }
-
-    private void processFromSave() throws Exception {
-        currentDialog = story.getCurrentText();
-        boolean isNewScene = story.getCurrentTags().contains("on enter") &&
-                !story.getCurrentTags().contains("save");
-
-        processTagsFromSave(isNewScene);
-        loadPlayerSessionData();
-        loadCharactersFromSave();
-        loadDialogFromSave();
-    }
-
-    private void processTagsFromSave(boolean isNewScene) throws Exception {
-        int breakIndex = findTagBreakIndex(isNewScene);
-        List<String> oldTags = List.copyOf(story.getCurrentTags());
-
-        story.getCurrentTags().clear();
-        for (int i = breakIndex; i < oldTags.size(); i++) {
-            story.getCurrentTags().add(oldTags.get(i));
-        }
-    }
-
-    private int findTagBreakIndex(boolean isNewScene) throws Exception {
-        int breakIndex = 0;
-        for (String tag : story.getCurrentTags()) {
-            breakIndex++;
-            if ((isNewScene && tag.equals("on enter")) || (!isNewScene && tag.equals("save"))) {
-                break;
-            }
-        }
-        return breakIndex;
-    }
-
-    private void loadPlayerSessionData() {
-        PlayerSession playerSessionFromSave = save.getPlayerSession();
-        playerSession.setKeyframeControllerBase(playerSessionFromSave.getKeyframeControllerBase());
-        playerSession.setSoloCam(playerSessionFromSave.getSoloCam());
-    }
-
-    private void loadCharactersFromSave() {
-        for (CharacterStoryData characterStoryData : save.getCharacterStoryDataList()) {
-            if (!characterStoryData.isOnlyTemplate()) {
-                characterStoryData.spawn(Utils.getServerLevel());
-                currentCharacters.add(characterStoryData.getCharacterStory());
-            }
-        }
-    }
-
-    private void loadDialogFromSave() {
-        if (save.getDialogSaveData() != null) {
-            DialogData dialogSaveData = save.getDialogSaveData();
-            globalDialogValue = dialogSaveData;
-
-            if (!currentCharacters.isEmpty()) {
-                if (isGlobalDialogOnly(dialogSaveData)) {
-                    showDialog();
-                } else {
-                    createDialogFromSaveData(dialogSaveData);
-                }
-            }
-        }
-    }
-
-    private boolean isGlobalDialogOnly(DialogData dialogSaveData) {
-        return dialogSaveData.getCharacterName() == null && dialogSaveData.getText() == null;
-    }
-
-    private void createDialogFromSaveData(DialogData dialogSaveData) {
-        Entity entity = findCharacterEntity(dialogSaveData.getCharacterName());
-
-        currentCharacterTalking = dialogSaveData.getCharacterName();
-        currentDialog = dialogSaveData.getText();
-
-        currentDialogBox = new Dialog(
-                entity,
-                ParsedDialog.parse(dialogSaveData.getText()).cleanedText(),
-                dialogSaveData.getTextColor(),
-                dialogSaveData.getBackgroundColor(),
-                dialogSaveData.getPaddingX(),
-                dialogSaveData.getPaddingY(),
-                dialogSaveData.getScale(),
-                dialogSaveData.getLetterSpacing(),
-                dialogSaveData.getGap(),
-                dialogSaveData.getMaxWidth(),
-                dialogSaveData.getOffset()
-        );
-
-        configureDialogFromSave(dialogSaveData);
-    }
-
-    private Entity findCharacterEntity(String characterName) {
-        return currentCharacters.stream()
-                .filter(character -> character.getName().equals(characterName))
-                .map(CharacterStory::getEntity)
-                .findFirst()
-                .orElse(null);
-    }
-
-    private void configureDialogFromSave(DialogData dialogSaveData) {
-        currentDialogBox.setUnSkippable(dialogSaveData.isUnSkippable());
-        currentDialogBox.setForcedEndTime(dialogSaveData.getEndForceEndTime());
-        ((Dialog) currentDialogBox).setCharacterName(dialogSaveData.getCharacterName());
-    }
-
-    private void updatePlayerSession() {
-        if (playerSession.getChapter() == null || playerSession.getScene() == null) {
-            initChapterSceneSession();
-        }
-    }
-
-    private void executeInkTags() throws Exception {
-        if (inkTagTranslators.executeCurrentTags()) {
-            if (!story.getCurrentChoices().isEmpty() && currentDialog.isEmpty()) {
-                showChoices();
-            } else {
-                showDialog();
-            }
-        } else {
-            endCurrentDialog();
-        }
-    }
-
-    private void handleSceneValidation() {
-        if (story.canContinue() && currentCharacters.isEmpty() &&
-                playerSession.getSoloCam() == null && playerSession.getKeyframeControllerBase() == null) {
-
-            stop(true);
-            showSceneLoadFailMessage();
-        }
-    }
-
-    private void showSceneLoadFailMessage() {
-        Component message = Component.literal(
-                        Translation.message("story.load.scene.fail").getString())
-                .withStyle(ChatFormatting.RED);
-        Minecraft.getInstance().player.displayClientMessage(message, false);
-    }
-
-    private void updateCutsceneMode() {
-        boolean inCutscene = playerSession.getSoloCam() != null ||
-                playerSession.getKeyframeControllerBase() != null;
-        changePlayerCutsceneMode(Playback.PlaybackType.PRODUCTION, inCutscene);
-    }
-
-    private Exception createStoryException(StoryException e) {
-        return new Exception(String.format("Chapter %s Scene %s\n%s",
-                playerSession.getChapter().getIndex(),
-                playerSession.getScene().getName(),
-                e.getMessage()));
-    }
-
-    private void showCreditsScreen() {
-        if (!debugMode) {
-            NarrativeWorldOption option = NarrativeCraftMod.getInstance().getNarrativeWorldOption();
-            boolean isFirstCompletion = option.finishedStory;
-
-            option.finishedStory = true;
-            NarrativeCraftFile.updateWorldOptions(option);
-
-            if(option.showCreditsScreen) {
-                CreditsScreen creditsScreen = new CreditsScreen(false, isFirstCompletion);
-                Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(creditsScreen));
-            }
-        }
-    }
-
-    private void cleanup() {
-        cleanupCharacters();
-        cleanupPlaybacks();
-        cleanupSounds();
-        resetState();
-    }
-
-    private void cleanupCharacters() {
-        currentCharacters.forEach(CharacterStory::kill);
-        currentCharacters.clear();
-    }
-
-    private void cleanupPlaybacks() {
-        NarrativeCraftMod.getInstance().getPlaybackHandler().getPlaybacks().forEach(Playback::forceStop);
-        NarrativeCraftMod.getInstance().getPlaybackHandler().getPlaybacks().clear();
-    }
-
-    private void cleanupSounds() {
-        typedSoundInstanceList.forEach(instance ->
-                Minecraft.getInstance().getSoundManager().stop(instance));
-    }
-
-    private void resetState() {
-        changePlayerCutsceneMode(Playback.PlaybackType.PRODUCTION, false);
-        currentKeyframeCoordinate = null;
-        story = null;
-        inkActionList.clear();
-        playerSession.reset();
-        NarrativeCraftMod.getInstance().setStoryHandler(null);
-    }
-
-    private void handleDebugModeCrash(Exception exception, boolean creatorFault, CrashReport report) {
-        Component message;
-        if (creatorFault) {
-            message = Translation.message("user.crash.his-fault")
-                    .withStyle(style -> style.withHoverEvent(
-                            new HoverEvent.ShowText(Component.literal(exception.getMessage()))))
-                    .withStyle(ChatFormatting.RED);
-        } else {
-            message = Translation.message("user.crash.not-his-fault")
-                    .withStyle(style -> style.withClickEvent(new ClickEvent.OpenFile(report.getSaveFile())))
-                    .withStyle(ChatFormatting.RED);
-        }
-
-        Minecraft.getInstance().player.displayClientMessage(message, false);
-    }
-
-    private void showCrashScreen(boolean creatorFault, CrashReport report) {
-        CrashScreen crashScreen = new CrashScreen(creatorFault, report);
-        Minecraft minecraft = Minecraft.getInstance();
-        minecraft.execute(() -> minecraft.setScreen(crashScreen));
-    }
-
-    private boolean hasCurrentChoices() {
-        return !story.getCurrentChoices().isEmpty();
-    }
-
-    private void endCurrentDialog() {
-        if (currentDialogBox != null) {
-            currentDialogBox.endDialogAndDontSkip();
-        }
-    }
-
-    private void validateCurrentDialog() {
-        if (currentDialogBox instanceof Dialog dialog) {
-            if (!dialog.getEntityServer().isAlive()) {
-                currentDialogBox = null;
-            }
-        }
-    }
-
-    private boolean shouldReuseDialog(ParsedDialog parsed) {
-        return parsed.characterName().equalsIgnoreCase(currentCharacterTalking) &&
-                currentDialogBox != null;
-    }
-
-    private void reuseExistingDialog(ParsedDialog parsed) {
-        currentDialogBox.getDialogAnimationScrollText().setText(parsed.cleanedText());
-        currentDialogBox.reset();
-    }
-
-    private boolean shouldEndCurrentDialog() {
-        return currentDialogBox != null &&
-                (!currentDialogBox.isDialogAutoSkipped() || NarrativeCraftMod.getInstance().getNarrativeClientOptions().autoSkip);
-    }
-
-    private void createNewDialog(ParsedDialog parsed) {
-        if (!parsed.characterName().isEmpty()) {
-            createCharacterDialog(parsed);
-        } else {
-            create2dDialog(parsed);
-        }
-        if(currentDialogBox == null) return;
-        configureDialog();
-    }
-
-    private void createCharacterDialog(ParsedDialog parsed) {
-        CharacterStory currentCharacter = getCharacter(parsed.characterName());
-        if (currentCharacter == null) {
-            crash(new Exception(Translation.message("user.crash.character_not_found",
-                    parsed.characterName(),
-                    playerSession.getChapter().getIndex(),
-                    playerSession.getScene().getName()).getString()), true);
-            return;
-        }
-
-        currentDialogBox = new Dialog(
-                currentCharacter.getEntity(),
-                parsed.cleanedText(),
-                globalDialogValue.getTextColor(),
-                globalDialogValue.getBackgroundColor(),
-                globalDialogValue.getPaddingX(),
-                globalDialogValue.getPaddingY(),
-                globalDialogValue.getScale(),
-                globalDialogValue.getLetterSpacing(),
-                globalDialogValue.getGap(),
-                globalDialogValue.getMaxWidth(),
-                globalDialogValue.getOffset()
-        );
-
-        configureCharacterDialog(currentCharacter);
-    }
-
-    private void configureCharacterDialog(CharacterStory currentCharacter) {
-        Dialog dialog = (Dialog) currentDialogBox;
-        dialog.getDialogEntityBobbing().setNoiseShakeStrength(globalDialogValue.getBobbingNoiseShakeStrength());
-        dialog.getDialogEntityBobbing().setNoiseShakeSpeed(globalDialogValue.getBobbingNoiseShakeSpeed());
-        dialog.setCharacterName(currentCharacter.getName());
-    }
-
-    private void create2dDialog(ParsedDialog parsed) {
-        currentDialogBox = new Dialog2d(
-                parsed.cleanedText(),
-                400, 90,
-                (int) globalDialogValue.getPaddingX(),
-                (int) globalDialogValue.getPaddingY(),
-                1.4f,
-                (int) globalDialogValue.getLetterSpacing(),
-                (int) globalDialogValue.getGap(),
-                30,
-                globalDialogValue.getTextColor(),
-                globalDialogValue.getBackgroundColor()
-        );
-    }
-
-    private void configureDialog() {
-        currentDialogBox.setUnSkippable(globalDialogValue.isUnSkippable());
-        currentDialogBox.setForcedEndTime(globalDialogValue.getEndForceEndTime());
-    }
-
-    private void updateCurrentCharacterTalking(String characterName) {
-        currentCharacterTalking = characterName;
-    }
-
-    private void configureAutoSkip() {
-        if (globalDialogValue.getEndForceEndTime() == 0 && NarrativeCraftMod.getInstance().getNarrativeClientOptions().autoSkip) {
-            long autoSkipTime = currentDialog.replaceAll("\\s+", "").length() * AUTO_SKIP_MULTIPLIER;
-            currentDialogBox.setForcedEndTime(autoSkipTime);
-        }
-    }
-
-    private void destroyCharacterEntity(CharacterStory characterStory) {
-        if (characterStory.getEntity() != null) {
-            characterStory.getEntity().remove(Entity.RemovalReason.KILLED);
-
-            if (characterStory.getEntity() instanceof FakePlayer fakePlayer) {
-                ((PlayerListFields) NarrativeCraftMod.server.getPlayerList())
-                        .getPlayersByUUID().remove(fakePlayer.getUUID());
-            }
-        }
-    }
-
-    private boolean matchesSoundEvent(SimpleSoundInstance instance, SoundEvent sound) {
-        String instancePath = instance.getSound().getLocation().getPath().replace("/", ".");
-        return instancePath.equals(sound.location().getPath());
-    }
-
-    private static void validateScene(Scene scene, List<ErrorLine> errorLineList,
-                                      Pattern inlineTagPattern, Pattern commentPattern) {
-        List<String> lines = NarrativeCraftFile.readSceneLines(scene);
-
-        for (int i = 0; i < lines.size(); i++) {
-            String line = lines.get(i);
-
-            if (commentPattern.matcher(line).find()) continue;
-
-            line = line.replaceFirst("^\\s+", "");
-
-            if (shouldValidateEnterTag(i, line)) {
-                addEnterTagError(errorLineList, i, scene, line);
-                break;
-            }
-
-            validateInlineTags(line, i, scene, errorLineList, inlineTagPattern);
-        }
-    }
-
-    private static boolean shouldValidateEnterTag(int lineIndex, String line) {
-        return lineIndex + 1 == 2 && !line.startsWith("#") && !line.contains("on enter");
-    }
-
-    private static void addEnterTagError(List<ErrorLine> errorLineList, int lineIndex,
-                                         Scene scene, String line) {
-        errorLineList.add(new ErrorLine(
-                lineIndex + 1,
-                scene,
-                Translation.message("validation.on_enter").getString(),
-                line,
-                false
-        ));
-    }
-
-    private static void validateInlineTags(String line, int lineIndex, Scene scene,
-                                           List<ErrorLine> errorLineList, Pattern inlineTagPattern) {
-        Matcher matcher = inlineTagPattern.matcher(line);
-
-        while (matcher.find()) {
-            String tag = extractTag(matcher.group());
-            String[] command = tag.split(" ");
-            InkTagType tagType = InkTagType.resolveType(tag);
-
-            if (tagType != null) {
-                validateTagType(tagType, command, lineIndex, matcher.group(), scene, errorLineList);
-            }
-        }
-    }
-
-    private static String extractTag(String rawTag) {
-        String tag = rawTag.trim();
-        if (tag.startsWith("#")) {
-            tag = tag.substring(1).trim();
-        }
-        return tag;
-    }
-
-    private static void validateTagType(InkTagType tagType, String[] command, int lineIndex,
-                                        String matchedGroup, Scene scene, List<ErrorLine> errorLineList) {
-        if (tagType == InkTagType.EMOTE) {
-            validateEmoteTag(lineIndex, scene, matchedGroup, errorLineList);
-        } else {
-            InkAction inkAction = tagType.getDefaultInstance();
-            if (inkAction != null) {
-                ErrorLine errorLine = inkAction.validate(command, lineIndex + 1, matchedGroup, scene);
-                if (errorLine != null) {
-                    errorLineList.add(errorLine);
-                }
-            }
-        }
-    }
-
-    private static void validateEmoteTag(int lineIndex, Scene scene, String matchedGroup,
-                                         List<ErrorLine> errorLineList) {
-        if (!Services.PLATFORM.isModLoaded("emotecraft")) {
-            errorLineList.add(new ErrorLine(
-                    lineIndex + 1,
-                    scene,
-                    Translation.message("validation.emotecraft").getString(),
-                    matchedGroup,
-                    false
-            ));
-        }
-    }
-
-    public PlayerSession getPlayerSession() {
-        return playerSession;
-    }
-
-    public List<CharacterStory> getCurrentCharacters() {
-        return currentCharacters;
+        loadScene = true;
+        storyDebugHud = new StoryDebugHud(playerSession);
     }
 
     public boolean isRunning() {
         return story != null;
     }
 
+    public boolean isFinished() {
+        return !story.canContinue() && story.getCurrentChoices().isEmpty() && !story.hasError() && !hasError;
+    }
+
+    public void start() {
+        playerSession.setStoryHandler(this);
+        firstLoad = true;
+        try {
+            story = new Story(NarrativeCraftFile.storyContent());
+            story.onError = (s, errorType) -> {
+                NarrativeCraftMod.server.execute(this::stop);
+                showCrash(new Exception(errorType + " " + s));
+                hasError = true;
+            };
+            if (NarrativeCraftFile.saveExists() && !debugMode) {
+                loadSave();
+                if (!loadScene) {
+                    return;
+                }
+            }
+            if (loadScene) {
+                loadScene(playerSession.getScene());
+            }
+            next();
+        } catch (Exception e) {
+            stop();
+            showCrash(e);
+        }
+    }
+
+    public void stop() {
+        playerSession.getInkTagHandler().stopAll();
+        for (InkAction inkAction : playerSession.getInkActions()) {
+            inkAction.stop();
+        }
+        playerSession.getInkActions().clear();
+        for (Playback playback : playerSession.getPlaybackManager().getPlaybacks()) {
+            playback.stop(true);
+        }
+        for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+            if (characterRuntime.getEntity() == null
+                    || !characterRuntime.getEntity().isAlive()) continue;
+            characterRuntime.getEntity().remove(Entity.RemovalReason.KILLED);
+        }
+        AbstractController controller = playerSession.getController();
+        if (controller != null) {
+            controller.stopSession(false);
+        }
+        playerSession.setCurrentCamera(null);
+        playerSession.getCharacterRuntimes().clear();
+        playerSession.setDialogRenderer(null);
+        playerSession.setStoryHandler(null);
+        playerSession.getInkTagHandler().getTagsToExecute().clear();
+    }
+
+    public void stopAndFinishScreen() {
+        stop();
+        if (worldOption.showCreditsScreen && !debugMode) {
+            CreditScreen creditScreen = new CreditScreen(playerSession, false, !worldOption.finishedStory);
+            minecraft.execute(() -> minecraft.setScreen(creditScreen));
+            worldOption.finishedStory = true;
+            NarrativeCraftFile.updateWorldOptions(worldOption);
+        }
+    }
+
+    public boolean characterInStory(CharacterStory characterStory) {
+        for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+            if (characterRuntime.getCharacterStory().getName().equals(characterStory.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public CharacterRuntime getCharacterRuntimeFromCharacter(CharacterStory characterStory) {
+        for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+            if (characterRuntime.getCharacterStory().getName().equals(characterStory.getName())) {
+                return characterRuntime;
+            }
+        }
+        return null;
+    }
+
+    public void killCharacter(CharacterStory characterStory) {
+        CharacterRuntime toRemove = null;
+        for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+            if (characterRuntime.getCharacterStory().getName().equals(characterStory.getName())) {
+                if (characterRuntime.getEntity() == null) continue;
+                characterRuntime.getEntity().remove(Entity.RemovalReason.KILLED);
+                toRemove = characterRuntime;
+            }
+        }
+        playerSession.getCharacterRuntimes().remove(toRemove);
+    }
+
+    public void chooseChoiceAndNext(int choiceIndex) {
+        try {
+            story.chooseChoiceIndex(choiceIndex);
+            playerSession.setDialogRenderer(null);
+            next();
+            if (dialogText.isEmpty() && !isFinished()) {
+                throw new Exception("Empty dialog after a choice cannot be rendered!");
+            }
+        } catch (Exception e) {
+            stop();
+            NarrativeCraftMod.LOGGER.error("Can't choose the choice: ", e);
+            Util.sendCrashMessage(minecraft.player, e);
+        }
+    }
+
+    public void next() {
+        try {
+            if (story == null) throw new Exception("Story is not initialized!");
+            if (isFinished()) {
+                stopAndFinishScreen();
+                return;
+            }
+            DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
+            dialogText = story.Continue().trim();
+            if (story.hasError() || hasError) return;
+            if (firstLoad) {
+                save(false);
+                firstLoad = false;
+            }
+            playerSession.getInkTagHandler().getTagsToExecute().addAll(story.getCurrentTags());
+            if (!story.getCurrentChoices().isEmpty()) {
+                handleChoices();
+                return;
+            }
+            // Handles dialog stopping animation, to executes tags AFTER the animation disappeared.
+            // And for that, it checks if the new dialog character is the same as the old dialog (dialog renderer)
+            if (dialogRenderer == null || sameCharacterTalking(dialogText)) {
+                playerSession.getInkTagHandler().execute();
+            } else {
+                dialogRenderer.stop();
+            }
+            playerSession.clearKilledCharacters();
+        } catch (Exception e) {
+            stop();
+            showCrash(e);
+        }
+    }
+
+    public void showCurrentDialog() {
+        try {
+            showDialog(dialogText);
+        } catch (Exception e) {
+            stop();
+            showCrash(e);
+        }
+    }
+
+    public Matcher getDialogMatcher(String dialog) {
+        Pattern pattern = Pattern.compile(DIALOG_REGEX);
+        return pattern.matcher(dialog);
+    }
+
+    private void loadSave() throws Exception {
+        StorySave save = NarrativeCraftFile.saveContent();
+        if (save == null) throw new Exception("Chapter or scene cannot be found in save file");
+        story.getState().loadJson(save.getSaveData());
+        if (loadScene) {
+            return;
+        }
+        playerSession.setChapter(save.getChapter());
+        playerSession.setScene(save.getScene());
+        removeForbiddenTagLoadSave();
+        story.getCurrentTags().addAll(save.getTagsRunning());
+        playerSession.getInkTagHandler().getTagsToExecute().addAll(story.getCurrentTags());
+        for (CharacterStoryData characterStoryData : save.getCharacterStoryDataList()) {
+            characterStoryData.spawn(playerSession.getPlayer().level(), Environment.PRODUCTION);
+            playerSession.getCharacterRuntimes().add(characterStoryData.getCharacterRuntime());
+        }
+        dialogData = save.getDialogData();
+        dialogText = story.getCurrentText();
+        playerSession.getInkTagHandler().execute();
+        if (!story.getCurrentChoices().isEmpty()) {
+            handleChoices();
+        }
+    }
+
+    private void loadScene(Scene scene) throws Exception {
+        story.choosePathString(scene.knotName());
+    }
+
+    private void removeForbiddenTagLoadSave() throws Exception {
+        story.getCurrentTags().remove("save");
+        story.getCurrentTags().remove("on enter");
+    }
+
+    private void handleChoices() {
+        DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
+        if (dialogRenderer != null) {
+            dialogRenderer.stop();
+            dialogRenderer.setRunDialogStopped(this::showChoices);
+        } else {
+            showChoices();
+        }
+    }
+
+    private void showChoices() {
+        playerSession.setDialogRenderer(null);
+        playerSession.getInkTagHandler().execute();
+        StoryChoicesScreen choicesScreen = new StoryChoicesScreen(playerSession, true);
+        minecraft.execute(() -> minecraft.setScreen(choicesScreen));
+    }
+
+    private void showCrash(Exception exception) {
+        if (debugMode) {
+            NarrativeCraftMod.LOGGER.error("Error occurred on the story: ", exception);
+            Util.sendCrashMessage(playerSession.getPlayer(), exception);
+        } else {
+            CrashScreen screen = new CrashScreen(playerSession, exception.getMessage());
+            minecraft.execute(() -> minecraft.setScreen(screen));
+        }
+    }
+
+    public void save(boolean showLogo) {
+        try {
+            if (!debugMode) {
+                StorySave save = new StorySave(playerSession);
+                NarrativeCraftFile.writeSave(save);
+            }
+            if (showLogo) playerSession.getStorySaveIconGui().showSave(debugMode);
+        } catch (Exception e) {
+            stop();
+            showCrash(e);
+        }
+    }
+
+    public boolean isChangingScene() {
+        String currentKnot = story.getState().getCurrentKnot();
+        return currentKnot != null
+                && !currentKnot.equalsIgnoreCase(playerSession.getScene().knotName());
+    }
+
+    private void showDialog(String dialog) throws Exception {
+        if (dialog == null || dialog.isEmpty()) return;
+        Matcher matcher = getDialogMatcher(dialog);
+        CharacterStory characterStory = null;
+        if (matcher.matches()) {
+            String characterName = matcher.group(1).trim();
+            characterStory =
+                    NarrativeCraftMod.getInstance().getCharacterManager().getCharacterByName(characterName);
+            if (characterStory == null) {
+                characterStory = playerSession.getScene().getNpcByName(characterName);
+            }
+            if (characterStory == null) {
+                throw new Exception("Character " + characterName + " was not found.");
+            }
+            if (!characterInStory(characterStory)) {
+                throw new Exception("Character " + characterName + " is not in the story, can't render the dialog.");
+            }
+            dialog = matcher.group(2).trim() + "\n";
+        }
+        DialogRenderer newDialogRenderer = getDialogRenderer(dialog, characterStory);
+        DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
+        if (dialogRenderer == null || newDialogRenderer.getClass() != dialogRenderer.getClass()) {
+            playerSession.setDialogRenderer(newDialogRenderer);
+            newDialogRenderer.setRunDialogStopped(() -> {
+                // Runnable task to execute the stuff AFTER the stopping animation ended.
+                // If the next action is only a new dialog, then show the new dialog
+                // Or else, executes the tags, and after it show the dialog (inside ink tag handler)
+                playerSession.setDialogRenderer(null);
+                try {
+                    if (playerSession.getInkTagHandler().getTagsToExecute().isEmpty()) {
+                        showCurrentDialog();
+                    } else {
+                        playerSession.getInkTagHandler().execute();
+                    }
+                } catch (Exception e) {
+                    stop();
+                    if (!debugMode && e instanceof InkTagHandlerException) {
+                        CrashScreen screen = new CrashScreen(playerSession, e.getMessage());
+                        minecraft.execute(() -> minecraft.setScreen(screen));
+                    } else {
+                        Util.sendCrashMessage(playerSession.getPlayer(), e);
+                    }
+                }
+            });
+            newDialogRenderer.setRunDialogAutoSkipped(this::next);
+            newDialogRenderer.start();
+        } else {
+            dialogRenderer.setText(dialog);
+            dialogRenderer.update();
+        }
+    }
+
+    private boolean sameCharacterTalking(String dialog) {
+        DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
+        Matcher matcher = getDialogMatcher(dialog);
+        if (dialog.isEmpty()) return true;
+        if (dialogRenderer instanceof DialogRenderer2D && !matcher.matches()) return true;
+        if (!(dialogRenderer instanceof DialogRenderer3D)) return false;
+        String characterName = "";
+        if (matcher.matches()) {
+            characterName = matcher.group(1).trim();
+        }
+        return ((DialogRenderer3D) dialogRenderer)
+                .getCharacterRuntime()
+                .getCharacterStory()
+                .getName()
+                .equalsIgnoreCase(characterName);
+    }
+
+    private DialogRenderer getDialogRenderer(String dialog, CharacterStory characterStory) {
+        DialogRenderer dialogRenderer;
+        if (characterStory != null) {
+            CharacterRuntime characterRuntime = playerSession.getCharacterRuntimeByCharacter(characterStory);
+            dialogRenderer = new DialogRenderer3D(dialog, characterStory.getName(), dialogData, characterRuntime);
+            DialogRenderer3D dialogRenderer3D = (DialogRenderer3D) dialogRenderer;
+            dialogRenderer3D.setDialogEntityBobbing(new DialogEntityBobbing(
+                    dialogRenderer3D, dialogData.getNoiseShakeSpeed(), dialogData.getNoiseShakeStrength()));
+        } else {
+            dialogRenderer = new DialogRenderer2D(dialog, 350, 400, 90, 30, dialogData);
+        }
+        dialogRenderer.autoSkipAt(dialogData.getAutoSkipSeconds());
+        dialogRenderer.setNoSkip(dialogData.isNoSkip());
+        if (clientOption.autoSkip) {
+            String[] words = dialog.trim().split("\\s+");
+            int wordCount = words.length;
+            double readingSpeed = 3.0;
+            int autoSkipTime = (int) Math.ceil(wordCount / readingSpeed);
+            autoSkipTime = Math.max(autoSkipTime, 2);
+            dialogRenderer.autoSkipAt(autoSkipTime);
+        }
+        return dialogRenderer;
+    }
+
+    public DialogData getDialogData() {
+        return dialogData;
+    }
+
+    public void setDialogData(DialogData dialogData) {
+        this.dialogData = dialogData;
+    }
+
     public Story getStory() {
         return story;
     }
 
-    public DialogImpl getCurrentDialogBox() {
-        return currentDialogBox;
-    }
-
-    public String getCurrentDialog() {
-        return currentDialog;
-    }
-
-    public void setCurrentDialogBox(Dialog currentDialogBox) {
-        this.currentDialogBox = currentDialogBox;
-    }
-
-    public KeyframeCoordinate getCurrentKeyframeCoordinate() {
-        return currentKeyframeCoordinate;
-    }
-
-    public void setCurrentKeyframeCoordinate(KeyframeCoordinate currentKeyframeCoordinate) {
-        this.currentKeyframeCoordinate = currentKeyframeCoordinate;
-    }
-
-    public InkTagTranslators getInkTagTranslators() {
-        return inkTagTranslators;
-    }
-
-    public List<TypedSoundInstance> getTypedSoundInstanceList() {
-        return typedSoundInstanceList;
+    public String getDialogText() {
+        return dialogText;
     }
 
     public boolean isDebugMode() {
@@ -920,39 +447,7 @@ public class StoryHandler {
         this.debugMode = debugMode;
     }
 
-    public List<InkAction> getInkActionList() {
-        return inkActionList;
-    }
-
-    public boolean isSaving() {
-        return isSaving;
-    }
-
-    public void setSaving(boolean saving) {
-        isSaving = saving;
-    }
-
-    public DialogData getGlobalDialogValue() {
-        return globalDialogValue;
-    }
-
-    public void setGlobalDialogValue(DialogData globalDialogValue) {
-        this.globalDialogValue = globalDialogValue;
-    }
-
-    public String getCurrentCharacterTalking() {
-        return currentCharacterTalking;
-    }
-
-    public boolean isLoading() {
-        return isLoading;
-    }
-
-    public void setLoading(boolean loading) {
-        isLoading = loading;
-    }
-
-    public boolean isFinished() {
-        return !story.canContinue() && story.getCurrentChoices().isEmpty() && currentDialog.isEmpty();
+    public StoryDebugHud getStoryDebugHud() {
+        return storyDebugHud;
     }
 }

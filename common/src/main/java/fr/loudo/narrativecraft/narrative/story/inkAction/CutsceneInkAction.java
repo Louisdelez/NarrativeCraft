@@ -1,87 +1,92 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.narrative.story.inkAction;
 
-import fr.loudo.narrativecraft.narrative.chapter.scenes.Scene;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.Cutscene;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.CutsceneController;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.CutscenePlayback;
-import fr.loudo.narrativecraft.narrative.recordings.playback.Playback;
-import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.narrative.story.inkAction.enums.InkTagType;
-import fr.loudo.narrativecraft.narrative.story.inkAction.validation.ErrorLine;
-import fr.loudo.narrativecraft.utils.Translation;
-import fr.loudo.narrativecraft.utils.Utils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
+import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
+import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
+import fr.loudo.narrativecraft.narrative.Environment;
+import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
+import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframe;
+import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframeGroup;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.util.Translation;
+import java.util.List;
 
 public class CutsceneInkAction extends InkAction {
 
-    public CutsceneInkAction(StoryHandler storyHandler, String command) {
-        super(storyHandler, InkTagType.CUTSCENE, command);
+    private Cutscene cutscene;
+    private CutsceneController controller;
+
+    public CutsceneInkAction(String id, Side side, String syntax, CommandMatcher matcher) {
+        super(id, side, syntax, matcher);
     }
 
     @Override
-    public InkActionResult execute() {
-        if(command.length < 3) {
-            return InkActionResult.error(this.getClass(), Translation.message("validation.missing_name").getString());
+    public void tick() {
+        if (!isRunning) return;
+        if (controller.atMaxTick()) {
+            blockEndTask.run();
         }
-        storyHandler.getPlayerSession().setSoloCam(null);
-        name = InkAction.parseName(command, 2);
-        Cutscene cutscene = storyHandler.getPlayerSession().getScene().getCutsceneByName(name);
-        if(cutscene == null) {
-            return InkActionResult.error(this.getClass(), Translation.message("validation.cutscene", name).getString());
+    }
+
+    @Override
+    protected InkActionResult doValidate(List<String> arguments, Scene scene) {
+        if (arguments.size() < 3) {
+            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Cutscene name"));
         }
-        executeCutscene(cutscene);
+        String cutsceneName = arguments.get(2);
+        cutscene = scene.getCutsceneByName(cutsceneName);
+        if (cutscene == null) {
+            return InkActionResult.error(Translation.message("cutscene.no_exists", cutsceneName, scene.getName()));
+        }
+        return InkActionResult.ok();
+    }
+
+    @Override
+    protected InkActionResult doExecute(PlayerSession playerSession) {
+        controller = new CutsceneController(Environment.PRODUCTION, playerSession.getPlayer(), cutscene);
+        controller.startSession();
+        if (controller.getKeyframeGroups().isEmpty()) {
+            return InkActionResult.error("Cutscene " + cutscene.getName() + " has not keyframes ! Can't be played.");
+        }
+        CutsceneKeyframeGroup keyframeGroup = controller.getKeyframeGroups().getFirst();
+        CutsceneKeyframe keyframeA = keyframeGroup.getKeyframes().getFirst();
+        CutsceneKeyframe keyframeB;
+        if (keyframeGroup.getKeyframes().size() > 1) {
+            keyframeB = keyframeGroup.getKeyframes().get(1);
+        } else {
+            keyframeB = keyframeA;
+        }
+        controller.setPlaying(true);
+        controller.getCutscenePlayback().setupAndPlay(keyframeA, keyframeB);
         return InkActionResult.block();
     }
 
-    private void executeCutscene(Cutscene cutscene) {
-        storyHandler.setCurrentDialogBox(null);
-        ServerPlayer serverPlayer = Utils.getServerPlayerByUUID(Minecraft.getInstance().player.getUUID());
-        CutsceneController cutsceneController = new CutsceneController(cutscene, serverPlayer, Playback.PlaybackType.PRODUCTION);
-        cutsceneController.startSession();
-        storyHandler.getPlayerSession().setKeyframeControllerBase(cutsceneController);
-        CutscenePlayback cutscenePlayback = new CutscenePlayback(serverPlayer, cutscene.getKeyframeGroupList(), cutscene.getKeyframeGroupList().getFirst().getKeyframeList().getFirst(), cutsceneController);
-        cutscenePlayback.setOnCutsceneEnd(() -> handleEndCutscene(cutsceneController));
-        cutscenePlayback.start();
-        sendDebugDetails();
-    }
-
-    private void handleEndCutscene(CutsceneController cutsceneController) {
-        storyHandler.getPlayerSession().setSoloCam(cutsceneController.getCutscene().getKeyframeGroupList().getLast().getKeyframeList().getLast().getKeyframeCoordinate());
-        if(storyHandler.getInkTagTranslators().getTagsToExecuteLater().isEmpty() && storyHandler.isFinished()) {
-            storyHandler.stop(false);
-        }
-        storyHandler.getInkTagTranslators().executeLaterTags();
-
-    }
-
     @Override
-    void sendDebugDetails() {
-        if(storyHandler.isDebugMode()) {
-            Minecraft.getInstance().player.displayClientMessage(Translation.message("debug.cutscene", name), false);
-        }
-    }
-
-    @Override
-    public ErrorLine validate(String[] command, int line, String lineText, Scene scene) {
-        if(command.length < 3) {
-            return new ErrorLine(
-                    line,
-                    scene,
-                    Translation.message("validation.missing_name").getString(),
-                    lineText, false
-            );
-        }
-        name = InkAction.parseName(command, 2);
-        Cutscene cutscene = scene.getCutsceneByName(name);
-        if(cutscene == null) {
-            return new ErrorLine(
-                    line,
-                    scene,
-                    Translation.message("validation.cutscene", name).getString(),
-                    lineText, false
-            );
-        }
-        return null;
+    public boolean needScene() {
+        return true;
     }
 }

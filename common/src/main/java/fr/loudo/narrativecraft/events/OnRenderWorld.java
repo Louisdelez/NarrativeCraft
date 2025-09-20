@@ -1,57 +1,52 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.events;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.KeyframeControllerBase;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.CutsceneController;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.keyframes.KeyframeGroup;
-import fr.loudo.narrativecraft.narrative.dialog.Dialog;
-import fr.loudo.narrativecraft.narrative.recordings.playback.Playback;
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
+import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.narrative.story.inkAction.ChangeDayTimeInkAction;
-import fr.loudo.narrativecraft.narrative.story.inkAction.InkAction;
-
-import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.Minecraft;
 
 public class OnRenderWorld {
-
-    public static void renderWorld(PoseStack poseStack) {
-
-        Dialog dialog = NarrativeCraftMod.getInstance().getTestDialog();
-        if(dialog != null) {
-            dialog.render(poseStack);
+    public static void renderWorld(PoseStack poseStack, float partialTick) {
+        PlayerSession playerSession = NarrativeCraftMod.getInstance()
+                .getPlayerSessionManager()
+                .getSessionByPlayer(Minecraft.getInstance().player);
+        if (playerSession == null) return;
+        if (playerSession.getController() instanceof CutsceneController controller) {
+            controller.drawLinesBetweenKeyframes(poseStack);
         }
-
-        StoryHandler storyHandler = NarrativeCraftMod.getInstance().getStoryHandler();
-        if(storyHandler != null) {
-            if(storyHandler.getCurrentDialogBox() instanceof Dialog dialog1) {
-                dialog1.render(poseStack);
-            }
-            List<InkAction> toRemove = new ArrayList<>();
-            for(InkAction inkAction : storyHandler.getInkActionList()) {
-                if(inkAction instanceof ChangeDayTimeInkAction action) {
-                    action.interpolateTime();
-                    if(action.isFinished()) toRemove.add(inkAction);
-                }
-            }
-            storyHandler.getInkActionList().removeAll(toRemove);
+        if (playerSession.getDialogRenderer() != null) {
+            playerSession.getDialogRenderer().render(poseStack, partialTick);
         }
-
-        PlayerSession playerSession = NarrativeCraftMod.getInstance().getPlayerSession();
-        KeyframeControllerBase keyframeControllerBase = playerSession.getKeyframeControllerBase();
-        if(keyframeControllerBase == null) return;
-        if(keyframeControllerBase.getPlaybackType() == Playback.PlaybackType.DEVELOPMENT) {
-            if(keyframeControllerBase instanceof CutsceneController cutsceneController) {
-                if (cutsceneController.getCurrentPreviewKeyframe() == null) {
-                    for (KeyframeGroup keyframeGroup : cutsceneController.getCutscene().getKeyframeGroupList()) {
-                        keyframeGroup.showLineBetweenKeyframes(poseStack);
-                    }
-                }
-            }
+        List<InkAction> inkActionsClient = playerSession.getClientSideInkActions();
+        for (InkAction inkAction : inkActionsClient) {
+            inkAction.partialTick(partialTick);
+            inkAction.render(poseStack, partialTick);
         }
-
     }
-
 }

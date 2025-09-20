@@ -1,129 +1,197 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.narrative.dialog;
 
 import net.minecraft.world.phys.Vec2;
 
 public class DialogData {
+    public static DialogData globalDialogData =
+            new DialogData(new Vec2(0, 0.8F), 90, 5, 5, 0.8F, 0, 0, 0, -1, 2.9F, 2.15F, false, false, 0.0);
 
-    public static DialogData globalDialogData;
-
-    private String characterName;
-    private String text;
     private Vec2 offset;
-    private int textColor;
-    private int backgroundColor;
-    private float paddingX;
-    private float paddingY;
-    private float scale;
-    private float letterSpacing;
-    private float gap;
-    private int maxWidth;
-    private boolean unSkippable;
-    private long endForceEndTime;
-    private float bobbingNoiseShakeSpeed;
-    private float bobbingNoiseShakeStrength;
+    private float width, paddingX, paddingY, scale, letterSpacing, gap, noiseShakeSpeed, noiseShakeStrength;
+    private int backgroundColor, textColor;
+    private boolean noSkip, dialogAutoSkip;
+    private double autoSkipSeconds;
 
-    public DialogData(String characterName, String text, Vec2 offset, int textColor, int backgroundColor,
-                          float paddingX, float paddingY, float scale, float letterSpacing, float gap,
-                          int maxWidth, boolean unSkippable, long endForceEndTime, float bobbingNoiseShakeSpeed, float bobbingNoiseShakeStrength) {
-        this.characterName = characterName;
-        this.text = text;
+    public DialogData(
+            Vec2 offset,
+            float width,
+            float paddingX,
+            float paddingY,
+            float scale,
+            float letterSpacing,
+            float gap,
+            int backgroundColor,
+            int textColor,
+            float noiseShakeSpeed,
+            float noiseShakeStrength,
+            boolean noSkip,
+            boolean dialogAutoSkip,
+            double autoSkipSeconds) {
         this.offset = offset;
-        this.textColor = textColor;
-        this.backgroundColor = backgroundColor;
+        this.width = width;
         this.paddingX = paddingX;
         this.paddingY = paddingY;
         this.scale = scale;
         this.letterSpacing = letterSpacing;
         this.gap = gap;
-        this.maxWidth = maxWidth;
-        this.unSkippable = unSkippable;
-        this.endForceEndTime = endForceEndTime;
-        this.bobbingNoiseShakeSpeed = bobbingNoiseShakeSpeed;
-        this.bobbingNoiseShakeStrength = bobbingNoiseShakeStrength;
+        this.backgroundColor = backgroundColor;
+        this.textColor = textColor;
+        this.noiseShakeSpeed = noiseShakeSpeed;
+        this.noiseShakeStrength = noiseShakeStrength;
+        this.noSkip = noSkip;
+        this.dialogAutoSkip = dialogAutoSkip;
+        this.autoSkipSeconds = autoSkipSeconds;
     }
 
     public DialogData(DialogData dialogData) {
-        this.characterName = dialogData.characterName;
-        this.text = dialogData.text;
-        this.offset = dialogData.offset;
-        this.textColor = dialogData.textColor;
-        this.backgroundColor = dialogData.backgroundColor;
-        this.paddingX = dialogData.paddingX;
-        this.paddingY = dialogData.paddingY;
-        this.scale = dialogData.scale;
-        this.letterSpacing = dialogData.letterSpacing;
-        this.gap = dialogData.gap;
-        this.maxWidth = dialogData.maxWidth;
-        this.unSkippable = dialogData.unSkippable;
-        this.endForceEndTime = dialogData.endForceEndTime;
-        this.bobbingNoiseShakeSpeed = dialogData.bobbingNoiseShakeSpeed;
-        this.bobbingNoiseShakeStrength = dialogData.bobbingNoiseShakeStrength;
+        offset = dialogData.offset;
+        width = dialogData.width;
+        paddingX = dialogData.paddingX;
+        paddingY = dialogData.paddingY;
+        scale = dialogData.scale;
+        letterSpacing = dialogData.letterSpacing;
+        gap = dialogData.gap;
+        backgroundColor = dialogData.backgroundColor;
+        textColor = dialogData.textColor;
+        noiseShakeSpeed = dialogData.noiseShakeSpeed;
+        noiseShakeStrength = dialogData.noiseShakeStrength;
+        noSkip = dialogData.noSkip;
+        dialogAutoSkip = dialogData.dialogAutoSkip;
+        autoSkipSeconds = dialogData.autoSkipSeconds;
     }
 
-    public static DialogData defaultValues() {
-        return new DialogData(
-                null,
-                null,
-                new Vec2(0, 0.8f),
-                -1,
-                0,
-                3,
-                4,
-                0.8f,
-                0,
-                10,
-                90,
-                false,
-                0,
-                100,
-                250
-        );
+    public Vec2 getOffset() {
+        return offset;
     }
 
-    public String getCharacterName() { return characterName; }
-    public void setCharacterName(String characterName) { this.characterName = characterName; }
+    public void setOffset(Vec2 offset) {
+        this.offset = offset;
+    }
 
-    public String getText() { return text; }
-    public void setText(String text) { this.text = text; }
+    public float getWidth() {
+        return width;
+    }
 
-    public Vec2 getOffset() { return offset; }
-    public void setOffset(Vec2 offset) { this.offset = offset; }
+    public void setWidth(float width) {
+        this.width = width;
+    }
 
-    public int getTextColor() { return textColor; }
-    public void setTextColor(int textColor) { this.textColor = textColor; }
+    public float getPaddingX() {
+        return paddingX;
+    }
 
-    public int getBackgroundColor() { return backgroundColor; }
-    public void setBackgroundColor(int backgroundColor) { this.backgroundColor = backgroundColor; }
+    public void setPaddingX(float paddingX) {
+        this.paddingX = paddingX;
+    }
 
-    public float getPaddingX() { return paddingX; }
-    public void setPaddingX(float paddingX) { this.paddingX = paddingX; }
+    public float getPaddingY() {
+        return paddingY;
+    }
 
-    public float getPaddingY() { return paddingY; }
-    public void setPaddingY(float paddingY) { this.paddingY = paddingY; }
+    public void setPaddingY(float paddingY) {
+        this.paddingY = paddingY;
+    }
 
-    public float getScale() { return scale; }
-    public void setScale(float scale) { this.scale = scale; }
+    public float getScale() {
+        return scale;
+    }
 
-    public float getLetterSpacing() { return letterSpacing; }
-    public void setLetterSpacing(float letterSpacing) { this.letterSpacing = letterSpacing; }
+    public void setScale(float scale) {
+        this.scale = scale;
+    }
 
-    public float getGap() { return gap; }
-    public void setGap(float gap) { this.gap = gap; }
+    public float getLetterSpacing() {
+        return letterSpacing;
+    }
 
-    public int getMaxWidth() { return maxWidth; }
-    public void setMaxWidth(int maxWidth) { this.maxWidth = maxWidth; }
+    public void setLetterSpacing(float letterSpacing) {
+        this.letterSpacing = letterSpacing;
+    }
 
-    public boolean isUnSkippable() { return unSkippable; }
-    public void setUnSkippable(boolean unSkippable) { this.unSkippable = unSkippable; }
+    public float getGap() {
+        return gap;
+    }
 
-    public long getEndForceEndTime() { return endForceEndTime; }
-    public void setEndForceEndTime(long endForceEndTime) { this.endForceEndTime = endForceEndTime; }
+    public void setGap(float gap) {
+        this.gap = gap;
+    }
 
-    public float getBobbingNoiseShakeSpeed() {return bobbingNoiseShakeSpeed;}
-    public void setBobbingNoiseShakeSpeed(float bobbingNoiseShakeSpeed) {this.bobbingNoiseShakeSpeed = bobbingNoiseShakeSpeed;}
+    public int getBackgroundColor() {
+        return backgroundColor;
+    }
 
-    public float getBobbingNoiseShakeStrength() {return bobbingNoiseShakeStrength;}
-    public void setBobbingNoiseShakeStrength(float bobbingNoiseShakeStrength) {this.bobbingNoiseShakeStrength = bobbingNoiseShakeStrength;}
+    public void setBackgroundColor(int backgroundColor) {
+        this.backgroundColor = backgroundColor;
+    }
+
+    public int getTextColor() {
+        return textColor;
+    }
+
+    public void setTextColor(int textColor) {
+        this.textColor = textColor;
+    }
+
+    public float getNoiseShakeSpeed() {
+        return noiseShakeSpeed;
+    }
+
+    public void setNoiseShakeSpeed(float noiseShakeSpeed) {
+        this.noiseShakeSpeed = noiseShakeSpeed;
+    }
+
+    public float getNoiseShakeStrength() {
+        return noiseShakeStrength;
+    }
+
+    public void setNoiseShakeStrength(float noiseShakeStrength) {
+        this.noiseShakeStrength = noiseShakeStrength;
+    }
+
+    public boolean isNoSkip() {
+        return noSkip;
+    }
+
+    public void setNoSkip(boolean noSkip) {
+        this.noSkip = noSkip;
+    }
+
+    public boolean isDialogAutoSkip() {
+        return dialogAutoSkip;
+    }
+
+    public void setDialogAutoSkip(boolean dialogAutoSkip) {
+        this.dialogAutoSkip = dialogAutoSkip;
+    }
+
+    public double getAutoSkipSeconds() {
+        return autoSkipSeconds;
+    }
+
+    public void setAutoSkipSeconds(double autoSkipSeconds) {
+        this.autoSkipSeconds = autoSkipSeconds;
+    }
 }
-
-

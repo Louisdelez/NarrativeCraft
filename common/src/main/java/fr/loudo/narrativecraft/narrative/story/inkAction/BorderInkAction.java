@@ -1,11 +1,34 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.narrative.story.inkAction;
 
-import fr.loudo.narrativecraft.narrative.chapter.scenes.Scene;
-import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.narrative.story.inkAction.enums.InkTagType;
-import fr.loudo.narrativecraft.narrative.story.inkAction.validation.ErrorLine;
-import fr.loudo.narrativecraft.utils.Translation;
-import net.minecraft.client.DeltaTracker;
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
+import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
+import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.util.Translation;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.ARGB;
@@ -15,62 +38,18 @@ public class BorderInkAction extends InkAction {
     private int up, right, down, left, color;
     private double opacity;
 
-    public BorderInkAction(StoryHandler storyHandler, String command) {
-        super(storyHandler, InkTagType.BORDER, command);
+    public BorderInkAction(String id, Side side, String syntax, CommandMatcher matcher) {
+        super(id, side, syntax, matcher);
     }
 
     @Override
-    public InkActionResult execute() {
-        if(command.length < 5) return InkActionResult.error(this.getClass(), Translation.message("validation.missing_values").getString());
-        up = 0;
-        right = 0;
-        down = 0;
-        left = 0;
-        opacity = 1;
-        color = 0;
-        try {
-            up = Integer.parseInt(command[1]) * 3;
-        } catch (NumberFormatException e) {
-            return InkActionResult.error(this.getClass(), Translation.message("validation.number", command[1]).getString());
-        }
-        try {
-            right = Integer.parseInt(command[2]) * 3;
-        } catch (NumberFormatException e) {
-            return InkActionResult.error(this.getClass(), Translation.message("validation.number", command[2]).getString());
-        }
-        try {
-            down = Integer.parseInt(command[3]) * 3;
-        } catch (NumberFormatException e) {
-            return InkActionResult.error(this.getClass(), Translation.message("validation.number", command[3]).getString());
-        }
-        try {
-            left = Integer.parseInt(command[4]) * 3;
-        } catch (NumberFormatException e) {
-            return InkActionResult.error(this.getClass(), Translation.message("validation.number", command[4]).getString());
-        }
-        if(command.length > 5) {
-            color = Integer.parseInt(command[5], 16);
-        }
-        if(command.length > 6) {
-            opacity = Math.clamp(Double.parseDouble(command[6]), 0, 1);
-        }
-
-        color = ARGB.color((int)(opacity * 255), color);
-        if(up == 0 && right == 0 && down == 0 && left == 0) {
-            storyHandler.getInkActionList().removeIf(inkAction -> inkAction instanceof BorderInkAction);
-        } else {
-            storyHandler.getInkActionList().add(this);
-        }
-        sendDebugDetails();
-        return InkActionResult.pass();
-    }
-
-    public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+    public void render(GuiGraphics guiGraphics, float partialTick) {
+        if (!isRunning) return;
         Minecraft minecraft = Minecraft.getInstance();
         int widthScreen = minecraft.getWindow().getGuiScaledWidth();
         int heightScreen = minecraft.getWindow().getGuiScaledHeight();
         int guiScale = minecraft.options.guiScale().get();
-        if(minecraft.options.guiScale().get() == 0) {
+        if (minecraft.options.guiScale().get() == 0) {
             guiScale = 3;
         }
         // UP
@@ -84,68 +63,76 @@ public class BorderInkAction extends InkAction {
 
         // LEFT
         guiGraphics.fill(0, 0, left / guiScale, heightScreen, color);
-
-
     }
 
     @Override
-    void sendDebugDetails() {
-        if(storyHandler.isDebugMode()) {
-            Minecraft.getInstance().player.displayClientMessage(
-                    Translation.message("debug.border", up / 3, right / 3, down / 3, left / 3, color, opacity),
-                    false
-            );
+    protected InkActionResult doValidate(List<String> arguments, Scene scene) {
+        if (arguments.size() < 2) {
+            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Up value missing"));
         }
+        if (arguments.size() < 3) {
+            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Right value missing"));
+        }
+        if (arguments.size() < 4) {
+            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Down value missing"));
+        }
+        if (arguments.size() < 5) {
+            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Left value missing"));
+        }
+        if (arguments.size() < 6) {
+            try {
+                up = Integer.parseInt(arguments.get(1)) * 2;
+            } catch (NumberFormatException e) {
+                return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(1)));
+            }
+            try {
+                right = Integer.parseInt(arguments.get(2)) * 2;
+            } catch (NumberFormatException e) {
+                return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(2)));
+            }
+            try {
+                down = Integer.parseInt(arguments.get(3)) * 2;
+            } catch (NumberFormatException e) {
+                return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(3)));
+            }
+            try {
+                left = Integer.parseInt(arguments.get(4)) * 2;
+            } catch (NumberFormatException e) {
+                return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(4)));
+            }
+        } else {
+            try {
+                color = Integer.parseInt(arguments.get(6), 16);
+            } catch (NumberFormatException e) {
+                return InkActionResult.error(Translation.message(NOT_VALID_COLOR, arguments.get(6)));
+            }
+        }
+        opacity = 1.0;
+        if (arguments.size() > 6) {
+            try {
+                opacity = Integer.parseInt(arguments.get(6));
+                if (opacity > 1) {
+                    return InkActionResult.error(
+                            Translation.message(WRONG_ARGUMENT_TEXT, "The opacity value is greater than 1"));
+                } else if (opacity < 0) {
+                    return InkActionResult.error(
+                            Translation.message(WRONG_ARGUMENT_TEXT, "The opacity value is less than 0"));
+                }
+            } catch (NumberFormatException e) {
+                return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(6)));
+            }
+        }
+        color = ARGB.color((int) (opacity * 255), color);
+        return InkActionResult.ok();
     }
 
     @Override
-    public ErrorLine validate(String[] command, int line, String lineText, Scene scene) {
-        if(command.length < 5) return new ErrorLine(
-                line,
-                scene,
-                Translation.message("validation.missing_values").getString(),
-                lineText,
-                false
-        );
-        for (int i = 1; i < 4; i++) {
-            try {
-                Integer.parseInt(command[i]);
-            } catch (NumberFormatException e) {
-                return new ErrorLine(
-                        line,
-                        scene,
-                        Translation.message("validation.number", command[i]).getString(),
-                        lineText,
-                        false
-                );
-            }
-        }
-        if(command.length > 5) {
-            try {
-                Integer.parseInt(command[5], 16);
-            } catch (NumberFormatException e) {
-                return new ErrorLine(
-                        line,
-                        scene,
-                        Translation.message("validation.number", command[5]).getString(),
-                        lineText,
-                        false
-                );
-            }
-        }
-        if(command.length > 6) {
-            try {
-                Double.parseDouble(command[6]);
-            } catch (NumberFormatException e) {
-                return new ErrorLine(
-                        line,
-                        scene,
-                        Translation.message("validation.number", command[6]).getString(),
-                        lineText,
-                        false
-                );
-            }
-        }
-        return null;
+    protected InkActionResult doExecute(PlayerSession playerSession) {
+        return InkActionResult.ok();
+    }
+
+    @Override
+    public boolean needScene() {
+        return false;
     }
 }

@@ -25,7 +25,7 @@ dependencies {
     compileOnly("io.github.kosmx.emotes:emotesServer:${emotesAPI_version}") {
         exclude group: 'com.google.guava', module: 'guava'
     }
-    include(implementation "com.bladecoder.ink:blade-ink:1.2.0+nc")
+    include(implementation "com.bladecoder.ink:blade-ink:1.2.1+nc")
 }
 
 loom {

@@ -1,69 +1,123 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.narrative.chapter;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.files.NarrativeCraftFile;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.Scene;
-import fr.loudo.narrativecraft.screens.storyManager.chapters.ChaptersScreen;
-import fr.loudo.narrativecraft.utils.ScreenUtils;
-import fr.loudo.narrativecraft.utils.Translation;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
-
+import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import net.minecraft.commands.CommandSourceStack;
 
 public class Chapter extends NarrativeEntry {
 
     private int index;
-    private final List<Scene> sceneList;
+    private final List<Scene> scenes = new ArrayList<>();
 
-    public Chapter(int index) {
-        super("", "");
-        this.index = index;
-        this.sceneList = new ArrayList<>();
-    }
-
-    public Chapter(int index, String name, String description) {
+    public Chapter(String name, String description, int index) {
         super(name, description);
         this.index = index;
-        this.sceneList = new ArrayList<>();
     }
 
-    public boolean addScene(Scene scene) {
-        if(NarrativeCraftFile.createSceneFolder(scene)) {
-            sceneList.add(scene);
-            List<Scene> sortedScenes = getSortedSceneList();
-            for (int i = 0; i < sceneList.size(); i++) {
-                sortedScenes.get(i).setPlacement(i + 1);
-            }
-            NarrativeCraftFile.updateMainInkFile();
-            return true;
-        }
-        return false;
+    public String knotName() {
+        return "chapter_" + index;
+    }
+
+    public void addScene(Scene scene) {
+        if (scenes.contains(scene)) return;
+        scenes.add(scene);
     }
 
     public void removeScene(Scene scene) {
-        sceneList.remove(scene);
+        scenes.remove(scene);
+        sortScenesByRank();
+    }
+
+    public Scene getSceneByName(String name) {
+        for (Scene scene : scenes) {
+            if (scene.getName().equalsIgnoreCase(name)) {
+                return scene;
+            }
+        }
+        return null;
     }
 
     public boolean sceneExists(String name) {
-        for(Scene scene : sceneList) {
-            if(scene.getName().equalsIgnoreCase(name)) {
+        for (Scene scene : scenes) {
+            if (scene.getName().equalsIgnoreCase(name)) {
                 return true;
             }
         }
         return false;
     }
 
-    public Scene getSceneByName(String sceneName) {
-        for(Scene scene : sceneList) {
-            if(scene.getName().equalsIgnoreCase(sceneName)) {
-                return scene;
+    public void setSceneRank(Scene scene, int newRank) {
+        int oldRank = scene.getRank();
+        if (newRank == oldRank) {
+            return;
+        }
+
+        if (newRank < oldRank) {
+            for (Scene s : scenes) {
+                int r = s.getRank();
+                if (r >= newRank && r < oldRank) {
+                    s.setRank(r + 1);
+                }
+            }
+        } else {
+            for (Scene s : scenes) {
+                int r = s.getRank();
+                if (r <= newRank && r > oldRank) {
+                    s.setRank(r - 1);
+                }
             }
         }
-        return null;
+
+        scene.setRank(newRank);
+    }
+
+    public SuggestionProvider<CommandSourceStack> getAnimationSuggestionFromScene(Scene scene) {
+        return (context, builder) -> {
+            for (Animation animation : scene.getAnimations()) {
+                if (animation.getName().split(" ").length > 1) {
+                    builder.suggest("\"" + animation.getName() + "\"");
+                } else {
+                    builder.suggest(animation.getName());
+                }
+            }
+            return builder.buildFuture();
+        };
+    }
+
+    public List<Scene> getSortedSceneList() {
+        return scenes.stream().sorted(Comparator.comparingInt(Scene::getRank)).toList();
+    }
+
+    public List<Scene> getScenes() {
+        return scenes;
     }
 
     public int getIndex() {
@@ -74,39 +128,10 @@ public class Chapter extends NarrativeEntry {
         this.index = index;
     }
 
-    public List<Scene> getSceneList() {
-       return sceneList;
-    }
-
-    public List<Scene> getSortedSceneList() {
-        return sceneList.stream()
-                .sorted(Comparator.comparingInt(Scene::getPlacement))
-                .toList();
-    }
-
-
-    @Override
-    public void update(String name, String description) {
-        if(!NarrativeCraftFile.updateChapterDetails(this, name, description)) {
-            ScreenUtils.sendToast(Translation.message("global.error"), Translation.message("screen.chapter_manager.update.failed"));
-            return;
+    private void sortScenesByRank() {
+        List<Scene> sortedScenes = getSortedSceneList();
+        for (int i = 0; i < sortedScenes.size(); i++) {
+            sortedScenes.get(i).setRank(i + 1);
         }
-        this.name = name;
-        this.description = description;
-        ScreenUtils.sendToast(Translation.message("global.info"), Translation.message("toast.description.updated", index));
-        Minecraft.getInstance().setScreen(reloadScreen());
-        NarrativeCraftFile.updateMainInkFile();
-    }
-
-    @Override
-    public void remove() {
-        NarrativeCraftFile.removeChapterFolder(this);
-        NarrativeCraftMod.getInstance().getChapterManager().removeChapter(this);
-        NarrativeCraftFile.updateMainInkFile();
-    }
-
-    @Override
-    public Screen reloadScreen() {
-        return new ChaptersScreen();
     }
 }

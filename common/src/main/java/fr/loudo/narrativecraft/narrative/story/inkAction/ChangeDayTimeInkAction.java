@@ -1,191 +1,127 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.narrative.story.inkAction;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.Scene;
-import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.narrative.story.inkAction.enums.InkTagType;
-import fr.loudo.narrativecraft.narrative.story.inkAction.validation.ErrorLine;
-import fr.loudo.narrativecraft.utils.Easing;
-import fr.loudo.narrativecraft.utils.Translation;
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
+import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
+import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
+import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.util.Easing;
+import fr.loudo.narrativecraft.util.Translation;
+import java.util.Arrays;
+import java.util.List;
 import net.minecraft.util.Mth;
 
 public class ChangeDayTimeInkAction extends InkAction {
 
-    private boolean isPaused;
-    private double waitSeconds;
-    private long startTime, firstTick, secondTick, pauseStartTime;
-    private double t;
-    private String subCommand;
+    private String action;
+    private long fromTick, toTick, segmentTick, currentTick, lastTick;
+    private double forSeconds;
     private Easing easing;
 
-    public ChangeDayTimeInkAction(StoryHandler storyHandler, String command) {
-        super(storyHandler, InkTagType.DAYTIME, command);
-        isPaused = false;
-        pauseStartTime = 0;
+    public ChangeDayTimeInkAction(String id, Side side, String syntax, CommandMatcher matcher) {
+        super(id, side, syntax, matcher);
     }
 
     @Override
-    public InkActionResult execute() {
-        subCommand = command[1];
-        firstTick = 0;
-        secondTick = 0;
-        t = 0;
+    public void tick() {
+        if (!canBeExecuted || !isRunning || easing == null) return;
+        segmentTick++;
+    }
+
+    @Override
+    public void partialTick(float partialTick) {
+        if (!canBeExecuted || !isRunning || easing == null) return;
+        double durationTicks = forSeconds * 20.0;
+        double t = Math.clamp((segmentTick + partialTick) / durationTicks, 0.0, 1.0);
+        currentTick = (long) Mth.lerp(t, fromTick, toTick);
+    }
+
+    @Override
+    protected InkActionResult doValidate(List<String> arguments, Scene scene) {
+        if (arguments.size() < 2) {
+            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Action set or add"));
+        }
+        action = arguments.get(1);
+        if (!action.equals("set") && !action.equals("add")) {
+            return InkActionResult.error(Translation.message(WRONG_ARGUMENT_TEXT, "Only set or add as action"));
+        }
+        if (arguments.size() < 3) {
+            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Time day tick"));
+        }
+        fromTick = getTickFromString(arguments.get(2));
+        currentTick = fromTick;
+        if (fromTick == -1) {
+            return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(2)));
+        }
+        if (action.equals("add") || arguments.size() == 3) {
+            return InkActionResult.ok();
+        }
+        if (arguments.get(3).equals("to") && arguments.size() < 5) {
+            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Time day tick"));
+        }
+        toTick = getTickFromString(arguments.get(4));
+        if (toTick == -1) {
+            return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(4)));
+        }
+        if (arguments.get(5).equals("for") && arguments.size() < 7) {
+            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "For seconds"));
+        }
+        try {
+            forSeconds = Double.parseDouble(arguments.get(6));
+        } catch (NumberFormatException e) {
+            return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(6)));
+        }
+        if (arguments.size() == 7) {
+            return InkActionResult.error(Translation.message(WRONG_TIME_VALUE));
+        }
+        String timeValue = arguments.get(7);
+        forSeconds = InkActionUtil.getSecondsFromTimeValue(forSeconds, timeValue);
+        if (forSeconds == -1) {
+            return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, forSeconds));
+        }
         easing = Easing.SMOOTH;
-        if(command.length > 2) {
-            String firstTickString = command[2];
-            firstTick = getTickFromString(firstTickString);
-            if(firstTick == -1) {
-                return InkActionResult.error(this.getClass(), Translation.message("validation.number", command[2]).getString());
-            }
-            if(command.length >= 8 &&  subCommand.equals("set")) {
-                String secondTickString = command[4];
-                secondTick = getTickFromString(secondTickString);
-                try {
-                    waitSeconds = Double.parseDouble(command[6]);
-                    if (command[7].contains("minute")) {
-                        waitSeconds *= 60;
-                    } else if (command[7].contains("hour")) {
-                        waitSeconds *= 60 * 60;
-                    }
-                } catch (NumberFormatException e) {
-                    return InkActionResult.error(this.getClass(), Translation.message("validation.number", command[6]).getString());
-                }
-                if(command.length >= 9 && !command[command.length - 1].equals("times")) {
-                    try {
-                        easing = Easing.valueOf(command[8].toUpperCase());
-                    } catch (IllegalArgumentException e) {
-                        return InkActionResult.error(this.getClass(), Translation.message("validation.easing", command[8], Easing.getEasingsString()).getString());
-                    }
-                }
-                startTime = System.currentTimeMillis();
-                storyHandler.getInkActionList().add(this);
-                if(secondTick == -1) {
-                    return InkActionResult.error(this.getClass(), Translation.message("validation.number", command[4]).getString());
-                }
-            }
-            if(command.length == 3) {
-                if(subCommand.equals("set")) {
-                    for(ServerLevel serverlevel : NarrativeCraftMod.server.getAllLevels()) {
-                        serverlevel.setDayTime(firstTick);
-                    }
-                } else if(subCommand.equals("add")) {
-                    for(ServerLevel serverlevel : NarrativeCraftMod.server.getAllLevels()) {
-                        serverlevel.setDayTime(serverlevel.getDayTime() + firstTick);
-                    }
-                }
-                NarrativeCraftMod.server.forceTimeSynchronization();
-            }
-            sendDebugDetails();
-        }
-        return InkActionResult.pass();
-    }
-
-    public void interpolateTime() {
-        long now = System.currentTimeMillis();
-        if(Minecraft.getInstance().isPaused() && !isPaused) {
-            isPaused = true;
-            pauseStartTime = now;
-        } else if(!Minecraft.getInstance().isPaused() && isPaused) {
-            startTime += now - pauseStartTime;
-            isPaused = false;
-        }
-        double easedT = Easing.getInterpolation(easing, t);
-
-        long interpolatedTick = (long) Mth.lerp(easedT, firstTick, secondTick);
-
-        for (ServerLevel serverLevel : NarrativeCraftMod.server.getAllLevels()) {
-            serverLevel.setDayTime(interpolatedTick);
-        }
-        NarrativeCraftMod.server.forceTimeSynchronization();
-
-        double elapsed = (now - startTime) / 1000.0;
-        if(!isPaused) {
-            t = Math.min(elapsed / waitSeconds, 1.0);
-        }
-    }
-
-
-    public boolean isFinished() {
-        return t >= 1.0;
-    }
-
-    @Override
-    void sendDebugDetails() {
-        if(storyHandler.isDebugMode()) {
-            Component message = null;
-            if(subCommand.equals("set") && secondTick == 0) {
-                message = Translation.message("debug.change_time.one_set", firstTick);
-            } else if(subCommand.equals("add") && secondTick == 0) {
-                message = Translation.message("debug.change_time.one_add", firstTick);
-            } else if(subCommand.equals("set") && secondTick > 0) {
-                message = Translation.message("debug.change_time.interpolate", firstTick, secondTick, waitSeconds);
-            }
-            Minecraft.getInstance().player.displayClientMessage(
-                    message,
-                    false
-            );
-        }
-    }
-
-    @Override
-    public ErrorLine validate(String[] command, int line, String lineText, Scene scene) {
-        if(getTickFromString(command[2]) == -1) {
-            return new ErrorLine(
-                    line,
-                    scene,
-                    Translation.message("validation.number", command[2]).getString(),
-                    lineText,
-                    false
-            );
-        }
-        if(command.length > 3) {
-            if(getTickFromString(command[4]) == -1) {
-                return new ErrorLine(
-                        line,
-                        scene,
-                        Translation.message("validation.number", command[4]).getString(),
-                        lineText,
-                        false
-                );
-            }
-            if(command.length == 5) {
-                return new ErrorLine(
-                        line,
-                        scene,
-                        Translation.message("validation.change_time.missing_time").getString(),
-                        lineText,
-                        false
-                );
-            }
+        if (arguments.size() > 8) {
             try {
-                Double.parseDouble(command[6]);
-            } catch (NumberFormatException e) {
-                return new ErrorLine(
-                        line,
-                        scene,
-                        Translation.message("validation.number", command[6]).getString(),
-                        lineText,
-                        false
-                );
-            }
-            if(command.length == 9) {
-                try {
-                    Easing.valueOf(command[8]);
-                } catch (IllegalArgumentException e) {
-                    return new ErrorLine(
-                            line,
-                            scene,
-                            Translation.message("validation.easing", command[8], Easing.getEasingsString()).getString(),
-                            lineText,
-                            false
-                    );
-                }
+                easing = Easing.valueOf(arguments.get(8).toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return InkActionResult.error(Translation.message(WRONG_EASING_VALUE, Arrays.toString(Easing.values())));
             }
         }
-        return null;
+        return InkActionResult.ok();
+    }
+
+    @Override
+    protected InkActionResult doExecute(PlayerSession playerSession) {
+        for (InkAction inkAction : playerSession.getInkActions()) {
+            if (inkAction instanceof ChangeDayTimeInkAction changeDayTimeInkAction) {
+                currentTick += changeDayTimeInkAction.getCurrentTick();
+                changeDayTimeInkAction.setRunning(false);
+            }
+        }
+        return InkActionResult.ok();
     }
 
     private long getTickFromString(String dayTime) {
@@ -210,5 +146,14 @@ public class ChangeDayTimeInkAction extends InkAction {
                 }
             }
         }
+    }
+
+    public long getCurrentTick() {
+        return currentTick;
+    }
+
+    @Override
+    public boolean needScene() {
+        return false;
     }
 }

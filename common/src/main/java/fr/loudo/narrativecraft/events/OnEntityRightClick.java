@@ -1,74 +1,59 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.KeyframeControllerBase;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.animations.Animation;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cameraAngle.CameraAngle;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cameraAngle.CameraAngleController;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.CutsceneController;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.keyframes.Keyframe;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.keyframes.KeyframeTrigger;
-import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
+import fr.loudo.narrativecraft.controllers.keyframe.AbstractKeyframeController;
+import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
+import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
+import fr.loudo.narrativecraft.narrative.keyframes.keyframeTrigger.KeyframeTrigger;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.narrative.story.MainScreenController;
-import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.screens.cameraAngles.CameraAngleCharacterScreen;
-import fr.loudo.narrativecraft.screens.keyframes.KeyframeTriggerScreen;
+import fr.loudo.narrativecraft.screens.characters.CharacterOptionsScreen;
+import fr.loudo.narrativecraft.screens.keyframe.KeyframeTriggerScreen;
 import net.minecraft.client.Minecraft;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 
 public class OnEntityRightClick {
 
-    public static void entityRightClick(ServerPlayer player, Entity entity) {
+    public static void entityRightClick(Player player, Entity entity) {
+        PlayerSession playerSession =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
 
-        StoryHandler storyHandler = NarrativeCraftMod.getInstance().getStoryHandler();
-        if(storyHandler != null && storyHandler.isRunning() && storyHandler.isRunning()) return;
-
-        PlayerSession playerSession = NarrativeCraftMod.getInstance().getPlayerSession();
-        if(playerSession == null) return;
-        KeyframeControllerBase keyframeControllerBase = playerSession.getKeyframeControllerBase();
-        if(keyframeControllerBase == null) return;
-
-        if(keyframeControllerBase instanceof CutsceneController cutsceneController) {
-            Keyframe keyframe = keyframeControllerBase.getKeyframeByEntity(entity);
-            if(keyframe != null) {
-                cutsceneController.setCurrentPreviewKeyframe(keyframe ,false);
+        if (playerSession.getController() instanceof AbstractKeyframeController<?> controller) {
+            CharacterRuntime characterRuntime = controller.getCharacterFromEntity(entity);
+            if (characterRuntime != null) {
+                CharacterOptionsScreen screen = new CharacterOptionsScreen(null, controller, characterRuntime);
+                Minecraft.getInstance().setScreen(screen);
             }
-        } else if (keyframeControllerBase instanceof CameraAngleController cameraAngleController) {
-            CameraAngle cameraAngle = cameraAngleController.getKeyframeByEntity(entity);
-            if(cameraAngle != null) {
-                cameraAngleController.setCurrentPreviewKeyframe(cameraAngle);
+            Keyframe keyframe = controller.getKeyframeByEntity(entity);
+            controller.setCamera(keyframe);
+            KeyframeTrigger keyframeTrigger = controller.getKeyframeTriggerByEntity(entity);
+            if (keyframeTrigger != null) {
+                KeyframeTriggerScreen screen = new KeyframeTriggerScreen(controller, keyframeTrigger);
+                Minecraft.getInstance().setScreen(screen);
             }
         }
-
-        if(keyframeControllerBase instanceof CameraAngleController cameraAngleController) {
-            if(cameraAngleController.isEntityInController(entity)) {
-                CharacterStoryData characterStoryData = cameraAngleController.getCharacterDataByEntity(entity);
-                CameraAngleCharacterScreen screen = new CameraAngleCharacterScreen(characterStoryData, cameraAngleController);
-                Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
-            }
-        }
-        if(keyframeControllerBase instanceof CutsceneController cutsceneController) {
-            Animation animation = cutsceneController.getAnimationFromEntity(entity);
-            if(animation != null) {
-                CameraAngleCharacterScreen screen = new CameraAngleCharacterScreen(animation, cutsceneController);
-                Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
-            }
-            KeyframeTrigger keyframeTrigger = cutsceneController.getKeyframeTriggerByEntity(entity);
-            if(keyframeTrigger != null) {
-                KeyframeTriggerScreen screen = new KeyframeTriggerScreen(cutsceneController, keyframeTrigger);
-                Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
-            }
-        }
-        if(keyframeControllerBase instanceof MainScreenController mainScreenController) {
-            KeyframeTrigger keyframeTrigger = mainScreenController.getKeyframeTriggerByEntity(entity);
-            if(keyframeTrigger != null) {
-                KeyframeTriggerScreen screen = new KeyframeTriggerScreen(mainScreenController, keyframeTrigger);
-                Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
-            }
-        }
-
     }
-
 }

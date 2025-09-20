@@ -1,9 +1,32 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.screens.components;
 
-import fr.loudo.narrativecraft.narrative.NarrativeEntry;
-import fr.loudo.narrativecraft.narrative.character.CharacterStory;
-import fr.loudo.narrativecraft.utils.ImageFontConstants;
-import fr.loudo.narrativecraft.utils.Translation;
+import fr.loudo.narrativecraft.util.ImageFontConstants;
+import fr.loudo.narrativecraft.util.Translation;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -14,9 +37,6 @@ import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class StoryElementList extends ContainerObjectSelectionList<StoryElementList.Entry> {
 
@@ -29,18 +49,21 @@ public class StoryElementList extends ContainerObjectSelectionList<StoryElementL
 
     public static class StoryEntryData {
         public final Button mainButton;
-        public NarrativeEntry narrativeEntry;
         public List<Button> extraButtons;
+        public Runnable onDelete;
+        public Runnable onUpdate;
 
-        public StoryEntryData(Button mainButton, NarrativeEntry narrativeEntry, List<Button> extraButtons) {
+        public StoryEntryData(Button mainButton, List<Button> extraButtons, Runnable onUpdate, Runnable onDelete) {
             this.mainButton = mainButton;
-            this.narrativeEntry = narrativeEntry;
             this.extraButtons = extraButtons;
+            this.onUpdate = onUpdate;
+            this.onDelete = onDelete;
         }
 
-        public StoryEntryData(Button mainButton, NarrativeEntry narrativeEntry) {
+        public StoryEntryData(Button mainButton, Runnable onUpdate, Runnable onDelete) {
             this.mainButton = mainButton;
-            this.narrativeEntry = narrativeEntry;
+            this.onUpdate = onUpdate;
+            this.onDelete = onDelete;
         }
 
         public StoryEntryData(Button mainButton) {
@@ -48,7 +71,7 @@ public class StoryElementList extends ContainerObjectSelectionList<StoryElementL
         }
     }
 
-    public class Entry extends ContainerObjectSelectionList.Entry<Entry> {
+    public static class Entry extends ContainerObjectSelectionList.Entry<Entry> {
         private final int gap = 5;
         private final Button mainButton;
         private final List<Button> buttons;
@@ -60,9 +83,9 @@ public class StoryElementList extends ContainerObjectSelectionList<StoryElementL
             this.buttons = new ArrayList<>();
             buttons.add(mainButton);
 
-            if (data.narrativeEntry != null && editButton) {
-                buttons.add(createEditButton(data.narrativeEntry));
-                buttons.add(createRemoveButton(data.narrativeEntry));
+            if (data.onUpdate != null && editButton) {
+                buttons.add(createEditButton(data.onUpdate));
+                buttons.add(createRemoveButton(data.onDelete));
             }
 
             if (data.extraButtons != null) {
@@ -73,34 +96,51 @@ public class StoryElementList extends ContainerObjectSelectionList<StoryElementL
             }
         }
 
-        private Button createEditButton(NarrativeEntry details) {
+        private Button createEditButton(Runnable onUpdate) {
             return Button.builder(ImageFontConstants.EDIT, btn -> {
-                if(details instanceof CharacterStory characterStory) {
-                    Minecraft.getInstance().setScreen(new EditCharacterInfoScreen(screen, characterStory));
-                } else {
-                    Minecraft.getInstance().setScreen(new EditInfoScreen(screen, details));
-                }
-            }).width(20).build();
+                        onUpdate.run();
+                    })
+                    .width(20)
+                    .build();
         }
 
-        private Button createRemoveButton(NarrativeEntry details) {
+        private Button createRemoveButton(Runnable onDelete) {
             return Button.builder(ImageFontConstants.REMOVE, btn -> {
-                ConfirmScreen confirm = new ConfirmScreen(b -> {
-                    if (b) {
-                        details.remove();
-                    }
-                    Minecraft.getInstance().setScreen(details.reloadScreen());
-                }, Component.literal(""), Translation.message("global.confirm_delete"),
-                        CommonComponents.GUI_YES, CommonComponents.GUI_CANCEL);
-                Minecraft.getInstance().setScreen(confirm);
-            }).width(20).build();
+                        ConfirmScreen confirm = new ConfirmScreen(
+                                b -> {
+                                    if (b) {
+                                        onDelete.run();
+                                    } else {
+                                        Minecraft.getInstance().setScreen(screen);
+                                    }
+                                },
+                                Component.literal(""),
+                                Translation.message("global.confirm_delete"),
+                                CommonComponents.GUI_YES,
+                                CommonComponents.GUI_CANCEL);
+                        Minecraft.getInstance().setScreen(confirm);
+                    })
+                    .width(20)
+                    .build();
         }
 
         @Override
-        public void render(GuiGraphics graphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovered, float partial) {
+        public void render(
+                GuiGraphics graphics,
+                int index,
+                int top,
+                int left,
+                int width,
+                int height,
+                int mouseX,
+                int mouseY,
+                boolean hovered,
+                float partial) {
             int totalWidth = buttons.stream().mapToInt(Button::getWidth).sum() + (buttons.size() - 1) * gap;
-            int x = (screen.width / 2 - totalWidth / 2); //  this line is wrong but sorry my head hurts okay, those mouseX coord shit is driving me crazy
-            if(buttons.size() > 1) {
+            int x = (screen.width / 2
+                    - totalWidth / 2); //  this line is wrong but sorry my head hurts okay, those mouseX coord shit is
+            // driving me crazy
+            if (buttons.size() > 1) {
                 x -= gap;
             }
             for (Button button : buttons) {
@@ -121,4 +161,3 @@ public class StoryElementList extends ContainerObjectSelectionList<StoryElementL
         }
     }
 }
-

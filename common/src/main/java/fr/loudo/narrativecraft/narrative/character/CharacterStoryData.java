@@ -1,241 +1,124 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.narrative.character;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.datafixers.util.Pair;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.mixin.fields.EntityFields;
-import fr.loudo.narrativecraft.mixin.fields.LivingEntityFields;
-import fr.loudo.narrativecraft.mixin.fields.PlayerFields;
-import fr.loudo.narrativecraft.mixin.fields.PlayerListFields;
-import fr.loudo.narrativecraft.utils.FakePlayer;
-import fr.loudo.narrativecraft.utils.Utils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
+import fr.loudo.narrativecraft.mixin.accessor.EntityAccessor;
+import fr.loudo.narrativecraft.mixin.accessor.LivingEntityAccessor;
+import fr.loudo.narrativecraft.narrative.Environment;
+import fr.loudo.narrativecraft.narrative.recording.Location;
+import fr.loudo.narrativecraft.util.Util;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
-import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
-import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import net.minecraft.world.level.Level;
 
 public class CharacterStoryData {
 
-    private CharacterStory characterStory;
-    private double x, y, z;
-    private float pitch, yaw;
-    private float yBodyRot;
-    private String pose;
+    private transient CharacterRuntime characterRuntime;
+    private final Location location;
+    private final List<ItemSlotData> itemSlotDataList = new ArrayList<>();
+
+    private String poseName = Pose.STANDING.name();
     private byte entityByte;
     private byte livingEntityByte;
-    private String skinName;
-    private final List<ItemSlotData> itemSlotDataList;
-    private boolean onlyTemplate;
+    private String skinName = "main.png";
+    private transient String oldSkinName = "main.png";
+    private boolean isTemplate;
 
-    public CharacterStoryData(CharacterStory characterStory) {
-        this.characterStory = characterStory;
-        skinName = characterStory.getCharacterSkinController().getCurrentSkin().getName();
-        itemSlotDataList = new ArrayList<>();
-        LivingEntity livingEntity = characterStory.getEntity();
-        if(livingEntity == null) return;
-        x = livingEntity.getX();
-        y = livingEntity.getY();
-        z = livingEntity.getZ();
-        pitch = livingEntity.getXRot();
-        yaw = livingEntity.getYRot();
-        yBodyRot = livingEntity.yBodyRot;
-        pose = livingEntity.getPose().name();
-        entityByte = livingEntity.getEntityData().get(EntityFields.getDATA_SHARED_FLAGS_ID());
-        livingEntityByte = livingEntity.getEntityData().get(LivingEntityFields.getDATA_LIVING_ENTITY_FLAGS());
-        onlyTemplate = false;
-        initItem(livingEntity);
+    public CharacterStoryData(CharacterStory characterStory, Location location, boolean isTemplate) {
+        this.characterRuntime = new CharacterRuntime(characterStory, skinName, null);
+        this.location = location;
+        this.isTemplate = isTemplate;
     }
 
-    public CharacterStoryData(CharacterStory characterStory, String skinName, double x, double y, double z, float XRot, float YRot, boolean onlyTemplate) {
-        this.characterStory = characterStory;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.pitch = XRot;
-        this.yaw = YRot;
-        this.skinName = skinName;
-        itemSlotDataList = new ArrayList<>();
-        LocalPlayer localPlayer = Minecraft.getInstance().player;
-        pose = localPlayer.getPose().name();
-        entityByte = localPlayer.getEntityData().get(EntityFields.getDATA_SHARED_FLAGS_ID());
-        livingEntityByte = localPlayer.getEntityData().get(LivingEntityFields.getDATA_LIVING_ENTITY_FLAGS());
-        this.onlyTemplate = onlyTemplate;
-        if(!onlyTemplate) {
-            initItem(localPlayer);
+    public void spawn(Level level, Environment environment) {
+        if (isTemplate && environment == Environment.PRODUCTION) return;
+        characterRuntime.getCharacterSkinController().setSkinName(skinName);
+        characterRuntime.getCharacterSkinController().cacheSkins();
+        characterRuntime.setEntity(Util.createEntityFromCharacter(characterRuntime.getCharacterStory(), level));
+        characterRuntime.getEntity().teleportTo(location.x(), location.y(), location.z());
+        characterRuntime.getEntity().setXRot(location.pitch());
+        characterRuntime.getEntity().setYRot(location.yaw());
+        characterRuntime.getEntity().setYHeadRot(location.yaw());
+        characterRuntime.getEntity().setOnGround(location.onGround());
+        try {
+            characterRuntime.getEntity().setPose(Pose.valueOf(poseName));
+        } catch (Exception ignored) {
+        }
+
+        applyBytes(characterRuntime.getEntity());
+        applyItems(level.registryAccess());
+    }
+
+    public void applyBytes(LivingEntity entity) {
+        entity.getEntityData().set(EntityAccessor.getDATA_SHARED_FLAGS_ID(), entityByte);
+        entity.getEntityData().set(LivingEntityAccessor.getDATA_LIVING_ENTITY_FLAGS(), livingEntityByte);
+    }
+
+    public void applyItems(RegistryAccess registryAccess) {
+        for (ItemSlotData itemSlotData : itemSlotDataList) {
+            try {
+                characterRuntime
+                        .getEntity()
+                        .setItemSlot(
+                                EquipmentSlot.valueOf(itemSlotData.equipmentSlot),
+                                itemSlotData.getItem(registryAccess));
+            } catch (Exception ignored) {
+            }
         }
     }
 
-    public CharacterStoryData(CharacterStory characterStory, double x, double y, double z, float pitch, float yaw, float yBodyRot, String pose, byte entityByte, byte livingEntityByte, String skinName, List<ItemSlotData> itemSlotDataList, boolean onlyTemplate) {
-        this.characterStory = characterStory;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.pitch = pitch;
-        this.yaw = yaw;
-        this.yBodyRot = yBodyRot;
-        this.pose = pose;
-        this.entityByte = entityByte;
-        this.livingEntityByte = livingEntityByte;
-        this.skinName = skinName;
-        this.itemSlotDataList = itemSlotDataList;
-        this.onlyTemplate = onlyTemplate;
+    public void kill() {
+        if (characterRuntime.getEntity() == null) return;
+        characterRuntime.getEntity().remove(Entity.RemovalReason.KILLED);
     }
 
-    public void initItem(LivingEntity entity) {
+    public void setItems(LivingEntity entity) {
         itemSlotDataList.clear();
-        for(EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
+        for (EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
             ItemStack itemStack = entity.getItemBySlot(equipmentSlot);
-            if(!itemStack.isEmpty()) {
-                Tag tag = Utils.getItemTag(itemStack, entity.registryAccess());
-                Tag componentsTag = ((CompoundTag)tag).get("components");
+            if (!itemStack.isEmpty()) {
+                Tag tag = Util.getItemTag(itemStack, entity.registryAccess());
+                Tag componentsTag = ((CompoundTag) tag).get("components");
                 String itemData = componentsTag == null ? "" : componentsTag.toString();
-                itemSlotDataList.add(
-                        new ItemSlotData(
-                                BuiltInRegistries.ITEM.getId(itemStack.getItem()),
-                                itemData,
-                                equipmentSlot.name()
-                        )
-                );
+                itemSlotDataList.add(new ItemSlotData(
+                        BuiltInRegistries.ITEM.getId(itemStack.getItem()), itemData, equipmentSlot.name()));
             } else {
                 itemSlotDataList.add(
-                        new ItemSlotData(
-                                BuiltInRegistries.ITEM.getId(Items.AIR),
-                                "",
-                                equipmentSlot.name()
-                        )
-                );
+                        new ItemSlotData(BuiltInRegistries.ITEM.getId(Items.AIR), "", equipmentSlot.name()));
             }
         }
-    }
-
-    public void spawn(ServerLevel serverLevel) {
-        LivingEntity livingEntity;
-        if(BuiltInRegistries.ENTITY_TYPE.getId(characterStory.getEntityType()) == BuiltInRegistries.ENTITY_TYPE.getId(EntityType.PLAYER)) {
-            livingEntity = new FakePlayer(serverLevel, new GameProfile(UUID.randomUUID(), characterStory.getName()));
-        } else {
-            livingEntity = (LivingEntity) characterStory.getEntityType().create(serverLevel, EntitySpawnReason.MOB_SUMMONED);
-            if(livingEntity instanceof Mob mob) {
-                mob.setNoAi(true);
-                mob.setSilent(true);
-                mob.setInvulnerable(true);
-            }
-        }
-        livingEntity.snapTo(x, y, z);
-        livingEntity.setXRot(pitch);
-        livingEntity.setYRot(yaw);
-        livingEntity.setYHeadRot(yaw);
-        livingEntity.setYBodyRot(yBodyRot);
-        livingEntity.setPose(Pose.valueOf(pose));
-        for(ItemSlotData itemSlotData : itemSlotDataList) {
-            livingEntity.setItemSlot(EquipmentSlot.valueOf(itemSlotData.equipmentSlot), itemSlotData.getItem(livingEntity.registryAccess()));
-            serverLevel.getServer().getPlayerList().broadcastAll(new ClientboundSetEquipmentPacket(
-                    livingEntity.getId(),
-                    List.of(new Pair<>(EquipmentSlot.valueOf(itemSlotData.equipmentSlot), itemSlotData.getItem(livingEntity.registryAccess())))
-            ));
-        }
-
-        SynchedEntityData entityData = livingEntity.getEntityData();
-        if(livingEntity instanceof FakePlayer fakePlayer) {
-            serverLevel.getServer().getPlayerList().broadcastAll(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
-            fakePlayer.getEntityData().set(PlayerFields.getDATA_PLAYER_MODE_CUSTOMISATION(), (byte) 0b01111111);
-        }
-        entityData.set(EntityFields.getDATA_SHARED_FLAGS_ID(), entityByte);
-        entityData.set(LivingEntityFields.getDATA_LIVING_ENTITY_FLAGS(), livingEntityByte);
-        livingEntity.setInvisible(false);
-        if(livingEntity instanceof FakePlayer fakePlayer) {
-            ((PlayerListFields)serverLevel.getServer().getPlayerList()).getPlayersByUUID().put(fakePlayer.getUUID(), fakePlayer);
-            serverLevel.getServer().getPlayerList().broadcastAll(new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
-            serverLevel.addNewPlayer(fakePlayer);
-        } else {
-            serverLevel.addFreshEntity(livingEntity);
-        }
-        if(characterStory.getCharacterType() == CharacterStory.CharacterType.MAIN) {
-            characterStory = NarrativeCraftMod.getInstance().getCharacterManager().getCharacter(characterStory.getName());
-        }
-        characterStory.getCharacterSkinController().setCurrentSkin(characterStory.getCharacterSkinController().getSkinFile(skinName));
-        characterStory.setEntity(livingEntity);
-    }
-
-    public String getSkinName() {
-        return skinName;
-    }
-
-    public void setSkinName(String skinName) {
-        this.skinName = skinName;
-    }
-
-    public CharacterStory getCharacterStory() {
-        return characterStory;
-    }
-
-    public void setCharacterStory(CharacterStory characterStory) {
-        this.characterStory = characterStory;
-    }
-
-    public List<ItemSlotData> getItemSlotDataList() {
-        return itemSlotDataList;
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public double getZ() {
-        return z;
-    }
-
-    public byte getEntityByte() {
-        return entityByte;
-    }
-
-    public float getPitch() {
-        return pitch;
-    }
-
-    public float getYaw() {
-        return yaw;
-    }
-
-    public float getyBodyRot() {
-        return yBodyRot;
-    }
-
-    public Pose getPose() {
-        return Pose.valueOf(pose);
-    }
-
-    public void setX(double x) {
-        this.x = x;
-    }
-
-    public void setY(double y) {
-        this.y = y;
-    }
-
-    public void setZ(double z) {
-        this.z = z;
-    }
-
-    public void setEntityByte(byte entityByte) {
-        this.entityByte = entityByte;
     }
 
     public byte getLivingEntityByte() {
@@ -246,39 +129,73 @@ public class CharacterStoryData {
         this.livingEntityByte = livingEntityByte;
     }
 
-    public void setPitch(float pitch) {
-        this.pitch = pitch;
+    public byte getEntityByte() {
+        return entityByte;
     }
 
-    public void setYaw(float yaw) {
-        this.yaw = yaw;
+    public void setEntityByte(byte entityByte) {
+        this.entityByte = entityByte;
     }
 
-    public void setyBodyRot(float yBodyRot) {
-        this.yBodyRot = yBodyRot;
+    public Location getLocation() {
+        return location;
+    }
+
+    public Pose getPose() {
+        try {
+            return Pose.valueOf(poseName);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     public void setPose(Pose pose) {
-        this.pose = pose.name();
+        this.poseName = pose.name();
     }
 
-    public boolean isOnlyTemplate() {
-        return onlyTemplate;
+    public String getSkinName() {
+        return skinName;
     }
 
-    public void setOnlyTemplate(boolean onlyTemplate) {
-        this.onlyTemplate = onlyTemplate;
+    public void setSkinName(String skinName) {
+        oldSkinName = this.skinName;
+        this.skinName = skinName;
     }
 
-    public record ItemSlotData(int id, String data, String equipmentSlot) {
+    public String getOldSkinName() {
+        if (oldSkinName == null) oldSkinName = "main.png";
+        return oldSkinName;
+    }
+
+    public boolean isTemplate() {
+        return isTemplate;
+    }
+
+    public void setTemplate(boolean template) {
+        isTemplate = template;
+    }
+
+    public CharacterRuntime getCharacterRuntime() {
+        return characterRuntime;
+    }
+
+    public void setCharacterRuntime(CharacterRuntime characterRuntime) {
+        this.characterRuntime = characterRuntime;
+    }
+
+    public CharacterStory getCharacterStory() {
+        return characterRuntime.getCharacterStory();
+    }
+
+    private record ItemSlotData(int id, String data, String equipmentSlot) {
         public ItemStack getItem(RegistryAccess registryAccess) {
-                Item item = BuiltInRegistries.ITEM.byId(id);
-                ItemStack itemStack = new ItemStack(item);
-                CompoundTag tag = Utils.tagFromIdAndComponents(item, data);
-                if (tag != null) {
-                    itemStack = Utils.generateItemStackFromNBT(tag, registryAccess);
-                }
-                return itemStack;
+            Item item = BuiltInRegistries.ITEM.byId(id);
+            ItemStack itemStack = new ItemStack(item);
+            CompoundTag tag = Util.tagFromIdAndComponents(item, data);
+            if (tag != null) {
+                itemStack = Util.generateItemStackFromNBT(tag, registryAccess);
             }
+            return itemStack;
         }
+    }
 }

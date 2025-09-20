@@ -9,12 +9,12 @@
     "BlockItemMixin",
     "DoubleHighBlockItemMixin",
     "LivingEntityFabricMixin",
-    "ServerPlayerCommonMixin",
-    "ServerPlayerMixin"
+    "ServerPlayerFabricMixin"
   ],
   "client": [
     "GuiGraphicsFabricMixin",
     "GuiMixin",
+    "LevelRendererMixin",
     "MinecraftFabricMixin"
   ],
   "server": [],

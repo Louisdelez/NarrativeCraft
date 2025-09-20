@@ -1,187 +1,128 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.narrative.story;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
+import fr.loudo.narrativecraft.mixin.accessor.EntityAccessor;
+import fr.loudo.narrativecraft.mixin.accessor.LivingEntityAccessor;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.Scene;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cameraAngle.CameraAngleController;
-import fr.loudo.narrativecraft.narrative.chapter.scenes.cutscenes.keyframes.KeyframeCoordinate;
-import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
-import fr.loudo.narrativecraft.narrative.dialog.Dialog;
 import fr.loudo.narrativecraft.narrative.dialog.DialogData;
-import fr.loudo.narrativecraft.narrative.dialog.DialogImpl;
+import fr.loudo.narrativecraft.narrative.playback.Playback;
+import fr.loudo.narrativecraft.narrative.recording.Location;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.narrative.story.inkAction.InkAction;
-import fr.loudo.narrativecraft.utils.ImageFontConstants;
-import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.chat.Component;
-import net.minecraft.util.ARGB;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.world.entity.Entity;
 
 public class StorySave {
+    private transient Chapter chapter;
+    private transient Scene scene;
+    private final String saveData;
+    private final DialogData dialogData;
+    private final List<String> tagsRunning;
+    private final List<CharacterStoryData> characterStoryDataList = new ArrayList<>();
 
-    private int chapterIndex;
-    private String sceneName;
-    private KeyframeCoordinate soloCam;
-    private String inkSave;
-    private final List<CharacterStoryData> characterStoryDataList;
-    private DialogData dialogSaveData;
-    private final List<String> tagList;
-    public static long startTimeSaveIcon;
-
-    public StorySave(StoryHandler storyHandler, boolean newScene) {
-        characterStoryDataList = new ArrayList<>();
-        tagList = new ArrayList<>();
-        PlayerSession playerSession = storyHandler.getPlayerSession();
-        try {
-            if(!newScene) {
-                if(playerSession.getKeyframeControllerBase() instanceof CameraAngleController cameraAngleController) {
-                    soloCam = cameraAngleController.getCurrentPreviewKeyframe().getKeyframeCoordinate();
-                } else {
-                    soloCam = playerSession.getSoloCam();
-                }
+    public StorySave(PlayerSession playerSession) throws Exception {
+        StoryHandler storyHandler = playerSession.getStoryHandler();
+        chapter = playerSession.getChapter();
+        scene = playerSession.getScene();
+        saveData = storyHandler.getStory().getState().toJson();
+        dialogData = storyHandler.getDialogData();
+        List<InkAction> inkActions = playerSession.getInkActions().stream()
+                .filter(InkAction::isRunning)
+                .toList();
+        tagsRunning =
+                new ArrayList<>(inkActions.stream().map(InkAction::getCommand).toList());
+        removeForbiddenTagLoadSave(tagsRunning);
+        for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+            for (Playback playback : playerSession.getPlaybackManager().getPlaybacks()) {
+                if (playback.getCharacter()
+                        .getName()
+                        .equalsIgnoreCase(characterRuntime.getCharacterStory().getName())) return;
+                if (characterRuntime.getEntity() == null) return;
             }
-            inkSave = storyHandler.getStory().getState().toJson();
-            chapterIndex = playerSession.getChapter().getIndex();
-            sceneName = playerSession.getScene().getName();
-            DialogImpl dialogImpl = storyHandler.getCurrentDialogBox();
-            DialogData globalDialogData = storyHandler.getGlobalDialogValue();
-            if(dialogImpl instanceof Dialog dialog) {
-                dialogSaveData = new DialogData(
-                        dialog.getCharacterName(),
-                        storyHandler.getCurrentDialog(),
-                        dialog.getDialogOffset(),
-                        dialog.getTextDialogColor(),
-                        dialog.getDialogBackgroundColor(),
-                        dialog.getPaddingX(),
-                        dialog.getPaddingY(),
-                        dialog.getScale() / 0.025f,
-                        dialog.getDialogAnimationScrollText().getLetterSpacing(),
-                        dialog.getDialogAnimationScrollText().getGap(),
-                        dialog.getDialogAnimationScrollText().getMaxWidth(),
-                        dialog.isUnSkippable(),
-                        dialog.getForcedEndTime(),
-                        globalDialogData.getBobbingNoiseShakeSpeed(),
-                        globalDialogData.getBobbingNoiseShakeStrength()
-                );
-            } else {
-                dialogSaveData = new DialogData(
-                        null,
-                        null,
-                        globalDialogData.getOffset(),
-                        globalDialogData.getTextColor(),
-                        globalDialogData.getBackgroundColor(),
-                        globalDialogData.getPaddingX(),
-                        globalDialogData.getPaddingY(),
-                        globalDialogData.getScale(),
-                        globalDialogData.getLetterSpacing(),
-                        globalDialogData.getGap(),
-                        globalDialogData.getMaxWidth(),
-                        globalDialogData.isUnSkippable(),
-                        globalDialogData.getEndForceEndTime(),
-                        globalDialogData.getBobbingNoiseShakeSpeed(),
-                        globalDialogData.getBobbingNoiseShakeStrength()
-                );
-            }
+            Entity entity = characterRuntime.getEntity();
+            CharacterStoryData characterStoryData = new CharacterStoryData(
+                    characterRuntime.getCharacterStory(),
+                    new Location(
+                            entity.getX(),
+                            entity.getY(),
+                            entity.getZ(),
+                            entity.getXRot(),
+                            entity.getYRot(),
+                            entity.onGround()),
+                    false);
 
-            if(!newScene) {
-                for(InkAction inkAction : storyHandler.getInkActionList()) {
-                    tagList.add(inkAction.getCommand());
-                }
-                for(CharacterStory characterStory : storyHandler.getCurrentCharacters()) {
-                    // If character not spawned by playback or camera angle
-                    if(NarrativeCraftMod.getInstance().getPlaybackHandler().getPlaybacks().stream().noneMatch(playback -> playback.getCharacter().getName().equals(characterStory.getName()))) {
-                        characterStoryDataList.add(new CharacterStoryData(characterStory));
-                    }
-                }
-            }
-        } catch (Exception e) {
-            storyHandler.crash(e, false);
-        }
-
-    }
-
-    public static void showSaveIcon(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
-
-        long fadeInDuration = 200;
-        long stayDuration = 900;
-        long fadeOutDuration = 200;
-
-        long elapsed = System.currentTimeMillis() - startTimeSaveIcon;
-        long totalDuration = fadeInDuration + stayDuration + fadeOutDuration;
-
-        float alpha;
-        if (elapsed < fadeInDuration) {
-            alpha = Math.max((float) elapsed / fadeInDuration, 0.05f);
-        } else if (elapsed < fadeInDuration + stayDuration) {
-            alpha = 1f;
-        } else {
-            long fadeOutElapsed = elapsed - fadeInDuration - stayDuration;
-            alpha = Math.max(1f - (float) fadeOutElapsed / fadeOutDuration, 0.05f);
-        }
-
-        int alphaInt = (int) (alpha * 255) & 0xFF;
-        int color = ARGB.color(alphaInt, 0xFFFFFF);
-
-        Minecraft minecraft = Minecraft.getInstance();
-        int width = minecraft.getWindow().getGuiScaledWidth();
-        int height = minecraft.getWindow().getGuiScaledHeight();
-
-        Component text = ImageFontConstants.SAVE;
-        int textWidth = minecraft.font.width(text);
-
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(0, 0);
-
-        guiGraphics.drawString(
-                minecraft.font,
-                text,
-                width - textWidth - 30,
-                height - 30,
-                color,
-                false
-        );
-
-        guiGraphics.pose().popMatrix();
-
-        if (elapsed >= totalDuration) {
-            NarrativeCraftMod.getInstance().getStoryHandler().setSaving(false);
+            characterStoryData.setPose(entity.getPose());
+            characterStoryData.setItems(characterRuntime.getEntity());
+            characterStoryData.setEntityByte(
+                    characterRuntime.getEntity().getEntityData().get(EntityAccessor.getDATA_SHARED_FLAGS_ID()));
+            characterStoryData.setLivingEntityByte(characterRuntime
+                    .getEntity()
+                    .getEntityData()
+                    .get(LivingEntityAccessor.getDATA_LIVING_ENTITY_FLAGS()));
+            characterStoryDataList.add(characterStoryData);
         }
     }
 
-    public PlayerSession getPlayerSession() {
-        Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getChapterByIndex(chapterIndex);
-        Scene scene = chapter.getSceneByName(sceneName);
-        PlayerSession playerSession = new PlayerSession(chapter, scene);
-        playerSession.setSoloCam(soloCam);
-        return playerSession;
+    private void removeForbiddenTagLoadSave(List<String> commands) {
+        commands.remove("save");
+        commands.remove("on enter");
     }
 
-    public String getInkSave() {
-        return inkSave;
+    public Chapter getChapter() {
+        return chapter;
+    }
+
+    public Scene getScene() {
+        return scene;
+    }
+
+    public void setChapter(Chapter chapter) {
+        this.chapter = chapter;
+    }
+
+    public void setScene(Scene scene) {
+        this.scene = scene;
+    }
+
+    public String getSaveData() {
+        return saveData;
+    }
+
+    public DialogData getDialogData() {
+        return dialogData;
+    }
+
+    public List<String> getTagsRunning() {
+        return tagsRunning;
     }
 
     public List<CharacterStoryData> getCharacterStoryDataList() {
         return characterStoryDataList;
-    }
-
-    public int getChapterIndex() {
-        return chapterIndex;
-    }
-
-    public String getSceneName() {
-        return sceneName;
-    }
-
-    public DialogData getDialogSaveData() {
-        return dialogSaveData;
-    }
-
-    public List<String> getTagList() {
-        return tagList;
     }
 }

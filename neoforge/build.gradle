@@ -47,10 +47,10 @@ repositories {
 dependencies {
     jarJar(implementation("com.bladecoder.ink:blade-ink")) {
         version {
-            prefer '1.2.0+nc'
+            prefer '1.2.1+nc'
         }
     }
-    additionalRuntimeClasspath 'com.bladecoder.ink:blade-ink:1.2.0+nc'
+    additionalRuntimeClasspath 'com.bladecoder.ink:blade-ink:1.2.1+nc'
     compileOnly("io.github.kosmx.emotes:emotesAPI:${emotesAPI_version}") {
         exclude group: 'com.google.guava', module: 'guava'
     }
