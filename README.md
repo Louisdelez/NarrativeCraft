@@ -7,10 +7,11 @@
 </div>
 
 ## Concept
+Do you want to create your own Life is Strange game, or Until Then game, or any narrative game you can think of? NarrativeCraft is a tool that makes this possible with a plot twist: you don't need to know how to code, all thanks to the Ink narrative scripting system.
 
-Minecraft is a great game for creating cinematic shots, as you can customize everything, resource packs, shaders, mods... And since Minecraft is a sandbox game, why not have the possibility to create an interactive story within it?
+Create your own unique stories with endearing characters, let your imagination take form in a 3D sandbox, with shaders, music, and cutscenes.
 
-In Minecraft, you already have the foundation: a 3D game world, characters, skins, resource packs, mods, shaders. The only limit is your imagination. This mod is aimed at people who find it hard to make video games themselves but want to tell powerful stories, or map makers who want to add more storytelling.
+This mod is mainly written to be singleplayer-only, to create adventure maps. Multiplayer is not supported yet.
 
 ## Features
 
