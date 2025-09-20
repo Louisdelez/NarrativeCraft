@@ -26,11 +26,13 @@ package fr.loudo.narrativecraft.keys;
 import com.mojang.blaze3d.platform.InputConstants;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
+import fr.loudo.narrativecraft.narrative.recording.Recording;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.screens.storyManager.chapter.ChaptersScreen;
 import fr.loudo.narrativecraft.screens.storyManager.scene.ScenesMenuScreen;
 import fr.loudo.narrativecraft.util.Translation;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 
 public class PressKeyListener {
@@ -74,9 +76,49 @@ public class PressKeyListener {
             PlayerSession playerSession =
                     NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
             if (playerSession == null) return;
+            if (!playerSession.isSessionSet()) {
+                minecraft.player.displayClientMessage(Translation.message("session.not_set"), false);
+                return;
+            }
             StoryHandler storyHandler = playerSession.getStoryHandler();
             if (storyHandler == null) return;
             playerSession.setShowDebugHud(!playerSession.isShowDebugHud());
+        });
+        ModKeys.handleKeyPress(ModKeys.START_ANIMATION_RECORDING, () -> {
+            PlayerSession playerSession =
+                    NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
+            if (playerSession == null) return;
+            if (!playerSession.isSessionSet()) {
+                minecraft.player.displayClientMessage(Translation.message("session.not_set"), false);
+                return;
+            }
+            Recording recording =
+                    NarrativeCraftMod.getInstance().getRecordingManager().getRecording(playerSession.getPlayer());
+            if (recording != null && recording.isRecording()) {
+                minecraft.player.displayClientMessage(
+                        Translation.message("record.start.already_recording").withStyle(ChatFormatting.RED), false);
+                return;
+            }
+            if (recording == null) {
+                recording = new Recording(playerSession.getPlayer(), playerSession);
+            }
+            recording.start();
+            NarrativeCraftMod.getInstance().getRecordingManager().addRecording(recording);
+            minecraft.player.displayClientMessage(Translation.message("record.start.success"), false);
+        });
+        ModKeys.handleKeyPress(ModKeys.STOP_ANIMATION_RECORDING, () -> {
+            PlayerSession playerSession =
+                    NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
+            if (playerSession == null) return;
+            Recording recording =
+                    NarrativeCraftMod.getInstance().getRecordingManager().getRecording(playerSession.getPlayer());
+            if (recording == null || !recording.isRecording()) {
+                minecraft.player.displayClientMessage(
+                        Translation.message("record.stop.no_recording").withStyle(ChatFormatting.RED), false);
+                return;
+            }
+            recording.stop();
+            minecraft.player.displayClientMessage(Translation.message("record.stop.success"), false);
         });
     }
 
