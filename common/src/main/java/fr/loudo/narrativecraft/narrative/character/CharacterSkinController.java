@@ -47,11 +47,14 @@ public class CharacterSkinController {
     public CharacterSkinController(CharacterRuntime characterRuntime, String skinName) {
         this.characterRuntime = characterRuntime;
         this.skinName = skinName;
-        skins = NarrativeCraftFile.getSkinFiles(characterRuntime.getCharacterStory(), null);
+        if (characterRuntime.getCharacterStory() != null) {
+            skins = NarrativeCraftFile.getSkinFiles(characterRuntime.getCharacterStory(), null);
+        }
         cachedSkins = new ArrayList<>();
     }
 
     public void cacheSkins() {
+        if (characterRuntime.getCharacterStory() == null) return;
         Minecraft minecraft = Minecraft.getInstance();
         unCacheSkins();
         skins = NarrativeCraftFile.getSkinFiles(characterRuntime.getCharacterStory(), null);

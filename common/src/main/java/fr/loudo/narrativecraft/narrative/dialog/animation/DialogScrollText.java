@@ -78,7 +78,7 @@ public class DialogScrollText {
         if (dialogRenderer instanceof DialogRenderer2D && lines.size() > 1) {
             currentY += (minecraft.font.lineHeight * (lines.size() - 1)) / 2.0F;
         }
-        currentX = -dialogRenderer.getTotalWidth() + dialogRenderer.getPaddingX() + 2 * 2;
+        currentX = -dialogRenderer.getTotalWidth() + dialogRenderer.getPaddingX() * 2;
         lettersRenderer.clear();
         textEffectAnimation = new TextEffectAnimation(dialogRenderer.getText());
     }
@@ -223,7 +223,7 @@ public class DialogScrollText {
         lettersRenderer.add(new LetterLocation(' ', currentX, currentY, false));
         currentLine++;
         currentCharIndex = 0;
-        currentX = -dialogRenderer.getTotalWidth() + dialogRenderer.getPaddingX() + 2 * 2;
+        currentX = -dialogRenderer.getTotalWidth() + dialogRenderer.getPaddingX() * 2;
         currentY += minecraft.font.lineHeight + dialogRenderer.getGap();
     }
 
