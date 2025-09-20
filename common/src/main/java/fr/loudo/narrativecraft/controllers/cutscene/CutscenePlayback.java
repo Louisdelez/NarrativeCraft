@@ -93,7 +93,6 @@ public class CutscenePlayback {
             }
             playerSession.getInkActions().clear();
         }
-        NarrativeCraftMod.server.execute(() -> cutsceneController.setPlaying(false));
     }
 
     public void tick() {
@@ -104,6 +103,7 @@ public class CutscenePlayback {
             playerSession.setCurrentCamera(keyframeA.getKeyframeLocation());
             Minecraft.getInstance().setScreen(new CutsceneKeyframeOptionScreen(keyframeA, playerSession, false));
             cutsceneController.changeTimePosition(keyframeA.getTick(), true);
+            cutsceneController.setPlaying(false);
         }
         segmentTick++;
         if (segmentTick >= keyframeA.getStartDelayTick()) {

@@ -102,6 +102,9 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
     @Override
     public void startSession() {
         stopCurrentSession();
+        if (playerSession.getController() instanceof CutsceneController cutsceneController) {
+            cutsceneController.getCutscenePlayback().stop();
+        }
         playerSession.setController(this);
         playbacks.clear();
         StoryHandler storyHandler = playerSession.getStoryHandler();

@@ -150,12 +150,12 @@ public class StoryHandler {
 
     public void stopAndFinishScreen() {
         stop();
-        if (worldOption.showCreditsScreen) {
+        if (worldOption.showCreditsScreen && !debugMode) {
             CreditScreen creditScreen = new CreditScreen(playerSession, false, !worldOption.finishedStory);
             minecraft.execute(() -> minecraft.setScreen(creditScreen));
+            worldOption.finishedStory = true;
+            NarrativeCraftFile.updateWorldOptions(worldOption);
         }
-        worldOption.finishedStory = true;
-        NarrativeCraftFile.updateWorldOptions(worldOption);
     }
 
     public boolean characterInStory(CharacterStory characterStory) {

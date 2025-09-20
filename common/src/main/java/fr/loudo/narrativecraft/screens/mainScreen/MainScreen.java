@@ -196,6 +196,11 @@ public class MainScreen extends Screen {
         } else {
             playBtnComponent = Translation.message("screen.main_screen.continue");
         }
+
+        boolean canPlay = !NarrativeCraftMod.getInstance()
+                .getChapterManager()
+                .getChapters()
+                .isEmpty();
         Button playButton = Button.builder(playBtnComponent, button -> {
                     if (pause) {
                         onClose();
@@ -205,11 +210,10 @@ public class MainScreen extends Screen {
                 })
                 .bounds(initialX, startY, buttonWidth, buttonHeight)
                 .build();
-        playButton.active = !NarrativeCraftMod.getInstance()
-                .getChapterManager()
-                .getChapters()
-                .isEmpty();
-        playButton.setTooltip(Tooltip.create(Translation.message("screen.main_screen.cant_play_tooltip")));
+        playButton.active = canPlay;
+        if (!canPlay) {
+            playButton.setTooltip(Tooltip.create(Translation.message("screen.main_screen.cant_play_tooltip")));
+        }
         this.addRenderableWidget(playButton);
 
         if (!firstGame && !pause) {
@@ -236,11 +240,10 @@ public class MainScreen extends Screen {
                     })
                     .bounds(initialX, startY, buttonWidth, buttonHeight)
                     .build();
-            startNewGame.active = !NarrativeCraftMod.getInstance()
-                    .getChapterManager()
-                    .getChapters()
-                    .isEmpty();
-            startNewGame.setTooltip(Tooltip.create(Translation.message("screen.main_screen.cant_play_tooltip")));
+            startNewGame.active = canPlay;
+            if (!canPlay) {
+                startNewGame.setTooltip(Tooltip.create(Translation.message("screen.main_screen.cant_play_tooltip")));
+            }
             this.addRenderableWidget(startNewGame);
         }
 

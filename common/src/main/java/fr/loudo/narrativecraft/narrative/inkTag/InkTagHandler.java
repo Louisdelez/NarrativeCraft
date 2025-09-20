@@ -34,7 +34,7 @@ import java.util.List;
 public class InkTagHandler {
 
     private final PlayerSession playerSession;
-    private final List<String> tagsToExecute = new ArrayList<>();
+    private List<String> tagsToExecute = new ArrayList<>();
 
     public InkTagHandler(PlayerSession playerSession) {
         this.playerSession = playerSession;
@@ -42,9 +42,8 @@ public class InkTagHandler {
 
     public void execute() {
         InkActionResult result = InkActionResult.ok();
-        List<String> executed = new ArrayList<>();
-        for (String tag : tagsToExecute) {
-            executed.add(tag);
+        for (int i = 0; i < tagsToExecute.size(); i++) {
+            String tag = tagsToExecute.get(i);
             InkAction inkAction = InkActionRegistry.findByCommand(tag);
             if (inkAction == null) continue;
             inkAction.setBlockEndTask(() -> {
@@ -58,11 +57,11 @@ public class InkTagHandler {
             result = inkAction.execute(playerSession);
             playerSession.addInkAction(inkAction);
             if (result.isBlock()) {
-                tagsToExecute.removeAll(executed);
+                tagsToExecute = tagsToExecute.subList(i + 1, tagsToExecute.size());
                 return;
             }
         }
-        tagsToExecute.removeAll(executed);
+        tagsToExecute.clear();
         StoryHandler storyHandler = playerSession.getStoryHandler();
         if (storyHandler != null && tagsToExecute.isEmpty() && result.isOk()) {
             if (storyHandler.isFinished() && storyHandler.getDialogText().isEmpty()) {

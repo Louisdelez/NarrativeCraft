@@ -86,23 +86,31 @@ public class StoryValidation {
         Pattern tagPattern = Pattern.compile(TAG_REGEX);
 
         String[] lines = Files.readString(scriptFile.toPath()).split("\n");
+        boolean firstMatcherFound = false;
+
         for (int i = 0; i < lines.length; i++) {
             String rawLine = lines[i].trim();
-            if ((!rawLine.equals("# on enter") && !rawLine.equals("#on enter")) && i + 1 == 2 && chapter == null) {
-                errorLines.add(new ErrorLine(
-                        i + 1,
-                        null,
-                        scene,
-                        Translation.message("validation.on_enter_required").getString(),
-                        "",
-                        false));
-            }
+
             if (!rawLine.startsWith("#")) continue;
+
             Matcher matcher = tagPattern.matcher(rawLine);
             while (matcher.find()) {
                 String command = matcher.group(1).trim();
-                InkAction inkAction = InkActionRegistry.findByCommand(command);
+                if (!firstMatcherFound) {
+                    firstMatcherFound = true;
+                    if (i + 1 == 2 && !command.equals("on enter")) {
+                        errorLines.add(new ErrorLine(
+                                i + 1,
+                                null,
+                                scene,
+                                Translation.message("validation.on_enter_required")
+                                        .getString(),
+                                command,
+                                false));
+                    }
+                }
 
+                InkAction inkAction = InkActionRegistry.findByCommand(command);
                 if (inkAction == null) continue;
 
                 InkActionResult result = inkAction.validate(command, scene);

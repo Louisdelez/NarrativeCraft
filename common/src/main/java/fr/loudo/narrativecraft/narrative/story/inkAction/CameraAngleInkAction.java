@@ -94,6 +94,7 @@ public class CameraAngleInkAction extends InkAction {
                         .getCharacterStory()
                         .getName()
                         .equalsIgnoreCase(characterRuntime.getCharacterStory().getName())) {
+                    if (characterRuntime.getEntity() == null) continue;
                     characterRuntime.getEntity().remove(Entity.RemovalReason.KILLED);
                     toRemove.add(characterRuntime);
                 }
