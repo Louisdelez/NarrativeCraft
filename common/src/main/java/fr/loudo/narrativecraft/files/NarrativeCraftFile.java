@@ -45,6 +45,7 @@ import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -652,6 +653,42 @@ public class NarrativeCraftFile {
         } catch (JsonIOException e) {
             NarrativeCraftMod.LOGGER.error("Couldn't update world options! ", e);
         }
+    }
+
+    public static void updateWorldOptions(File worldOptionsFile, NarrativeWorldOption narrativeWorldOption) {
+        try {
+            try (Writer writer = new BufferedWriter(new FileWriter(worldOptionsFile))) {
+                new Gson().toJson(narrativeWorldOption, writer);
+            } catch (IOException e) {
+                NarrativeCraftMod.LOGGER.error("Couldn't update world options! ", e);
+            }
+        } catch (JsonIOException e) {
+            NarrativeCraftMod.LOGGER.error("Couldn't update world options! ", e);
+        }
+    }
+
+    public static NarrativeWorldOption getNarrativeCraftWorldVersion(String levelName, String levelVersion) {
+        File worldOptionFile = getWorldOptionFile(levelName);
+        if (!worldOptionFile.exists()) return null;
+        try {
+            String worldOptionContent = Files.readString(worldOptionFile.toPath());
+            NarrativeWorldOption option = new Gson().fromJson(worldOptionContent, NarrativeWorldOption.class);
+            if (option.stringMcVersion.isEmpty()) {
+                option.stringMcVersion = levelVersion;
+                updateWorldOptions(worldOptionFile, option);
+            }
+            return option;
+        } catch (IOException e) {
+            NarrativeCraftMod.LOGGER.info("Can't get narrative craft world version of {}", levelName, e);
+        }
+        return null;
+    }
+
+    public static File getWorldOptionFile(String levelName) {
+        Path path = Minecraft.getInstance().getLevelSource().getLevelPath(levelName);
+        File narrativecraftFolder = new File(path.toFile(), "narrativecraft");
+        File dataFolder = new File(narrativecraftFolder, "data");
+        return new File(dataFolder, "world_options" + NarrativeCraftFile.EXTENSION_DATA_FILE);
     }
 
     public static NarrativeWorldOption loadWorldOptions() {

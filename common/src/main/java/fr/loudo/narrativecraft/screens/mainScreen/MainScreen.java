@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.util.List;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -208,6 +209,7 @@ public class MainScreen extends Screen {
                 .getChapterManager()
                 .getChapters()
                 .isEmpty();
+        playButton.setTooltip(Tooltip.create(Translation.message("screen.main_screen.cant_play_tooltip")));
         this.addRenderableWidget(playButton);
 
         if (!firstGame && !pause) {
@@ -234,6 +236,11 @@ public class MainScreen extends Screen {
                     })
                     .bounds(initialX, startY, buttonWidth, buttonHeight)
                     .build();
+            startNewGame.active = !NarrativeCraftMod.getInstance()
+                    .getChapterManager()
+                    .getChapters()
+                    .isEmpty();
+            startNewGame.setTooltip(Tooltip.create(Translation.message("screen.main_screen.cant_play_tooltip")));
             this.addRenderableWidget(startNewGame);
         }
 

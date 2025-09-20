@@ -170,6 +170,7 @@
   "narrativecraft.screen.keyframe_option.keyframe_id": "Keyframe ID #%d",
 
   "narrativecraft.screen.main_screen.play": "Play",
+  "narrativecraft.screen.main_screen.cant_play_tooltip": "No chapters or scenes available.",
   "narrativecraft.screen.main_screen.new_game": "New Game",
   "narrativecraft.screen.main_screen.new_game.confirm": "Are you sure? This will erase your save data.",
   "narrativecraft.screen.main_screen.continue": "Continue",
@@ -205,6 +206,8 @@
   "narrativecraft.screen.finished_story.line_2": "You can now select specific scenes",
 
   "narrativecraft.screen.change_skin_link.title": "Change skin of character %s",
+
+  "narrativecraft.screen.nc_incompatible": "NarrativeCraft world version differs from the world. Continuing may cause issues but will update NarrativeCraft world version.",
 
   "narrativecraft.ink_action.no_exists": "This tag could not be recognized.",
   "narrativecraft.ink_action.not_authorized": "Tag %s is not authorized.",
