@@ -79,6 +79,7 @@ public class PlayerSession {
     }
 
     public boolean isSamePlayer(Player player) {
+        if (player == null) return false;
         return this.player.getUUID().equals(player.getUUID());
     }
 

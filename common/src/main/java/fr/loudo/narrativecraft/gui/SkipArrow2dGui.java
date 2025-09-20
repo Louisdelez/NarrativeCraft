@@ -25,7 +25,6 @@ package fr.loudo.narrativecraft.gui;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import javax.annotation.Nullable;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.render.state.GuiElementRenderState;
@@ -70,7 +69,7 @@ public record SkipArrow2dGui(
     }
 
     private static ScreenRectangle getBounds(
-            float x0, float y0, float x1, float y1, Matrix3x2f pose, @Nullable ScreenRectangle scissorArea) {
+            float x0, float y0, float x1, float y1, Matrix3x2f pose, ScreenRectangle scissorArea) {
         ScreenRectangle screenrectangle =
                 (new ScreenRectangle((int) x0, (int) y0, (int) (x1 - x0), (int) (y1 - y0))).transformMaxBounds(pose);
         return scissorArea != null ? scissorArea.intersection(screenrectangle) : screenrectangle;
