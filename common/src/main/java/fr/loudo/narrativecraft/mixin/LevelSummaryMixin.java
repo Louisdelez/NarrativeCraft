@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.mixin;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import net.minecraft.ChatFormatting;
+import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.level.LevelSettings;
@@ -63,7 +64,7 @@ public abstract class LevelSummaryMixin {
         if (option.stringMcVersion.isEmpty()) return;
         Component original = cir.getReturnValue();
         Component versionComp;
-        if (!this.getWorldVersionName().getString().equals(option.stringMcVersion)) {
+        if (!SharedConstants.getCurrentVersion().name().equals(option.stringMcVersion)) {
             versionComp = Component.literal(option.stringMcVersion).withStyle(ChatFormatting.RED);
         } else {
             versionComp = Component.literal(option.stringMcVersion);

@@ -112,6 +112,7 @@ public class MainScreen extends Screen {
     private void playStory() {
         this.onClose();
         StoryHandler storyHandler = new StoryHandler(playerSession);
+        minecraft.getSoundManager().stop(musicInstance);
         try {
             List<ErrorLine> errorLines = StoryValidation.validate();
             if (errorLines.stream().map(ErrorLine::isWarn).toList().isEmpty()) {

@@ -64,8 +64,7 @@ public class StoryHandler {
     private DialogData dialogData = new DialogData(DialogData.globalDialogData);
     private Story story;
     private String dialogText;
-    private boolean loadScene;
-    private boolean debugMode;
+    private boolean loadScene, debugMode, firstLoad, hasError;
 
     public StoryHandler(PlayerSession playerSession) {
         this.playerSession = playerSession;
@@ -96,16 +95,18 @@ public class StoryHandler {
     }
 
     public boolean isFinished() {
-        return !story.canContinue() && story.getCurrentChoices().isEmpty();
+        return !story.canContinue() && story.getCurrentChoices().isEmpty() && !story.hasError() && !hasError;
     }
 
     public void start() {
         playerSession.setStoryHandler(this);
+        firstLoad = true;
         try {
             story = new Story(NarrativeCraftFile.storyContent());
             story.onError = (s, errorType) -> {
                 NarrativeCraftMod.server.execute(this::stop);
                 showCrash(new Exception(errorType + " " + s));
+                hasError = true;
             };
             if (NarrativeCraftFile.saveExists() && !debugMode) {
                 loadSave();
@@ -212,6 +213,11 @@ public class StoryHandler {
             }
             DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
             dialogText = story.Continue().trim();
+            if (story.hasError() || hasError) return;
+            if (firstLoad) {
+                save(false);
+                firstLoad = false;
+            }
             playerSession.getInkTagHandler().getTagsToExecute().addAll(story.getCurrentTags());
             if (!story.getCurrentChoices().isEmpty()) {
                 handleChoices();
@@ -305,16 +311,16 @@ public class StoryHandler {
         }
     }
 
-    public void save() {
+    public void save(boolean showLogo) {
         try {
             if (!debugMode) {
                 StorySave save = new StorySave(playerSession);
                 NarrativeCraftFile.writeSave(save);
             }
-            playerSession.getStorySaveIconGui().showSave(debugMode);
+            if (showLogo) playerSession.getStorySaveIconGui().showSave(debugMode);
         } catch (Exception e) {
             stop();
-            Util.sendCrashMessage(playerSession.getPlayer(), e);
+            showCrash(e);
         }
     }
 

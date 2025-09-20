@@ -207,7 +207,7 @@
 
   "narrativecraft.screen.change_skin_link.title": "Change skin of character %s",
 
-  "narrativecraft.screen.nc_incompatible": "NarrativeCraft world version differs from the world. Continuing may cause issues but will update NarrativeCraft world version.",
+  "narrativecraft.screen.nc_incompatible": "NarrativeCraft world version differs from Minecraft's. Continuing may cause issues but will update NarrativeCraft world version.",
 
   "narrativecraft.ink_action.no_exists": "This tag could not be recognized.",
   "narrativecraft.ink_action.not_authorized": "Tag %s is not authorized.",

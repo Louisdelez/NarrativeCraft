@@ -87,7 +87,7 @@ public class OnEnterInkAction extends InkAction {
         DialogData dialogData =
                 new DialogData(new Vec2(0, 0.8F), 90, 5, 5, 0.4F, 0, 0, 0, -1, 2.9F, 2.15F, false, false, 0.0);
         storyHandler.setDialogData(dialogData);
-        storyHandler.save();
+        storyHandler.save(true);
         return InkActionResult.ok();
     }
 

@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.util.Translation;
 import java.io.File;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
@@ -61,16 +62,16 @@ public abstract class WorldSelectionListMixin {
     @Inject(method = "joinWorld", at = @At("HEAD"), cancellable = true)
     private void narrativecraft$joinWorld(CallbackInfo ci) {
         NarrativeWorldOption worldOption = NarrativeCraftFile.getNarrativeCraftWorldVersion(
-                this.summary.getLevelId(), this.summary.getWorldVersionName().getString());
+                this.summary.getLevelId(), SharedConstants.getCurrentVersion().name());
         if (worldOption == null) return;
         if (worldOption.stringMcVersion == null) return;
-        if (!this.summary.getWorldVersionName().getString().equals(worldOption.stringMcVersion)) {
+        if (!SharedConstants.getCurrentVersion().name().equals(worldOption.stringMcVersion)) {
             ConfirmScreen confirmScreen = new ConfirmScreen(
                     b -> {
                         if (b) {
                             File worldOptionFile = NarrativeCraftFile.getWorldOptionFile(this.summary.getLevelId());
                             worldOption.stringMcVersion =
-                                    this.summary.getWorldVersionName().getString();
+                                    SharedConstants.getCurrentVersion().name();
                             NarrativeCraftFile.updateWorldOptions(worldOptionFile, worldOption);
                             this.joinWorld();
                         } else {

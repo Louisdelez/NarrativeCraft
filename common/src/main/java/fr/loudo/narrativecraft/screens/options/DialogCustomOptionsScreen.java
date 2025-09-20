@@ -51,6 +51,7 @@ import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 
 public class DialogCustomOptionsScreen extends Screen {
@@ -94,6 +95,7 @@ public class DialogCustomOptionsScreen extends Screen {
         playerSession.setDialogRenderer(null);
         minecraft.setScreen(lastScreen);
         minecraft.options.hideGui = false;
+        playerSession.getPlayer().setGameMode(GameType.CREATIVE);
     }
 
     @Override
@@ -132,6 +134,7 @@ public class DialogCustomOptionsScreen extends Screen {
             dialog.setNoSkip(true);
             dialog.start();
             playerSession.setDialogRenderer(dialog);
+            playerSession.getPlayer().setGameMode(GameType.SPECTATOR);
         }
         int gap = 5;
         int labelHeight = 20;

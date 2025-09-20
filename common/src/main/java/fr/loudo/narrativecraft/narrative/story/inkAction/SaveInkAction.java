@@ -45,7 +45,7 @@ public class SaveInkAction extends InkAction {
     protected InkActionResult doExecute(PlayerSession playerSession) {
         StoryHandler storyHandler = playerSession.getStoryHandler();
         if (storyHandler == null) return InkActionResult.ignored();
-        NarrativeCraftMod.server.execute(storyHandler::save);
+        NarrativeCraftMod.server.execute(() -> storyHandler.save(true));
         isRunning = false;
         return InkActionResult.ok();
     }
