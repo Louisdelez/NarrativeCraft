@@ -1,15 +1,17 @@
 # NarrativeCraft
-
-<p align="center">
+<div align="center">
     Create your own stories, easily and freely, in Minecraft.
-</p>
-
+</div>
+&nbsp;&nbsp;&nbsp;
 <p align="center">
-  <img width="250" height="150" alt="join_disord" src="https://github.com/user-attachments/assets/075953b6-de64-4f55-a9c8-fb407e50458b" />
+  <a href="https://discord.com/invite/E3zzNv79DN">
+    <img width="250" height="150" alt="join_disord" src="https://github.com/user-attachments/assets/075953b6-de64-4f55-a9c8-fb407e50458b" />
+  </a>
    &nbsp;&nbsp;&nbsp;
-  <img width="250" height="150" alt="documentation" src="https://github.com/user-attachments/assets/7eaaca5f-52ef-4a5f-bb2d-9320ffc247b5" />
+  <a href="https://loudo56.github.io/NarrativeCraft-docs/">
+    <img width="250" height="150" alt="documentation" src="https://github.com/user-attachments/assets/7eaaca5f-52ef-4a5f-bb2d-9320ffc247b5" />
+  </a>
 </p>
-
 
 
 ## Concept
