@@ -43,6 +43,6 @@ public class CommandsRegister {
         PlaybackCommand.register(event.getDispatcher());
         OpenScreenCommand.register(event.getDispatcher());
         StoryCommand.register(event.getDispatcher());
-        //        LinkCommand.register(event.getDispatcher());
+        LinkCommand.register(event.getDispatcher());
     }
 }

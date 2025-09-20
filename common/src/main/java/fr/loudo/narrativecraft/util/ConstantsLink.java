@@ -21,21 +21,11 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.registers;
+package fr.loudo.narrativecraft.util;
 
-import fr.loudo.narrativecraft.commands.*;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-
-public class CommandsRegister {
-
-    public static void register() {
-        CommandRegistrationCallback.EVENT.register((commandDispatcher, commandBuildContext, commandSelection) -> {
-            PlayerSessionCommand.register(commandDispatcher);
-            RecordCommand.register(commandDispatcher);
-            PlaybackCommand.register(commandDispatcher);
-            StoryCommand.register(commandDispatcher);
-            OpenScreenCommand.register(commandDispatcher);
-            LinkCommand.register(commandDispatcher);
-        });
-    }
+public class ConstantsLink {
+    public static final String DISCORD = "https://discord.gg/E3zzNv79DN";
+    public static final String DOCS = "https://loudo56.github.io/NarrativeCraft-docs";
+    public static final String INKY = "https://github.com/inkle/inky/releases/";
+    public static final String GITHUB = "https://github.com/LOUDO56/NarrativeCraft";
 }

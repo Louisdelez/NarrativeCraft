@@ -21,21 +21,29 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.registers;
+package fr.loudo.narrativecraft.commands;
 
-import fr.loudo.narrativecraft.commands.*;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.CommandDispatcher;
+import fr.loudo.narrativecraft.util.ConstantsLink;
+import java.net.URI;
+import net.minecraft.Util;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 
-public class CommandsRegister {
+public class LinkCommand {
 
-    public static void register() {
-        CommandRegistrationCallback.EVENT.register((commandDispatcher, commandBuildContext, commandSelection) -> {
-            PlayerSessionCommand.register(commandDispatcher);
-            RecordCommand.register(commandDispatcher);
-            PlaybackCommand.register(commandDispatcher);
-            StoryCommand.register(commandDispatcher);
-            OpenScreenCommand.register(commandDispatcher);
-            LinkCommand.register(commandDispatcher);
-        });
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        dispatcher.register(Commands.literal("nc")
+                .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
+                .then(Commands.literal("link")
+                        .then(Commands.literal("discord").executes(commandContext -> openLink(ConstantsLink.DISCORD)))
+                        .then(Commands.literal("docs").executes(commandContext -> openLink(ConstantsLink.DOCS)))
+                        .then(Commands.literal("github").executes(commandContext -> openLink(ConstantsLink.GITHUB)))));
+    }
+
+    private static int openLink(String url) {
+        Util.getPlatform().openUri(URI.create(url));
+        return Command.SINGLE_SUCCESS;
     }
 }
