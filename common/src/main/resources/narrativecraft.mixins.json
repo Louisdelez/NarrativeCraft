@@ -13,6 +13,7 @@
     "LivingEntityMixin",
     "ServerLevelMixin",
     "ServerPlayerCommonMixin",
+    "Utf8StringMixin",
     "accessor.AbstractBoatAccessor",
     "accessor.AbstractHorseAccessor",
     "accessor.EntityAccessor",
