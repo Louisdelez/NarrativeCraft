@@ -42,9 +42,9 @@ import org.joml.Matrix4f;
 public class DialogRenderer3D extends DialogRenderer {
 
     private final DialogTail dialogTail;
+    private final String characterName;
     private DialogEntityBobbing dialogEntityBobbing;
     private Vec2 dialogOffset;
-    private String characterName;
     private CharacterRuntime characterRuntime;
     private Vec3 dialogPosition;
 

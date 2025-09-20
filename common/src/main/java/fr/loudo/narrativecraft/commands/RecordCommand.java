@@ -59,8 +59,9 @@ public class RecordCommand {
                         .then(Commands.literal("start")
                                 .then(Commands.literal("with")
                                         .then(Commands.argument("subscenes", StringArgumentType.greedyString())
-                                                //
-                                                // .suggests(NarrativeCraftMod.getInstance().getChapterManager().getSubscenesOfScenesSuggestions())
+                                                .suggests(NarrativeCraftMod.getInstance()
+                                                        .getChapterManager()
+                                                        .getSubscenesOfScenesSuggestions())
                                                 .executes(commandContext -> {
                                                     String subscenes =
                                                             StringArgumentType.getString(commandContext, "subscenes");

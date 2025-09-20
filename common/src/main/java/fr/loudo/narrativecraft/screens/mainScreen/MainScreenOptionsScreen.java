@@ -45,7 +45,7 @@ public class MainScreenOptionsScreen extends OptionsSubScreen {
 
     private final NarrativeClientOption option = NarrativeCraftMod.getInstance().getNarrativeClientOptions();
     private final PlayerSession playerSession;
-    private int textSpeed;
+    private float textSpeed;
     private Checkbox autoSkipCheck;
 
     public MainScreenOptionsScreen(PlayerSession playerSession, Screen lastScreen) {
@@ -62,6 +62,15 @@ public class MainScreenOptionsScreen extends OptionsSubScreen {
         NarrativeCraftFile.updateUserOptions(option);
     }
 
+    private double textSpeedToSlider(double textSpeed) {
+        double visualMin = 0.1;
+        double visualMax = 10.0;
+        double internalMin = 0.05;
+        double internalMax = 4.0;
+
+        return visualMin + (internalMax - textSpeed) * (visualMax - visualMin) / (internalMax - internalMin);
+    }
+
     @Override
     protected void addContents() {
         NarrativeClientOption clientOption = NarrativeCraftMod.getInstance().getNarrativeClientOptions();
@@ -75,20 +84,24 @@ public class MainScreenOptionsScreen extends OptionsSubScreen {
                         20,
                         Translation.message(
                                 "screen.main_screen.options.dialog_speed",
-                                String.format(Locale.US, "%.2f", clientOption.textSpeed / 1000.0)),
-                        (400.0 - clientOption.textSpeed) / 400.0) {
+                                String.format(Locale.US, "%.2f", textSpeedToSlider(clientOption.textSpeed))),
+                        textSpeedToSlider(clientOption.textSpeed) / 10.0) {
                     @Override
                     protected void updateMessage() {
+                        double visualSpeed = 0.1 + this.value * (10.0 - 0.1);
                         this.setMessage(Translation.message(
-                                "screen.main_screen.options.dialog_speed",
-                                String.format("%.2f", (400 - (this.value * 400)) / 1000.0)));
+                                "screen.main_screen.options.dialog_speed", String.format("%.2f", visualSpeed)));
                     }
 
                     @Override
                     protected void applyValue() {
-                        textSpeed = (int) (400 - (this.value * 400));
+                        double visualSpeed = 0.1 + this.value * (10.0 - 0.1);
+                        double internalSpeed = 0.05 + (10.0 - visualSpeed) / 9.9 * (4.0 - 0.05);
+
+                        textSpeed = (float) internalSpeed;
                     }
                 };
+
         linearlayout.addChild(abstractSliderButton);
         autoSkipCheck = Checkbox.builder(Translation.message("screen.main_screen.options.auto_skip"), minecraft.font)
                 .selected(clientOption.autoSkip)

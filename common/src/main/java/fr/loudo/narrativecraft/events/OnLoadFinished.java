@@ -21,9 +21,13 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.options;
+package fr.loudo.narrativecraft.events;
 
-public class NarrativeClientOption {
-    public float textSpeed = 0.4f;
-    public boolean autoSkip = false;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+
+public class OnLoadFinished {
+
+    public static void loadFinished() {
+        NarrativeCraftMod.getInstance().getNarrativeCraftLogoRenderer().init();
+    }
 }

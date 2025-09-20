@@ -81,22 +81,22 @@ public class BorderInkAction extends InkAction {
         }
         if (arguments.size() < 6) {
             try {
-                up = Integer.parseInt(arguments.get(1));
+                up = Integer.parseInt(arguments.get(1)) * 2;
             } catch (NumberFormatException e) {
                 return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(1)));
             }
             try {
-                right = Integer.parseInt(arguments.get(2));
+                right = Integer.parseInt(arguments.get(2)) * 2;
             } catch (NumberFormatException e) {
                 return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(2)));
             }
             try {
-                down = Integer.parseInt(arguments.get(3));
+                down = Integer.parseInt(arguments.get(3)) * 2;
             } catch (NumberFormatException e) {
                 return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(3)));
             }
             try {
-                left = Integer.parseInt(arguments.get(4));
+                left = Integer.parseInt(arguments.get(4)) * 2;
             } catch (NumberFormatException e) {
                 return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(4)));
             }

@@ -39,6 +39,7 @@ import fr.loudo.narrativecraft.narrative.dialog.*;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandlerException;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.options.NarrativeClientOption;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.screens.components.CrashScreen;
 import fr.loudo.narrativecraft.screens.credits.CreditScreen;
@@ -51,8 +52,10 @@ import net.minecraft.world.entity.Entity;
 
 public class StoryHandler {
 
-    private NarrativeWorldOption narrativeWorldOption =
+    private final NarrativeWorldOption worldOption =
             NarrativeCraftMod.getInstance().getNarrativeWorldOption();
+    private final NarrativeClientOption clientOption =
+            NarrativeCraftMod.getInstance().getNarrativeClientOptions();
     private final Minecraft minecraft = Minecraft.getInstance();
     public static final String DIALOG_REGEX = "^(\\w+)\\s*:\\s*(.+?)\\s*$";
 
@@ -104,12 +107,14 @@ public class StoryHandler {
                 NarrativeCraftMod.server.execute(this::stop);
                 showCrash(new Exception(errorType + " " + s));
             };
-            if (loadScene) {
-                loadScene(playerSession.getScene());
-            }
             if (NarrativeCraftFile.saveExists() && !debugMode) {
                 loadSave();
-                return;
+                if (!loadScene) {
+                    return;
+                }
+            }
+            if (loadScene) {
+                loadScene(playerSession.getScene());
             }
             next();
         } catch (Exception e) {
@@ -145,12 +150,12 @@ public class StoryHandler {
 
     public void stopAndFinishScreen() {
         stop();
-        if (narrativeWorldOption.showCreditsScreen) {
-            CreditScreen creditScreen = new CreditScreen(playerSession, false, !narrativeWorldOption.finishedStory);
+        if (worldOption.showCreditsScreen) {
+            CreditScreen creditScreen = new CreditScreen(playerSession, false, !worldOption.finishedStory);
             minecraft.execute(() -> minecraft.setScreen(creditScreen));
         }
-        narrativeWorldOption.finishedStory = true;
-        NarrativeCraftFile.updateWorldOptions(narrativeWorldOption);
+        worldOption.finishedStory = true;
+        NarrativeCraftFile.updateWorldOptions(worldOption);
     }
 
     public boolean characterInStory(CharacterStory characterStory) {
@@ -400,6 +405,14 @@ public class StoryHandler {
         }
         dialogRenderer.autoSkipAt(dialogData.getAutoSkipSeconds());
         dialogRenderer.setNoSkip(dialogData.isNoSkip());
+        if (clientOption.autoSkip) {
+            String[] words = dialog.trim().split("\\s+");
+            int wordCount = words.length;
+            double readingSpeed = 3.0;
+            int autoSkipTime = (int) Math.ceil(wordCount / readingSpeed);
+            autoSkipTime = Math.max(autoSkipTime, 2);
+            dialogRenderer.autoSkipAt(autoSkipTime);
+        }
         return dialogRenderer;
     }
 

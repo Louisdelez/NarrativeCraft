@@ -78,7 +78,6 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
             screen.extraFields.put("year", yearLabelBox);
         }
 
-        // Ajout du modelButton dans tous les cas (scene == null ou scene != null)
         Button modelButton = Button.builder(Component.literal(CharacterModel.WIDE.name()), button -> {
                     String currentModel = button.getMessage().getString();
 
@@ -114,7 +113,6 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
 
     @Override
     public void renderExtraFields(EditInfoScreen<CharacterStory> screen, CharacterStory entry, int x, int y) {
-        // Rendu des champs de date uniquement si scene == null
         if (scene == null) {
             ScreenUtils.LabelBox dayLabelBox = (ScreenUtils.LabelBox) screen.extraFields.get("day");
             dayLabelBox.setPosition(x, y);

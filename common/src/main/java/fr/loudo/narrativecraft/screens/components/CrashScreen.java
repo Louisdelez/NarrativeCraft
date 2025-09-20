@@ -28,31 +28,20 @@ import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.screens.mainScreen.MainScreen;
 import fr.loudo.narrativecraft.util.Translation;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
-import net.minecraft.client.gui.layouts.LinearLayout;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FormattedCharSequence;
 
-public class CrashScreen extends Screen {
+public class CrashScreen extends AbstractTextBoxScreen {
 
-    private static final ResourceLocation WINDOW_LOCATION =
-            ResourceLocation.withDefaultNamespace("textures/gui/advancements/window.png");
-    private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
-    private final PlayerSession playerSession;
     private final String message;
+    private final PlayerSession playerSession;
 
     public CrashScreen(PlayerSession playerSession, String message) {
         super(Component.literal("Crash Screen"));
-        this.playerSession = playerSession;
         this.message = message;
+        this.playerSession = playerSession;
     }
 
     @Override
@@ -67,69 +56,16 @@ public class CrashScreen extends Screen {
     }
 
     @Override
-    protected void init() {
-        LinearLayout linearLayout =
-                this.layout.addToFooter(LinearLayout.horizontal().spacing(4));
-        linearLayout.addChild(Button.builder(CommonComponents.GUI_DONE, (p_331557_) -> this.onClose())
-                .width(130)
-                .build());
-        this.layout.visitWidgets(this::addRenderableWidget);
-        this.repositionElements();
-    }
+    protected List<String> renderContent() {
+        List<String> lines = new ArrayList<>();
 
-    @Override
-    protected void repositionElements() {
-        this.layout.arrangeElements();
-    }
+        lines.add(Translation.message("screen.crash.title").getString());
 
-    @Override
-    public void render(GuiGraphics guiGraphics, int x, int y, float partialTick) {
-        super.render(guiGraphics, x, y, partialTick);
-        int i = (this.width - 252) / 2;
-        int j = (this.height - 140) / 2;
-        this.renderInside(guiGraphics, x, y, i, j);
-        this.renderWindow(guiGraphics, i, j);
-    }
+        String translatedMessage = Translation.message("screen.crash.message").getString();
+        lines.addAll(Arrays.asList(translatedMessage.split("\n")));
 
-    private void renderInside(GuiGraphics guiGraphics, int mouseX, int mouseY, int offsetX, int offsetY) {
-        int boxX = offsetX + 9;
-        int boxY = offsetY + 18;
-        int boxWidth = 234;
-        int boxHeight = 113;
+        lines.add(message);
 
-        int centerX = boxX + boxWidth / 2;
-
-        guiGraphics.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight, -16777216);
-
-        String title = Translation.message("screen.crash.title").getString();
-        List<String> messageLines =
-                List.of(Translation.message("screen.crash.message").getString().split("\n"));
-        List<FormattedCharSequence> errorLines = minecraft.font.split(FormattedText.of(message), 200);
-
-        int totalLines = 1 + messageLines.size() + errorLines.size();
-
-        int totalTextHeight = totalLines * minecraft.font.lineHeight;
-
-        int startY = boxY + (boxHeight - totalTextHeight) / 2;
-
-        int currentY = startY;
-
-        guiGraphics.drawCenteredString(this.font, title, centerX, currentY, -1);
-        currentY += minecraft.font.lineHeight;
-
-        for (String line : messageLines) {
-            guiGraphics.drawCenteredString(this.font, line, centerX, currentY, -1);
-            currentY += minecraft.font.lineHeight;
-        }
-
-        for (FormattedCharSequence errorLine : errorLines) {
-            guiGraphics.drawCenteredString(this.font, errorLine, centerX, currentY, -1);
-            currentY += minecraft.font.lineHeight;
-        }
-    }
-
-    public void renderWindow(GuiGraphics guiGraphics, int offsetX, int offsetY) {
-        guiGraphics.blit(
-                RenderPipelines.GUI_TEXTURED, WINDOW_LOCATION, offsetX, offsetY, 0.0F, 0.0F, 252, 140, 256, 256);
+        return lines;
     }
 }

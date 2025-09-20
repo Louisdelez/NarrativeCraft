@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.screens.controller.cutscene;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
 import fr.loudo.narrativecraft.controllers.cutscene.CutscenePlayback;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
@@ -115,7 +116,7 @@ public class CutsceneKeyframeOptionScreen extends KeyframeOptionScreen<CutsceneK
                         } else {
                             cutscenePlayback.setupAndPlay(keyframe, cutsceneController.getNextKeyframe(keyframe));
                         }
-                        cutsceneController.setPlaying(true);
+                        NarrativeCraftMod.server.execute(() -> cutsceneController.setPlaying(true));
                         minecraft.setScreen(null);
                     }
                 })

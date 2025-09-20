@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.keys;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
@@ -59,21 +60,15 @@ public class PressKeyListener {
             if (playerSession.getController() == null) return;
             minecraft.setScreen(playerSession.getController().getControllerScreen());
         });
+        ModKeys.handleKeyPress(InputConstants.MOUSE_BUTTON_LEFT, minecraft.mouseHandler.isLeftPressed(), () -> {
+            PlayerSession playerSession =
+                    NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
+            nextStory(playerSession);
+        });
         ModKeys.handleKeyPress(ModKeys.NEXT_DIALOG, () -> {
             PlayerSession playerSession =
                     NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
-            if (playerSession == null) return;
-            DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
-            if (dialogRenderer == null) return;
-            if (dialogRenderer.isAnimating()) return;
-            if (dialogRenderer.isNoSkip()) return;
-            if (!dialogRenderer.getDialogScrollText().isFinished()) {
-                dialogRenderer.getDialogScrollText().forceFinish();
-                return;
-            }
-            if (playerSession.getStoryHandler() == null) return;
-            StoryHandler storyHandler = playerSession.getStoryHandler();
-            NarrativeCraftMod.server.execute(storyHandler::next);
+            nextStory(playerSession);
         });
         ModKeys.handleKeyPress(ModKeys.STORY_DEBUG, () -> {
             PlayerSession playerSession =
@@ -83,5 +78,20 @@ public class PressKeyListener {
             if (storyHandler == null) return;
             playerSession.setShowDebugHud(!playerSession.isShowDebugHud());
         });
+    }
+
+    private static void nextStory(PlayerSession playerSession) {
+        if (playerSession == null) return;
+        DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
+        if (dialogRenderer == null) return;
+        if (dialogRenderer.isAnimating()) return;
+        if (dialogRenderer.isNoSkip()) return;
+        if (!dialogRenderer.getDialogScrollText().isFinished()) {
+            dialogRenderer.getDialogScrollText().forceFinish();
+            return;
+        }
+        if (playerSession.getStoryHandler() == null) return;
+        StoryHandler storyHandler = playerSession.getStoryHandler();
+        NarrativeCraftMod.server.execute(storyHandler::next);
     }
 }

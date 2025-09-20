@@ -96,6 +96,7 @@ public class MainScreen extends Screen {
 
     private final boolean finishedStory;
     private final boolean pause;
+    private boolean rendered;
 
     private int userFloodedKeyboard;
 
@@ -176,10 +177,9 @@ public class MainScreen extends Screen {
             }
         }
 
-        if (!pause) {
-            if (!minecraft.getSoundManager().isActive(musicInstance)) {
-                minecraft.getSoundManager().play(musicInstance);
-            }
+        if (!pause && !rendered) {
+            minecraft.getSoundManager().play(musicInstance);
+            rendered = true;
         }
 
         int totalButtons = storyFinished ? 5 : 4;

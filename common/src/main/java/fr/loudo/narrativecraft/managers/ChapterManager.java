@@ -25,12 +25,14 @@ package fr.loudo.narrativecraft.managers;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 
 public class ChapterManager {
@@ -62,8 +64,12 @@ public class ChapterManager {
         };
     }
 
-    public SuggestionProvider<CommandSourceStack> getSubscenesOfScenesSuggestions(PlayerSession playerSession) {
+    public SuggestionProvider<CommandSourceStack> getSubscenesOfScenesSuggestions() {
         return (context, builder) -> {
+            PlayerSession playerSession = NarrativeCraftMod.getInstance()
+                    .getPlayerSessionManager()
+                    .getSessionByPlayer(Minecraft.getInstance().player);
+            if (playerSession == null) return builder.buildFuture();
             if (!playerSession.isSessionSet()) return builder.buildFuture();
             for (Subscene subscene : playerSession.getScene().getSubscenes()) {
                 if (subscene.getName().split(" ").length > 1) {

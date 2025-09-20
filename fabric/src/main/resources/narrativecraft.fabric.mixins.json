@@ -13,7 +13,8 @@
   ],
   "client": [
     "GuiGraphicsFabricMixin",
-    "GuiMixin"
+    "GuiMixin",
+    "MinecraftFabricMixin"
   ],
   "server": [],
   "injectors": {

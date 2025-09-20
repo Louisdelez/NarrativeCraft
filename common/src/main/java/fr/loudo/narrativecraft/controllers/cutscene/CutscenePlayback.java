@@ -93,6 +93,7 @@ public class CutscenePlayback {
             }
             playerSession.getInkActions().clear();
         }
+        NarrativeCraftMod.server.execute(() -> cutsceneController.setPlaying(false));
     }
 
     public void tick() {

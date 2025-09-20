@@ -24,12 +24,14 @@
 package fr.loudo.narrativecraft.narrative.dialog.animation;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.gui.ICustomGuiRender;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.narrative.story.text.ParsedDialog;
 import fr.loudo.narrativecraft.narrative.story.text.TextEffectAnimation;
+import fr.loudo.narrativecraft.options.NarrativeClientOption;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.*;
 import net.minecraft.client.Minecraft;
@@ -45,26 +47,29 @@ import net.minecraft.util.FormattedCharSequence;
 import org.joml.Vector2f;
 
 public class DialogScrollText {
+    private final NarrativeClientOption clientOption =
+            NarrativeCraftMod.getInstance().getNarrativeClientOptions();
     private final DialogRenderer dialogRenderer;
     private final Minecraft minecraft;
     private final List<LetterLocation> lettersRenderer = new ArrayList<>();
-    private ParsedDialog parsedDialog;
     private TextEffectAnimation textEffectAnimation;
     private List<String> lines = new ArrayList<>();
-    private int currentTick, currentLine, currentCharIndex;
+    private int currentLine, currentCharIndex;
     private float currentX, currentY;
+
+    private float tickAccumulator = 0.0f;
 
     public DialogScrollText(DialogRenderer dialogRenderer, Minecraft minecraft) {
         this.dialogRenderer = dialogRenderer;
         this.minecraft = minecraft;
-        parsedDialog = ParsedDialog.parse(dialogRenderer.getText());
+        ParsedDialog parsedDialog = ParsedDialog.parse(dialogRenderer.getText());
         setText(parsedDialog.cleanedText());
     }
 
     public void reset() {
-        currentTick = 0;
         currentLine = 0;
         currentCharIndex = 0;
+        tickAccumulator = 0.0f;
         currentY = -dialogRenderer.getTotalHeight()
                 + dialogRenderer.getPaddingY()
                 + (minecraft.font.lineHeight / 2.0F)
@@ -86,7 +91,7 @@ public class DialogScrollText {
 
     public void tick() {
         if (!isFinished() && !dialogRenderer.isAnimating()) {
-            currentTick++;
+            tickAccumulator += 1.0f;
             populateLetters();
         }
         textEffectAnimation.tick();
@@ -176,29 +181,50 @@ public class DialogScrollText {
     }
 
     private void populateLetters() {
-        if (currentTick >= 1 && currentLine < lines.size()) {
+        boolean playSound = false;
+        while (tickAccumulator >= currentLine && currentLine < lines.size()) {
             if (addLetter() != ' ') {
-                playLetterSound();
+                playSound = true;
             }
+            tickAccumulator -= clientOption.textSpeed;
+        }
+        if (playSound) {
+            playLetterSound();
         }
     }
 
     private char addLetter() {
-        if (currentLine == lines.size()) return ' ';
-        char letter = lines.get(currentLine).charAt(currentCharIndex);
+        if (currentLine >= lines.size()) {
+            return ' ';
+        }
+
+        String currentLineText = lines.get(currentLine);
+
+        if (currentLineText.isEmpty() || currentCharIndex >= currentLineText.length()) {
+            if (lines.size() > 1 && currentLine < lines.size() - 1) {
+                moveToNextLine();
+            }
+            return ' ';
+        }
+
+        char letter = currentLineText.charAt(currentCharIndex);
         lettersRenderer.add(new LetterLocation(letter, currentX, currentY, true));
-        currentTick = 0;
         currentX += Util.getLetterWidth(letter, minecraft) + dialogRenderer.getLetterSpacing();
         currentCharIndex++;
-        if (currentCharIndex >= lines.get(currentLine).length() && lines.size() > 1) {
-            lettersRenderer.add(new LetterLocation(
-                    ' ', currentX, currentY, false)); // Synchronize start and end index from text effects
-            currentLine++;
-            currentCharIndex = 0;
-            currentX = -dialogRenderer.getTotalWidth() + dialogRenderer.getPaddingX() + 2 * 2;
-            currentY += minecraft.font.lineHeight + dialogRenderer.getGap();
+
+        if (currentCharIndex >= currentLineText.length() && lines.size() > 1 && currentLine < lines.size() - 1) {
+            moveToNextLine();
         }
+
         return letter;
+    }
+
+    private void moveToNextLine() {
+        lettersRenderer.add(new LetterLocation(' ', currentX, currentY, false));
+        currentLine++;
+        currentCharIndex = 0;
+        currentX = -dialogRenderer.getTotalWidth() + dialogRenderer.getPaddingX() + 2 * 2;
+        currentY += minecraft.font.lineHeight + dialogRenderer.getGap();
     }
 
     private void playLetterSound() {
