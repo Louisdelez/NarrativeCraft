@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.screens.options;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.controllers.mainScreen.MainScreenController;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.Environment;
@@ -69,14 +70,16 @@ public class StoryOptionsScreen extends StoryElementScreen {
 
         entries.add(new StoryElementList.StoryEntryData(
                 Button.builder(Translation.message("screen.story_options.main_screen"), button -> {
-                            try {
-                                MainScreenData mainScreenData = NarrativeCraftFile.getMainScreenBackground();
-                                MainScreenController mainScreenController = new MainScreenController(
-                                        Environment.DEVELOPMENT, minecraft.player, mainScreenData);
-                                mainScreenController.startSession();
-                            } catch (IOException e) {
-                                fr.loudo.narrativecraft.util.Util.sendCrashMessage(minecraft.player, e);
-                            }
+                            NarrativeCraftMod.server.execute(() -> {
+                                try {
+                                    MainScreenData mainScreenData = NarrativeCraftFile.getMainScreenBackground();
+                                    MainScreenController mainScreenController = new MainScreenController(
+                                            Environment.DEVELOPMENT, minecraft.player, mainScreenData);
+                                    mainScreenController.startSession();
+                                } catch (IOException e) {
+                                    fr.loudo.narrativecraft.util.Util.sendCrashMessage(minecraft.player, e);
+                                }
+                            });
                             onClose();
                         })
                         .build()));

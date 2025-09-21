@@ -63,7 +63,7 @@ public class CharacterStoryData {
     }
 
     public void spawn(Level level, Environment environment) {
-        if (isTemplate && environment == Environment.PRODUCTION) return;
+        if (isTemplate && environment == Environment.PRODUCTION && characterRuntime.getCharacterStory() == null) return;
         characterRuntime.getCharacterSkinController().setSkinName(skinName);
         characterRuntime.getCharacterSkinController().cacheSkins();
         characterRuntime.setEntity(Util.createEntityFromCharacter(characterRuntime.getCharacterStory(), level));

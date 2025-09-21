@@ -29,13 +29,13 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.dialog.geometric.DialogTail;
 import fr.loudo.narrativecraft.util.Easing;
+import fr.loudo.narrativecraft.util.Position2D;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.Direction;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
@@ -44,7 +44,7 @@ public class DialogRenderer3D extends DialogRenderer {
     private final DialogTail dialogTail;
     private final String characterName;
     private DialogEntityBobbing dialogEntityBobbing;
-    private Vec2 dialogOffset;
+    private Position2D dialogOffset;
     private CharacterRuntime characterRuntime;
     private Vec3 dialogPosition;
 
@@ -52,7 +52,7 @@ public class DialogRenderer3D extends DialogRenderer {
             String text,
             String characterName,
             CharacterRuntime characterRuntime,
-            Vec2 dialogOffset,
+            Position2D dialogOffset,
             float width,
             float paddingX,
             float paddingY,
@@ -441,11 +441,11 @@ public class DialogRenderer3D extends DialogRenderer {
         this.characterRuntime = characterRuntime;
     }
 
-    public Vec2 getDialogOffset() {
+    public Position2D getDialogOffset() {
         return dialogOffset;
     }
 
-    public void setDialogOffset(Vec2 dialogOffset) {
+    public void setDialogOffset(Position2D dialogOffset) {
         this.dialogOffset = dialogOffset;
     }
 

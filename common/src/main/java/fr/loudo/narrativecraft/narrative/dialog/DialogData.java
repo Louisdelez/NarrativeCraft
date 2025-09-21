@@ -23,20 +23,20 @@
 
 package fr.loudo.narrativecraft.narrative.dialog;
 
-import net.minecraft.world.phys.Vec2;
+import fr.loudo.narrativecraft.util.Position2D;
 
 public class DialogData {
     public static DialogData globalDialogData =
-            new DialogData(new Vec2(0, 0.8F), 90, 5, 5, 0.8F, 0, 0, 0, -1, 2.9F, 2.15F, false, false, 0.0);
+            new DialogData(new Position2D(0, 0.8F), 90, 5, 5, 0.8F, 0, 0, 0, -1, 2.9F, 2.15F, false, false, 0.0);
 
-    private Vec2 offset;
+    private Position2D offset;
     private float width, paddingX, paddingY, scale, letterSpacing, gap, noiseShakeSpeed, noiseShakeStrength;
     private int backgroundColor, textColor;
     private boolean noSkip, dialogAutoSkip;
     private double autoSkipSeconds;
 
     public DialogData(
-            Vec2 offset,
+            Position2D offset,
             float width,
             float paddingX,
             float paddingY,
@@ -83,11 +83,11 @@ public class DialogData {
         autoSkipSeconds = dialogData.autoSkipSeconds;
     }
 
-    public Vec2 getOffset() {
+    public Position2D getOffset() {
         return offset;
     }
 
-    public void setOffset(Vec2 offset) {
+    public void setOffset(Position2D offset) {
         this.offset = offset;
     }
 

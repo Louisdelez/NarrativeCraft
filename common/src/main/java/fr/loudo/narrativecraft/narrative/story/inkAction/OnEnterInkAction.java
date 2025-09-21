@@ -36,7 +36,6 @@ import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import java.util.Arrays;
 import java.util.List;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.phys.Vec2;
 
 public class OnEnterInkAction extends InkAction {
     public OnEnterInkAction(String id, Side side, String syntax, CommandMatcher matcher) {
@@ -84,9 +83,7 @@ public class OnEnterInkAction extends InkAction {
             characterRuntime.getEntity().remove(Entity.RemovalReason.KILLED);
         }
         playerSession.getCharacterRuntimes().clear();
-        DialogData dialogData =
-                new DialogData(new Vec2(0, 0.8F), 90, 5, 5, 0.4F, 0, 0, 0, -1, 2.9F, 2.15F, false, false, 0.0);
-        storyHandler.setDialogData(dialogData);
+        storyHandler.setDialogData(DialogData.globalDialogData);
         storyHandler.save(true);
         return InkActionResult.ok();
     }

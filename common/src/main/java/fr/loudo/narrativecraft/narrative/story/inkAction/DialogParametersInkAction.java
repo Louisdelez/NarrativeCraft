@@ -31,12 +31,12 @@ import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer3D;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.util.Position2D;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import net.minecraft.util.ARGB;
-import net.minecraft.world.phys.Vec2;
 
 public class DialogParametersInkAction extends InkAction {
 
@@ -167,8 +167,9 @@ public class DialogParametersInkAction extends InkAction {
     private void executeParameter(DialogRenderer dialogRenderer, StoryHandler storyHandler) {
         switch (parameterType) {
             case OFFSET:
-                executeIfRenderer3D(dialogRenderer, renderer3D -> renderer3D.setDialogOffset(new Vec2(value1, value2)));
-                executeDialogData(storyHandler, dialogData -> dialogData.setOffset(new Vec2(value1, value2)));
+                executeIfRenderer3D(
+                        dialogRenderer, renderer3D -> renderer3D.setDialogOffset(new Position2D(value1, value2)));
+                executeDialogData(storyHandler, dialogData -> dialogData.setOffset(new Position2D(value1, value2)));
                 break;
             case SCALE:
                 executeIfRenderer(dialogRenderer, renderer -> renderer.setScale(value1));
