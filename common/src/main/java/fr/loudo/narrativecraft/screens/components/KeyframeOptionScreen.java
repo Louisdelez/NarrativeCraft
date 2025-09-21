@@ -408,7 +408,7 @@ public class KeyframeOptionScreen<T extends Keyframe, E extends AbstractKeyframe
                 EDIT_BOX_HEIGHT,
                 Component.literal("FOV Value"));
         fovBox.setValue(formatFloat.apply(defaultFov));
-        fovBox.setFilter(s -> s.matches(Util.REGEX_INT));
+        fovBox.setFilter(s -> s.matches(Util.REGEX_FLOAT));
         Button fovButton = Button.builder(Component.literal("✔"), btn -> {
                     try {
                         fovValue = Float.parseFloat(fovBox.getValue());
