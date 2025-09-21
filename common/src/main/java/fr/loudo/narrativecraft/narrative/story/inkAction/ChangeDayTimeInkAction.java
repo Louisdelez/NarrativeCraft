@@ -116,7 +116,7 @@ public class ChangeDayTimeInkAction extends InkAction {
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
         for (InkAction inkAction : playerSession.getInkActions()) {
-            if (inkAction instanceof ChangeDayTimeInkAction changeDayTimeInkAction) {
+            if (inkAction instanceof ChangeDayTimeInkAction changeDayTimeInkAction && this.action.equals("add")) {
                 currentTick += changeDayTimeInkAction.getCurrentTick();
                 changeDayTimeInkAction.setRunning(false);
             }
