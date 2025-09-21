@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.screens.storyManager.animations;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.screens.components.ChooseCharacterScreen;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.components.StoryElementList;
@@ -34,6 +35,8 @@ import fr.loudo.narrativecraft.screens.storyManager.scene.ScenesMenuScreen;
 import fr.loudo.narrativecraft.util.ImageFontConstants;
 import fr.loudo.narrativecraft.util.ScreenUtils;
 import fr.loudo.narrativecraft.util.Translation;
+
+import java.io.IOException;
 import java.util.List;
 import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
@@ -108,7 +111,14 @@ public class AnimationsScreen extends StoryElementScreen {
                                             Translation.message("character.must_link_character"));
                                     return;
                                 }
-                                animation.setCharacter(characterStory);
+                                CharacterStory oldCharacter = animation.getCharacter();
+                                try {
+                                    animation.setCharacter(characterStory);
+                                    NarrativeCraftFile.updateAnimationFile(animation);
+                                } catch (IOException e) {
+                                    fr.loudo.narrativecraft.util.Util.sendCrashMessage(minecraft.player, e);
+                                    animation.setCharacter(oldCharacter);
+                                }
                             });
                     this.minecraft.setScreen(screen);
                 })
