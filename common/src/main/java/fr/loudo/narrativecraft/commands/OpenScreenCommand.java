@@ -28,16 +28,14 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.network.OpenChaptersScreenPacket;
-import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.screens.mainScreen.MainScreen;
 import fr.loudo.narrativecraft.screens.options.StoryOptionsScreen;
+import fr.loudo.narrativecraft.screens.storyManager.chapter.ChaptersScreen;
 import fr.loudo.narrativecraft.screens.storyManager.character.CharactersScreen;
 import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.server.level.ServerPlayer;
 
 public class OpenScreenCommand {
 
@@ -66,7 +64,6 @@ public class OpenScreenCommand {
     }
 
     private static int openStoryManager(CommandContext<CommandSourceStack> context) {
-        ServerPlayer player = context.getSource().getPlayer();
         PlayerSession playerSession = NarrativeCraftMod.getInstance()
                 .getPlayerSessionManager()
                 .getSessionByPlayer(context.getSource().getPlayer());
@@ -75,7 +72,9 @@ public class OpenScreenCommand {
             return 0;
         }
         if (playerSession.getStoryHandler() != null) return 0;
-        Services.PACKET_SENDER.sendToPlayer(player, new OpenChaptersScreenPacket("", 13));
+        ChaptersScreen chaptersScreen = new ChaptersScreen();
+        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(chaptersScreen));
+        // Services.PACKET_SENDER.sendToPlayer(player, new OpenChaptersScreenPacket("", 13));
         return Command.SINGLE_SUCCESS;
     }
 

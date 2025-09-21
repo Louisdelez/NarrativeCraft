@@ -430,7 +430,9 @@ public class StoryHandler {
 
     private boolean isTransitioning() {
         if (story.getState().getCurrentKnot() == null) return false;
-        return !story.getState().getCurrentKnot().equals(playerSession.getScene().knotName());
+        return !story.getState()
+                .getCurrentKnot()
+                .equals(playerSession.getScene().knotName());
     }
 
     public DialogData getDialogData() {

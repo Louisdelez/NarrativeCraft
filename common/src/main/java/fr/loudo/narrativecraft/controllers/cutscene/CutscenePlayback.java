@@ -224,6 +224,7 @@ public class CutscenePlayback {
         if (cutsceneController.getEnvironment() == Environment.DEVELOPMENT) {
             CutsceneKeyframeOptionScreen screen = new CutsceneKeyframeOptionScreen(keyframeB, playerSession, false);
             Minecraft.getInstance().setScreen(screen);
+            cutsceneController.pause();
         }
     }
 
@@ -242,7 +243,7 @@ public class CutscenePlayback {
             keyframeB = cutsceneController.getNextKeyframe(keyframeB);
         }
         segmentTick = 0;
-        currentKeyframeGroup = cutsceneKeyframeGroupB;
+        currentKeyframeGroup = cutsceneController.getKeyframeGroupOfKeyframe(keyframeB);
     }
 
     public KeyframeLocation interpolate(double delta, KeyframeLocation a, KeyframeLocation b) {
