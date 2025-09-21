@@ -77,11 +77,20 @@ public class Subscene extends SceneData {
 
     public boolean isPlaying() {
         for (Playback playback : playbacks) {
-            if (playback.isPlaying()) {
-                return true;
+            if (!playback.isPlaying()) {
+                return false;
             }
         }
-        return false;
+        return true;
+    }
+
+    public boolean hasEnded() {
+        for (Playback playback : playbacks) {
+            if (!playback.hasEnded()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public List<Playback> getPlaybacks() {

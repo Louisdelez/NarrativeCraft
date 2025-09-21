@@ -53,7 +53,7 @@ public class SubsceneInkAction extends InkAction {
             blockEndTask.run();
             return;
         }
-        isRunning = !subscene.isPlaying();
+        isRunning = !subscene.hasEnded();
     }
 
     @Override
@@ -110,11 +110,17 @@ public class SubsceneInkAction extends InkAction {
                 subscene.start(playerSession.getPlayer().level(), Environment.PRODUCTION, isLooping);
             }
             for (Playback playback : subscene.getPlaybacks()) {
+                playerSession.getCharacterRuntimes().add(playback.getCharacterRuntime());
                 playback.setUnique(isUnique);
             }
             playerSession.clearKilledCharacters();
+            playerSession.getPlaybackManager().getPlaybacks().addAll(subscene.getPlaybacks());
         } else if (action.equals("stop")) {
             subscene.stop(true);
+            for (Playback playback : subscene.getPlaybacks()) {
+                playerSession.getCharacterRuntimes().remove(playback.getCharacterRuntime());
+            }
+            playerSession.getPlaybackManager().getPlaybacks().removeAll(subscene.getPlaybacks());
         }
         return isBlock ? InkActionResult.block() : InkActionResult.ok();
     }

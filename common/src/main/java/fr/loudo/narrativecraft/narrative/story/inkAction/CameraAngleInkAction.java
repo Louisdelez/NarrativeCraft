@@ -80,6 +80,11 @@ public class CameraAngleInkAction extends InkAction {
         } else if (!(playerSession.getController() instanceof CameraAngleController)) {
             clear(playerSession);
         }
+        for (CharacterStoryData characterStoryData : cameraAngle.getCharacterStoryDataList()) {
+            if (!characterStoryData.isTemplate()) {
+                playerSession.getCharacterRuntimes().add(characterStoryData.getCharacterRuntime());
+            }
+        }
         playerSession.setCurrentCamera(keyframe.getKeyframeLocation());
         Minecraft.getInstance().options.hideGui = true;
         return InkActionResult.ok();
@@ -91,9 +96,11 @@ public class CameraAngleInkAction extends InkAction {
         for (CharacterStoryData characterStoryData : cameraAngle.getCharacterStoryDataList()) {
             for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
                 if (characterStoryData
-                        .getCharacterStory()
-                        .getName()
-                        .equalsIgnoreCase(characterRuntime.getCharacterStory().getName())) {
+                                .getCharacterStory()
+                                .getName()
+                                .equalsIgnoreCase(
+                                        characterRuntime.getCharacterStory().getName())
+                        && !characterStoryData.isTemplate()) {
                     if (characterRuntime.getEntity() == null) continue;
                     characterRuntime.getEntity().remove(Entity.RemovalReason.KILLED);
                     toRemove.add(characterRuntime);

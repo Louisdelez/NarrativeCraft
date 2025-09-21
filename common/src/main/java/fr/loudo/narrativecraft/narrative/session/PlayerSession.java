@@ -152,6 +152,15 @@ public class PlayerSession {
                 || !characterRuntime.getEntity().isAlive());
     }
 
+    public void clearPlaybacksNotPlaying() {
+        playbackManager
+                .getPlaybacks()
+                .removeIf(playback -> !playback.isPlaying()
+                        || playback.hasEnded()
+                        || playback.getCharacterRuntime().getEntity() == null
+                        || !playback.getCharacterRuntime().getEntity().isAlive());
+    }
+
     public List<CharacterRuntime> getCharacterRuntimes() {
         return characterRuntimes;
     }

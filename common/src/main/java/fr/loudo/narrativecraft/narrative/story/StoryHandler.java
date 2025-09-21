@@ -231,6 +231,7 @@ public class StoryHandler {
                 dialogRenderer.stop();
             }
             playerSession.clearKilledCharacters();
+            playerSession.clearPlaybacksNotPlaying();
         } catch (Exception e) {
             stop();
             showCrash(e);

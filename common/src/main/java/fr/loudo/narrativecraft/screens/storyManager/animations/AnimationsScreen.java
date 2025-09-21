@@ -35,7 +35,6 @@ import fr.loudo.narrativecraft.screens.storyManager.scene.ScenesMenuScreen;
 import fr.loudo.narrativecraft.util.ImageFontConstants;
 import fr.loudo.narrativecraft.util.ScreenUtils;
 import fr.loudo.narrativecraft.util.Translation;
-
 import java.io.IOException;
 import java.util.List;
 import net.minecraft.Util;
