@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.narrative.recording;
 
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
+import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.recording.actions.ActionsData;
@@ -92,6 +93,10 @@ public class Recording {
                     0, player.gameMode.getGameModeForPlayer(), player.gameMode.getGameModeForPlayer());
             entityRecorderData.getActionsData().addAction(gameModeAction);
         }
+        for (Subscene subscene : subscenesPlaying) {
+            subscene.start(playerSession.getPlayer().level(), Environment.RECORDING, false);
+            playerSession.getPlaybackManager().getPlaybacks().addAll(subscene.getPlaybacks());
+        }
     }
 
     public void stop() {
@@ -99,6 +104,7 @@ public class Recording {
         isRecording = false;
         for (Subscene subscene : subscenesPlaying) {
             subscene.stop(true);
+            playerSession.getPlaybackManager().getPlaybacks().removeAll(subscene.getPlaybacks());
         }
         subscenesPlaying.clear();
         for (RecordingData recordingData : recordingDataList) {
@@ -216,5 +222,13 @@ public class Recording {
         if (!trackEntity(entity)) return;
         RecordingData recordingData = getRecordingDataFromEntity(entity);
         recordingData.getActionsData().setSpawnTick(tickSpawn);
+    }
+
+    public List<Subscene> getSubscenesPlaying() {
+        return subscenesPlaying;
+    }
+
+    public void setSubscenesPlaying(List<Subscene> subscenesPlaying) {
+        this.subscenesPlaying = subscenesPlaying;
     }
 }

@@ -72,7 +72,7 @@ public class Subscene extends SceneData {
         for (Playback playback : playbacks) {
             playback.stop(killEntity);
         }
-        playbacks.clear();
+        getPlaybacks().clear();
     }
 
     public boolean isPlaying() {

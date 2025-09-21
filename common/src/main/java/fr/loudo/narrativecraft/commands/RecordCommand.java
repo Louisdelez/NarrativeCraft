@@ -130,6 +130,7 @@ public class RecordCommand {
             if (recording == null) {
                 recording = new Recording(context.getSource().getPlayer(), playerSession, subsceneToPlay);
             }
+            recording.setSubscenesPlaying(subsceneToPlay);
             recording.start();
             recordingManager.addRecording(recording);
             context.getSource()
