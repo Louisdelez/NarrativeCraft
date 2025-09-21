@@ -103,7 +103,7 @@ public class CutscenePlayback {
             cutsceneController.setPlaying(false);
         }
         segmentTick++;
-        totalTick++; // CORRECTION: Toujours incrémenter totalTick
+        totalTick++;
     }
 
     public void cameraInterpolation(double partialTick) {
@@ -156,13 +156,11 @@ public class CutscenePlayback {
             startIndex++;
         }
 
-        // CORRECTION: Utiliser segmentTick au lieu de totalTick pour éviter le décalage
         double elapsedTick = (segmentTick + partialTick);
-        // Soustraire le startDelayTick pour avoir le temps réel d'animation
         if (elapsedTick >= keyframeA.getStartDelayTick()) {
             elapsedTick -= keyframeA.getStartDelayTick();
         } else {
-            elapsedTick = 0; // Pas encore commencé l'animation
+            elapsedTick = 0;
         }
 
         int accumulatedTick = 0;
