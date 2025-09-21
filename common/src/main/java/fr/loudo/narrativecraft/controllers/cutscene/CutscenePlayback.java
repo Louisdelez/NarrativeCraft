@@ -203,23 +203,11 @@ public class CutscenePlayback {
 
         float pitch = MathHelper.catmullRom(p0.getPitch(), p1.getPitch(), p2.getPitch(), p3.getPitch(), (float) t);
 
-        float yaw = interpolateAngleCatmullRom(
-                p0.getYaw(),
-                p1.getYaw(),
-                p2.getYaw(),
-                p3.getYaw(),
-                t
-        );
+        float yaw = interpolateAngleCatmullRom(p0.getYaw(), p1.getYaw(), p2.getYaw(), p3.getYaw(), t);
 
         float fov = MathHelper.catmullRom(p0.getFov(), p1.getFov(), p2.getFov(), p3.getFov(), (float) t);
 
-        float roll = interpolateAngleCatmullRom(
-                p0.getRoll(),
-                p1.getRoll(),
-                p2.getRoll(),
-                p3.getRoll(),
-                t
-        );
+        float roll = interpolateAngleCatmullRom(p0.getRoll(), p1.getRoll(), p2.getRoll(), p3.getRoll(), t);
 
         return new KeyframeLocation(x, y, z, pitch, yaw, roll, fov);
     }
@@ -280,7 +268,7 @@ public class CutscenePlayback {
 
     private static float interpolateAngle(float from, float to, double t) {
         float diff = getShortestAngleDifference(from, to);
-        return normalizeAngle(from + (float)(diff * t));
+        return normalizeAngle(from + (float) (diff * t));
     }
 
     private static float unwrapAngle(float angle, float reference) {
@@ -294,10 +282,11 @@ public class CutscenePlayback {
         double t2 = t * t;
         double t3 = t2 * t;
 
-        float angle = (float) (0.5 * ((2.0 * a1)
-                + (-a0 + a2) * t
-                + (2.0 * a0 - 5.0 * a1 + 4.0 * a2 - a3) * t2
-                + (-a0 + 3.0 * a1 - 3.0 * a2 + a3) * t3));
+        float angle = (float) (0.5
+                * ((2.0 * a1)
+                        + (-a0 + a2) * t
+                        + (2.0 * a0 - 5.0 * a1 + 4.0 * a2 - a3) * t2
+                        + (-a0 + 3.0 * a1 - 3.0 * a2 + a3) * t3));
 
         return normalizeAngle(angle);
     }

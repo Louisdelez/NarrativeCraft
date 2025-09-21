@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.screens.storyManager.cameraAngle;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.controllers.cameraAngle.CameraAngleController;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.Environment;
@@ -75,8 +76,9 @@ public class CameraAngleScreen extends StoryElementScreen {
         List<StoryElementList.StoryEntryData> entries = scene.getCameraAngles().stream()
                 .map(cameraAngle -> {
                     Button button = Button.builder(Component.literal(cameraAngle.getName()), button1 -> {
-                                new CameraAngleController(Environment.DEVELOPMENT, minecraft.player, cameraAngle)
-                                        .startSession();
+                                NarrativeCraftMod.server.execute(() -> new CameraAngleController(
+                                                Environment.DEVELOPMENT, minecraft.player, cameraAngle)
+                                        .startSession());
                                 minecraft.setScreen(null);
                             })
                             .build();

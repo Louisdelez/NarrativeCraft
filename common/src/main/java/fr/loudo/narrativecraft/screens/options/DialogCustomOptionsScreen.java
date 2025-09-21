@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.screens.options;
 
 import com.mojang.authlib.GameProfile;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.dialog.DialogData;
@@ -85,17 +86,22 @@ public class DialogCustomOptionsScreen extends Screen {
     @Override
     public void onClose() {
         LocalPlayer player = minecraft.player;
-        fakePlayer.remove(Entity.RemovalReason.KILLED);
         player.setPos(lastPos);
         player.setXRot(lastXRot);
         player.setYRot(lastYRot);
         player.setYHeadRot(lastYRot);
-        playerSession.getPlayer().connection.send(new ClientboundPlayerInfoRemovePacket(List.of(fakePlayer.getUUID())));
-        playerSession.getPlayer().connection.send(new ClientboundRemoveEntitiesPacket(fakePlayer.getId()));
+        NarrativeCraftMod.server.execute(() -> {
+            fakePlayer.remove(Entity.RemovalReason.KILLED);
+            playerSession
+                    .getPlayer()
+                    .connection
+                    .send(new ClientboundPlayerInfoRemovePacket(List.of(fakePlayer.getUUID())));
+            playerSession.getPlayer().connection.send(new ClientboundRemoveEntitiesPacket(fakePlayer.getId()));
+            playerSession.getPlayer().setGameMode(GameType.CREATIVE);
+        });
         playerSession.setDialogRenderer(null);
         minecraft.setScreen(lastScreen);
         minecraft.options.hideGui = false;
-        playerSession.getPlayer().setGameMode(GameType.CREATIVE);
     }
 
     @Override
@@ -113,28 +119,30 @@ public class DialogCustomOptionsScreen extends Screen {
             player.setXRot(0);
             player.setYRot(0);
             player.setYHeadRot(0);
-            fakePlayer = new FakePlayer(playerSession.getPlayer().level(), new GameProfile(UUID.randomUUID(), ""));
-            fakePlayer.setXRot(0);
-            fakePlayer.setYHeadRot(180);
-            fakePlayer.setYRot(180);
-            fakePlayer.setPos(localPos.x, localPos.y + player.getEyeHeight() + 4.2, localPos.z + 2);
-            playerSession
-                    .getPlayer()
-                    .connection
-                    .send(new ClientboundPlayerInfoUpdatePacket(
-                            ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
-            playerSession.getPlayer().level().addFreshEntity(fakePlayer);
-            DialogRenderer3D dialog = new DialogRenderer3D(
-                    "Lorem ipsum dolor sit amet consectetur adipiscing elit\n",
-                    "",
-                    dialogData,
-                    new CharacterRuntime(null, null, fakePlayer));
-            dialog.setDialogEntityBobbing(new DialogEntityBobbing(
-                    dialog, dialogData.getNoiseShakeSpeed(), dialogData.getNoiseShakeStrength()));
-            dialog.setNoSkip(true);
-            dialog.start();
-            playerSession.setDialogRenderer(dialog);
-            playerSession.getPlayer().setGameMode(GameType.SPECTATOR);
+            NarrativeCraftMod.server.execute(() -> {
+                fakePlayer = new FakePlayer(playerSession.getPlayer().level(), new GameProfile(UUID.randomUUID(), ""));
+                fakePlayer.setXRot(0);
+                fakePlayer.setYHeadRot(180);
+                fakePlayer.setYRot(180);
+                fakePlayer.setPos(localPos.x, localPos.y + player.getEyeHeight() + 4.2, localPos.z + 2);
+                playerSession
+                        .getPlayer()
+                        .connection
+                        .send(new ClientboundPlayerInfoUpdatePacket(
+                                ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
+                playerSession.getPlayer().level().addFreshEntity(fakePlayer);
+                playerSession.getPlayer().setGameMode(GameType.SPECTATOR);
+                DialogRenderer3D dialog = new DialogRenderer3D(
+                        "Lorem ipsum dolor sit amet consectetur adipiscing elit\n",
+                        "",
+                        dialogData,
+                        new CharacterRuntime(null, null, fakePlayer));
+                dialog.setDialogEntityBobbing(new DialogEntityBobbing(
+                        dialog, dialogData.getNoiseShakeSpeed(), dialogData.getNoiseShakeStrength()));
+                dialog.setNoSkip(true);
+                dialog.start();
+                playerSession.setDialogRenderer(dialog);
+            });
         }
         int gap = 5;
         int labelHeight = 20;

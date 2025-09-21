@@ -367,6 +367,8 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
                     }
                 }
             }
+        } else {
+            selectedGroup = getSelectedGroup();
         }
         selectedGroup.addKeyframe(keyframe);
         keyframe.setParentGroup(selectedGroup.getKeyframes().getFirst().getId() == keyframe.getId());

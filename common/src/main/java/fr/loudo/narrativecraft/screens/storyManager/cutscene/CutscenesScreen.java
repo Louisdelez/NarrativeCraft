@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.screens.storyManager.cutscene;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.Environment;
@@ -84,8 +85,9 @@ public class CutscenesScreen extends StoryElementScreen {
         List<StoryElementList.StoryEntryData> entries = scene.getCutscenes().stream()
                 .map(cutscene -> {
                     Button button = Button.builder(Component.literal(cutscene.getName()), button1 -> {
-                                new CutsceneController(Environment.DEVELOPMENT, minecraft.player, cutscene)
-                                        .startSession();
+                                NarrativeCraftMod.server.execute(() -> new CutsceneController(
+                                                Environment.DEVELOPMENT, minecraft.player, cutscene)
+                                        .startSession());
                                 minecraft.setScreen(null);
                             })
                             .build();

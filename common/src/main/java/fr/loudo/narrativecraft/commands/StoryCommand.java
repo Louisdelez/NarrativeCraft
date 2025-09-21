@@ -41,6 +41,7 @@ import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.List;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -89,7 +90,7 @@ public class StoryCommand {
                 return Command.SINGLE_SUCCESS;
             }
             for (ErrorLine errorLine : results) {
-                player.sendSystemMessage(errorLine.toMessage());
+                Minecraft.getInstance().player.displayClientMessage(errorLine.toMessage(), false);
             }
             if (!errorLines.isEmpty()) {
                 player.sendSystemMessage(Translation.message(
