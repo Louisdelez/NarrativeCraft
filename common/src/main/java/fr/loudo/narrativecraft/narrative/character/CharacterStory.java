@@ -53,6 +53,7 @@ public class CharacterStory extends NarrativeEntry {
         this.characterType = characterType;
         this.model = model;
         this.entityType = EntityType.PLAYER;
+        this.entityTypeId = BuiltInRegistries.ENTITY_TYPE.getId(entityType);
     }
 
     public void updateEntityType(EntityType<?> entityType) {
