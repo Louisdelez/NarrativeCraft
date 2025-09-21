@@ -451,4 +451,8 @@ public class StoryHandler {
     public StoryDebugHud getStoryDebugHud() {
         return storyDebugHud;
     }
+
+    public PlayerSession getPlayerSession() {
+        return playerSession;
+    }
 }

@@ -26,6 +26,9 @@ package fr.loudo.narrativecraft.controllers.cutscene;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.inkAction.InkAction;
+import fr.loudo.narrativecraft.api.inkAction.InkActionRegistry;
+import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.controllers.keyframe.AbstractKeyframeGroupsBase;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.managers.PlaybackManager;
@@ -85,6 +88,18 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
             hudMessage = Translation.message("controller.cutscene.hud_no_tick").getString();
         }
         if (!isPlaying) return;
+        List<KeyframeTrigger> keyframeTriggersToExecute = keyframeTriggers.stream()
+                .filter(trigger -> trigger.getTick() == currentTick)
+                .toList();
+        for (KeyframeTrigger keyframeTrigger : keyframeTriggersToExecute) {
+            for (String command : keyframeTrigger.getCommandsToList()) {
+                InkAction inkAction = InkActionRegistry.findByCommand(command);
+                if (inkAction == null) continue;
+                InkActionResult result = inkAction.validateAndExecute(command, playerSession);
+                if (!result.isOk()) continue;
+                playerSession.addInkAction(inkAction);
+            }
+        }
         currentTick++;
         if (currentTick >= totalTick && environment == Environment.DEVELOPMENT) {
             pause();
@@ -135,6 +150,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         for (Playback playback : playbacks) {
             playerSession.getCharacterRuntimes().add(playback.getCharacterRuntime());
         }
+        playerSession.clearKilledCharacters();
         playerSession.getPlaybackManager().getPlaybacks().addAll(playbacks);
         if (environment != Environment.DEVELOPMENT) return;
         if (!keyframeGroups.isEmpty()) {
