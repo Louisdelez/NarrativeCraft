@@ -99,8 +99,8 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
         List<Button> subscenesButton = new ArrayList<>();
         Button subsceneButton = Button.builder(Translation.message("global.subscenes"), button -> {
                     for (Subscene subscene : scene.getSubscenes()) {
-                        for (Animation animation : subscene.getAnimations()) {
-                            Button button1 = Button.builder(Component.literal(animation.getName()), button2 -> {
+                        Button button1 = Button.builder(Component.literal(subscene.getName()), button2 -> {
+                                    for (Animation animation : subscene.getAnimations()) {
                                         spawnEntity(
                                                 animation,
                                                 animation
@@ -109,10 +109,10 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                                                                 .getLocations()
                                                                 .size()
                                                         - 1);
-                                    })
-                                    .build();
-                            subscenesButton.add(button1);
-                        }
+                                    }
+                                })
+                                .build();
+                        subscenesButton.add(button1);
                     }
                     minecraft.setScreen(new CameraAngleAddTemplateCharacter(
                             this, Translation.message("global.subscenes"), cameraAngleController, subscenesButton));
@@ -194,6 +194,7 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
         characterStoryData.applyItems(minecraft.player.registryAccess());
         characterStoryData.applyBytes((LivingEntity) playbackData.getEntity());
         cameraAngleController.getCharacterStoryDataList().add(characterStoryData);
+        cameraAngleController.getPlayerSession().getCharacterRuntimes().add(characterStoryData.getCharacterRuntime());
         minecraft.setScreen(null);
     }
 }

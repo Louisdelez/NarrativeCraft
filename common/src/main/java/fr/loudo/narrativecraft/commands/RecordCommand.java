@@ -80,6 +80,10 @@ public class RecordCommand {
         PlayerSession playerSession =
                 CommandUtil.getSession(context, context.getSource().getPlayer());
         if (playerSession == null) return 0;
+        if (playerSession.getController() != null) {
+            playerSession.getPlayer().sendSystemMessage(Translation.message("session.controller_set"));
+            return 0;
+        }
 
         ServerPlayer player = context.getSource().getPlayer();
 
@@ -105,6 +109,10 @@ public class RecordCommand {
         PlayerSession playerSession =
                 CommandUtil.getSession(context, context.getSource().getPlayer());
         if (playerSession == null) return 0;
+        if (playerSession.getController() != null) {
+            playerSession.getPlayer().sendSystemMessage(Translation.message("session.controller_set"));
+            return 0;
+        }
 
         ServerPlayer player = context.getSource().getPlayer();
 
@@ -147,6 +155,10 @@ public class RecordCommand {
         PlayerSession playerSession =
                 CommandUtil.getSession(context, context.getSource().getPlayer());
         if (playerSession == null) return 0;
+        if (playerSession.getController() != null) {
+            playerSession.getPlayer().sendSystemMessage(Translation.message("session.controller_set"));
+            return 0;
+        }
 
         ServerPlayer player = context.getSource().getPlayer();
 
@@ -167,6 +179,10 @@ public class RecordCommand {
         PlayerSession playerSession =
                 CommandUtil.getSession(context, context.getSource().getPlayer());
         if (playerSession == null) return 0;
+        if (playerSession.getController() != null) {
+            playerSession.getPlayer().sendSystemMessage(Translation.message("session.controller_set"));
+            return 0;
+        }
 
         ServerPlayer player = context.getSource().getPlayer();
 
