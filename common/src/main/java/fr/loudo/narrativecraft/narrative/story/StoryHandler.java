@@ -223,6 +223,10 @@ public class StoryHandler {
                 handleChoices();
                 return;
             }
+            if (isTransitioning() && dialogRenderer != null) {
+                dialogRenderer.stop();
+                return;
+            }
             // Handles dialog stopping animation, to executes tags AFTER the animation disappeared.
             // And for that, it checks if the new dialog character is the same as the old dialog (dialog renderer)
             if (dialogRenderer == null || sameCharacterTalking(dialogText)) {
@@ -422,6 +426,11 @@ public class StoryHandler {
             dialogRenderer.autoSkipAt(autoSkipTime);
         }
         return dialogRenderer;
+    }
+
+    private boolean isTransitioning() {
+        if (story.getState().getCurrentKnot() == null) return false;
+        return !story.getState().getCurrentKnot().equals(playerSession.getScene().knotName());
     }
 
     public DialogData getDialogData() {
