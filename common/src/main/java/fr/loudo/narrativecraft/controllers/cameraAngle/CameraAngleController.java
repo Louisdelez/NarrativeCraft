@@ -81,6 +81,7 @@ public class CameraAngleController extends AbstractKeyframesBase<CameraAngleKeyf
         stopCurrentSession();
         playerSession.setController(this);
         for (CharacterStoryData characterStoryData : characterStoryDataList) {
+            if (characterStoryData.isTemplate()) continue;
             characterStoryData.spawn(playerSession.getPlayer().level(), environment);
             playerSession.getCharacterRuntimes().add(characterStoryData.getCharacterRuntime());
         }

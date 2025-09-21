@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.story.inkAction;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.controllers.cameraAngle.CameraAngleController;
@@ -80,13 +81,9 @@ public class CameraAngleInkAction extends InkAction {
         } else if (!(playerSession.getController() instanceof CameraAngleController)) {
             clear(playerSession);
         }
-        for (CharacterStoryData characterStoryData : cameraAngle.getCharacterStoryDataList()) {
-            if (!characterStoryData.isTemplate()) {
-                playerSession.getCharacterRuntimes().add(characterStoryData.getCharacterRuntime());
-            }
-        }
         playerSession.setCurrentCamera(keyframe.getKeyframeLocation());
         Minecraft.getInstance().options.hideGui = true;
+        playerSession.clearKilledCharacters();
         return InkActionResult.ok();
     }
 
@@ -102,7 +99,8 @@ public class CameraAngleInkAction extends InkAction {
                                         characterRuntime.getCharacterStory().getName())
                         && !characterStoryData.isTemplate()) {
                     if (characterRuntime.getEntity() == null) continue;
-                    characterRuntime.getEntity().remove(Entity.RemovalReason.KILLED);
+                    NarrativeCraftMod.server.execute(
+                            () -> characterRuntime.getEntity().remove(Entity.RemovalReason.KILLED));
                     toRemove.add(characterRuntime);
                 }
             }

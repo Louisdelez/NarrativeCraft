@@ -50,7 +50,7 @@ public class GameRendererMixin {
         callbackInfo.setReturnValue(playerSession.getCurrentCamera().getFov());
     }
 
-    @Inject(method = "bobView", at = @At("RETURN"))
+    @Inject(method = "bobHurt", at = @At("RETURN"))
     public void narrativecraft$applyInkShakeScreen(PoseStack poseStack, float partialTicks, CallbackInfo ci) {
         LocalPlayer player = Minecraft.getInstance().player;
         PlayerSession playerSession =

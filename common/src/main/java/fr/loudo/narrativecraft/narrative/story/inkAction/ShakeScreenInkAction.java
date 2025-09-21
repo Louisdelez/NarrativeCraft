@@ -141,7 +141,7 @@ public class ShakeScreenInkAction extends InkAction {
     }
 
     private boolean noShaking() {
-        return noiseShakeStrength > 0 && shakeDecayRate > 0 && noiseShakeSpeed > 0;
+        return noiseShakeStrength == 0 && shakeDecayRate == 0 && noiseShakeSpeed == 0;
     }
 
     @Override
