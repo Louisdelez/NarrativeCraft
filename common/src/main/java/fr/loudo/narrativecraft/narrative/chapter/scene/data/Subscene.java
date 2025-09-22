@@ -45,7 +45,7 @@ public class Subscene extends SceneData {
     public void start(Level level, Environment environment, boolean looping) {
         playbacks = getPlaybacks();
         playbacks.clear();
-        for (Animation animation : animations) {
+        for (Animation animation : getAnimations()) {
             Playback playback = new Playback(
                     PlaybackManager.ID_INCREMENTER.incrementAndGet(), animation, level, environment, looping);
             playback.start();
@@ -56,7 +56,7 @@ public class Subscene extends SceneData {
     public void start(Level level, Environment environment, boolean looping, StoryHandler storyHandler) {
         playbacks = getPlaybacks();
         playbacks.clear();
-        for (Animation animation : animations) {
+        for (Animation animation : getAnimations()) {
             Playback playback = new Playback(
                     PlaybackManager.ID_INCREMENTER.incrementAndGet(), animation, level, environment, looping);
             if (storyHandler != null) {

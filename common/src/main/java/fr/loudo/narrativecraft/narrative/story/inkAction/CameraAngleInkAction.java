@@ -73,6 +73,7 @@ public class CameraAngleInkAction extends InkAction {
 
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
+        playerSession.clearKilledCharacters();
         if (playerSession.getController() instanceof CameraAngleController cameraAngleController) {
             playerSession.getInkActions().removeIf(inkAction -> inkAction instanceof CameraAngleInkAction);
             if (!cameraAngleController.getCameraAngle().getName().equalsIgnoreCase(cameraAngle.getName())) {
@@ -83,7 +84,6 @@ public class CameraAngleInkAction extends InkAction {
         }
         playerSession.setCurrentCamera(keyframe.getKeyframeLocation());
         Minecraft.getInstance().options.hideGui = true;
-        playerSession.clearKilledCharacters();
         return InkActionResult.ok();
     }
 

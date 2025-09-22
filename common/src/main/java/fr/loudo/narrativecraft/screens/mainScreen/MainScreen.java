@@ -36,6 +36,7 @@ import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.narrative.story.StorySave;
 import fr.loudo.narrativecraft.narrative.story.StoryValidation;
+import fr.loudo.narrativecraft.narrative.story.inkAction.FadeInkAction;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.screens.components.ChapterSelectorScreen;
 import fr.loudo.narrativecraft.screens.components.CrashScreen;
@@ -286,7 +287,11 @@ public class MainScreen extends Screen {
                                 if (controller instanceof CutsceneController cutsceneController) {
                                     CutscenePlayback cutscenePlayback = cutsceneController.getCutscenePlayback();
                                     if (cutscenePlayback != null) {
-                                        cutscenePlayback.skip();
+                                        playerSession
+                                                .getInkActions()
+                                                .removeIf(inkAction -> inkAction instanceof FadeInkAction);
+                                        NarrativeCraftMod.server.execute(cutsceneController::skip);
+                                        cutscenePlayback.stop();
                                     }
                                 }
                             })

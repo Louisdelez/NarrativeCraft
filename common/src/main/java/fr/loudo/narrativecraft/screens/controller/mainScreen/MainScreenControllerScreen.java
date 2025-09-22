@@ -106,8 +106,11 @@ public class MainScreenControllerScreen extends Screen {
                                 }
                                 Location location =
                                         mainScreenController.getPlayerSession().getPlayerPosition();
-                                CharacterStoryData characterStoryData =
-                                        new CharacterStoryData(characterStory, location, false);
+                                CharacterStoryData characterStoryData = new CharacterStoryData(
+                                        characterStory,
+                                        location,
+                                        false,
+                                        mainScreenController.getPlayerSession().getScene());
                                 characterStoryData.setItems(minecraft.player);
                                 characterStoryData.setEntityByte(
                                         minecraft.player.getEntityData().get(EntityAccessor.getDATA_SHARED_FLAGS_ID()));

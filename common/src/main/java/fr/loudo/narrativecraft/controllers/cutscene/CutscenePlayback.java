@@ -23,14 +23,12 @@
 
 package fr.loudo.narrativecraft.controllers.cutscene;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframeGroup;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.narrative.story.inkAction.FadeInkAction;
 import fr.loudo.narrativecraft.screens.controller.cutscene.CutsceneKeyframeOptionScreen;
 import fr.loudo.narrativecraft.util.Easing;
 import fr.loudo.narrativecraft.util.MathHelper;
@@ -70,16 +68,6 @@ public class CutscenePlayback {
 
     public void play() {
         isPlaying = true;
-    }
-
-    public void skip() {
-        CutsceneKeyframe lastKeyframe =
-                cutsceneController.getKeyframeGroups().getLast().getKeyframes().getLast();
-        int lastTick = lastKeyframe.getTick() + lastKeyframe.getTransitionDelayTick();
-        NarrativeCraftMod.server.execute(() -> cutsceneController.changeTimePosition(lastTick - 1, false));
-        if (cutsceneController.getEnvironment() == Environment.PRODUCTION) {
-            playerSession.getInkActions().removeIf(inkAction -> inkAction instanceof FadeInkAction);
-        }
     }
 
     public void stop() {
@@ -218,6 +206,7 @@ public class CutscenePlayback {
         if (cutsceneController.getEnvironment() == Environment.DEVELOPMENT) {
             CutsceneKeyframeOptionScreen screen = new CutsceneKeyframeOptionScreen(keyframeB, playerSession, false);
             Minecraft.getInstance().setScreen(screen);
+            cutsceneController.setCurrentTick(keyframeB.getTick());
             cutsceneController.pause();
         }
     }

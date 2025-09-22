@@ -136,7 +136,7 @@ public class DialogCustomOptionsScreen extends Screen {
                         "Lorem ipsum dolor sit amet consectetur adipiscing elit\n",
                         "",
                         dialogData,
-                        new CharacterRuntime(null, null, fakePlayer));
+                        new CharacterRuntime(null, null, fakePlayer, playerSession.getScene()));
                 dialog.setDialogEntityBobbing(new DialogEntityBobbing(
                         dialog, dialogData.getNoiseShakeSpeed(), dialogData.getNoiseShakeStrength()));
                 dialog.setNoSkip(true);

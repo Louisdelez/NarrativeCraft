@@ -49,7 +49,9 @@ public class CameraAngleController extends AbstractKeyframesBase<CameraAngleKeyf
     public CameraAngleController(Environment environment, Player player, CameraAngle cameraAngle) {
         super(environment, player);
         this.cameraAngle = cameraAngle;
-        hudMessage = Translation.message("controller.camera_angle.hud").getString();
+        hudMessage = Translation.message(
+                        "controller.camera_angle.hud", cameraAngle.getScene().getName())
+                .getString();
         characterStoryDataList.addAll(cameraAngle.getCharacterStoryDataList());
         keyframes.addAll(cameraAngle.getCameraAngleKeyframes());
     }
@@ -81,7 +83,7 @@ public class CameraAngleController extends AbstractKeyframesBase<CameraAngleKeyf
         stopCurrentSession();
         playerSession.setController(this);
         for (CharacterStoryData characterStoryData : characterStoryDataList) {
-            if (characterStoryData.isTemplate()) continue;
+            if (characterStoryData.isTemplate() && environment == Environment.PRODUCTION) continue;
             characterStoryData.spawn(playerSession.getPlayer().level(), environment);
             playerSession.getCharacterRuntimes().add(characterStoryData.getCharacterRuntime());
         }

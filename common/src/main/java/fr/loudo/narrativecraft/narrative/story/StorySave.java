@@ -75,7 +75,8 @@ public class StorySave {
                             entity.getXRot(),
                             entity.getYRot(),
                             entity.onGround()),
-                    false);
+                    false,
+                    scene);
 
             characterStoryData.setPose(entity.getPose());
             characterStoryData.setItems(characterRuntime.getEntity());

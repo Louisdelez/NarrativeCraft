@@ -82,10 +82,15 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
 
     public void tick() {
         if (totalTick > 0) {
-            hudMessage = Translation.message("controller.cutscene.hud_tick", currentTick, totalTick)
+            hudMessage = Translation.message(
+                            "controller.cutscene.hud_tick", cutscene.getScene().getName(), currentTick, totalTick)
                     .getString();
         } else {
-            hudMessage = Translation.message("controller.cutscene.hud_no_tick").getString();
+            hudMessage = Translation.message(
+                            "controller.cutscene.hud_no_calculated_tick",
+                            cutscene.getScene().getName(),
+                            currentTick)
+                    .getString();
         }
         if (!isPlaying) return;
         List<KeyframeTrigger> keyframeTriggersToExecute = keyframeTriggers.stream()
@@ -101,6 +106,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
             }
         }
         currentTick++;
+        if (totalTick == 0) return;
         if (currentTick >= totalTick && environment == Environment.DEVELOPMENT) {
             pause();
             if (Minecraft.getInstance().screen instanceof CutsceneControllerScreen screen) {
@@ -244,6 +250,18 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         }
     }
 
+    public void skip() {
+        CutsceneKeyframe keyframe = getLastKeyframeLastGroup();
+        if (keyframe == null) return;
+        currentTick = totalTick;
+        for (Playback playback : playbacks) {
+            playback.changeLocationByTick(currentTick, false);
+            playerSession.getCharacterRuntimes().remove(playback.getCharacterRuntime());
+            playerSession.getCharacterRuntimes().add(playback.getCharacterRuntime());
+        }
+        playerSession.clearKilledCharacters();
+    }
+
     @Override
     public Screen getControllerScreen() {
         return new CutsceneControllerScreen(this);
@@ -322,7 +340,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         selectedGroup = keyframeGroup;
         keyframeGroups.add(keyframeGroup);
         createKeyframe();
-        if (lastKeyframe != null && totalTick > 0) {
+        if (lastKeyframe != null) {
             lastKeyframe.setTransitionDelayTick(currentTick - lastKeyframe.getTick());
         }
         keyframeGroup.showGroupText(playerSession.getPlayer());
@@ -344,31 +362,27 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         if (environment != Environment.DEVELOPMENT) return null;
         int pathTime = 0;
         CutsceneKeyframe lastKeyframe = getLastKeyframeLastGroup();
-        if (lastKeyframe != null && totalTick > 0) {
+        if (lastKeyframe != null) {
             pathTime = currentTick - lastKeyframe.getTick();
         }
         CutsceneKeyframe keyframe = new CutsceneKeyframe(
                 keyframesCounter.incrementAndGet(), getKeyframeLocationFromPlayer(), currentTick, 0, pathTime);
-        if (totalTick > 0) {
-            outer:
-            for (CutsceneKeyframeGroup keyframeGroup : keyframeGroups) {
-                for (int i = 0; i < keyframeGroup.getKeyframes().size(); i++) {
-                    if (keyframeGroup.getKeyframes().get(i).getTick() > currentTick) {
-                        CutsceneKeyframe before = i > 0
-                                ? keyframeGroup.getKeyframes().get(i - 1)
-                                : keyframeGroup.getKeyframes().get(i);
-                        CutsceneKeyframe after = keyframeGroup.getKeyframes().get(i);
-                        keyframe.setPathTick(currentTick - before.getTick());
-                        after.setPathTick(after.getTick() - currentTick);
-                        selectedGroup = keyframeGroup;
-                        selectedGroup.getKeyframes().add(i, keyframe);
-                        updateCurrentTick(keyframe.getTick());
-                        break outer;
-                    }
+        outer:
+        for (CutsceneKeyframeGroup keyframeGroup : keyframeGroups) {
+            for (int i = 0; i < keyframeGroup.getKeyframes().size(); i++) {
+                if (keyframeGroup.getKeyframes().get(i).getTick() > currentTick) {
+                    CutsceneKeyframe before = i > 0
+                            ? keyframeGroup.getKeyframes().get(i - 1)
+                            : keyframeGroup.getKeyframes().get(i);
+                    CutsceneKeyframe after = keyframeGroup.getKeyframes().get(i);
+                    keyframe.setPathTick(currentTick - before.getTick());
+                    after.setPathTick(after.getTick() - currentTick);
+                    selectedGroup = keyframeGroup;
+                    selectedGroup.getKeyframes().add(i, keyframe);
+                    updateCurrentTick(keyframe.getTick());
+                    break outer;
                 }
             }
-        } else {
-            selectedGroup = getSelectedGroup();
         }
         selectedGroup.addKeyframe(keyframe);
         keyframe.setParentGroup(selectedGroup.getKeyframes().getFirst().getId() == keyframe.getId());
@@ -470,15 +484,26 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
     }
 
     public void nextSecondSkip() {
-        changeTimePosition(currentTick + skipTickCount, true);
+        if (totalTick == 0) {
+            currentTick += skipTickCount;
+        } else {
+            changeTimePosition(currentTick + skipTickCount, true);
+        }
     }
 
     public void previousSecondSkip() {
-        changeTimePosition(Math.max(0, currentTick - skipTickCount), true);
+        if (totalTick == 0) {
+            currentTick = Math.max(0, currentTick - skipTickCount);
+        } else {
+            changeTimePosition(Math.max(0, currentTick - skipTickCount), true);
+        }
     }
 
     public void changeTimePosition(int newTick, boolean seamless) {
         currentTick = Math.min(newTick, totalTick);
+        if (totalTick == 0) {
+            currentTick = newTick;
+        }
         for (Playback playback : playbacks) {
             playback.changeLocationByTick(newTick, seamless);
         }

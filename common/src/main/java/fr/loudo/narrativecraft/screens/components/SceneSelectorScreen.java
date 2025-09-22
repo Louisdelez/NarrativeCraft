@@ -49,7 +49,11 @@ public class SceneSelectorScreen extends ButtonListScreen {
         for (Scene scene : chapter.getSortedSceneList()) {
             Button button = Button.builder(Component.literal(scene.getName()), button1 -> {
                         StoryHandler storyHandler = new StoryHandler(chapter, scene, playerSession);
-                        NarrativeCraftMod.server.execute(storyHandler::start);
+
+                        NarrativeCraftMod.server.execute(() -> {
+                            playerSession.getController().stopSession(false);
+                            storyHandler.start();
+                        });
                         minecraft.setScreen(null);
                     })
                     .build();

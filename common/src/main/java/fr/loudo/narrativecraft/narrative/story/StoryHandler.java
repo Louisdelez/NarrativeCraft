@@ -45,6 +45,8 @@ import fr.loudo.narrativecraft.screens.components.CrashScreen;
 import fr.loudo.narrativecraft.screens.credits.CreditScreen;
 import fr.loudo.narrativecraft.screens.story.StoryChoicesScreen;
 import fr.loudo.narrativecraft.util.Util;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.client.Minecraft;
@@ -111,6 +113,7 @@ public class StoryHandler {
             if (NarrativeCraftFile.saveExists() && !debugMode) {
                 loadSave();
                 if (!loadScene) {
+                    firstLoad = false;
                     return;
                 }
             }
@@ -265,8 +268,23 @@ public class StoryHandler {
         }
         playerSession.setChapter(save.getChapter());
         playerSession.setScene(save.getScene());
-        removeForbiddenTagLoadSave();
-        story.getCurrentTags().addAll(save.getTagsRunning());
+        List<String> tags = new ArrayList<>(story.getCurrentTags());
+        int subListId = 0;
+        for (int i = 0; i < tags.size(); i++) {
+            if ("on enter".equals(tags.get(i))) {
+                subListId = i + 1;
+                break;
+            }
+        }
+        List<String> newTags = new ArrayList<>();
+        if (subListId <= tags.size()) {
+            newTags.addAll(tags.subList(subListId, tags.size()));
+        }
+        newTags.addAll(save.getTagsRunning());
+
+        story.getCurrentTags().clear();
+        story.getCurrentTags().addAll(newTags);
+
         playerSession.getInkTagHandler().getTagsToExecute().addAll(story.getCurrentTags());
         for (CharacterStoryData characterStoryData : save.getCharacterStoryDataList()) {
             characterStoryData.spawn(playerSession.getPlayer().level(), Environment.PRODUCTION);
@@ -282,11 +300,6 @@ public class StoryHandler {
 
     private void loadScene(Scene scene) throws Exception {
         story.choosePathString(scene.knotName());
-    }
-
-    private void removeForbiddenTagLoadSave() throws Exception {
-        story.getCurrentTags().remove("save");
-        story.getCurrentTags().remove("on enter");
     }
 
     private void handleChoices() {
@@ -306,7 +319,7 @@ public class StoryHandler {
         minecraft.execute(() -> minecraft.setScreen(choicesScreen));
     }
 
-    private void showCrash(Exception exception) {
+    public void showCrash(Exception exception) {
         if (debugMode) {
             NarrativeCraftMod.LOGGER.error("Error occurred on the story: ", exception);
             Util.sendCrashMessage(playerSession.getPlayer(), exception);
@@ -322,7 +335,9 @@ public class StoryHandler {
                 StorySave save = new StorySave(playerSession);
                 NarrativeCraftFile.writeSave(save);
             }
-            if (showLogo) playerSession.getStorySaveIconGui().showSave(debugMode);
+            if (showLogo) {
+                playerSession.getStorySaveIconGui().showSave(debugMode);
+            }
         } catch (Exception e) {
             stop();
             showCrash(e);

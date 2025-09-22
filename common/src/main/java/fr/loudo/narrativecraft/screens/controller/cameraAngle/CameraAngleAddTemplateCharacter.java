@@ -182,8 +182,11 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                                 || action instanceof EntityByteAction
                                 || action instanceof PoseAction))
                 .toList();
-        CharacterStoryData characterStoryData =
-                new CharacterStoryData(animation.getCharacter(), animation.getLastLocation(), true);
+        CharacterStoryData characterStoryData = new CharacterStoryData(
+                animation.getCharacter(),
+                animation.getLastLocation(),
+                true,
+                cameraAngleController.getCameraAngle().getScene());
         characterStoryData.spawn(
                 cameraAngleController.getPlayerSession().getPlayer().level(), Environment.DEVELOPMENT);
         PlaybackData playbackData = new PlaybackData(animation.getActionsData().getFirst(), null);

@@ -67,6 +67,7 @@ public class CutsceneInkAction extends InkAction {
 
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
+        playerSession.clearKilledCharacters();
         controller = new CutsceneController(Environment.PRODUCTION, playerSession.getPlayer(), cutscene);
         controller.startSession();
         if (controller.getKeyframeGroups().isEmpty()) {

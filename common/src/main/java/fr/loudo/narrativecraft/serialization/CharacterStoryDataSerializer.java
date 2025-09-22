@@ -67,7 +67,7 @@ public class CharacterStoryDataSerializer
                 if (characterStory == null) return characterStoryData;
             }
             characterStoryData.setCharacterRuntime(
-                    new CharacterRuntime(characterStory, characterStoryData.getSkinName(), null));
+                    new CharacterRuntime(characterStory, characterStoryData.getSkinName(), null, scene));
         }
         return characterStoryData;
     }

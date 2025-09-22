@@ -174,20 +174,25 @@ public class CutsceneKeyframeOptionScreen extends KeyframeOptionScreen<CutsceneK
         MutableComponent groupText =
                 Translation.message("screen.keyframe_option.keyframe_group", cutsceneKeyframeGroup.getId());
         MutableComponent keyframeText = Translation.message("screen.keyframe_option.keyframe_id", keyframe.getId());
+        MutableComponent keyframeTickText = Translation.message("screen.keyframe_option.tick", keyframe.getTick());
 
         int groupWidth = this.font.width(groupText);
         int keyframeWidth = this.font.width(keyframeText);
+        int keyframeTickWidth = this.font.width(keyframeTickText);
         int spacing = 5;
-        int totalWidth = groupWidth + spacing + keyframeWidth;
+        int totalWidth = groupWidth + spacing + keyframeWidth + spacing + keyframeTickWidth;
 
         int startX = (this.width - totalWidth) / 2;
 
         StringWidget groupLabel = ScreenUtils.text(groupText, this.font, startX, y, 0x27cf1f);
         StringWidget keyframeIdLabel =
                 ScreenUtils.text(keyframeText, this.font, startX + groupWidth + spacing, y, 0xF1C40F);
+        StringWidget keyframeTickLabel = ScreenUtils.text(
+                keyframeTickText, this.font, startX + groupWidth + spacing + keyframeWidth + spacing, y, 0xFFFFFFFF);
 
         this.addRenderableWidget(groupLabel);
         this.addRenderableWidget(keyframeIdLabel);
+        this.addRenderableWidget(keyframeTickLabel);
     }
 
     protected void updateValues() {

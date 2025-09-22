@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.controllers.keyframe.AbstractKeyframeController;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
+import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
 import fr.loudo.narrativecraft.screens.components.ButtonListScreen;
 import fr.loudo.narrativecraft.screens.components.ChangeSkinLinkScreen;
@@ -55,6 +56,7 @@ public class CharacterOptionsScreen extends ButtonListScreen {
 
     @Override
     protected void addContents() {
+        if (characterRuntime.getCharacterStory() == null) return;
 
         if (characterStoryData != null) {
             Button changeCharacterPoseButton = Button.builder(Translation.message("character.change_pose"), button -> {
@@ -65,13 +67,15 @@ public class CharacterOptionsScreen extends ButtonListScreen {
             objectListScreen.addButton(changeCharacterPoseButton);
         }
 
-        Button changeCharacterSkinButton = Button.builder(Translation.message("character.change_skin"), button -> {
-                    ChangeSkinLinkScreen screen =
-                            new ChangeSkinLinkScreen(this, characterRuntime, characterRuntime::setSkinName);
-                    minecraft.setScreen(screen);
-                })
-                .build();
-        objectListScreen.addButton(changeCharacterSkinButton);
+        if (characterRuntime.getCharacterStory().getCharacterType() == CharacterType.MAIN) {
+            Button changeCharacterSkinButton = Button.builder(Translation.message("character.change_skin"), button -> {
+                        ChangeSkinLinkScreen screen =
+                                new ChangeSkinLinkScreen(this, characterRuntime, characterRuntime::setSkinName);
+                        minecraft.setScreen(screen);
+                    })
+                    .build();
+            objectListScreen.addButton(changeCharacterSkinButton);
+        }
 
         if (characterStoryData != null) {
             Button removeCharacterButton = Button.builder(Translation.message("global.remove"), button -> {
@@ -96,5 +100,6 @@ public class CharacterOptionsScreen extends ButtonListScreen {
                     .build();
             objectListScreen.addButton(removeCharacterButton);
         }
+        if (objectListScreen.children().isEmpty()) minecraft.setScreen(null);
     }
 }

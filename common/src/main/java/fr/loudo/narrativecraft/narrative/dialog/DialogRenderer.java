@@ -43,9 +43,11 @@ public class DialogRenderer {
     protected float width,
             totalWidth,
             oldWidth,
+            oldTotalWidth,
             height,
             totalHeight,
             oldHeight,
+            oldTotalHeight,
             paddingX,
             paddingY,
             oldScale,
@@ -173,11 +175,11 @@ public class DialogRenderer {
     }
 
     public float getInterpolatedWidth(float partialTick) {
-        return (float) Mth.lerp(Easing.SMOOTH.interpolate(t(partialTick)), oldWidth, totalWidth);
+        return (float) Mth.lerp(Easing.SMOOTH.interpolate(t(partialTick)), oldTotalWidth, totalWidth);
     }
 
     public float getInterpolatedHeight(float partialTick) {
-        return (float) Mth.lerp(Easing.SMOOTH.interpolate(t(partialTick)), oldHeight, totalHeight);
+        return (float) Mth.lerp(Easing.SMOOTH.interpolate(t(partialTick)), oldTotalHeight, totalHeight);
     }
 
     protected double t(float partialTick) {

@@ -111,8 +111,11 @@ public class CameraAngleControllerScreen extends Screen {
                                 }
                                 Location location =
                                         cameraAngleController.getPlayerSession().getPlayerPosition();
-                                CharacterStoryData characterStoryData =
-                                        new CharacterStoryData(characterStory, location, false);
+                                CharacterStoryData characterStoryData = new CharacterStoryData(
+                                        characterStory,
+                                        location,
+                                        false,
+                                        cameraAngleController.getCameraAngle().getScene());
                                 characterStoryData.setItems(minecraft.player);
                                 characterStoryData.setEntityByte(
                                         minecraft.player.getEntityData().get(EntityAccessor.getDATA_SHARED_FLAGS_ID()));

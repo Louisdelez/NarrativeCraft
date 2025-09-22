@@ -105,11 +105,11 @@ public class NarrativeEntryInit {
             }
             Scene scene = new Scene(sceneData.getName(), sceneData.getDescription(), chapter);
             scene.setRank(sceneData.getRank());
+            initNpcs(scene);
             initAnimations(scene);
             initSubscenes(scene);
             initCutscenes(scene);
             initCameraAngleGroups(scene);
-            initNpcs(scene);
             chapter.addScene(scene);
         }
     }
@@ -207,6 +207,8 @@ public class NarrativeEntryInit {
                     "Alex", "Alex from Minecraft.", "22", "08", "2014", CharacterModel.SLIM, CharacterType.MAIN);
             characterManager.addCharacter(steve);
             characterManager.addCharacter(alex);
+            NarrativeCraftFile.createCharacterFolder(steve);
+            NarrativeCraftFile.createCharacterFolder(alex);
             if (new Random().nextInt(0, 500) >= 445) {
                 CharacterStory herobrine = new CharacterStory(
                         "Herobrine",
@@ -217,6 +219,7 @@ public class NarrativeEntryInit {
                         CharacterModel.WIDE,
                         CharacterType.MAIN);
                 characterManager.addCharacter(herobrine);
+                NarrativeCraftFile.createCharacterFolder(herobrine);
             }
         }
     }

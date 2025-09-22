@@ -27,6 +27,7 @@ import com.google.common.io.Files;
 import com.mojang.blaze3d.platform.NativeImage;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
+import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.util.Util;
 import java.io.File;
 import java.io.IOException;
@@ -38,27 +39,41 @@ import net.minecraft.resources.ResourceLocation;
 
 public class CharacterSkinController {
 
+    private final Scene scene;
     private final CharacterRuntime characterRuntime;
     private final List<String> cachedSkins;
     private String skinName;
     private List<File> skins;
     private File currentSkin;
 
-    public CharacterSkinController(CharacterRuntime characterRuntime, String skinName) {
+    public CharacterSkinController(CharacterRuntime characterRuntime, String skinName, Scene scene) {
         this.characterRuntime = characterRuntime;
         this.skinName = skinName;
-        if (characterRuntime.getCharacterStory() != null) {
-            skins = NarrativeCraftFile.getSkinFiles(characterRuntime.getCharacterStory(), null);
-        }
+        this.scene = scene;
+        initSkins();
         cachedSkins = new ArrayList<>();
+    }
+
+    private void initSkins() {
+        if (characterRuntime.getCharacterStory() != null) {
+            if (characterRuntime.getCharacterStory().getCharacterType() == CharacterType.MAIN) {
+                skins = NarrativeCraftFile.getSkinFiles(characterRuntime.getCharacterStory());
+            } else if (characterRuntime.getCharacterStory().getCharacterType() == CharacterType.NPC) {
+                File mainSkin = NarrativeCraftFile.getSkinFile(characterRuntime.getCharacterStory(), scene);
+                skins = new ArrayList<>();
+                if (mainSkin.exists()) {
+                    skins.add(mainSkin);
+                }
+            }
+        }
     }
 
     public void cacheSkins() {
         if (characterRuntime.getCharacterStory() == null) return;
         Minecraft minecraft = Minecraft.getInstance();
         unCacheSkins();
-        skins = NarrativeCraftFile.getSkinFiles(characterRuntime.getCharacterStory(), null);
-        for (File skin : NarrativeCraftFile.getSkinFiles(characterRuntime.getCharacterStory(), null)) {
+        initSkins();
+        for (File skin : skins) {
             String path = "character/"
                     + Util.snakeCase(characterRuntime.getCharacterStory().getName()) + "/"
                     + Util.snakeCase(skin.getName());

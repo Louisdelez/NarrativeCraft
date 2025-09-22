@@ -104,8 +104,8 @@
   "narrativecraft.controller.confirm_leaving": "Are you sure you want to leave without saving?",
   "narrativecraft.controller.saved": "Successfully saved!",
 
-  "narrativecraft.controller.cutscene.hud_tick": "Cutscene controller. Tick %s/%s",
-  "narrativecraft.controller.cutscene.hud_no_tick": "Cutscene controller.",
+  "narrativecraft.controller.cutscene.hud_tick": "Cutscene controller scene %s. Tick %s/%s",
+  "narrativecraft.controller.cutscene.hud_no_calculated_tick": "Cutscene controller scene %s. Tick %s",
   "narrativecraft.controller.cutscene.keyframe_group_created": "Keyframe group #%s created.",
   "narrativecraft.controller.cutscene.keyframe_group.start_text": "Group #%s.",
   "narrativecraft.controller.cutscene.keyframe_created": "Keyframe #%s created for group #%s.",
@@ -117,7 +117,7 @@
   "narrativecraft.controller.cutscene.settings.select_group_name_selected": "Keyframe Group #%d (selected)",
   "narrativecraft.controller.cutscene.settings.group_selected": "Keyframe Group #%d selected.",
 
-  "narrativecraft.controller.camera_angle.hud": "Camera angle controller",
+  "narrativecraft.controller.camera_angle.hud": "Camera angle controller scene %s",
   "narrativecraft.controller.camera_angle.add_character": "Add character to %s",
   "narrativecraft.controller.camera_angle.template_character": "Add template character to %s",
 
@@ -168,6 +168,7 @@
   "narrativecraft.screen.keyframe_option.speed": "Speed:",
   "narrativecraft.screen.keyframe_option.keyframe_group": "Group %d",
   "narrativecraft.screen.keyframe_option.keyframe_id": "Keyframe ID #%d",
+  "narrativecraft.screen.keyframe_option.tick": "Tick %s",
 
   "narrativecraft.screen.main_screen.play": "Play",
   "narrativecraft.screen.main_screen.cant_play_tooltip": "No chapters or scenes available.",

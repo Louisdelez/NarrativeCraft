@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.narrative.character;
 import fr.loudo.narrativecraft.mixin.accessor.EntityAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.LivingEntityAccessor;
 import fr.loudo.narrativecraft.narrative.Environment;
+import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.recording.Location;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.ArrayList;
@@ -56,8 +57,8 @@ public class CharacterStoryData {
     private transient String oldSkinName = "main.png";
     private boolean isTemplate;
 
-    public CharacterStoryData(CharacterStory characterStory, Location location, boolean isTemplate) {
-        this.characterRuntime = new CharacterRuntime(characterStory, skinName, null);
+    public CharacterStoryData(CharacterStory characterStory, Location location, boolean isTemplate, Scene scene) {
+        this.characterRuntime = new CharacterRuntime(characterStory, skinName, null, scene);
         this.location = location;
         this.isTemplate = isTemplate;
     }

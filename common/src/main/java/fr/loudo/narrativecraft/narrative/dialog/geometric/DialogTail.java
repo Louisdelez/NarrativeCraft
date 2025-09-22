@@ -69,23 +69,18 @@ public class DialogTail {
         }
 
         if (tailDirection == TailDirection.RIGHT) {
-            if (dialog.isAnimating()) {
-                tailOffsetX = dialog.getInterpolatedWidth(partialTick);
-            } else {
-                tailOffsetX = dialog.getTotalWidth();
-            }
+            tailOffsetX = dialog.getTotalWidth();
         }
 
         if (tailDirection == TailDirection.LEFT) {
-            if (dialog.isAnimating()) {
-                tailOffsetX = -dialog.getInterpolatedWidth(partialTick);
-            } else {
-                tailOffsetX = -dialog.getTotalWidth();
-            }
+            tailOffsetX = -dialog.getTotalWidth();
         }
 
         if (tailDirection == TailDirection.RIGHT || tailDirection == TailDirection.LEFT) {
             float halfHeight = dialog.getTotalHeight() / 2f;
+            if (dialog.isAnimating()) {
+                halfHeight = dialog.getInterpolatedHeight(partialTick) / 2f;
+            }
 
             float minY = -halfHeight + width / 2f;
             float maxY = halfHeight - width / 2f;
@@ -129,13 +124,12 @@ public class DialogTail {
         poseStack.popPose();
     }
 
-    Vec2 getTailOffset(Camera camera) {
+    public Vec2 getTailOffset(Camera camera) {
         Vec3 entityPos = dialog.translateToRelative(dialog.getDialogPosition());
         Vec3 dialogPos = dialog.translateToRelativeApplyOffset(dialog.getDialogPosition());
         Vec3 toDialog = dialogPos.subtract(entityPos);
 
-        // Vecteurs caméra
-        Vec3 camRight = new Vec3(camera.getLeftVector()).scale(-1); // right = -left
+        Vec3 camRight = new Vec3(camera.getLeftVector()).scale(-1);
         Vec3 camUp = new Vec3(camera.getUpVector());
 
         float scale = dialog.getScale() * 0.025F;

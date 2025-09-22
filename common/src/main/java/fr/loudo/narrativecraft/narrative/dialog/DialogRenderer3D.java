@@ -135,12 +135,22 @@ public class DialogRenderer3D extends DialogRenderer {
         Side side = dialogOffsetSide();
 
         poseStack.pushPose();
+        float height = this.height;
+        if (isAnimating()) {
+            height = (float) Mth.lerp(Easing.SMOOTH.interpolate(t(partialTick)), oldHeight, height);
+        }
         switch (side) {
-            case RIGHT -> poseStack.translate(totalWidth, dialogOffset.y < 0 ? height / 2.0F : 0, 0);
+            case RIGHT ->
+                poseStack.translate(
+                        totalWidth, dialogOffset.y == 0 ? height : (dialogOffset.y < 0 ? height / 2.0F : 0), 0);
             case LEFT ->
                 poseStack.translate(
                         -totalWidth,
-                        dialogOffset.y < 0 ? height / 2.0F - paddingY / 2.0F + 2 : -height / 2.0F - paddingY * 2 - 1,
+                        dialogOffset.y == 0
+                                ? 0
+                                : (dialogOffset.y < 0
+                                        ? height / 2.0F - paddingY / 2.0F + 2
+                                        : -height / 2.0F - paddingY * 2 - 1),
                         0);
             case DOWN -> poseStack.translate(0, dialogOffset.x == 0 ? height : height / 2.0F + paddingY / 2.0F, 0);
         }
@@ -161,8 +171,12 @@ public class DialogRenderer3D extends DialogRenderer {
 
         poseStack.pushPose();
         switch (side) {
-            case RIGHT -> poseStack.translate(totalWidth, dialogOffset.y < 0 ? totalHeight : 0, 0);
-            case LEFT -> poseStack.translate(-totalWidth, dialogOffset.y < 0 ? totalHeight : 0, 0);
+            case RIGHT ->
+                poseStack.translate(
+                        totalWidth, dialogOffset.y == 0 ? paddingY : (dialogOffset.y < 0 ? totalHeight : 0), 0);
+            case LEFT ->
+                poseStack.translate(
+                        -totalWidth, dialogOffset.y == 0 ? paddingY : (dialogOffset.y < 0 ? totalHeight : 0), 0);
             case DOWN -> poseStack.translate(0, totalHeight, 0);
         }
 
@@ -224,8 +238,10 @@ public class DialogRenderer3D extends DialogRenderer {
             originalWidth = getInterpolatedWidth(partialTick);
             originalHeight = getInterpolatedHeight(partialTick);
         } else {
-            oldWidth = totalWidth;
-            oldHeight = totalHeight;
+            oldTotalWidth = totalWidth;
+            oldWidth = width;
+            oldHeight = height;
+            oldTotalHeight = totalHeight;
             oldScale = scale;
         }
 

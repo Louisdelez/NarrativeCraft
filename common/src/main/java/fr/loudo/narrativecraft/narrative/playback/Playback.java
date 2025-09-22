@@ -61,7 +61,8 @@ public class Playback {
         this.animation = animation;
         this.level = level;
         this.environment = environment;
-        this.characterRuntime = new CharacterRuntime(animation.getCharacter(), animation.getSkinName(), masterEntity);
+        this.characterRuntime = new CharacterRuntime(
+                animation.getCharacter(), animation.getSkinName(), masterEntity, animation.getScene());
         this.isPlaying = false;
         this.hasEnded = false;
         this.isLooping = isLooping;
@@ -84,6 +85,7 @@ public class Playback {
             storyHandler.killCharacter(animation.getCharacter());
         } else {
             masterEntity = characterRuntime.getEntity();
+            characterRuntime.setEntity(masterEntity);
         }
         start();
     }

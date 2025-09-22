@@ -45,14 +45,14 @@ public class OnEntityRightClick {
             CharacterRuntime characterRuntime = controller.getCharacterFromEntity(entity);
             if (characterRuntime != null) {
                 CharacterOptionsScreen screen = new CharacterOptionsScreen(null, controller, characterRuntime);
-                Minecraft.getInstance().setScreen(screen);
+                Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
             }
             Keyframe keyframe = controller.getKeyframeByEntity(entity);
             controller.setCamera(keyframe);
             KeyframeTrigger keyframeTrigger = controller.getKeyframeTriggerByEntity(entity);
             if (keyframeTrigger != null) {
                 KeyframeTriggerScreen screen = new KeyframeTriggerScreen(controller, keyframeTrigger);
-                Minecraft.getInstance().setScreen(screen);
+                Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
             }
         }
     }

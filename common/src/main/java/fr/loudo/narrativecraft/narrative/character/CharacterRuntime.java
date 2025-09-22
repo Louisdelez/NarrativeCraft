@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.character;
 
+import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import net.minecraft.world.entity.LivingEntity;
 
 public class CharacterRuntime {
@@ -32,10 +33,10 @@ public class CharacterRuntime {
     private String skinName;
     private String oldSkinName;
 
-    public CharacterRuntime(CharacterStory characterStory, String skinName, LivingEntity entity) {
+    public CharacterRuntime(CharacterStory characterStory, String skinName, LivingEntity entity, Scene scene) {
         this.characterStory = characterStory;
         this.entity = entity;
-        characterSkinController = new CharacterSkinController(this, skinName);
+        characterSkinController = new CharacterSkinController(this, skinName, scene);
         characterSkinController.cacheSkins();
     }
 

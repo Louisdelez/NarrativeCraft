@@ -447,11 +447,15 @@ public class NarrativeCraftFile {
         }
     }
 
-    public static List<File> getSkinFiles(CharacterStory characterStory, Scene scene) {
+    public static List<File> getSkinFiles(CharacterStory characterStory) {
         File[] skinFiles = createDirectory(getCharacterFolder(characterStory), SKINS_FOLDER_NAME)
                 .listFiles();
         if (skinFiles == null) return new ArrayList<>();
         return Arrays.stream(skinFiles).toList();
+    }
+
+    public static File getSkinFile(CharacterStory characterStory, Scene scene) {
+        return new File(getCharacterFolder(characterStory, scene), "main.png");
     }
 
     public static void updateCharacterData(CharacterStory oldCharacter, CharacterStory newCharacter)
