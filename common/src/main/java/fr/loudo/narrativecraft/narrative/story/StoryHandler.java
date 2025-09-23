@@ -397,6 +397,8 @@ public class StoryHandler {
             newDialogRenderer.setRunDialogAutoSkipped(this::next);
             newDialogRenderer.start();
         } else {
+            configureAutoSkip(dialogRenderer, dialog);
+            dialogRenderer.autoSkipAt(dialogData.getAutoSkipSeconds());
             dialogRenderer.setText(dialog);
             dialogRenderer.update();
         }
@@ -430,8 +432,14 @@ public class StoryHandler {
         } else {
             dialogRenderer = new DialogRenderer2D(dialog, 350, 400, 90, 30, dialogData);
         }
+        configureAutoSkip(dialogRenderer, dialog);
         dialogRenderer.autoSkipAt(dialogData.getAutoSkipSeconds());
         dialogRenderer.setNoSkip(dialogData.isNoSkip());
+        return dialogRenderer;
+    }
+
+    private void configureAutoSkip(DialogRenderer dialogRenderer, String dialog) {
+        dialogRenderer.stopAutoSkip();
         if (clientOption.autoSkip) {
             String[] words = dialog.trim().split("\\s+");
             int wordCount = words.length;
@@ -440,7 +448,6 @@ public class StoryHandler {
             autoSkipTime = Math.max(autoSkipTime, 2);
             dialogRenderer.autoSkipAt(autoSkipTime);
         }
-        return dialogRenderer;
     }
 
     private boolean isTransitioning() {
