@@ -101,6 +101,9 @@ public class StoryHandler {
     }
 
     public void start() {
+        if (playerSession.getController() != null) {
+            playerSession.getController().stopSession(false);
+        }
         playerSession.setStoryHandler(this);
         firstLoad = true;
         try {
@@ -214,6 +217,10 @@ public class StoryHandler {
                 stopAndFinishScreen();
                 return;
             }
+            if (!story.getCurrentChoices().isEmpty()) {
+                handleChoices();
+                return;
+            }
             DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
             dialogText = story.Continue().trim();
             if (story.hasError() || hasError) return;
@@ -222,11 +229,15 @@ public class StoryHandler {
                 firstLoad = false;
             }
             playerSession.getInkTagHandler().getTagsToExecute().addAll(story.getCurrentTags());
-            if (!story.getCurrentChoices().isEmpty()) {
-                handleChoices();
+            if (isTransitioning() && dialogRenderer != null) {
+                dialogRenderer.stop();
                 return;
             }
-            if (isTransitioning() && dialogRenderer != null) {
+            if (dialogText.isEmpty() && !story.getCurrentChoices().isEmpty() && dialogRenderer != null) {
+                playerSession.getInkTagHandler().setRun(() -> {
+                    playerSession.getInkTagHandler().setRun(null);
+                    showChoices();
+                });
                 dialogRenderer.stop();
                 return;
             }
@@ -303,7 +314,13 @@ public class StoryHandler {
             story.choosePathString(scene.knotName());
         } catch (Exception e) {
             // If the scene was added in-game after a save was created, then load the latest scene
-            story.choosePathString(NarrativeCraftMod.getInstance().getChapterManager().getChapters().getFirst().getSortedSceneList().getLast().knotName());
+            story.choosePathString(NarrativeCraftMod.getInstance()
+                    .getChapterManager()
+                    .getChapters()
+                    .getFirst()
+                    .getSortedSceneList()
+                    .getLast()
+                    .knotName());
         }
     }
 
@@ -317,9 +334,8 @@ public class StoryHandler {
         }
     }
 
-    private void showChoices() {
+    public void showChoices() {
         playerSession.setDialogRenderer(null);
-        playerSession.getInkTagHandler().execute();
         StoryChoicesScreen choicesScreen = new StoryChoicesScreen(playerSession, true);
         minecraft.execute(() -> minecraft.setScreen(choicesScreen));
     }

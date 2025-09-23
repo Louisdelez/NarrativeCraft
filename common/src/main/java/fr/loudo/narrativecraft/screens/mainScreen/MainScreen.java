@@ -32,6 +32,7 @@ import fr.loudo.narrativecraft.controllers.mainScreen.MainScreenController;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.data.MainScreenData;
+import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframe;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.narrative.story.StorySave;
@@ -42,7 +43,6 @@ import fr.loudo.narrativecraft.screens.components.ChapterSelectorScreen;
 import fr.loudo.narrativecraft.screens.components.CrashScreen;
 import fr.loudo.narrativecraft.screens.components.FinishedStoryScreen;
 import fr.loudo.narrativecraft.screens.components.NarrativeCraftLogoRenderer;
-import fr.loudo.narrativecraft.screens.story.StoryChoicesScreen;
 import fr.loudo.narrativecraft.util.ErrorLine;
 import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
@@ -146,15 +146,6 @@ public class MainScreen extends Screen {
             if (playerSession.getController() != null) {
                 NarrativeCraftMod.server.execute(
                         () -> playerSession.getController().stopSession(false));
-            }
-        } else {
-            StoryHandler storyHandler = playerSession.getStoryHandler();
-            if (storyHandler != null) {
-                if (!storyHandler.getStory().getCurrentChoices().isEmpty()) {
-                    StoryChoicesScreen choicesScreen =
-                            new StoryChoicesScreen(storyHandler.getStory().getCurrentChoices(), false);
-                    minecraft.setScreen(choicesScreen);
-                }
             }
         }
     }
@@ -265,11 +256,20 @@ public class MainScreen extends Screen {
         if (pause) {
             startY += buttonHeight + gap;
             Button loadLastSaveButton = Button.builder(
-                            Translation.message("screen.main_screen.pause.load_last_save"), button -> {
+                            playerSession.getStoryHandler().isDebugMode()
+                                    ? Translation.message("screen.main_screen.pause.restart_scene")
+                                    : Translation.message("screen.main_screen.pause.load_last_save"),
+                            button -> {
                                 minecraft.setScreen(null);
-                                StoryHandler storyHandler = new StoryHandler(playerSession);
-                                storyHandler.setDebugMode(
-                                        playerSession.getStoryHandler().isDebugMode());
+                                StoryHandler storyHandler;
+                                if (playerSession.getStoryHandler().isDebugMode()) {
+                                    storyHandler = new StoryHandler(
+                                            playerSession.getChapter(), playerSession.getScene(), playerSession);
+                                    storyHandler.setDebugMode(
+                                            playerSession.getStoryHandler().isDebugMode());
+                                } else {
+                                    storyHandler = new StoryHandler(playerSession);
+                                }
                                 NarrativeCraftMod.server.execute(() -> {
                                     playerSession.getStoryHandler().stop();
                                     storyHandler.start();
@@ -292,6 +292,9 @@ public class MainScreen extends Screen {
                                                 .removeIf(inkAction -> inkAction instanceof FadeInkAction);
                                         NarrativeCraftMod.server.execute(cutsceneController::skip);
                                         cutscenePlayback.stop();
+                                        CutsceneKeyframe keyframe = cutsceneController.getLastKeyframeLastGroup();
+                                        if (keyframe == null) return;
+                                        playerSession.setCurrentCamera(keyframe.getKeyframeLocation());
                                     }
                                 }
                             })

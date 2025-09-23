@@ -35,6 +35,7 @@ public class InkTagHandler {
 
     private final PlayerSession playerSession;
     private List<String> tagsToExecute = new ArrayList<>();
+    private Runnable run;
 
     public InkTagHandler(PlayerSession playerSession) {
         this.playerSession = playerSession;
@@ -73,6 +74,7 @@ public class InkTagHandler {
                 storyHandler.showCurrentDialog();
             }
         }
+        if (run != null) run.run();
     }
 
     public void stopAll() {
@@ -87,5 +89,13 @@ public class InkTagHandler {
 
     public List<String> getTagsToExecute() {
         return tagsToExecute;
+    }
+
+    public Runnable getRun() {
+        return run;
+    }
+
+    public void setRun(Runnable run) {
+        this.run = run;
     }
 }

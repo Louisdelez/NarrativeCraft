@@ -182,6 +182,7 @@
   "narrativecraft.screen.main_screen.loading": "Loading...",
   "narrativecraft.screen.main_screen.dev_tip": "To exists this screen and go in development mode, press 5 times LEFT_CTRL",
   "narrativecraft.screen.main_screen.pause.load_last_save": "Load last save",
+  "narrativecraft.screen.main_screen.pause.restart_scene": "Restart scene",
   "narrativecraft.screen.main_screen.pause.skip_cutscene": "Skip cutscene",
   "narrativecraft.screen.main_screen.pause.leave": "Leave",
   "narrativecraft.screen.main_screen.options.dialog_speed": "Text speed: %s",

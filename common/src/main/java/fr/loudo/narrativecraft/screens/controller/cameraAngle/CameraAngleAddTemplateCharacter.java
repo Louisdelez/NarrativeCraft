@@ -82,10 +82,10 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                                     NarrativeCraftMod.server.execute(() -> spawnEntity(
                                             animation,
                                             animation
-                                                    .getActionsData()
-                                                    .getFirst()
-                                                    .getLocations()
-                                                    .size()
+                                                            .getActionsData()
+                                                            .getFirst()
+                                                            .getLocations()
+                                                            .size()
                                                     - 1));
                                 })
                                 .build();
@@ -105,10 +105,10 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                                         NarrativeCraftMod.server.execute(() -> spawnEntity(
                                                 animation,
                                                 animation
-                                                        .getActionsData()
-                                                        .getFirst()
-                                                        .getLocations()
-                                                        .size()
+                                                                .getActionsData()
+                                                                .getFirst()
+                                                                .getLocations()
+                                                                .size()
                                                         - 1));
                                     }
                                 })
@@ -139,10 +139,10 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                                                     Math.min(
                                                             lastLocIndex,
                                                             animation
-                                                                    .getActionsData()
-                                                                    .getFirst()
-                                                                    .getLocations()
-                                                                    .size()
+                                                                            .getActionsData()
+                                                                            .getFirst()
+                                                                            .getLocations()
+                                                                            .size()
                                                                     - 1)));
                                         }
                                     }
@@ -152,10 +152,10 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                                                 Math.min(
                                                         lastLocIndex,
                                                         animation
-                                                                .getActionsData()
-                                                                .getFirst()
-                                                                .getLocations()
-                                                                .size()
+                                                                        .getActionsData()
+                                                                        .getFirst()
+                                                                        .getLocations()
+                                                                        .size()
                                                                 - 1)));
                                     }
                                 })
