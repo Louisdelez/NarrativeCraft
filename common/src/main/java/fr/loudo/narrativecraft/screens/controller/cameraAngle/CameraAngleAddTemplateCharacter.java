@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.screens.controller.cameraAngle;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.controllers.cameraAngle.CameraAngleController;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
@@ -78,14 +79,14 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
         Button animationButton = Button.builder(Translation.message("global.animations"), button -> {
                     for (Animation animation : scene.getAnimations()) {
                         Button button1 = Button.builder(Component.literal(animation.getName()), button2 -> {
-                                    spawnEntity(
+                                    NarrativeCraftMod.server.execute(() -> spawnEntity(
                                             animation,
                                             animation
-                                                            .getActionsData()
-                                                            .getFirst()
-                                                            .getLocations()
-                                                            .size()
-                                                    - 1);
+                                                    .getActionsData()
+                                                    .getFirst()
+                                                    .getLocations()
+                                                    .size()
+                                                    - 1));
                                 })
                                 .build();
                         animationsButton.add(button1);
@@ -101,14 +102,14 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                     for (Subscene subscene : scene.getSubscenes()) {
                         Button button1 = Button.builder(Component.literal(subscene.getName()), button2 -> {
                                     for (Animation animation : subscene.getAnimations()) {
-                                        spawnEntity(
+                                        NarrativeCraftMod.server.execute(() -> spawnEntity(
                                                 animation,
                                                 animation
-                                                                .getActionsData()
-                                                                .getFirst()
-                                                                .getLocations()
-                                                                .size()
-                                                        - 1);
+                                                        .getActionsData()
+                                                        .getFirst()
+                                                        .getLocations()
+                                                        .size()
+                                                        - 1));
                                     }
                                 })
                                 .build();
@@ -133,29 +134,29 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                                             (lastKeyframe.getTick() + 2 + lastKeyframe.getTransitionDelayTick());
                                     for (Subscene subscene : cutscene.getSubscenes()) {
                                         for (Animation animation : subscene.getAnimations()) {
-                                            spawnEntity(
+                                            NarrativeCraftMod.server.execute(() -> spawnEntity(
                                                     animation,
                                                     Math.min(
                                                             lastLocIndex,
                                                             animation
-                                                                            .getActionsData()
-                                                                            .getFirst()
-                                                                            .getLocations()
-                                                                            .size()
-                                                                    - 1));
+                                                                    .getActionsData()
+                                                                    .getFirst()
+                                                                    .getLocations()
+                                                                    .size()
+                                                                    - 1)));
                                         }
                                     }
                                     for (Animation animation : cutscene.getAnimations()) {
-                                        spawnEntity(
+                                        NarrativeCraftMod.server.execute(() -> spawnEntity(
                                                 animation,
                                                 Math.min(
                                                         lastLocIndex,
                                                         animation
-                                                                        .getActionsData()
-                                                                        .getFirst()
-                                                                        .getLocations()
-                                                                        .size()
-                                                                - 1));
+                                                                .getActionsData()
+                                                                .getFirst()
+                                                                .getLocations()
+                                                                .size()
+                                                                - 1)));
                                     }
                                 })
                                 .build();
