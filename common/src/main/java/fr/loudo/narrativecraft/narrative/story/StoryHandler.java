@@ -299,7 +299,12 @@ public class StoryHandler {
     }
 
     private void loadScene(Scene scene) throws Exception {
-        story.choosePathString(scene.knotName());
+        try {
+            story.choosePathString(scene.knotName());
+        } catch (Exception e) {
+            // If the scene was added in-game after a save was created, then load the latest scene
+            story.choosePathString(NarrativeCraftMod.getInstance().getChapterManager().getChapters().getFirst().getSortedSceneList().getLast().knotName());
+        }
     }
 
     private void handleChoices() {
