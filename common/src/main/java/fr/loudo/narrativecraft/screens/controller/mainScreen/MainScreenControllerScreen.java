@@ -125,6 +125,10 @@ public class MainScreenControllerScreen extends Screen {
                                                 .level(),
                                         Environment.DEVELOPMENT);
                                 mainScreenController.getCharacterStoryDataList().add(characterStoryData);
+                                mainScreenController
+                                        .getPlayerSession()
+                                        .getCharacterRuntimes()
+                                        .add(characterStoryData.getCharacterRuntime());
                                 minecraft.setScreen(null);
                             });
                     minecraft.setScreen(screen);

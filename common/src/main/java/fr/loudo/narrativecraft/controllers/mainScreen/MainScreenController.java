@@ -80,6 +80,7 @@ public class MainScreenController extends AbstractKeyframesBase<MainScreenKeyfra
 
     @Override
     public void startSession() {
+        stopCurrentSession();
         playerSession.setController(this);
         for (CharacterStoryData characterStoryData : characterStoryDataList) {
             characterStoryData.spawn(playerSession.getPlayer().level(), environment);
