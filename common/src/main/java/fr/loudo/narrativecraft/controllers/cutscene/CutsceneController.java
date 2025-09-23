@@ -271,6 +271,14 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
     public void setCamera(Keyframe keyframe) {
         super.setCamera(keyframe);
         CutsceneKeyframe cutsceneKeyframe = (CutsceneKeyframe) keyframe;
+        pause();
+        Minecraft.getInstance().execute(cutscenePlayback::stop);
+        if (environment == Environment.DEVELOPMENT) {
+            for (InkAction inkAction : playerSession.getInkActions()) {
+                inkAction.stop();
+            }
+            playerSession.getInkActions().clear();
+        }
         if (keyframe == null) {
             updateSelectedGroupGlow();
             showTextGroups();

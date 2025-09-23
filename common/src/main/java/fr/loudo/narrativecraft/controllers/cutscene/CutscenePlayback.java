@@ -23,7 +23,6 @@
 
 package fr.loudo.narrativecraft.controllers.cutscene;
 
-import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframe;
@@ -72,12 +71,6 @@ public class CutscenePlayback {
 
     public void stop() {
         isPlaying = false;
-        if (cutsceneController.getEnvironment() == Environment.DEVELOPMENT) {
-            for (InkAction inkAction : playerSession.getInkActions()) {
-                inkAction.stop();
-            }
-            playerSession.getInkActions().clear();
-        }
     }
 
     public void tick() {
