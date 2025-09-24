@@ -146,19 +146,7 @@ public class SoundInkAction extends InkAction {
             } catch (NumberFormatException e) {
                 return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(7)));
             }
-            simpleSoundInstance = new SimpleSoundInstance(
-                    ResourceLocation.fromNamespaceAndPath(identifier, name),
-                    SoundSource.MASTER,
-                    volume,
-                    pitch,
-                    SoundInstance.createUnseededRandom(),
-                    isLooping,
-                    0,
-                    SoundInstance.Attenuation.NONE,
-                    0,
-                    0,
-                    0,
-                    true);
+            simpleSoundInstance = getSimpleSoundInstance();
             soundManager.play(simpleSoundInstance);
             soundManager.setVolume(simpleSoundInstance, 0f);
         } else if (action.equals("stop") && arguments.size() > 3) {
@@ -180,7 +168,11 @@ public class SoundInkAction extends InkAction {
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
         if (action.equals("start")) {
+            simpleSoundInstance = getSimpleSoundInstance();
             soundManager.play(simpleSoundInstance);
+            if (fadeTime > 0) {
+                soundManager.setVolume(simpleSoundInstance, 0);
+            }
         } else if (action.equals("stop")) {
             for (InkAction inkAction : playerSession.getInkActions()) {
                 if (inkAction instanceof SoundInkAction soundInkAction) {
@@ -207,6 +199,25 @@ public class SoundInkAction extends InkAction {
             }
         }
         return InkActionResult.ok();
+    }
+
+    private SimpleSoundInstance getSimpleSoundInstance() {
+        if (simpleSoundInstance == null) {
+            simpleSoundInstance = new SimpleSoundInstance(
+                    ResourceLocation.fromNamespaceAndPath(identifier, name),
+                    SoundSource.MASTER,
+                    volume,
+                    pitch,
+                    SoundInstance.createUnseededRandom(),
+                    isLooping,
+                    0,
+                    SoundInstance.Attenuation.NONE,
+                    0,
+                    0,
+                    0,
+                    true);
+        }
+        return simpleSoundInstance;
     }
 
     public enum Type {

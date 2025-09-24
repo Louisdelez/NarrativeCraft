@@ -25,7 +25,7 @@ package fr.loudo.narrativecraft.narrative.inkTag;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 
-public class InkTagHandlerException extends RuntimeException {
+public class InkTagHandlerException extends Exception {
     public InkTagHandlerException(Class<? extends InkAction> inkActionClass, String message) {
         super("Tag " + inkActionClass.getSimpleName() + " cannot be executed! " + message);
     }
