@@ -343,6 +343,10 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
     public CutsceneKeyframeGroup createKeyframeGroup() {
         if (environment != Environment.DEVELOPMENT) return null;
         CutsceneKeyframe lastKeyframe = getLastKeyframeLastGroup();
+        if (lastKeyframe != null && currentTick < lastKeyframe.getTick()) {
+            playerSession.getPlayer().sendSystemMessage(Translation.message("controller.cutscene.cant_create_keyframe_group"));
+            return null;
+        }
         CutsceneKeyframeGroup keyframeGroup = new CutsceneKeyframeGroup(keyframeGroupsCounter.incrementAndGet());
         selectedGroup = keyframeGroup;
         keyframeGroups.add(keyframeGroup);
@@ -367,61 +371,40 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
 
     public CutsceneKeyframe createKeyframe() {
         if (environment != Environment.DEVELOPMENT) return null;
-
         int pathTime = 0;
         CutsceneKeyframe lastKeyframe = getLastKeyframeLastGroup();
         if (lastKeyframe != null) {
             pathTime = currentTick - lastKeyframe.getTick();
         }
-
         CutsceneKeyframe keyframe = new CutsceneKeyframe(
                 keyframesCounter.incrementAndGet(), getKeyframeLocationFromPlayer(), currentTick, 0, pathTime);
-
-        boolean insertedBetweenKeyframes = false;
+        boolean insertedKeyframe = false;
         outer:
         for (CutsceneKeyframeGroup keyframeGroup : keyframeGroups) {
-            List<CutsceneKeyframe> keyframes = keyframeGroup.getKeyframes();
-
-            for (int i = 0; i < keyframes.size(); i++) {
-                CutsceneKeyframe currentKeyframeInGroup = keyframes.get(i);
-                if (currentKeyframeInGroup.getTick() > currentTick) {
-                    if (i > 0) {
-                        CutsceneKeyframe beforeKeyframe = keyframes.get(i - 1);
-                        CutsceneKeyframe afterKeyframe = currentKeyframeInGroup;
-                        int pathTickFromBefore = currentTick - beforeKeyframe.getTick();
-                        int pathTickToAfter = afterKeyframe.getTick() - currentTick;
-                        keyframe.setPathTick(pathTickFromBefore);
-                        afterKeyframe.setPathTick(pathTickToAfter);
-                        selectedGroup = keyframeGroup;
-                        selectedGroup.getKeyframes().add(i, keyframe);
-
-                        insertedBetweenKeyframes = true;
-                        break outer;
-                    }
+            for (int i = 0; i < keyframeGroup.getKeyframes().size(); i++) {
+                if (keyframeGroup.getKeyframes().get(i).getTick() > currentTick) {
+                    CutsceneKeyframe before = i > 0
+                            ? keyframeGroup.getKeyframes().get(i - 1)
+                            : keyframeGroup.getKeyframes().get(i);
+                    CutsceneKeyframe after = keyframeGroup.getKeyframes().get(i);
+                    keyframe.setPathTick(currentTick - before.getTick());
+                    after.setPathTick(after.getTick() - currentTick);
+                    selectedGroup = keyframeGroup;
+                    selectedGroup.getKeyframes().add(i, keyframe);
+                    updateCurrentTick(keyframe.getTick());
+                    insertedKeyframe = true;
+                    break outer;
                 }
             }
         }
-
-        if (!insertedBetweenKeyframes) {
-            if (selectedGroup == null && !keyframeGroups.isEmpty()) {
-                selectedGroup = keyframeGroups.getLast();
-            }
-
-            if (selectedGroup != null) {
-                selectedGroup.addKeyframe(keyframe);
-            }
+        if (!insertedKeyframe) {
+            selectedGroup.addKeyframe(keyframe);
         }
-
-        if (selectedGroup != null) {
-            keyframe.setParentGroup(selectedGroup.getKeyframes().getFirst().getId() == keyframe.getId());
-            updateCurrentTick(keyframe.getTick());
-        }
-
+        keyframe.setParentGroup(selectedGroup.getKeyframes().getFirst().getId() == keyframe.getId());
         keyframe.showKeyframe(playerSession.getPlayer());
         keyframe.getCamera().setGlowingTag(true);
         keyframe.updateEntityData(playerSession.getPlayer());
         updateSelectedGroupGlow();
-
         return keyframe;
     }
 

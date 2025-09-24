@@ -107,6 +107,7 @@
   "narrativecraft.controller.cutscene.hud_tick": "Cutscene controller scene %s. Tick %s/%s",
   "narrativecraft.controller.cutscene.hud_no_calculated_tick": "Cutscene controller scene %s. Tick %s",
   "narrativecraft.controller.cutscene.keyframe_group_created": "Keyframe group #%s created.",
+  "narrativecraft.controller.cutscene.cant_create_keyframe_group": "Can't create a keyframe group, you must be above the last keyframe tick",
   "narrativecraft.controller.cutscene.keyframe_group.start_text": "Group #%s.",
   "narrativecraft.controller.cutscene.keyframe_created": "Keyframe #%s created for group #%s.",
   "narrativecraft.controller.cutscene.changed_time_skip_value": "Skip value now set to %d seconds",
