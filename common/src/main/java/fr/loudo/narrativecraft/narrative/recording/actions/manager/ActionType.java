@@ -41,6 +41,7 @@ public enum ActionType {
     USE_ITEM(UseItemAction.class),
     GAMEMODE(GameModeAction.class),
     RIDE(RidingAction.class),
+    STOP_RIDE(StopRidingAction.class),
     ABSTRACT_HORSE_BYTE(AbstractHorseByteAction.class),
     ABSTRACT_BOAT_BUBBLE(AbstractBoatBubbleAction.class),
     ABSTRACT_BOAT_PADDLE(AbstractBoatPaddleAction.class),

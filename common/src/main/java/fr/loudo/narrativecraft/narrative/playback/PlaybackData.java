@@ -107,12 +107,13 @@ public class PlaybackData {
     public void spawnEntity(Location location) {
         if (actionsData.getEntityId() == BuiltInRegistries.ENTITY_TYPE.getId(EntityType.PLAYER)) return;
         EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.byId(actionsData.getEntityId());
-        entity = entityType.create(entity.level(), EntitySpawnReason.MOB_SUMMONED);
+        entity = entityType.create(playback.getLevel(), EntitySpawnReason.MOB_SUMMONED);
         if (entity == null) return;
         try {
             entity.load(Util.valueInputFromCompoundTag(entity.registryAccess(), actionsData.getNbtData()));
         } catch (CommandSyntaxException e) {
             NarrativeCraftMod.LOGGER.error("Unexpected error when trying to load nbt entity data! ", e);
+            return;
         }
         if (entity instanceof Mob mob) mob.setNoAi(true);
         moveEntity(location, location, true);
@@ -124,7 +125,7 @@ public class PlaybackData {
             entity = ((LivingEntityInvoker) playback.getMasterEntity())
                     .callCreateItemStackToDrop(itemEntity.getItem(), randomizeMotion, false);
         }
-        entity.level().addFreshEntity(entity);
+        playback.getLevel().addFreshEntity(entity);
     }
 
     private void moveEntity(Location current, Location next, boolean silent) {

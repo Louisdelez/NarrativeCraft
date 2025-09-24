@@ -318,11 +318,16 @@ public class MainScreen extends Screen {
         if (pause) {
             startY += buttonHeight + gap;
             Button quitButton = Button.builder(Translation.message("screen.main_screen.pause.leave"), button -> {
+                        boolean debugMod = playerSession.getStoryHandler().isDebugMode();
                         NarrativeCraftMod.server.execute(() -> {
                             playerSession.getStoryHandler().stop();
-                            MainScreen mainScreen = new MainScreen(playerSession, false, false);
-                            minecraft.execute(() -> minecraft.setScreen(mainScreen));
                         });
+                        if (NarrativeCraftMod.getInstance().getNarrativeWorldOption().showMainScreen && !debugMod) {
+                            MainScreen mainScreen = new MainScreen(playerSession, false, false);
+                            minecraft.setScreen(mainScreen);
+                        } else {
+                            minecraft.setScreen(null);
+                        }
                     })
                     .bounds(initialX, startY, buttonWidth, buttonHeight)
                     .build();

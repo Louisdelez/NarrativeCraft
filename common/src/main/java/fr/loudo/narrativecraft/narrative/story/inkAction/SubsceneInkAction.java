@@ -127,6 +127,6 @@ public class SubsceneInkAction extends InkAction {
 
     @Override
     public boolean needScene() {
-        return false;
+        return true;
     }
 }

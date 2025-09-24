@@ -32,6 +32,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
+import fr.loudo.narrativecraft.narrative.character.CharacterModel;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.data.MainScreenData;
@@ -429,6 +430,11 @@ public class NarrativeCraftFile {
         try (Writer writer = new BufferedWriter(new FileWriter(dataFile))) {
             gson.toJson(characterStory, writer);
         }
+        try {
+            characterStory.setModel(
+                    CharacterModel.valueOf(defaultPlayerSkin.model().name()));
+        } catch (IllegalArgumentException ignored) {
+        }
     }
 
     public static void createCharacterFolder(CharacterStory characterStory, Scene scene) throws IOException {
@@ -444,6 +450,11 @@ public class NarrativeCraftFile {
         Gson gson = new Gson();
         try (Writer writer = new BufferedWriter(new FileWriter(dataFile))) {
             gson.toJson(characterStory, writer);
+        }
+        try {
+            characterStory.setModel(
+                    CharacterModel.valueOf(defaultPlayerSkin.model().name()));
+        } catch (IllegalArgumentException ignored) {
         }
     }
 

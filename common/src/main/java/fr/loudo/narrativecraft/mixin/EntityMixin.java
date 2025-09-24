@@ -25,16 +25,24 @@ package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.recording.Recording;
+import fr.loudo.narrativecraft.narrative.recording.actions.ActionsData;
 import fr.loudo.narrativecraft.narrative.recording.actions.HurtAction;
+import fr.loudo.narrativecraft.narrative.recording.actions.StopRidingAction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Entity.class)
-public class EntityMixin {
+public abstract class EntityMixin {
+    @Shadow
+    @Nullable
+    public abstract Entity getVehicle();
+
     @Inject(method = "markHurt", at = @At("HEAD"))
     private void narrativecraft$mark(CallbackInfo ci) {
         if ((Object) this instanceof ServerPlayer player) {
@@ -43,6 +51,21 @@ public class EntityMixin {
             if (recording == null || !recording.isRecording()) return;
             HurtAction hurtAction = new HurtAction(recording.getTick());
             recording.getActionDataFromEntity(player).addAction(hurtAction);
+        }
+    }
+
+    @Inject(method = "removeVehicle", at = @At("HEAD"))
+    private void narrativecraft$stopRiding(CallbackInfo ci) {
+        if ((Object) this instanceof ServerPlayer player) {
+            Entity entity = this.getVehicle();
+            Recording recording =
+                    NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
+            if (recording == null || !recording.isRecording()) return;
+            ActionsData vehicleActionsData = recording.getActionDataFromEntity(entity);
+            if (vehicleActionsData == null) return;
+            StopRidingAction stopRidingAction =
+                    new StopRidingAction(recording.getTick(), vehicleActionsData.getEntityIdRecording());
+            recording.getActionDataFromEntity(player).addAction(stopRidingAction);
         }
     }
 }

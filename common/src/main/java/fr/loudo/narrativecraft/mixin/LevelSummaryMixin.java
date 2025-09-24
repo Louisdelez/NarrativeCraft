@@ -29,7 +29,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.world.level.LevelSettings;
 import net.minecraft.world.level.storage.LevelSummary;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -40,13 +39,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LevelSummary.class)
 public abstract class LevelSummaryMixin {
-
-    @Shadow
-    @Final
-    private LevelSettings settings;
-
-    @Shadow
-    public abstract String getLevelName();
 
     @Shadow
     public abstract MutableComponent getWorldVersionName();

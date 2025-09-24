@@ -56,9 +56,21 @@ public class DeathAction extends Action {
     @Override
     public void rewind(PlaybackData playbackData) {
         Playback playback = playbackData.getPlayback();
-        ActionsData actionsData = playbackData.getPlayback().getMasterEntityData();
-        Location posToSpawn = actionsData.getLocations().get(playback.getTick() - 1);
-        if (posToSpawn == null) return;
-        playback.respawnMasterEntity(posToSpawn);
+        if (playback.getEntityByRecordId(entityRecordingId)
+                .getUUID()
+                .equals(playback.getMasterEntity().getUUID())) {
+            ActionsData actionsData = playback.getMasterEntityData();
+            Location posToSpawn = actionsData.getLocations().get(playback.getTick() - 1);
+            if (posToSpawn == null) return;
+            playback.respawnMasterEntity(posToSpawn);
+        } else {
+            ActionsData actionsData =
+                    playback.getPlaybackDataByRecordId(entityRecordingId).getActionsData();
+            Location posToSpawn = actionsData.getLocations().get(playback.getTick() - 1);
+            if (posToSpawn == null) return;
+            if (playbackData.getEntity() == null || !playbackData.getEntity().isAlive()) {
+                playbackData.spawnEntity(posToSpawn);
+            }
+        }
     }
 }

@@ -146,6 +146,21 @@ public class SoundInkAction extends InkAction {
             } catch (NumberFormatException e) {
                 return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(7)));
             }
+            simpleSoundInstance = new SimpleSoundInstance(
+                    ResourceLocation.fromNamespaceAndPath(identifier, name),
+                    SoundSource.MASTER,
+                    volume,
+                    pitch,
+                    SoundInstance.createUnseededRandom(),
+                    isLooping,
+                    0,
+                    SoundInstance.Attenuation.NONE,
+                    0,
+                    0,
+                    0,
+                    true);
+            soundManager.play(simpleSoundInstance);
+            soundManager.setVolume(simpleSoundInstance, 0f);
         } else if (action.equals("stop") && arguments.size() > 3) {
             String fadeValue = arguments.get(3);
             if (!fadeValue.equals("fadeout")) return InkActionResult.ok();
@@ -165,30 +180,27 @@ public class SoundInkAction extends InkAction {
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
         if (action.equals("start")) {
-            simpleSoundInstance = new SimpleSoundInstance(
-                    ResourceLocation.fromNamespaceAndPath(identifier, name),
-                    SoundSource.MASTER,
-                    volume,
-                    pitch,
-                    SoundInstance.createUnseededRandom(),
-                    isLooping,
-                    0,
-                    SoundInstance.Attenuation.NONE,
-                    0,
-                    0,
-                    0,
-                    true);
             soundManager.play(simpleSoundInstance);
         } else if (action.equals("stop")) {
             for (InkAction inkAction : playerSession.getInkActions()) {
                 if (inkAction instanceof SoundInkAction soundInkAction) {
                     boolean matchAll =
                             name.equals("all") && (soundInkAction.type == this.type || this.type == Type.SOUND);
-                    boolean matchOne = !name.equals("all") && (soundInkAction.name.equals(name) || type != Type.SOUND);
+                    boolean matchOne =
+                            !name.equals("all") && (soundInkAction.name.equals(name) && type == soundInkAction.type);
+
                     if (matchAll || matchOne) {
                         soundInkAction.isRunning = false;
-                        if (!name.equals("all")) {
+                    }
+                    if (matchAll) {
+                        isRunning = false;
+                        soundInkAction.stop();
+                    } else if (matchOne) {
+                        if (fadeTime > 0) {
                             this.simpleSoundInstance = soundInkAction.simpleSoundInstance;
+                        } else {
+                            isRunning = false;
+                            soundInkAction.stop();
                         }
                     }
                 }
