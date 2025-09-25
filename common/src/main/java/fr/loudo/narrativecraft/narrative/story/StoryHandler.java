@@ -213,15 +213,20 @@ public class StoryHandler {
     public void next() {
         try {
             if (story == null) throw new Exception("Story is not initialized!");
+            DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
             if (isFinished()) {
-                stopAndFinishScreen();
+                if (dialogRenderer != null) {
+                    dialogRenderer.setRunDialogStopped(this::stopAndFinishScreen);
+                    dialogRenderer.stop();
+                } else {
+                    stopAndFinishScreen();
+                }
                 return;
             }
             if (!story.getCurrentChoices().isEmpty()) {
                 handleChoices();
                 return;
             }
-            DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
             dialogText = story.Continue().trim();
             if (story.hasError() || hasError) return;
             if (firstLoad) {
@@ -238,6 +243,10 @@ public class StoryHandler {
                     playerSession.getInkTagHandler().setRun(null);
                     showChoices();
                 });
+                dialogRenderer.stop();
+                return;
+            }
+            if (dialogRenderer != null && isFinished() && dialogText.isEmpty()) {
                 dialogRenderer.stop();
                 return;
             }
@@ -290,6 +299,9 @@ public class StoryHandler {
         List<String> newTags = new ArrayList<>();
         if (subListId <= tags.size()) {
             newTags.addAll(tags.subList(subListId, tags.size()));
+        }
+        if (!newTags.isEmpty() && newTags.getFirst().equalsIgnoreCase("save")) {
+            newTags = newTags.subList(1, newTags.size());
         }
         newTags.addAll(save.getTagsRunning());
 

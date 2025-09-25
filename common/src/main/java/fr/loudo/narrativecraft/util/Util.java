@@ -91,6 +91,7 @@ public class Util {
                                 style.withHoverEvent(new HoverEvent.ShowText(Component.literal(finalMessage)))),
                 false);
         NarrativeCraftMod.LOGGER.error("Unexpected error occurred on NarrativeCraft: ", exception);
+        player.displayClientMessage(Component.literal(finalMessage).withStyle(ChatFormatting.RED), false);
     }
 
     // https://github.com/mt1006/mc-mocap-mod/blob/1.21.1/common/src/main/java/net/mt1006/mocap/utils/Utils.java#L61
