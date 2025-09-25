@@ -91,7 +91,7 @@ public class CutscenePlayback {
         if (!isPlaying) return;
 
         double totalDelta;
-        if (segmentTick < keyframeA.getStartDelayTick()) {
+        if (segmentTick + partialTick < keyframeA.getStartDelayTick()) {
             playerSession.setCurrentCamera(keyframeA.getKeyframeLocation());
             return;
         } else {
@@ -220,6 +220,7 @@ public class CutscenePlayback {
         }
         segmentTick = 0;
         currentKeyframeGroup = cutsceneController.getKeyframeGroupOfKeyframe(keyframeB);
+        playerSession.setCurrentCamera(keyframeA.getKeyframeLocation());
     }
 
     public KeyframeLocation interpolate(double delta, KeyframeLocation a, KeyframeLocation b) {

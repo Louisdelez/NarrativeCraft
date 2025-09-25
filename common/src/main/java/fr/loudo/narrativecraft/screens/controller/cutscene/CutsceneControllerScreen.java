@@ -111,6 +111,7 @@ public class CutsceneControllerScreen extends Screen {
         Button createKeyframeGroup = Button.builder(ImageFontConstants.CREATE_KEYFRAME_GROUP, button -> {
                     CutsceneKeyframeGroup keyframeGroup = cutsceneController.createKeyframeGroup();
 
+                    if (keyframeGroup == null) return;
                     minecraft.player.displayClientMessage(
                             Translation.message("controller.cutscene.keyframe_group_created", keyframeGroup.getId()),
                             false);

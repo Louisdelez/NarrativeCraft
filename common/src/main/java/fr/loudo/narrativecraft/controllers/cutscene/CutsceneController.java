@@ -75,7 +75,11 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         this.cutscene = cutscene;
         skipTickCount = 20;
         isPlaying = false;
-        keyframeGroups.addAll(cutscene.getKeyframeGroups());
+        for (CutsceneKeyframeGroup keyframeGroup : cutscene.getKeyframeGroups()) {
+            CutsceneKeyframeGroup keyframeGroup1 = new CutsceneKeyframeGroup(keyframeGroup.getId());
+            keyframeGroup1.getKeyframes().addAll(keyframeGroup.getKeyframes());
+            keyframeGroups.add(keyframeGroup1);
+        }
         keyframeTriggers.addAll(cutscene.getKeyframeTriggers());
         cutscenePlayback = new CutscenePlayback(this, () -> {});
     }
@@ -172,14 +176,14 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         if (!keyframeGroups.isEmpty()) {
             CutsceneKeyframeGroup keyframeGroup = keyframeGroups.getLast();
             keyframeGroupsCounter.set(keyframeGroup.getId());
-            CutsceneKeyframe cutsceneKeyframe = getLastKeyframeLastGroup();
-            if (cutsceneKeyframe == null) return;
-            keyframesCounter.set(keyframeGroup.getId());
             for (CutsceneKeyframeGroup keyframeGroup1 : keyframeGroups) {
                 keyframeGroup1.showKeyframes(playerSession.getPlayer());
+                keyframeGroup1.showGroupText(playerSession.getPlayer());
             }
-            selectedGroup.showGroupText(playerSession.getPlayer());
             updateSelectedGroupGlow();
+            CutsceneKeyframe cutsceneKeyframe = getLatestKeyframeFromId();
+            if (cutsceneKeyframe == null) return;
+            keyframesCounter.set(cutsceneKeyframe.getId());
         }
         for (KeyframeTrigger keyframeTrigger : keyframeTriggers) {
             keyframeTrigger.showKeyframe(playerSession.getPlayer());
@@ -263,6 +267,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
 
     @Override
     public Screen getControllerScreen() {
+        if (cutscenePlayback.isPlaying()) return null;
         return new CutsceneControllerScreen(this);
     }
 
@@ -344,7 +349,9 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         if (environment != Environment.DEVELOPMENT) return null;
         CutsceneKeyframe lastKeyframe = getLastKeyframeLastGroup();
         if (lastKeyframe != null && currentTick < lastKeyframe.getTick()) {
-            playerSession.getPlayer().sendSystemMessage(Translation.message("controller.cutscene.cant_create_keyframe_group"));
+            playerSession
+                    .getPlayer()
+                    .sendSystemMessage(Translation.message("controller.cutscene.cant_create_keyframe_group"));
             return null;
         }
         CutsceneKeyframeGroup keyframeGroup = new CutsceneKeyframeGroup(keyframeGroupsCounter.incrementAndGet());
@@ -396,6 +403,10 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
                     break outer;
                 }
             }
+        }
+        CutsceneKeyframe lastKeyframeGroup = getLastKeyframeLastGroup();
+        if (lastKeyframeGroup != null && currentTick > lastKeyframeGroup.getTick()) {
+            selectedGroup = keyframeGroups.getLast();
         }
         if (!insertedKeyframe) {
             selectedGroup.addKeyframe(keyframe);
@@ -449,6 +460,20 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         List<CutsceneKeyframe> keyframes = keyframeGroups.getLast().getKeyframes();
         if (keyframes.isEmpty()) return null;
         return keyframes.getLast();
+    }
+
+    public CutsceneKeyframe getLatestKeyframeFromId() {
+        if (keyframeGroups.isEmpty()) return null;
+
+        CutsceneKeyframe latest = null;
+        for (CutsceneKeyframeGroup group : keyframeGroups) {
+            for (CutsceneKeyframe keyframe : group.getKeyframes()) {
+                if (latest == null || keyframe.getId() > latest.getId()) {
+                    latest = keyframe;
+                }
+            }
+        }
+        return latest;
     }
 
     public void updateCurrentTick(int tick) {
