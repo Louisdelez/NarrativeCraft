@@ -102,14 +102,14 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                     for (Subscene subscene : scene.getSubscenes()) {
                         Button button1 = Button.builder(Component.literal(subscene.getName()), button2 -> {
                                     for (Animation animation : subscene.getAnimations()) {
-                                        NarrativeCraftMod.server.execute(() -> spawnEntity(
+                                        spawnEntity(
                                                 animation,
                                                 animation
                                                                 .getActionsData()
                                                                 .getFirst()
                                                                 .getLocations()
                                                                 .size()
-                                                        - 1));
+                                                        - 1);
                                     }
                                 })
                                 .build();
@@ -125,6 +125,8 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
         Button cutsceneButton = Button.builder(Translation.message("global.cutscenes"), button -> {
                     for (Cutscene cutscene : scene.getCutscenes()) {
                         if (cutscene.getKeyframeGroups().isEmpty()) continue;
+                        if (cutscene.getSubscenes().isEmpty()
+                                && cutscene.getAnimations().isEmpty()) continue;
                         Button button1 = Button.builder(Component.literal(cutscene.getName()), button2 -> {
                                     CutsceneKeyframe lastKeyframe = cutscene.getKeyframeGroups()
                                             .getLast()
@@ -134,7 +136,7 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                                             (lastKeyframe.getTick() + 2 + lastKeyframe.getTransitionDelayTick());
                                     for (Subscene subscene : cutscene.getSubscenes()) {
                                         for (Animation animation : subscene.getAnimations()) {
-                                            NarrativeCraftMod.server.execute(() -> spawnEntity(
+                                            spawnEntity(
                                                     animation,
                                                     Math.min(
                                                             lastLocIndex,
@@ -143,11 +145,11 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                                                                             .getFirst()
                                                                             .getLocations()
                                                                             .size()
-                                                                    - 1)));
+                                                                    - 1));
                                         }
                                     }
                                     for (Animation animation : cutscene.getAnimations()) {
-                                        NarrativeCraftMod.server.execute(() -> spawnEntity(
+                                        spawnEntity(
                                                 animation,
                                                 Math.min(
                                                         lastLocIndex,
@@ -156,7 +158,7 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                                                                         .getFirst()
                                                                         .getLocations()
                                                                         .size()
-                                                                - 1)));
+                                                                - 1));
                                     }
                                 })
                                 .build();
@@ -188,17 +190,23 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                 animation.getLastLocation(),
                 true,
                 cameraAngleController.getCameraAngle().getScene());
-        characterStoryData.spawn(
-                cameraAngleController.getPlayerSession().getPlayer().level(), Environment.DEVELOPMENT);
-        PlaybackData playbackData = new PlaybackData(animation.getActionsData().getFirst(), null);
-        playbackData.setEntity(characterStoryData.getCharacterRuntime().getEntity());
-        for (Action action : actions) {
-            action.execute(playbackData);
-        }
-        characterStoryData.applyItems(minecraft.player.registryAccess());
-        characterStoryData.applyBytes((LivingEntity) playbackData.getEntity());
-        cameraAngleController.getCharacterStoryDataList().add(characterStoryData);
-        cameraAngleController.getPlayerSession().getCharacterRuntimes().add(characterStoryData.getCharacterRuntime());
+        NarrativeCraftMod.server.execute(() -> {
+            characterStoryData.spawn(
+                    cameraAngleController.getPlayerSession().getPlayer().level(), Environment.DEVELOPMENT);
+            PlaybackData playbackData =
+                    new PlaybackData(animation.getActionsData().getFirst(), null);
+            playbackData.setEntity(characterStoryData.getCharacterRuntime().getEntity());
+            for (Action action : actions) {
+                action.execute(playbackData);
+            }
+            characterStoryData.applyItems(minecraft.player.registryAccess());
+            characterStoryData.applyBytes((LivingEntity) playbackData.getEntity());
+            cameraAngleController.getCharacterStoryDataList().add(characterStoryData);
+            cameraAngleController
+                    .getPlayerSession()
+                    .getCharacterRuntimes()
+                    .add(characterStoryData.getCharacterRuntime());
+        });
         minecraft.setScreen(null);
     }
 }
