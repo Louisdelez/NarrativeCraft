@@ -36,9 +36,12 @@ import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.util.Translation;
 import io.github.kosmx.emotes.api.events.server.ServerEmoteAPI;
 import io.github.kosmx.emotes.common.tools.UUIDMap;
+import io.github.kosmx.emotes.mc.McUtils;
 import io.github.kosmx.emotes.server.serializer.UniversalEmoteSerializer;
 import java.util.List;
 import java.util.UUID;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.util.StringUtil;
 
 public class EmoteInkAction extends InkAction {
 
@@ -93,13 +96,14 @@ public class EmoteInkAction extends InkAction {
 
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
+        isRunning = false;
         if (!Services.PLATFORM.isModLoaded("emotecraft")) return InkActionResult.ignored();
         StoryHandler storyHandler = playerSession.getStoryHandler();
         if (storyHandler == null) return InkActionResult.ignored();
         CharacterRuntime characterRuntime = storyHandler.getCharacterRuntimeFromCharacter(characterStory);
         if (characterRuntime == null || characterRuntime.getEntity() == null) return InkActionResult.ignored();
         ServerEmoteAPI.playEmote(characterRuntime.getEntity().getUUID(), emote, forced);
-        return null;
+        return InkActionResult.ok();
     }
 
     private Animation getEmote(String id, UUIDMap<Animation> emotes) {
@@ -114,9 +118,10 @@ public class EmoteInkAction extends InkAction {
         } // Not a UUID
 
         for (Animation animation : emotes) {
-            String emoteName = animation.data().name();
-            emoteName = emoteName.replace("\"", "");
-            if (emoteName.equalsIgnoreCase(id)) {
+            String name =
+                    StringUtil.filterText(McUtils.fromJson(animation.data().getRaw("name"), RegistryAccess.EMPTY)
+                            .getString());
+            if (name.equalsIgnoreCase(id)) {
                 return animation;
             }
         }
