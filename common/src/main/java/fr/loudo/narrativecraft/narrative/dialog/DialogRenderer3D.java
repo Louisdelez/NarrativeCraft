@@ -133,26 +133,10 @@ public class DialogRenderer3D extends DialogRenderer {
         renderDialogBackground(poseStack, partialTick);
 
         Side side = dialogOffsetSide();
-
         poseStack.pushPose();
-        float height = this.height;
-        if (isAnimating()) {
-            height = (float) Mth.lerp(Easing.SMOOTH.interpolate(t(partialTick)), oldHeight, height);
-        }
-        switch (side) {
-            case RIGHT ->
-                poseStack.translate(
-                        totalWidth, dialogOffset.y == 0 ? height : (dialogOffset.y < 0 ? height / 2.0F : 0), 0);
-            case LEFT ->
-                poseStack.translate(
-                        -totalWidth,
-                        dialogOffset.y == 0
-                                ? 0
-                                : (dialogOffset.y < 0
-                                        ? height / 2.0F - paddingY / 2.0F + 2
-                                        : -height / 2.0F - paddingY * 2 - 1),
-                        0);
-            case DOWN -> poseStack.translate(0, dialogOffset.x == 0 ? height : height / 2.0F + paddingY / 2.0F, 0);
+
+        if (side == Side.DOWN) {
+            poseStack.translate(0, dialogOffset.x == 0 ? height : height / 2.0F + paddingY / 2.0F, 0);
         }
 
         dialogTail.render(
@@ -165,19 +149,29 @@ public class DialogRenderer3D extends DialogRenderer {
 
         if (dialogOffset.y == 0) {
             switch (side) {
-                case RIGHT, LEFT -> poseStack.translate(0, height / 2, 0);
+                case RIGHT, LEFT -> poseStack.translate(0, 0, 0);
             }
         }
 
         poseStack.pushPose();
-        switch (side) {
-            case RIGHT ->
-                poseStack.translate(
-                        totalWidth, dialogOffset.y == 0 ? paddingY : (dialogOffset.y < 0 ? totalHeight : 0), 0);
-            case LEFT ->
-                poseStack.translate(
-                        -totalWidth, dialogOffset.y == 0 ? paddingY : (dialogOffset.y < 0 ? totalHeight : 0), 0);
-            case DOWN -> poseStack.translate(0, totalHeight, 0);
+        if (side == Side.RIGHT) {
+            if (dialogOffset.y == 0) {
+                poseStack.translate(totalWidth, totalHeight / 2.0F, 0);
+            } else if (dialogOffset.y > 0) {
+                poseStack.translate(totalWidth, 0, 0);
+            } else if (dialogOffset.y < 0) {
+                poseStack.translate(totalWidth, totalHeight, 0);
+            }
+        } else if (side == Side.LEFT) {
+            if (dialogOffset.y == 0) {
+                poseStack.translate(-totalWidth, totalHeight / 2.0F, 0);
+            } else if (dialogOffset.y > 0) {
+                poseStack.translate(-totalWidth, 0, 0);
+            } else if (dialogOffset.y < 0) {
+                poseStack.translate(-totalWidth, totalHeight, 0);
+            }
+        } else if (side == Side.DOWN) {
+            poseStack.translate(0, totalHeight, 0);
         }
 
         if (!dialogStopping) {
@@ -412,13 +406,13 @@ public class DialogRenderer3D extends DialogRenderer {
             offsetX = dialogPos.x - dialogPosOffset.x;
         }
 
-        if (offsetY >= 0 && offsetX >= -0.2 && offsetX <= 0.2) {
+        if (offsetY >= 0 && offsetX >= 0 && offsetX <= 0) {
             return Side.UP;
-        } else if (offsetY <= 0 && offsetX >= -0.2 && offsetX <= 0.2) {
+        } else if (offsetY <= 0 && offsetX >= 0 && offsetX <= 0) {
             return Side.DOWN;
-        } else if (offsetX <= 0.2) {
+        } else if (offsetX <= 0) {
             return Side.LEFT;
-        } else if (offsetX >= 0.2) {
+        } else if (offsetX >= 0) {
             return Side.RIGHT;
         }
         return Side.UP;

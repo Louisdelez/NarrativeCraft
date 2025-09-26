@@ -70,13 +70,17 @@ public class DialogScrollText {
         currentLine = 0;
         currentCharIndex = 0;
         tickAccumulator = 0.0f;
-        currentY = -dialogRenderer.getTotalHeight()
-                + dialogRenderer.getPaddingY()
-                + (minecraft.font.lineHeight / 2.0F)
-                + (dialogRenderer.getGap() / 2.0F)
-                + 0.7F;
-        if (dialogRenderer instanceof DialogRenderer2D && lines.size() > 1) {
-            currentY += (minecraft.font.lineHeight * (lines.size() - 1)) / 2.0F;
+        if (dialogRenderer instanceof DialogRenderer2D) {
+            if (lines.size() > 1) {
+                currentY -= ((minecraft.font.lineHeight + dialogRenderer.getGap()) * (lines.size() - 1)
+                                        + minecraft.font.lineHeight)
+                                / 2.0F
+                        + 0.7F;
+            } else {
+                currentY -= minecraft.font.lineHeight / 2.0F;
+            }
+        } else {
+            currentY = -dialogRenderer.getTotalHeight() + dialogRenderer.getPaddingY() + 0.7F;
         }
         currentX = -dialogRenderer.getTotalWidth() + dialogRenderer.getPaddingX() * 2;
         lettersRenderer.clear();
@@ -160,6 +164,7 @@ public class DialogScrollText {
     }
 
     public void setText(String text) {
+        text = text.replace("\n", "");
         lines = splitText(text);
     }
 

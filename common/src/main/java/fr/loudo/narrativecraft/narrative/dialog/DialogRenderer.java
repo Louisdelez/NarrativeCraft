@@ -71,7 +71,7 @@ public class DialogRenderer {
         this.text = text;
         this.width = width;
         this.paddingX = paddingX;
-        this.paddingY = paddingY;
+        this.paddingY = paddingY + 5;
         this.scale = scale;
         this.letterSpacing = letterSpacing;
         this.gap = gap;
@@ -244,7 +244,7 @@ public class DialogRenderer {
     }
 
     public void setPaddingY(float paddingY) {
-        this.paddingY = paddingY;
+        this.paddingY = paddingY + 5;
     }
 
     public float getScale() {

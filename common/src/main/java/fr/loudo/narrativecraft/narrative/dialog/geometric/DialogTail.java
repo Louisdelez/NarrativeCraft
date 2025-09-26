@@ -61,47 +61,28 @@ public class DialogTail {
         Vec2 tailOffset = getTailOffset(camera);
 
         poseStack.pushPose();
-        float tailOffsetX = 0;
-        float tailOffsetY = 0;
-        if (tailDirection == TailDirection.TOP || tailDirection == TailDirection.BOTTOM) {
-            tailOffsetX =
-                    Math.clamp(tailOffset.x, -dialog.getTotalWidth() + width / 2, dialog.getTotalWidth() - width / 2);
-        }
 
-        if (tailDirection == TailDirection.RIGHT) {
-            tailOffsetX = dialog.getTotalWidth();
-        }
-
-        if (tailDirection == TailDirection.LEFT) {
-            tailOffsetX = -dialog.getTotalWidth();
+        if (dialog.getDialogOffset().x != 0) {
+            if (dialog.getDialogOffset().y < 0) {
+                poseStack.translate(0, (height / 2.0F) - width / 2.0F, 0);
+            } else if (dialog.getDialogOffset().y > 0) {
+                poseStack.translate(0, -(height / 2.0F) + width / 2.0F, 0);
+            }
         }
 
         if (tailDirection == TailDirection.RIGHT || tailDirection == TailDirection.LEFT) {
-            float halfHeight = dialog.getTotalHeight() / 2f;
-            if (dialog.isAnimating()) {
-                halfHeight = dialog.getInterpolatedHeight(partialTick) / 2f;
-            }
-
+            float halfHeight = dialog.getHeight() / 2f;
             float minY = -halfHeight + width / 2f;
             float maxY = halfHeight - width / 2f;
 
-            if (tailOffset.y < minY) {
-                tailDirection = TailDirection.valueOf(tailDirection.name() + "_UP_CORNER");
-                tailOffsetY = minY;
-            } else if (tailOffset.y > maxY) {
-                tailDirection = TailDirection.valueOf(tailDirection.name() + "_DOWN_CORNER");
-                tailOffsetY = maxY;
-            } else {
-                tailOffsetY = tailOffset.y;
-            }
-            if (tailDirection.name().contains("RIGHT") || dialog.getDialogOffset().y < 0) {
-                tailOffsetY += 5.5F;
-            } else if (tailDirection.name().contains("LEFT") || dialog.getDialogOffset().y > 0) {
-                tailOffsetY -= dialog.getTotalHeight() / 2.0F;
+            if (dialog.getDialogOffset().y != 0) {
+                if (tailOffset.y < minY) {
+                    tailDirection = TailDirection.valueOf(tailDirection.name() + "_UP_CORNER");
+                } else if (tailOffset.y > maxY) {
+                    tailDirection = TailDirection.valueOf(tailDirection.name() + "_DOWN_CORNER");
+                }
             }
         }
-
-        poseStack.translate(tailOffsetX, tailOffsetY, 0);
 
         VertexConsumer vertexConsumer = bufferSource.getBuffer(NarrativeCraftMod.dialogBackgroundRenderType);
         Matrix4f matrix4f = poseStack.last().pose();
