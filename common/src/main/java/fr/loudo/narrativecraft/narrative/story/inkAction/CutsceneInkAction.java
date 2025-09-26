@@ -83,6 +83,7 @@ public class CutsceneInkAction extends InkAction {
         }
         controller.setPlaying(true);
         controller.getCutscenePlayback().setupAndPlay(keyframeA, keyframeB);
+        playerSession.getInkActions().removeIf(inkAction -> inkAction instanceof CameraAngleInkAction);
         return InkActionResult.block();
     }
 
