@@ -37,6 +37,7 @@ import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
@@ -96,7 +97,10 @@ public class Playback {
         if (animation.getCharacter() == null) {
             Minecraft.getInstance()
                     .player
-                    .displayClientMessage(Translation.message("animation.no_character_linked"), false);
+                    .displayClientMessage(
+                            Translation.message("animation.no_character_linked", animation.getName())
+                                    .withStyle(ChatFormatting.RED),
+                            false);
             return;
         }
 

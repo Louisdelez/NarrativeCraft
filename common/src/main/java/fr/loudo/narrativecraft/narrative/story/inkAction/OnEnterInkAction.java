@@ -33,6 +33,7 @@ import fr.loudo.narrativecraft.narrative.dialog.DialogData;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.util.InkUtil;
 import java.util.Arrays;
 import java.util.List;
 import net.minecraft.world.entity.Entity;
@@ -54,9 +55,11 @@ public class OnEnterInkAction extends InkAction {
         if (storyHandler == null) return InkActionResult.ignored();
         String currentKnot = storyHandler.getStory().getState().getCurrentKnot();
         if (currentKnot == null
-                || currentKnot.equalsIgnoreCase(playerSession.getScene().knotName())) return InkActionResult.ok();
+                || currentKnot.equalsIgnoreCase(playerSession.getScene().knotName())) return InkActionResult.ignored();
 
+        if (!currentKnot.matches(InkUtil.SCENE_KNOT_PATTERN.pattern())) return InkActionResult.ignored();
         String[] splitKnot = currentKnot.split("_");
+        if (splitKnot.length < 2) return InkActionResult.ignored();
         int chapterIndex = Integer.parseInt(splitKnot[1]);
         Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getChapterByIndex(chapterIndex);
         if (chapter == null) return InkActionResult.error("Chapter " + chapterIndex + " does not exists!");

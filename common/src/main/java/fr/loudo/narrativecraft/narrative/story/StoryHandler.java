@@ -44,6 +44,7 @@ import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.screens.components.CrashScreen;
 import fr.loudo.narrativecraft.screens.credits.CreditScreen;
 import fr.loudo.narrativecraft.screens.story.StoryChoicesScreen;
+import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.ArrayList;
 import java.util.List;
@@ -227,7 +228,7 @@ public class StoryHandler {
                 handleChoices();
                 return;
             }
-            dialogText = story.Continue().trim();
+            dialogText = story.Continue().replace("\n", "");
             if (story.hasError() || hasError) return;
             if (firstLoad) {
                 save(false);
@@ -314,7 +315,7 @@ public class StoryHandler {
             playerSession.getCharacterRuntimes().add(characterStoryData.getCharacterRuntime());
         }
         dialogData = save.getDialogData();
-        dialogText = story.getCurrentText();
+        dialogText = story.getCurrentText().replace("\n", "");
         playerSession.getInkTagHandler().execute();
         if (!story.getCurrentChoices().isEmpty()) {
             handleChoices();
@@ -486,8 +487,9 @@ public class StoryHandler {
     private boolean isTransitioning() {
         if (story.getState().getCurrentKnot() == null) return false;
         return !story.getState()
-                .getCurrentKnot()
-                .equals(playerSession.getScene().knotName());
+                        .getCurrentKnot()
+                        .equals(playerSession.getScene().knotName())
+                && story.getState().getCurrentKnot().matches(InkUtil.SCENE_KNOT_PATTERN.pattern());
     }
 
     public DialogData getDialogData() {

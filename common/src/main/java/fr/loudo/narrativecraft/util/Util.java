@@ -34,6 +34,7 @@ import fr.loudo.narrativecraft.mixin.accessor.PlayerAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.PlayerListAccessor;
 import fr.loudo.narrativecraft.mixin.invoker.FontInvoker;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.platform.Services;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Optional;
@@ -91,7 +92,9 @@ public class Util {
                                 style.withHoverEvent(new HoverEvent.ShowText(Component.literal(finalMessage)))),
                 false);
         NarrativeCraftMod.LOGGER.error("Unexpected error occurred on NarrativeCraft: ", exception);
-        player.displayClientMessage(Component.literal(finalMessage).withStyle(ChatFormatting.RED), false);
+        if (Services.PLATFORM.isDevelopmentEnvironment()) {
+            player.displayClientMessage(Component.literal("-- " + finalMessage).withStyle(ChatFormatting.RED), false);
+        }
     }
 
     // https://github.com/mt1006/mc-mocap-mod/blob/1.21.1/common/src/main/java/net/mt1006/mocap/utils/Utils.java#L61
@@ -198,6 +201,7 @@ public class Util {
             if (level instanceof ServerLevel serverLevel) {
                 serverLevel.addNewPlayer(fakePlayer);
             }
+            addFakePlayerUUID(fakePlayer);
         } else {
             level.addFreshEntity(entity);
         }
