@@ -62,16 +62,16 @@ public abstract class WorldSelectionListMixin {
     @Inject(method = "joinWorld", at = @At("HEAD"), cancellable = true)
     private void narrativecraft$joinWorld(CallbackInfo ci) {
         NarrativeWorldOption worldOption = NarrativeCraftFile.getNarrativeCraftWorldVersion(
-                this.summary.getLevelId(), SharedConstants.getCurrentVersion().name());
+                this.summary.getLevelId(), SharedConstants.getCurrentVersion().getName());
         if (worldOption == null) return;
         if (worldOption.stringMcVersion == null) return;
-        if (!SharedConstants.getCurrentVersion().name().equals(worldOption.stringMcVersion)) {
+        if (!SharedConstants.getCurrentVersion().getName().equals(worldOption.stringMcVersion)) {
             ConfirmScreen confirmScreen = new ConfirmScreen(
                     b -> {
                         if (b) {
                             File worldOptionFile = NarrativeCraftFile.getWorldOptionFile(this.summary.getLevelId());
                             worldOption.stringMcVersion =
-                                    SharedConstants.getCurrentVersion().name();
+                                    SharedConstants.getCurrentVersion().getName();
                             NarrativeCraftFile.updateWorldOptions(worldOptionFile, worldOption);
                             this.joinWorld();
                         } else {

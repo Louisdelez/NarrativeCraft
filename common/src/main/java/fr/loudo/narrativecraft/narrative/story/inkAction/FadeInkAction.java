@@ -30,7 +30,7 @@ import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 
 public class FadeInkAction extends InkAction {
@@ -71,7 +71,7 @@ public class FadeInkAction extends InkAction {
         } else if (currentFadeState == FadeState.FADE_OUT) {
             opacity = (int) Mth.lerp(t, 255, 0);
         }
-        int newColor = ARGB.color(opacity, color);
+        int newColor = FastColor.ARGB32.color(opacity, color);
         guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), newColor);
     }
 

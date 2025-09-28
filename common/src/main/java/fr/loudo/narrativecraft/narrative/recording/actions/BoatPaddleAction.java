@@ -23,13 +23,13 @@
 
 package fr.loudo.narrativecraft.narrative.recording.actions;
 
-import fr.loudo.narrativecraft.mixin.accessor.AbstractBoatAccessor;
+import fr.loudo.narrativecraft.mixin.accessor.BoatAccessor;
 import fr.loudo.narrativecraft.narrative.playback.PlaybackData;
 import fr.loudo.narrativecraft.narrative.recording.actions.manager.ActionType;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.vehicle.AbstractBoat;
+import net.minecraft.world.entity.vehicle.Boat;
 
-public class AbstractBoatPaddleAction extends Action {
+public class BoatPaddleAction extends Action {
 
     private final boolean leftPaddle;
     private final boolean rightPaddle;
@@ -37,7 +37,7 @@ public class AbstractBoatPaddleAction extends Action {
     private final boolean oldLeftPaddle;
     private final boolean oldRightPaddle;
 
-    public AbstractBoatPaddleAction(
+    public BoatPaddleAction(
             int tick, boolean leftPaddle, boolean rightPaddle, boolean oldLeftPaddle, boolean oldRightPaddle) {
         super(tick, ActionType.ABSTRACT_BOAT_PADDLE);
         this.leftPaddle = leftPaddle;
@@ -52,9 +52,9 @@ public class AbstractBoatPaddleAction extends Action {
                 .getEntity()
                 .level()
                 .getEntity(playbackData.getEntity().getId());
-        if (entity1 instanceof AbstractBoat) {
-            playbackData.getEntity().getEntityData().set(AbstractBoatAccessor.getDATA_ID_PADDLE_LEFT(), leftPaddle);
-            playbackData.getEntity().getEntityData().set(AbstractBoatAccessor.getDATA_ID_PADDLE_RIGHT(), rightPaddle);
+        if (entity1 instanceof Boat) {
+            playbackData.getEntity().getEntityData().set(BoatAccessor.getDATA_ID_PADDLE_LEFT(), leftPaddle);
+            playbackData.getEntity().getEntityData().set(BoatAccessor.getDATA_ID_PADDLE_RIGHT(), rightPaddle);
         }
     }
 
@@ -64,12 +64,9 @@ public class AbstractBoatPaddleAction extends Action {
                 .getEntity()
                 .level()
                 .getEntity(playbackData.getEntity().getId());
-        if (entity1 instanceof AbstractBoat) {
-            playbackData.getEntity().getEntityData().set(AbstractBoatAccessor.getDATA_ID_PADDLE_LEFT(), oldLeftPaddle);
-            playbackData
-                    .getEntity()
-                    .getEntityData()
-                    .set(AbstractBoatAccessor.getDATA_ID_PADDLE_RIGHT(), oldRightPaddle);
+        if (entity1 instanceof Boat) {
+            playbackData.getEntity().getEntityData().set(BoatAccessor.getDATA_ID_PADDLE_LEFT(), oldLeftPaddle);
+            playbackData.getEntity().getEntityData().set(BoatAccessor.getDATA_ID_PADDLE_RIGHT(), oldRightPaddle);
         }
     }
 }

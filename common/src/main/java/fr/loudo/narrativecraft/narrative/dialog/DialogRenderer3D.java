@@ -33,7 +33,7 @@ import fr.loudo.narrativecraft.util.Position2D;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.Direction;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
@@ -117,7 +117,7 @@ public class DialogRenderer3D extends DialogRenderer {
                     opacity = Mth.lerp(t, 1.0, 0.0);
                     position = getDialogInterpolatedDisappearPosition(t);
                 }
-                backgroundColor = ARGB.color((int) (opacity * 255.0), backgroundColor);
+                backgroundColor = FastColor.ARGB32.color((int) (opacity * 255.0), backgroundColor);
             } else {
                 originalScale = (float) Mth.lerp(t, oldScale, scale);
             }

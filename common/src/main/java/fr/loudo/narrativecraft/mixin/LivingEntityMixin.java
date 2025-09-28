@@ -30,7 +30,6 @@ import fr.loudo.narrativecraft.narrative.recording.actions.HurtAction;
 import fr.loudo.narrativecraft.narrative.recording.actions.SleepAction;
 import fr.loudo.narrativecraft.narrative.recording.actions.SwingAction;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
@@ -71,10 +70,9 @@ public abstract class LivingEntityMixin {
         }
     }
 
-    @Inject(method = "hurtServer", at = @At("HEAD"))
-    private void narrativecraft$hurtServer(
-            ServerLevel serverLevel, DamageSource damageSource, float damageHit, CallbackInfoReturnable<Boolean> cir) {
-        if (damageSource.getEntity() instanceof ServerPlayer player) {
+    @Inject(method = "hurt", at = @At("HEAD"))
+    private void narrativecraft$hurtServer(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+        if (source.getEntity() instanceof ServerPlayer player) {
             Recording recording =
                     NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
             if (recording == null || !recording.isRecording()) return;

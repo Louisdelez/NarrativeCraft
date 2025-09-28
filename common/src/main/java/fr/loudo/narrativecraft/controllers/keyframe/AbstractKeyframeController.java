@@ -79,7 +79,7 @@ public abstract class AbstractKeyframeController<T extends Keyframe> extends Abs
         }
         if (keyframe == null) return;
         if (playerSession.getCurrentCamera() == null) {
-            lastGameType = playerSession.getPlayer().gameMode();
+            lastGameType = playerSession.getPlayer().gameMode.getGameModeForPlayer();
         }
         playerSession.getPlayer().setGameMode(GameType.SPECTATOR);
         playerSession.setCurrentCamera(keyframe.getKeyframeLocation());

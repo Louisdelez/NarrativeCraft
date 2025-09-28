@@ -24,7 +24,6 @@
 package fr.loudo.narrativecraft.screens.components;
 
 import com.bladecoder.ink.runtime.Choice;
-import fr.loudo.narrativecraft.gui.ICustomGuiRender;
 import fr.loudo.narrativecraft.narrative.story.text.ParsedDialog;
 import fr.loudo.narrativecraft.narrative.story.text.TextEffectAnimation;
 import fr.loudo.narrativecraft.util.Util;
@@ -35,8 +34,9 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 import org.joml.Vector2f;
 
 public class ChoiceButtonWidget extends AbstractButton {
@@ -100,14 +100,17 @@ public class ChoiceButtonWidget extends AbstractButton {
         for (int i = 0; i < parsedDialog.cleanedText().length(); i++) {
             Vector2f offset = letterOffsets.getOrDefault(i, new Vector2f(0, 0));
             String character = String.valueOf(parsedDialog.cleanedText().charAt(i));
-            ((ICustomGuiRender) guiGraphics)
-                    .narrativecraft$drawStringFloat(
-                            character,
-                            Minecraft.getInstance().font,
-                            startX + offset.x,
-                            top + paddingY + 1 + offset.y,
-                            textColor,
-                            false);
+            minecraft.font.drawInBatch(
+                    character,
+                    startX + offset.x,
+                    top + paddingY + 1 + offset.y,
+                    textColor,
+                    false,
+                    guiGraphics.pose().last().pose(),
+                    guiGraphics.bufferSource(),
+                    Font.DisplayMode.SEE_THROUGH,
+                    0,
+                    LightTexture.FULL_BRIGHT);
             startX += Util.getLetterWidth(parsedDialog.cleanedText().codePointAt(i), minecraft);
         }
     }
@@ -138,9 +141,9 @@ public class ChoiceButtonWidget extends AbstractButton {
     }
 
     public void setOpacity(int opacity) {
-        backgroundColor = ARGB.color(opacity, backgroundColor);
-        textColor = ARGB.color(opacity, textColor);
-        hoverColor = ARGB.color(opacity, hoverColor);
+        backgroundColor = FastColor.ARGB32.color(opacity, backgroundColor);
+        textColor = FastColor.ARGB32.color(opacity, textColor);
+        hoverColor = FastColor.ARGB32.color(opacity, hoverColor);
     }
 
     public boolean isCanPress() {

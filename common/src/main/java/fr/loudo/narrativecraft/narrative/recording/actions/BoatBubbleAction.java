@@ -23,18 +23,18 @@
 
 package fr.loudo.narrativecraft.narrative.recording.actions;
 
-import fr.loudo.narrativecraft.mixin.accessor.AbstractBoatAccessor;
+import fr.loudo.narrativecraft.mixin.accessor.BoatAccessor;
 import fr.loudo.narrativecraft.narrative.playback.PlaybackData;
 import fr.loudo.narrativecraft.narrative.recording.actions.manager.ActionType;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.vehicle.AbstractBoat;
+import net.minecraft.world.entity.vehicle.Boat;
 
-public class AbstractBoatBubbleAction extends Action {
+public class BoatBubbleAction extends Action {
 
     private final int currentByte;
     private final int oldByte;
 
-    public AbstractBoatBubbleAction(int tick, int currentByte, int oldByte) {
+    public BoatBubbleAction(int tick, int currentByte, int oldByte) {
         super(tick, ActionType.ABSTRACT_BOAT_BUBBLE);
         this.currentByte = currentByte;
         this.oldByte = oldByte;
@@ -46,8 +46,8 @@ public class AbstractBoatBubbleAction extends Action {
                 .getEntity()
                 .level()
                 .getEntity(playbackData.getEntity().getId());
-        if (entity1 instanceof AbstractBoat) {
-            playbackData.getEntity().getEntityData().set(AbstractBoatAccessor.getDATA_ID_BUBBLE_TIME(), currentByte);
+        if (entity1 instanceof Boat) {
+            playbackData.getEntity().getEntityData().set(BoatAccessor.getDATA_ID_BUBBLE_TIME(), currentByte);
         }
     }
 
@@ -57,8 +57,8 @@ public class AbstractBoatBubbleAction extends Action {
                 .getEntity()
                 .level()
                 .getEntity(playbackData.getEntity().getId());
-        if (entity1 instanceof AbstractBoat) {
-            playbackData.getEntity().getEntityData().set(AbstractBoatAccessor.getDATA_ID_BUBBLE_TIME(), oldByte);
+        if (entity1 instanceof Boat) {
+            playbackData.getEntity().getEntityData().set(BoatAccessor.getDATA_ID_BUBBLE_TIME(), oldByte);
         }
     }
 }

@@ -56,7 +56,7 @@ public abstract class LevelSummaryMixin {
         if (option.stringMcVersion.isEmpty()) return;
         Component original = cir.getReturnValue();
         Component versionComp;
-        if (!SharedConstants.getCurrentVersion().name().equals(option.stringMcVersion)) {
+        if (!SharedConstants.getCurrentVersion().getName().equals(option.stringMcVersion)) {
             versionComp = Component.literal(option.stringMcVersion).withStyle(ChatFormatting.RED);
         } else {
             versionComp = Component.literal(option.stringMcVersion);

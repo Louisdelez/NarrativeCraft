@@ -202,13 +202,13 @@ public class StoryChoicesScreen extends Screen {
         t = Math.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
         for (AnimatedChoice ac : animatedChoices) {
             int newOpacity = (int) Mth.lerp(t, 5, 255);
-            guiGraphics.pose().pushMatrix();
+            guiGraphics.pose().pushPose();
             if (choiceList.size() > 1) {
-                guiGraphics.pose().translate((float) Mth.lerp(t, ac.offsetX, 0), (float) Mth.lerp(t, ac.offsetY, 0));
+                guiGraphics.pose().translate((float) Mth.lerp(t, ac.offsetX, 0), (float) Mth.lerp(t, ac.offsetY, 0), 0);
             }
             ac.widget.setOpacity(newOpacity);
             ac.widget.render(guiGraphics, mouseX, mouseY, partialTick);
-            guiGraphics.pose().popMatrix();
+            guiGraphics.pose().popPose();
             if (t >= 1.0) {
                 ac.widget.setCanPress(true);
             }
@@ -230,7 +230,7 @@ public class StoryChoicesScreen extends Screen {
     }
 
     @Override
-    protected void renderBlurredBackground(GuiGraphics guiGraphics) {}
+    protected void renderBlurredBackground(float partialTick) {}
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {}

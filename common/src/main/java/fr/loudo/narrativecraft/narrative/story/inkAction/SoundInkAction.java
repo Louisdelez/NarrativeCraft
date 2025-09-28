@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.narrative.story.inkAction;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
+import fr.loudo.narrativecraft.audio.VolumeAudio;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.util.Translation;
@@ -72,7 +73,7 @@ public class SoundInkAction extends InkAction {
         } else if (action.equals("stop")) {
             volume = (float) Mth.lerp(t, 1.0, 0.0);
         }
-        soundManager.setVolume(simpleSoundInstance, volume);
+        ((VolumeAudio) soundManager).narrativecraft$setVolume(simpleSoundInstance, volume);
         if (volume == 0.0 && action.equals("stop")) {
             soundManager.stop(simpleSoundInstance);
         }
@@ -148,7 +149,7 @@ public class SoundInkAction extends InkAction {
             }
             simpleSoundInstance = getSimpleSoundInstance();
             soundManager.play(simpleSoundInstance);
-            soundManager.setVolume(simpleSoundInstance, 0f);
+            ((VolumeAudio) soundManager).narrativecraft$setVolume(simpleSoundInstance, 0f);
         } else if (action.equals("stop") && arguments.size() > 3) {
             String fadeValue = arguments.get(3);
             if (!fadeValue.equals("fadeout")) return InkActionResult.ok();
@@ -171,7 +172,7 @@ public class SoundInkAction extends InkAction {
             simpleSoundInstance = getSimpleSoundInstance();
             soundManager.play(simpleSoundInstance);
             if (fadeTime > 0) {
-                soundManager.setVolume(simpleSoundInstance, 0);
+                ((VolumeAudio) soundManager).narrativecraft$setVolume(simpleSoundInstance, 0);
             }
         } else if (action.equals("stop")) {
             for (InkAction inkAction : playerSession.getInkActions()) {

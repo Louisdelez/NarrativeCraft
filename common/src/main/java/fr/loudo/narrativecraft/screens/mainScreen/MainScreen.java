@@ -53,14 +53,13 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 
 public class MainScreen extends Screen {
 
@@ -335,7 +334,7 @@ public class MainScreen extends Screen {
         } else {
             startY += buttonHeight + gap;
             Button quitButton = Button.builder(Translation.message("screen.main_screen.quit"), button -> {
-                        Util.disconnectPlayer(minecraft);
+                        Util.disconnectPlayer();
                     })
                     .bounds(initialX, startY, buttonWidth, buttonHeight)
                     .build();
@@ -368,7 +367,7 @@ public class MainScreen extends Screen {
                     guiGraphics.guiWidth() / 2
                             - minecraft.font.width(Translation.message("screen.main_screen.dev_tip")) / 2,
                     20,
-                    ARGB.colorFromFloat(1, 1, 1, 1));
+                    FastColor.ARGB32.colorFromFloat(1, 1, 1, 1));
         }
     }
 
@@ -381,24 +380,22 @@ public class MainScreen extends Screen {
         if (playerSession.getController() != null) return;
         if (Util.resourceExists(BACKGROUND_IMAGE)) {
             guiGraphics.blit(
-                    RenderPipelines.GUI_TEXTURED,
                     BACKGROUND_IMAGE,
                     0,
                     0,
-                    0,
-                    0,
+                    0f,
+                    0f,
                     guiGraphics.guiWidth(),
                     guiGraphics.guiHeight(),
                     guiGraphics.guiWidth(),
-                    guiGraphics.guiHeight(),
-                    ARGB.colorFromFloat(1, 1, 1, 1));
+                    guiGraphics.guiHeight());
         } else {
-            guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), ARGB.colorFromFloat(1, 0, 0, 0));
+            guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0xFF000000);
         }
     }
 
     @Override
-    protected void renderBlurredBackground(GuiGraphics guiGraphics) {}
+    protected void renderBlurredBackground(float partialTick) {}
 
     @Override
     public boolean isPauseScreen() {

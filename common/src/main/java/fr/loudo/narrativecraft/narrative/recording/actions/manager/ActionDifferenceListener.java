@@ -39,7 +39,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
-import net.minecraft.world.entity.vehicle.AbstractBoat;
+import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -52,8 +52,7 @@ public class ActionDifferenceListener {
             EquipmentSlot.CHEST,
             EquipmentSlot.BODY,
             EquipmentSlot.LEGS,
-            EquipmentSlot.FEET,
-            EquipmentSlot.SADDLE);
+            EquipmentSlot.FEET);
 
     private final ActionsData actionsData;
     private final Recording recording;
@@ -64,9 +63,9 @@ public class ActionDifferenceListener {
 
     private byte abstractHorseEntityByteState;
 
-    private int abstractBoatEntityBubbleState;
-    private boolean abstractBoatEntityLeftPaddleState;
-    private boolean abstractBoatEntityRightPaddleState;
+    private int BoatEntityBubbleState;
+    private boolean BoatEntityLeftPaddleState;
+    private boolean BoatEntityRightPaddleState;
 
     private final HashMap<EquipmentSlot, ItemStack> currentItemInEquipmentSlot;
     private List<ModsListenerImpl> modsListenerList;
@@ -75,8 +74,8 @@ public class ActionDifferenceListener {
         this.actionsData = actionsData;
         this.currentItemInEquipmentSlot = new HashMap<>();
         this.recording = recording;
-        abstractBoatEntityLeftPaddleState = false;
-        abstractBoatEntityRightPaddleState = false;
+        BoatEntityLeftPaddleState = false;
+        BoatEntityRightPaddleState = false;
         initItemSlot();
         initModsListeners();
     }
@@ -147,28 +146,24 @@ public class ActionDifferenceListener {
         }
     }
 
-    public void abstractBoatEntityBubbleListener(int abstractBoatCurrentBubble) {
-        if (actionsData.getEntity() instanceof AbstractBoat) {
-            if (abstractBoatEntityBubbleState != abstractBoatCurrentBubble) {
-                AbstractBoatBubbleAction action = new AbstractBoatBubbleAction(
-                        recording.getTick(), abstractBoatCurrentBubble, abstractBoatEntityBubbleState);
-                abstractBoatEntityBubbleState = abstractBoatCurrentBubble;
+    public void BoatEntityBubbleListener(int BoatCurrentBubble) {
+        if (actionsData.getEntity() instanceof Boat) {
+            if (BoatEntityBubbleState != BoatCurrentBubble) {
+                BoatBubbleAction action =
+                        new BoatBubbleAction(recording.getTick(), BoatCurrentBubble, BoatEntityBubbleState);
+                BoatEntityBubbleState = BoatCurrentBubble;
                 actionsData.addAction(action);
             }
         }
     }
 
-    public void abstractBoatEntityPaddleListener(boolean left, boolean right) {
-        if (actionsData.getEntity() instanceof AbstractBoat) {
-            if (abstractBoatEntityLeftPaddleState != left || abstractBoatEntityRightPaddleState != right) {
-                AbstractBoatPaddleAction action = new AbstractBoatPaddleAction(
-                        recording.getTick(),
-                        left,
-                        right,
-                        abstractBoatEntityLeftPaddleState,
-                        abstractBoatEntityRightPaddleState);
-                abstractBoatEntityLeftPaddleState = left;
-                abstractBoatEntityRightPaddleState = right;
+    public void BoatEntityPaddleListener(boolean left, boolean right) {
+        if (actionsData.getEntity() instanceof Boat) {
+            if (BoatEntityLeftPaddleState != left || BoatEntityRightPaddleState != right) {
+                BoatPaddleAction action = new BoatPaddleAction(
+                        recording.getTick(), left, right, BoatEntityLeftPaddleState, BoatEntityRightPaddleState);
+                BoatEntityLeftPaddleState = left;
+                BoatEntityRightPaddleState = right;
                 actionsData.addAction(action);
             }
         }

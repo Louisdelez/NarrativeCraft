@@ -187,7 +187,7 @@ public class CameraAngleControllerScreen extends Screen {
     }
 
     @Override
-    protected void renderBlurredBackground(GuiGraphics guiGraphics) {}
+    protected void renderBlurredBackground(float partialTick) {}
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {}

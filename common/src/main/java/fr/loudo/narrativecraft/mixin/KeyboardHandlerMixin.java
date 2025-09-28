@@ -29,7 +29,6 @@ import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.player.LocalPlayer;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -42,7 +41,7 @@ public class KeyboardHandlerMixin {
      */
     @Redirect(
             method = "keyPress",
-            at = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;hideGui:Z", opcode = Opcodes.PUTFIELD))
+            at = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;hideGui:Z", ordinal = 1))
     private void narrativecraft$changeHideGui(Options instance, boolean value) {
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;

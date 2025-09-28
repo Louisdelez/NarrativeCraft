@@ -31,7 +31,7 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 
 public class OnHudRender {
     public static void controllerHudInfo(GuiGraphics guiGraphics) {
@@ -83,7 +83,11 @@ public class OnHudRender {
         String debugText = "Debug mode";
         Font font = Minecraft.getInstance().font;
         guiGraphics.drawString(
-                font, debugText, guiGraphics.guiWidth() - font.width(debugText) - 5, 5, ARGB.color(255, 255, 255, 255));
+                font,
+                debugText,
+                guiGraphics.guiWidth() - font.width(debugText) - 5,
+                5,
+                FastColor.ARGB32.color(255, 255, 255, 255));
         if (!playerSession.isShowDebugHud()) return;
         storyHandler.getStoryDebugHud().render(guiGraphics, partialTick);
     }

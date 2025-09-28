@@ -25,7 +25,6 @@ package fr.loudo.narrativecraft.narrative.playback;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.mixin.invoker.LivingEntityInvoker;
 import fr.loudo.narrativecraft.narrative.recording.Location;
 import fr.loudo.narrativecraft.narrative.recording.actions.Action;
 import fr.loudo.narrativecraft.narrative.recording.actions.ActionsData;
@@ -34,7 +33,11 @@ import fr.loudo.narrativecraft.util.FakePlayer;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.List;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.entity.*;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
 
@@ -107,10 +110,10 @@ public class PlaybackData {
     public void spawnEntity(Location location) {
         if (actionsData.getEntityId() == BuiltInRegistries.ENTITY_TYPE.getId(EntityType.PLAYER)) return;
         EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.byId(actionsData.getEntityId());
-        entity = entityType.create(playback.getLevel(), EntitySpawnReason.MOB_SUMMONED);
+        entity = Util.createEntityFromKey(entityType, (ServerLevel) playback.getLevel());
         if (entity == null) return;
         try {
-            entity.load(Util.valueInputFromCompoundTag(entity.registryAccess(), actionsData.getNbtData()));
+            entity.load(Util.nbtFromString(actionsData.getNbtData()));
         } catch (CommandSyntaxException e) {
             NarrativeCraftMod.LOGGER.error("Unexpected error when trying to load nbt entity data! ", e);
             return;
@@ -122,8 +125,9 @@ public class PlaybackData {
                     .filter(action -> action instanceof BreakBlockAction && action.getTick() == playback.getTick() - 1)
                     .toList();
             boolean randomizeMotion = !actions.isEmpty();
-            entity = ((LivingEntityInvoker) playback.getMasterEntity())
-                    .callCreateItemStackToDrop(itemEntity.getItem(), randomizeMotion, false);
+            if (playback.getMasterEntity() instanceof FakePlayer fakePlayer) {
+                entity = fakePlayer.drop(itemEntity.getItem(), randomizeMotion, false);
+            }
         }
         playback.getLevel().addFreshEntity(entity);
     }

@@ -34,7 +34,6 @@ import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.phys.Vec3;
 
@@ -80,9 +79,8 @@ public class Keyframe {
         camera.setYRot(keyframeLocation.getYaw());
         camera.setYHeadRot(keyframeLocation.getYaw());
         Vec3 playerCoordVec3 = new Vec3(keyframeLocation.getX(), keyframeLocation.getY() - 1, keyframeLocation.getZ());
-        PositionMoveRotation pos = new PositionMoveRotation(
-                playerCoordVec3, new Vec3(0, 0, 0), keyframeLocation.getYaw(), keyframeLocation.getPitch());
-        player.connection.send(new ClientboundEntityPositionSyncPacket(camera.getId(), pos, false));
+        camera.setPos(playerCoordVec3);
+        player.connection.send(new ClientboundTeleportEntityPacket(camera));
         player.connection.send(new ClientboundSetEntityDataPacket(
                 camera.getId(), camera.getEntityData().getNonDefaultValues()));
     }

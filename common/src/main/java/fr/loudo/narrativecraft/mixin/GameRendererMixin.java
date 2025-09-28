@@ -41,13 +41,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
     @Inject(method = "getFov", at = @At("RETURN"), cancellable = true)
-    public void narrativecraft$getZoomLevel(CallbackInfoReturnable<Float> callbackInfo) {
+    public void narrativecraft$getZoomLevel(CallbackInfoReturnable<Double> callbackInfo) {
         LocalPlayer player = Minecraft.getInstance().player;
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
         if (playerSession == null) return;
         if (playerSession.getCurrentCamera() == null) return;
-        callbackInfo.setReturnValue(playerSession.getCurrentCamera().getFov());
+        callbackInfo.setReturnValue((double) playerSession.getCurrentCamera().getFov());
     }
 
     @Inject(method = "bobHurt", at = @At("RETURN"))

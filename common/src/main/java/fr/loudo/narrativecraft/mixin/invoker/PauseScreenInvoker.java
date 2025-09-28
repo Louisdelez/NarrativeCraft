@@ -21,12 +21,15 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.gui;
+package fr.loudo.narrativecraft.mixin.invoker;
 
-import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.PauseScreen;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
-public interface ICustomGuiRender {
-    void narrativecraft$drawDialogSkip(float width, float height, int color);
+@Mixin(PauseScreen.class)
+public interface PauseScreenInvoker {
 
-    void narrativecraft$drawStringFloat(String text, Font font, float x, float y, int color, boolean drawShadow);
+    @Invoker
+    void callOnDisconnect();
 }

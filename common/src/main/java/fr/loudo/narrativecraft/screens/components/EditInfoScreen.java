@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
@@ -199,5 +200,9 @@ public class EditInfoScreen<T extends NarrativeEntry> extends Screen {
     @Override
     public <T extends GuiEventListener & Renderable & NarratableEntry> T addRenderableWidget(T widget) {
         return super.addRenderableWidget(widget);
+    }
+
+    public Font getFont() {
+        return minecraft.font;
     }
 }

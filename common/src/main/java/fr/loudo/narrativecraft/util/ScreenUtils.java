@@ -45,7 +45,7 @@ public class ScreenUtils {
 
     public static void sendToast(Component name, Component description) {
         Minecraft.getInstance()
-                .getToastManager()
+                .getToasts()
                 .addToast(new SystemToast(SystemToast.SystemToastId.NARRATOR_TOGGLE, name, description));
     }
 
@@ -103,11 +103,8 @@ public class ScreenUtils {
         public MultilineLabelBox(
                 Component text, Font font, int width, int height, int x, int y, Component placeholder) {
             stringWidget = ScreenUtils.text(text, font, x, y);
-            multiLineEditBox = MultiLineEditBox.builder()
-                    .setPlaceholder(placeholder)
-                    .setX(x)
-                    .setY(y + stringWidget.getHeight() + 5)
-                    .build(font, width, height, Component.literal(""));
+            multiLineEditBox = new MultiLineEditBox(
+                    font, x, y + stringWidget.getHeight() + 5, width, height, placeholder, Component.literal(""));
         }
 
         public void setPosition(int x, int y) {

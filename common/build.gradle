@@ -24,20 +24,13 @@ neoForge {
     }
 }
 
+
 dependencies {
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
-    // fabric and neoforge both bundle mixinextras, so it is safe to use it in common
     compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
     annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
-    compileOnly("io.github.kosmx.emotes:emotesAPI:${emotesAPI_version}") {
-        exclude group: 'com.google.guava', module: 'guava'
-    }
-    compileOnly("io.github.kosmx.emotes:emotesServer:${emotesAPI_version}") {
-        exclude group: 'com.google.guava', module: 'guava'
-    }
-    compileOnly("io.github.kosmx.emotes:emotesMc:${emotesAPI_version}") {
-        exclude group: 'com.google.guava', module: 'guava'
-    }
+    compileOnly (group: 'io.github.kosmx.emotes', name: 'emotesAPI', version: "${emotesAPI_version}")
+    compileOnly (group: 'io.github.kosmx.emotes', name: 'emotesServer', version: "${emotesAPI_version}")
     implementation "com.bladecoder.ink:blade-ink:1.2.1+nc"
 }
 

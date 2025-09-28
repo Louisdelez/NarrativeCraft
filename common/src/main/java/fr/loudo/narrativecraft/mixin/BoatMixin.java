@@ -28,15 +28,15 @@ import fr.loudo.narrativecraft.narrative.recording.Recording;
 import fr.loudo.narrativecraft.narrative.recording.RecordingData;
 import fr.loudo.narrativecraft.narrative.recording.actions.manager.ActionDifferenceListener;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.vehicle.AbstractBoat;
+import net.minecraft.world.entity.vehicle.Boat;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(AbstractBoat.class)
-public abstract class AbstractBoatMixin {
+@Mixin(Boat.class)
+public abstract class BoatMixin {
 
     @Shadow
     protected abstract int getBubbleTime();
@@ -51,12 +51,12 @@ public abstract class AbstractBoatMixin {
             Recording recording =
                     NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
             if (recording == null || !recording.isRecording()) return;
-            AbstractBoat boat = (AbstractBoat) (Object) this;
+            Boat boat = (Boat) (Object) this;
             RecordingData recordingData = recording.getRecordingDataFromEntity(boat);
             if (recordingData == null || boat.level().isClientSide) return;
             ActionDifferenceListener actionDifferenceListener = recordingData.getActionDifferenceListener();
-            actionDifferenceListener.abstractBoatEntityBubbleListener(getBubbleTime());
-            actionDifferenceListener.abstractBoatEntityPaddleListener(getPaddleState(0), getPaddleState(1));
+            actionDifferenceListener.BoatEntityBubbleListener(getBubbleTime());
+            actionDifferenceListener.BoatEntityPaddleListener(getPaddleState(0), getPaddleState(1));
         }
     }
 }

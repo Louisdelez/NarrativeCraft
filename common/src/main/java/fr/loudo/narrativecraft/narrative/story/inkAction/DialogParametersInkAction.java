@@ -36,7 +36,7 @@ import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 
 public class DialogParametersInkAction extends InkAction {
 
@@ -191,21 +191,21 @@ public class DialogParametersInkAction extends InkAction {
                 break;
             case TEXT_COLOR:
                 executeIfRenderer(dialogRenderer, renderer -> {
-                    int color = ARGB.color(255, (int) value1);
+                    int color = FastColor.ARGB32.color(255, (int) value1);
                     renderer.setTextColor(color);
                 });
                 executeDialogData(storyHandler, dialogData -> {
-                    int color = ARGB.color(255, (int) value1);
+                    int color = FastColor.ARGB32.color(255, (int) value1);
                     dialogData.setTextColor(color);
                 });
                 break;
             case BACKGROUND_COLOR:
                 executeIfRenderer(dialogRenderer, renderer -> {
-                    int color = ARGB.color(255, (int) value1);
+                    int color = FastColor.ARGB32.color(255, (int) value1);
                     renderer.setBackgroundColor(color);
                 });
                 executeDialogData(storyHandler, dialogData -> {
-                    int color = ARGB.color(255, (int) value1);
+                    int color = FastColor.ARGB32.color(255, (int) value1);
                     dialogData.setBackgroundColor(color);
                 });
                 break;

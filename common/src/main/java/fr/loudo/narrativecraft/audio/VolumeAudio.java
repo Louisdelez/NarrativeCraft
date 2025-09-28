@@ -21,45 +21,10 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.screens.components;
+package fr.loudo.narrativecraft.audio;
 
-import fr.loudo.narrativecraft.util.Util;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.resources.sounds.SoundInstance;
 
-public class NarrativeCraftLogoRenderer {
-
-    public static final ResourceLocation LOGO =
-            ResourceLocation.withDefaultNamespace("textures/narrativecraft_logo.png");
-
-    private final ResourceLocation resourceLocation;
-    private int[] logoRes;
-    private int imageHeight;
-
-    public NarrativeCraftLogoRenderer(ResourceLocation resourceLocation) {
-        this.resourceLocation = resourceLocation;
-    }
-
-    public void init() {
-        logoRes = Util.getImageResolution(LOGO);
-        if (logoRes != null) {
-            imageHeight = Util.getDynamicHeight(logoRes, 256);
-        }
-    }
-
-    public boolean logoExists() {
-        return Util.resourceExists(resourceLocation);
-    }
-
-    public void render(GuiGraphics guiGraphics, int x, int y) {
-        guiGraphics.blit(LOGO, x, y, 0f, 0f, 256, imageHeight, 256, imageHeight);
-    }
-
-    public int getImageHeight() {
-        return imageHeight;
-    }
-
-    public int[] getLogoRes() {
-        return logoRes;
-    }
+public interface VolumeAudio {
+    void narrativecraft$setVolume(SoundInstance soundInstance, float volume);
 }

@@ -95,9 +95,13 @@ public class ErrorLine {
             if (fileName != null) {
                 ClickEvent clickEvent;
                 if (scene != null) {
-                    clickEvent = new ClickEvent.OpenFile(NarrativeCraftFile.getScriptFile(scene));
+                    clickEvent = new ClickEvent(
+                            ClickEvent.Action.OPEN_FILE,
+                            NarrativeCraftFile.getScriptFile(scene).getAbsolutePath());
                 } else {
-                    clickEvent = new ClickEvent.OpenFile(NarrativeCraftFile.getScriptFile(chapter));
+                    clickEvent = new ClickEvent(
+                            ClickEvent.Action.OPEN_FILE,
+                            NarrativeCraftFile.getScriptFile(chapter).getAbsolutePath());
                 }
 
                 result = result.copy()
@@ -105,8 +109,9 @@ public class ErrorLine {
                                 .withStyle(ChatFormatting.GRAY)
                                 .withStyle(style -> style.withBold(false)
                                         .withClickEvent(clickEvent)
-                                        .withHoverEvent(
-                                                new HoverEvent.ShowText(Translation.message("validation.quick_edit")))))
+                                        .withHoverEvent(new HoverEvent(
+                                                HoverEvent.Action.SHOW_TEXT,
+                                                Translation.message("validation.quick_edit")))))
                         .append("\n");
             }
 

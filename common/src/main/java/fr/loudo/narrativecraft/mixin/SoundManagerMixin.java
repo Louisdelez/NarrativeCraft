@@ -21,10 +21,24 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.gui;
+package fr.loudo.narrativecraft.mixin;
 
-public interface IGuiTextAccessor {
-    void narrativecraft$setFloatX(float floatX);
+import fr.loudo.narrativecraft.audio.VolumeAudio;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.sounds.SoundEngine;
+import net.minecraft.client.sounds.SoundManager;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 
-    void narrativecraft$setFloatY(float floatY);
+@Mixin(SoundManager.class)
+public class SoundManagerMixin implements VolumeAudio {
+    @Shadow
+    @Final
+    private SoundEngine soundEngine;
+
+    @Override
+    public void narrativecraft$setVolume(SoundInstance soundInstance, float volume) {
+        ((VolumeAudio) this.soundEngine).narrativecraft$setVolume(soundInstance, volume);
+    }
 }

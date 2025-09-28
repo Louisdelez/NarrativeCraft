@@ -48,20 +48,16 @@ public class CutsceneEditItems {
     }
 
     private static ItemStack getItem(String name, RegistryAccess registryAccess, Item item) {
-
         CompoundTag tag = Util.tagFromIdAndComponents(item, "{\"minecraft:custom_name\":\"" + name + "\"}");
-
-        return Util.generateItemStackFromNBT(tag, registryAccess);
+        return ItemStack.parse(registryAccess, tag).get();
     }
 
     private static ItemStack getItemWithTexture(
             String name, RegistryAccess registryAccess, Item item, Property textures) {
-
         CompoundTag tag = Util.tagFromIdAndComponents(
                 item,
                 "{\"minecraft:custom_name\":\"" + name + "\", \"minecraft:profile\":{properties:[{name: \""
                         + textures.name() + "\", value: \"" + textures.value() + "\"}]}}");
-
-        return Util.generateItemStackFromNBT(tag, registryAccess);
+        return ItemStack.parse(registryAccess, tag).get();
     }
 }

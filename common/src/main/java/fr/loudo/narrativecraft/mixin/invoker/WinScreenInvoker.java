@@ -31,5 +31,5 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(WinScreen.class)
 public interface WinScreenInvoker {
     @Invoker
-    void callAddCreditsLine(Component text, boolean centered, boolean narrate);
+    void callAddCreditsLine(Component creditsLine, boolean centered);
 }

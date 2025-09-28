@@ -39,14 +39,17 @@ public class RenderWorldEvent {
         NeoForge.EVENT_BUS.addListener(RenderWorldEvent::onWorldRender);
     }
 
-    private static void onWorldRender(RenderLevelStageEvent.AfterLevel event) {
+    private static void onWorldRender(RenderLevelStageEvent event) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_LEVEL) return;
         Matrix4fStack matrix4fstack = RenderSystem.getModelViewStack();
         matrix4fstack.pushMatrix();
         matrix4fstack.mul(event.getModelViewMatrix());
-        PoseStack poseStack = new PoseStack();
-        poseStack.pushPose();
-        OnRenderWorld.renderWorld(poseStack, event.getPartialTick().getGameTimeDeltaPartialTick(true));
-        poseStack.popPose();
+        RenderSystem.applyModelViewMatrix();
+        RenderSystem.depthMask(false);
+        RenderSystem.disableDepthTest();
+        OnRenderWorld.renderWorld(new PoseStack(), event.getPartialTick().getGameTimeDeltaPartialTick(true));
         matrix4fstack.popMatrix();
+        RenderSystem.depthMask(true);
+        RenderSystem.enableDepthTest();
     }
 }

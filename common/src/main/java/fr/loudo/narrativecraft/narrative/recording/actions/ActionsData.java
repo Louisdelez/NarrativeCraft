@@ -33,10 +33,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.storage.TagValueOutput;
 
 public class ActionsData {
 
@@ -61,9 +59,7 @@ public class ActionsData {
     }
 
     private CompoundTag serializeNBT() {
-        TagValueOutput nbt = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, entity.registryAccess());
-        entity.saveWithoutId(nbt);
-        CompoundTag compoundTag = nbt.buildResult();
+        CompoundTag compoundTag = entity.saveWithoutId(new CompoundTag());
         compoundTag.remove("UUID");
         compoundTag.remove("Pos");
         compoundTag.remove("Motion");

@@ -63,7 +63,7 @@ public class WeatherInkAction extends InkAction {
 
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
-        ServerLevel level = playerSession.getPlayer().level();
+        ServerLevel level = (ServerLevel) playerSession.getPlayer().level();
         ServerGamePacketListenerImpl connection = playerSession.getPlayer().connection;
         boolean isSinglePlayer = level.getServer().isSingleplayer();
         switch (weather) {

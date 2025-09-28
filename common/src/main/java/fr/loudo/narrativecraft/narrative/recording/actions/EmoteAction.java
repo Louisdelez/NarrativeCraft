@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.recording.actions;
 
-import com.zigythebird.playeranimcore.animation.Animation;
+import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 import fr.loudo.narrativecraft.narrative.playback.PlaybackData;
 import fr.loudo.narrativecraft.narrative.recording.actions.manager.ActionType;
 import fr.loudo.narrativecraft.util.FakePlayer;
@@ -43,7 +43,7 @@ public class EmoteAction extends Action {
     @Override
     public void execute(PlaybackData playbackData) {
         if (playbackData.getEntity() instanceof FakePlayer fakePlayer) {
-            Animation emote = UniversalEmoteSerializer.getEmote(emoteId);
+            KeyframeAnimation emote = UniversalEmoteSerializer.getEmote(emoteId);
             ServerEmoteAPI.playEmote(fakePlayer.getUUID(), emote, false);
         }
     }

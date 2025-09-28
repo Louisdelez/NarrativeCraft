@@ -43,8 +43,8 @@ public enum ActionType {
     RIDE(RidingAction.class),
     STOP_RIDE(StopRidingAction.class),
     ABSTRACT_HORSE_BYTE(AbstractHorseByteAction.class),
-    ABSTRACT_BOAT_BUBBLE(AbstractBoatBubbleAction.class),
-    ABSTRACT_BOAT_PADDLE(AbstractBoatPaddleAction.class),
+    ABSTRACT_BOAT_BUBBLE(BoatBubbleAction.class),
+    ABSTRACT_BOAT_PADDLE(BoatPaddleAction.class),
     DEATH(DeathAction.class),
     RESPAWN(RespawnAction.class),
     ITEM_PICKUP(ItemPickUpAction.class);

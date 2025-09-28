@@ -35,6 +35,7 @@ import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 public class MinecraftCommandInkAction extends InkAction {
@@ -89,7 +90,7 @@ public class MinecraftCommandInkAction extends InkAction {
                 commandSource,
                 player.position(),
                 player.getRotationVector(),
-                player.level(),
+                (ServerLevel) player.level(),
                 4,
                 player.getName().getString(),
                 player.getDisplayName(),

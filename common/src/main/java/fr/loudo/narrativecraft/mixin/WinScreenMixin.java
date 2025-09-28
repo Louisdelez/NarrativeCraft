@@ -30,8 +30,6 @@ import fr.loudo.narrativecraft.util.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.screens.WinScreen;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.util.ARGB;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -76,17 +74,17 @@ public class WinScreenMixin {
                 NarrativeCraftLogoRenderer narrativeCraftLogoRenderer =
                         NarrativeCraftMod.getInstance().getNarrativeCraftLogoRenderer();
                 guiGraphics.blit(
-                        RenderPipelines.GUI_TEXTURED,
                         CreditScreen.LOGO,
                         creditsScreen.width / 2 - 128,
                         creditsScreen.height + 50 - narrativeCraftLogoRenderer.getImageHeight() / 2,
-                        0,
-                        0,
+                        256,
+                        narrativeCraftLogoRenderer.getImageHeight(),
+                        0f,
+                        0f,
                         256,
                         narrativeCraftLogoRenderer.getImageHeight(),
                         256,
-                        narrativeCraftLogoRenderer.getImageHeight(),
-                        ARGB.colorFromFloat(1, 1, 1, 1));
+                        narrativeCraftLogoRenderer.getImageHeight());
             }
         } else {
             instance.renderLogo(guiGraphics, winScreen.width, 1.0F, winScreen.height + 50);

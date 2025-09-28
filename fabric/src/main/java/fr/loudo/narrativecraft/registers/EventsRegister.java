@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.keys.PressKeyListener;
 import fr.loudo.narrativecraft.narrative.playback.PlaybackTickHandler;
 import fr.loudo.narrativecraft.narrative.recording.RecordingTickHandler;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -52,5 +53,6 @@ public class EventsRegister {
         ServerPlayerEvents.AFTER_RESPAWN.register(RespawnEvent::onRespawn);
         PlayerBlockBreakEvents.AFTER.register(BlockBreakEvent::onBlockBreak);
         UseBlockCallback.EVENT.register(RightClickBlock::onRightClickBlock);
+        WorldRenderEvents.LAST.register(RenderWorldEvent::renderWorld);
     }
 }

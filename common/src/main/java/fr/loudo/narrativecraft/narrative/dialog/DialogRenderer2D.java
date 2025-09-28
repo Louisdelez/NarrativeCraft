@@ -23,12 +23,12 @@
 
 package fr.loudo.narrativecraft.narrative.dialog;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.narrative.dialog.animation.DialogArrowSkip;
 import fr.loudo.narrativecraft.util.Easing;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
-import org.joml.Matrix3x2fStack;
 
 public class DialogRenderer2D extends DialogRenderer {
 
@@ -74,8 +74,8 @@ public class DialogRenderer2D extends DialogRenderer {
     @Override
     public void render(GuiGraphics guiGraphics, float partialTick) {
 
-        Matrix3x2fStack poseStack = guiGraphics.pose();
-        poseStack.pushMatrix();
+        PoseStack poseStack = guiGraphics.pose();
+        poseStack.pushPose();
 
         float originalScale = scale;
         if (currentTick < totalTick) {
@@ -90,7 +90,7 @@ public class DialogRenderer2D extends DialogRenderer {
                     originalScale = (float) Mth.lerp(t, scale, 0.8);
                     opacity = Mth.lerp(t, 0.8, 0.0);
                 }
-                backgroundColor = ARGB.color((int) (opacity * 255.0), backgroundColor);
+                backgroundColor = FastColor.ARGB32.color((int) (opacity * 255.0), backgroundColor);
             }
         }
         if (currentTick == totalTick) {
@@ -113,14 +113,14 @@ public class DialogRenderer2D extends DialogRenderer {
         int centerX = windowWidth / 2;
         int centerY = windowHeight - offsetDialog - heightBox / 2;
 
-        poseStack.translate(centerX, centerY);
-        poseStack.scale(originalScale);
+        poseStack.translate(centerX, centerY, 0);
+        poseStack.scale(originalScale, originalScale, originalScale);
 
-        poseStack.translate(-widthBox / 2.0f, -heightBox / 2.0f);
+        poseStack.translate(-widthBox / 2.0f, -heightBox / 2.0f, 0);
 
         guiGraphics.fill(0, 0, widthBox, heightBox, backgroundColor);
 
-        poseStack.translate(widthBox / 2.0f - 4.0F, heightBox / 2.0F);
+        poseStack.translate(widthBox / 2.0f - 4.0F, heightBox / 2.0F, 0);
 
         if (!dialogStopping) {
             dialogScrollText.render(guiGraphics, partialTick);
@@ -132,14 +132,14 @@ public class DialogRenderer2D extends DialogRenderer {
                 dialogArrowSkip.start();
             }
             if (!noSkip) {
-                poseStack.pushMatrix();
-                poseStack.translate((widthBox / 2.0F), heightBox / 2.0F - 10);
+                poseStack.pushPose();
+                poseStack.translate((widthBox / 2.0F), heightBox / 2.0F - 10, 0);
                 dialogArrowSkip.render(guiGraphics, partialTick);
-                poseStack.popMatrix();
+                poseStack.popPose();
             }
         }
 
-        poseStack.popMatrix();
+        poseStack.pushPose();
     }
 
     public int getWidthBox() {

@@ -81,11 +81,7 @@ public class CharacterSkinController {
                 try {
                     byte[] array = Files.toByteArray(skin);
                     NativeImage nativeImage = NativeImage.read(array);
-                    DynamicTexture texture = new DynamicTexture(
-                            () -> NarrativeCraftMod.MOD_ID + "_"
-                                    + characterRuntime.getCharacterStory().getName() + "_"
-                                    + Util.snakeCase(skin.getName()) + "_skin_texture",
-                            nativeImage);
+                    DynamicTexture texture = new DynamicTexture(nativeImage);
                     minecraft
                             .getTextureManager()
                             .register(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, path), texture);

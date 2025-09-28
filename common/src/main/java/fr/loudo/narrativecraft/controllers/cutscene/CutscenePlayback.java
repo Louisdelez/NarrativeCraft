@@ -225,7 +225,10 @@ public class CutscenePlayback {
 
     public KeyframeLocation interpolate(double delta, KeyframeLocation a, KeyframeLocation b) {
         if (!isPlaying) return null;
-        Vec3 position = Mth.lerp(delta, a.getPosition(), b.getPosition());
+        double x = Mth.lerp(delta, a.getPosition().x, b.getPosition().x);
+        double y = Mth.lerp(delta, a.getPosition().y, b.getPosition().y);
+        double z = Mth.lerp(delta, a.getPosition().z, b.getPosition().z);
+        Vec3 position = new Vec3(x, y, z);
         float pitch = (float) Mth.lerp(delta, a.getPitch(), b.getPitch());
         float yaw = interpolateAngle(a.getYaw(), b.getYaw(), delta);
         float roll = interpolateAngle(a.getRoll(), b.getRoll(), delta);

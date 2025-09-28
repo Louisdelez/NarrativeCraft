@@ -25,7 +25,6 @@ package fr.loudo.narrativecraft.util;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.font.GlyphInfo;
-import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.DynamicOps;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
@@ -33,10 +32,12 @@ import fr.loudo.narrativecraft.mixin.accessor.FontAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.PlayerAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.PlayerListAccessor;
 import fr.loudo.narrativecraft.mixin.invoker.FontInvoker;
+import fr.loudo.narrativecraft.mixin.invoker.PauseScreenInvoker;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.platform.Services;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
 import java.util.UUID;
 import javax.imageio.ImageIO;
@@ -44,7 +45,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.font.FontSet;
 import net.minecraft.client.gui.screens.PauseScreen;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -58,15 +58,15 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.ProblemReporter;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.TagValueInput;
-import net.minecraft.world.level.storage.ValueInput;
 
 public class Util {
 
@@ -88,8 +88,8 @@ public class Util {
         player.displayClientMessage(
                 Translation.message("crash.global-message")
                         .withStyle(ChatFormatting.RED)
-                        .withStyle((style) ->
-                                style.withHoverEvent(new HoverEvent.ShowText(Component.literal(finalMessage)))),
+                        .withStyle((style) -> style.withHoverEvent(
+                                new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(finalMessage)))),
                 false);
         NarrativeCraftMod.LOGGER.error("Unexpected error occurred on NarrativeCraft: ", exception);
         if (Services.PLATFORM.isDevelopmentEnvironment()) {
@@ -97,36 +97,7 @@ public class Util {
         }
     }
 
-    // https://github.com/mt1006/mc-mocap-mod/blob/1.21.1/common/src/main/java/net/mt1006/mocap/utils/Utils.java#L61
-    public static CompoundTag nbtFromString(String nbtString) throws CommandSyntaxException {
-        return TagParser.parseCompoundAsArgument(new StringReader(nbtString));
-    }
-
-    public static BlockState getBlockStateFromData(String data, RegistryAccess registry) {
-        try {
-            CompoundTag compoundTag = Util.nbtFromString(data);
-            return NbtUtils.readBlockState(registry.lookupOrThrow(Registries.BLOCK), compoundTag);
-        } catch (CommandSyntaxException ignored) {
-            return null;
-        }
-    }
-
-    public static ValueInput valueInputFromCompoundTag(RegistryAccess registryAccess, String nbtString)
-            throws CommandSyntaxException {
-        return TagValueInput.create(ProblemReporter.DISCARDING, registryAccess, nbtFromString(nbtString));
-    }
-
-    public static Tag getItemTag(ItemStack itemStack, RegistryAccess registryAccess) {
-        DynamicOps<Tag> ops = registryAccess.createSerializationContext(NbtOps.INSTANCE);
-        Tag tag;
-        try {
-            tag = ItemStack.CODEC.encodeStart(ops, itemStack).getOrThrow();
-        } catch (Exception exception) {
-            tag = new CompoundTag();
-        }
-        return tag;
-    }
-
+    // https://github.com/mt1006/mc-mocap-mod/blob/1.21.1/common/src/main/java/net/mt1006/mocap/mocap/actions/ChangeItem.java#L291
     public static CompoundTag tagFromIdAndComponents(Item item, String data) {
         CompoundTag tag = new CompoundTag();
 
@@ -138,6 +109,31 @@ public class Util {
 
         tag.put("id", StringTag.valueOf(BuiltInRegistries.ITEM.getKey(item).toString()));
         tag.put("count", IntTag.valueOf(1));
+        return tag;
+    }
+
+    // https://github.com/mt1006/mc-mocap-mod/blob/1.21.1/common/src/main/java/net/mt1006/mocap/utils/Utils.java#L61
+    public static CompoundTag nbtFromString(String nbtString) throws CommandSyntaxException {
+        return TagParser.parseTag(nbtString);
+    }
+
+    public static BlockState getBlockStateFromData(String data, RegistryAccess registry) {
+        try {
+            CompoundTag compoundTag = Util.nbtFromString(data);
+            return NbtUtils.readBlockState(registry.lookupOrThrow(Registries.BLOCK), compoundTag);
+        } catch (CommandSyntaxException ignored) {
+            return null;
+        }
+    }
+
+    public static Tag getItemTag(ItemStack itemStack, RegistryAccess registryAccess) {
+        DynamicOps<Tag> ops = registryAccess.createSerializationContext(NbtOps.INSTANCE);
+        Tag tag;
+        try {
+            tag = ItemStack.CODEC.encodeStart(ops, itemStack).getOrThrow();
+        } catch (Exception exception) {
+            tag = new CompoundTag();
+        }
         return tag;
     }
 
@@ -177,6 +173,14 @@ public class Util {
         return player1.getUUID().equals(player2.getUUID());
     }
 
+    public static Entity createEntityFromKey(EntityType<?> entityType, ServerLevel serverLevel) {
+        CompoundTag compoundTag = new CompoundTag();
+        compoundTag.putString(
+                "id", BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString());
+        Optional<Entity> entity = EntityType.create(compoundTag, serverLevel);
+        return entity.orElse(null);
+    }
+
     public static LivingEntity createEntityFromCharacter(CharacterStory characterStory, Level level) {
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), characterStory.getName());
 
@@ -186,7 +190,7 @@ public class Util {
             entity = new FakePlayer((ServerLevel) level, gameProfile);
             entity.getEntityData().set(PlayerAccessor.getDATA_PLAYER_MODE_CUSTOMISATION(), (byte) 0b01111111);
         } else {
-            entity = (LivingEntity) characterStory.getEntityType().create(level, EntitySpawnReason.MOB_SUMMONED);
+            entity = (LivingEntity) createEntityFromKey(characterStory.getEntityType(), (ServerLevel) level);
             if (entity instanceof Mob mob) mob.setNoAi(true);
         }
 
@@ -208,8 +212,9 @@ public class Util {
         return entity;
     }
 
-    public static void disconnectPlayer(Minecraft minecraft) {
-        PauseScreen.disconnectFromWorld(minecraft, ClientLevel.DEFAULT_QUIT_MESSAGE);
+    public static void disconnectPlayer() {
+        PauseScreen pauseScreen = new PauseScreen(false);
+        ((PauseScreenInvoker) pauseScreen).callOnDisconnect();
     }
 
     public static float getLetterWidth(int letterCode, Minecraft minecraft) {

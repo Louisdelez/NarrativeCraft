@@ -30,7 +30,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.player.Player;
 
 public abstract class AbstractController {
@@ -62,7 +62,11 @@ public abstract class AbstractController {
         Font font = minecraft.font;
         int width = minecraft.getWindow().getGuiScaledWidth();
         guiGraphics.drawString(
-                font, hudMessage, width / 2 - font.width(hudMessage) / 2, 10, ARGB.colorFromFloat(1, 1, 1, 1));
+                font,
+                hudMessage,
+                width / 2 - font.width(hudMessage) / 2,
+                10,
+                FastColor.ARGB32.colorFromFloat(1, 1, 1, 1));
     }
 
     public Environment getEnvironment() {

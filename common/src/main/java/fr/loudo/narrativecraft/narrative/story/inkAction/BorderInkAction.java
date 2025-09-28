@@ -31,7 +31,7 @@ import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 
 public class BorderInkAction extends InkAction {
 
@@ -122,7 +122,7 @@ public class BorderInkAction extends InkAction {
                 return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(6)));
             }
         }
-        color = ARGB.color((int) (opacity * 255), color);
+        color = FastColor.ARGB32.color((int) (opacity * 255), color);
         return InkActionResult.ok();
     }
 

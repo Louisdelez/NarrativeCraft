@@ -12,9 +12,7 @@
     "ServerPlayerFabricMixin"
   ],
   "client": [
-    "GuiGraphicsFabricMixin",
     "GuiMixin",
-    "LevelRendererMixin",
     "MinecraftFabricMixin"
   ],
   "server": [],

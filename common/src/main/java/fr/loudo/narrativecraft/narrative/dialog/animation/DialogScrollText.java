@@ -25,7 +25,6 @@ package fr.loudo.narrativecraft.narrative.dialog.animation;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.gui.ICustomGuiRender;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer3D;
@@ -42,7 +41,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.FormattedCharSequence;
 import org.joml.Vector2f;
 
@@ -117,7 +116,7 @@ public class DialogScrollText {
                     String.valueOf(letter.letter),
                     x,
                     y,
-                    ARGB.color(255, dialogRenderer.getTextColor()),
+                    FastColor.ARGB32.color(255, dialogRenderer.getTextColor()),
                     false,
                     poseStack.last().pose(),
                     minecraft.renderBuffers().bufferSource(),
@@ -144,15 +143,27 @@ public class DialogScrollText {
                 x += offsets.get(i).x;
                 y += offsets.get(i).y;
             }
-            ((ICustomGuiRender) guiGraphics)
-                    .narrativecraft$drawStringFloat(
-                            String.valueOf(letter.letter),
-                            minecraft.font,
-                            x,
-                            y,
-                            ARGB.color(255, dialogRenderer.getTextColor()),
-                            false);
+            drawStringPoseStack(String.valueOf(letter.letter), guiGraphics.pose(), guiGraphics.bufferSource(), x, y);
         }
+    }
+
+    private void drawStringPoseStack(
+            String character, PoseStack poseStack, MultiBufferSource bufferSource, float x, float y) {
+        Minecraft client = Minecraft.getInstance();
+
+        int color = dialogRenderer.getTextColor();
+
+        client.font.drawInBatch(
+                character,
+                x,
+                y,
+                color,
+                false,
+                poseStack.last().pose(),
+                bufferSource,
+                Font.DisplayMode.SEE_THROUGH,
+                0,
+                LightTexture.FULL_BRIGHT);
     }
 
     public boolean isFinished() {
