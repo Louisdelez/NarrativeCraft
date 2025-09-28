@@ -56,7 +56,11 @@ I'm glad you asked! I made a small showcase to demonstrate what this mod is capa
 
 ## I want to start making stories
 
-You can start learning from the NarrativeCraft [documentation](https://loudo56.github.io/NarrativeCraft-docs/getting-started/introduction-to-narrativecraft.html).
+
+<a href="https://youtu.be/QUZUdqEoVRU">
+   <img width="1920" height="1080" src="https://github.com/user-attachments/assets/33024ef3-eeef-4bee-aa94-a108a45c0866" />
+</a>
+
 
 ## Contribution
 
