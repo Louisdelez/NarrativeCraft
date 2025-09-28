@@ -70,6 +70,7 @@ public class DialogScrollText {
         currentLine = 0;
         currentCharIndex = 0;
         tickAccumulator = 0.0f;
+        currentY = 0;
         if (dialogRenderer instanceof DialogRenderer2D) {
             if (lines.size() > 1) {
                 currentY -= ((minecraft.font.lineHeight + dialogRenderer.getGap()) * (lines.size() - 1)
