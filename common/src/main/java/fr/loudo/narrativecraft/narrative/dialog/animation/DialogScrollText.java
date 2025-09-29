@@ -116,7 +116,7 @@ public class DialogScrollText {
                     String.valueOf(letter.letter),
                     x,
                     y,
-                    FastColor.ARGB32.color(255, dialogRenderer.getTextColor()),
+                    FastColor.ABGR32.color(255, dialogRenderer.getTextColor()),
                     false,
                     poseStack.last().pose(),
                     minecraft.renderBuffers().bufferSource(),
@@ -168,7 +168,7 @@ public class DialogScrollText {
 
     public boolean isFinished() {
         return currentLine == lines.size() - 1
-                && currentCharIndex == lines.getLast().length();
+                && currentCharIndex == lines.get(lines.size() - 1).length();
     }
 
     public String getLongerTextLine() {
@@ -246,7 +246,7 @@ public class DialogScrollText {
 
     private void playLetterSound() {
         float pitch = 0.8F + new Random().nextFloat() * 0.4F;
-        ResourceLocation soundRes = ResourceLocation.withDefaultNamespace("sfx.dialog_sound");
+        ResourceLocation soundRes =new ResourceLocation("minecraft", "sfx.dialog_sound");
         SoundEvent soundEvent = SoundEvent.createVariableRangeEvent(soundRes);
         minecraft.player.playSound(soundEvent, 1.0F, pitch);
     }

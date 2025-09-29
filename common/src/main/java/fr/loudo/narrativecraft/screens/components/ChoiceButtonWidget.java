@@ -72,7 +72,6 @@ public class ChoiceButtonWidget extends AbstractButton {
         int width = font.width(parsedDialog.cleanedText());
         int height = font.lineHeight;
         this.setWidth(width + paddingX * 2);
-        this.setHeight(height + paddingY * 2);
         textEffectAnimation = new TextEffectAnimation(choiceString);
     }
 
@@ -141,9 +140,9 @@ public class ChoiceButtonWidget extends AbstractButton {
     }
 
     public void setOpacity(int opacity) {
-        backgroundColor = FastColor.ARGB32.color(opacity, backgroundColor);
-        textColor = FastColor.ARGB32.color(opacity, textColor);
-        hoverColor = FastColor.ARGB32.color(opacity, hoverColor);
+        backgroundColor = FastColor.ABGR32.color(opacity, backgroundColor);
+        textColor = FastColor.ABGR32.color(opacity, textColor);
+        hoverColor = FastColor.ABGR32.color(opacity, hoverColor);
     }
 
     public boolean isCanPress() {

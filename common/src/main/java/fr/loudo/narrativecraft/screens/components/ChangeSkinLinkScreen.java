@@ -25,18 +25,25 @@ package fr.loudo.narrativecraft.screens.components;
 
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.util.Translation;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
+import net.minecraft.client.gui.layouts.LayoutElement;
+import net.minecraft.client.gui.navigation.CommonInputs;
+import net.minecraft.client.gui.screens.OptionsSubScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+
 import java.io.File;
 import java.util.List;
 import java.util.function.Consumer;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.ObjectSelectionList;
-import net.minecraft.client.gui.navigation.CommonInputs;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.options.OptionsSubScreen;
-import net.minecraft.network.chat.Component;
 
 public class ChangeSkinLinkScreen extends OptionsSubScreen {
+
+    protected final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
+
     private SkinList skinList;
     private final CharacterRuntime characterRuntime;
     private final Consumer<String> stringCallback;
@@ -61,7 +68,7 @@ public class ChangeSkinLinkScreen extends OptionsSubScreen {
 
     protected void repositionElements() {
         super.repositionElements();
-        this.skinList.updateSize(this.width, this.layout);
+        this.skinList.updateSize(this.width, this.height, this.layout.getX(), this.layout.getY());
     }
 
     @Override
@@ -79,9 +86,9 @@ public class ChangeSkinLinkScreen extends OptionsSubScreen {
         stringCallback.accept(skin);
     }
 
-    class SkinList extends ObjectSelectionList<SkinList.Entry> {
+    class SkinList extends ObjectSelectionList<SkinList.Entry> implements LayoutElement {
         public SkinList(Minecraft minecraft, List<File> skins) {
-            super(minecraft, ChangeSkinLinkScreen.this.width, ChangeSkinLinkScreen.this.height - 33 - 53, 33, 18);
+            super(minecraft, ChangeSkinLinkScreen.this.width, ChangeSkinLinkScreen.this.height - 33 - 53, 33, 18, 18);
             String selectedSkin;
             if (characterRuntime.getCharacterSkinController().getCurrentSkin() != null) {
                 selectedSkin = characterRuntime
@@ -105,6 +112,41 @@ public class ChangeSkinLinkScreen extends OptionsSubScreen {
 
         public int getRowWidth() {
             return super.getRowWidth() + 50;
+        }
+
+        @Override
+        public void setX(int x0) {
+            this.x0 = x0;
+        }
+
+        @Override
+        public void setY(int y0) {
+            this.y0 = y0;
+        }
+
+        @Override
+        public int getX() {
+            return x0;
+        }
+
+        @Override
+        public int getY() {
+            return y0;
+        }
+
+        @Override
+        public int getWidth() {
+            return width;
+        }
+
+        @Override
+        public int getHeight() {
+            return height;
+        }
+
+        @Override
+        public void visitWidgets(Consumer<AbstractWidget> consumer) {
+
         }
 
         public class Entry extends ObjectSelectionList.Entry<Entry> {

@@ -48,7 +48,7 @@ public class StoryDebugHud {
         List<InkAction> inkActions = new ArrayList<>(playerSession.getInkActions());
         int x = 5;
         int y = 5;
-        int color = FastColor.ARGB32.color(255, 255, 255, 255);
+        int color = FastColor.ABGR32.color(255, 255, 255, 255);
 
         guiGraphics.drawString(minecraft.font, "Ink tag running:", x, y, color);
         y += minecraft.font.lineHeight + 5;

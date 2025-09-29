@@ -24,26 +24,21 @@
 package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.event.RenderGuiEvent;
-import net.neoforged.neoforge.common.NeoForge;
+import net.minecraftforge.client.event.RenderGuiEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
-@Mod(NarrativeCraftMod.MOD_ID)
+@Mod.EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class HudRenderEvent {
-
-    public HudRenderEvent(IEventBus eventBus) {
-        NeoForge.EVENT_BUS.addListener(HudRenderEvent::onHudRender);
-    }
-
-    private static void onHudRender(RenderGuiEvent.Post event) {
+    @SubscribeEvent
+    public static void onHudRender(RenderGuiEvent.Post event) {
         OnHudRender.controllerHudInfo(event.getGuiGraphics());
         OnHudRender.inkActionRender(
-                event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaPartialTick(true));
-        OnHudRender.dialogRender(event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaPartialTick(true));
+                event.getGuiGraphics(), event.getPartialTick());
+        OnHudRender.dialogRender(event.getGuiGraphics(), event.getPartialTick());
         OnHudRender.saveIconRender(
-                event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaPartialTick(true));
+                event.getGuiGraphics(), event.getPartialTick());
         OnHudRender.storyDebugRender(
-                event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaPartialTick(true));
+                event.getGuiGraphics(), event.getPartialTick());
     }
 }

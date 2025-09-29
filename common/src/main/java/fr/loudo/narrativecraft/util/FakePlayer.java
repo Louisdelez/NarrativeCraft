@@ -32,10 +32,8 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.stats.Stat;
 import net.minecraft.world.damagesource.DamageSource;
@@ -44,11 +42,10 @@ import org.jetbrains.annotations.NotNull;
 // FakePlayer class from
 // https://github.com/mt1006/mc-mocap-mod/blob/1.21.1/common/src/main/java/net/mt1006/mocap/utils/FakePlayer.java
 public class FakePlayer extends ServerPlayer {
-    private static final ClientInformation DEFAULT_CLIENT_INFO = ClientInformation.createDefault();
 
     public FakePlayer(ServerLevel level, GameProfile profile) {
-        super(level.getServer(), level, profile, DEFAULT_CLIENT_INFO);
-        this.connection = new FakePlayerNetHandler(level.getServer(), this, profile);
+        super(level.getServer(), level, profile);
+        this.connection = new FakePlayerNetHandler(level.getServer(), this);
         setInvulnerable(true);
     }
 
@@ -73,8 +70,8 @@ public class FakePlayer extends ServerPlayer {
         private static final net.minecraft.network.Connection DUMMY_CONNECTION =
                 new DummyConnection(PacketFlow.CLIENTBOUND);
 
-        public FakePlayerNetHandler(MinecraftServer server, ServerPlayer player, GameProfile profile) {
-            super(server, DUMMY_CONNECTION, player, new CommonListenerCookie(profile, 0, DEFAULT_CLIENT_INFO, false));
+        public FakePlayerNetHandler(MinecraftServer server, ServerPlayer player) {
+            super(server, DUMMY_CONNECTION, player);
         }
 
         @Override
@@ -133,12 +130,6 @@ public class FakePlayer extends ServerPlayer {
 
         @Override
         public void handleEditBook(ServerboundEditBookPacket packet) {}
-
-        @Override
-        public void handleEntityTagQuery(ServerboundEntityTagQueryPacket packet) {}
-
-        @Override
-        public void handleBlockEntityTagQuery(ServerboundBlockEntityTagQueryPacket packet) {}
 
         @Override
         public void handleMovePlayer(ServerboundMovePlayerPacket packet) {}

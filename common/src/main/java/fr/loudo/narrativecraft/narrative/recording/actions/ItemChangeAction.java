@@ -50,22 +50,20 @@ public class ItemChangeAction extends Action {
             int waitTick,
             String equipmentSlot,
             ItemStack itemStack,
-            ItemStack oldItemStack,
-            RegistryAccess registryAccess) {
+            ItemStack oldItemStack) {
         super(waitTick, ActionType.ITEM_CHANGE);
         this.itemId = BuiltInRegistries.ITEM.getId(itemStack.getItem());
         this.oldItemId = BuiltInRegistries.ITEM.getId(oldItemStack.getItem());
         this.equipmentSlot = equipmentSlot;
-        this.data = getItemComponents(itemStack, registryAccess);
-        this.oldData = getItemComponents(oldItemStack, registryAccess);
+        this.data = getItemComponents(itemStack);
+        this.oldData = getItemComponents(oldItemStack);
     }
 
-    private String getItemComponents(ItemStack itemStack, RegistryAccess registryAccess) {
+    private String getItemComponents(ItemStack itemStack) {
         if (itemStack.isEmpty()) return null;
-        Tag tag = Util.getItemTag(itemStack, registryAccess);
-        Tag componentsTag = ((CompoundTag) tag).get("components");
+        Tag componentsTag = itemStack.getTag();
         if (componentsTag != null) {
-            return componentsTag.toString();
+            return itemStack.getTag().getAsString();
         }
         return null;
     }
@@ -89,9 +87,7 @@ public class ItemChangeAction extends Action {
         ItemStack itemStack = new ItemStack(item);
         if (data != null) {
             CompoundTag tag = Util.tagFromIdAndComponents(item, data);
-            if (tag != null) {
-                itemStack = Util.generateItemStackFromNBT(tag, entity.registryAccess());
-            }
+            itemStack.setTag(tag);
         }
         entity.getServer()
                 .getPlayerList()

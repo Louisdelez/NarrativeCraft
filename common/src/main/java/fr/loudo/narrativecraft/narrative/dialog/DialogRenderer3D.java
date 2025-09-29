@@ -117,7 +117,7 @@ public class DialogRenderer3D extends DialogRenderer {
                     opacity = Mth.lerp(t, 1.0, 0.0);
                     position = getDialogInterpolatedDisappearPosition(t);
                 }
-                backgroundColor = FastColor.ARGB32.color((int) (opacity * 255.0), backgroundColor);
+                backgroundColor = FastColor.ABGR32.color((int) (opacity * 255.0), backgroundColor);
             } else {
                 originalScale = (float) Mth.lerp(t, oldScale, scale);
             }
@@ -242,147 +242,147 @@ public class DialogRenderer3D extends DialogRenderer {
         switch (side) {
             case UP -> {
                 vertexConsumer
-                        .addVertex(matrix4f, -originalWidth, 0, 0)
-                        .setColor(backgroundColor)
-                        .setLight(LightTexture.FULL_BRIGHT);
+                        .vertex(matrix4f, -originalWidth, 0, 0)
+                        .color(backgroundColor)
+                        ;
                 vertexConsumer
-                        .addVertex(matrix4f, originalWidth, 0, 0)
-                        .setColor(backgroundColor)
-                        .setLight(LightTexture.FULL_BRIGHT);
+                        .vertex(matrix4f, originalWidth, 0, 0)
+                        .color(backgroundColor)
+                        ;
                 vertexConsumer
-                        .addVertex(matrix4f, originalWidth, -originalHeight, 0)
-                        .setColor(backgroundColor)
-                        .setLight(LightTexture.FULL_BRIGHT);
+                        .vertex(matrix4f, originalWidth, -originalHeight, 0)
+                        .color(backgroundColor)
+                        ;
                 vertexConsumer
-                        .addVertex(matrix4f, -originalWidth, -originalHeight, 0)
-                        .setColor(backgroundColor)
-                        .setLight(LightTexture.FULL_BRIGHT);
+                        .vertex(matrix4f, -originalWidth, -originalHeight, 0)
+                        .color(backgroundColor)
+                        ;
             }
             case RIGHT -> {
                 if (diffY < 0) {
                     vertexConsumer
-                            .addVertex(matrix4f, 0, 0, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, 0, 0, 0)
+                            .color(backgroundColor)
+                            ;
                     vertexConsumer
-                            .addVertex(matrix4f, 0, originalHeight, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, 0, originalHeight, 0)
+                            .color(backgroundColor)
+                            ;
                     vertexConsumer
-                            .addVertex(matrix4f, originalWidth * 2, originalHeight, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, originalWidth * 2, originalHeight, 0)
+                            .color(backgroundColor)
+                            ;
                     vertexConsumer
-                            .addVertex(matrix4f, originalWidth * 2, 0, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, originalWidth * 2, 0, 0)
+                            .color(backgroundColor)
+                            ;
                 } else if (diffY > 0) {
                     vertexConsumer
-                            .addVertex(matrix4f, 0, -originalHeight, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, 0, -originalHeight, 0)
+                            .color(backgroundColor)
+                            ;
                     vertexConsumer
-                            .addVertex(matrix4f, 0, 0, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, 0, 0, 0)
+                            .color(backgroundColor)
+                            ;
                     vertexConsumer
-                            .addVertex(matrix4f, originalWidth * 2, 0, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, originalWidth * 2, 0, 0)
+                            .color(backgroundColor)
+                            ;
                     vertexConsumer
-                            .addVertex(matrix4f, originalWidth * 2, -originalHeight, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, originalWidth * 2, -originalHeight, 0)
+                            .color(backgroundColor)
+                            ;
                 } else {
                     vertexConsumer
-                            .addVertex(matrix4f, 0, -originalHeight / 2, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, 0, -originalHeight / 2, 0)
+                            .color(backgroundColor)
+                            ;
                     vertexConsumer
-                            .addVertex(matrix4f, 0, originalHeight / 2, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, 0, originalHeight / 2, 0)
+                            .color(backgroundColor)
+                            ;
                     vertexConsumer
-                            .addVertex(matrix4f, originalWidth * 2, originalHeight / 2, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, originalWidth * 2, originalHeight / 2, 0)
+                            .color(backgroundColor)
+                            ;
                     vertexConsumer
-                            .addVertex(matrix4f, originalWidth * 2, -originalHeight / 2, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, originalWidth * 2, -originalHeight / 2, 0)
+                            .color(backgroundColor)
+                            ;
                 }
             }
             case LEFT -> {
                 if (diffY < 0) {
                     vertexConsumer
-                            .addVertex(matrix4f, -originalWidth * 2, 0, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, -originalWidth * 2, 0, 0)
+                            .color(backgroundColor)
+                            ;
                     vertexConsumer
-                            .addVertex(matrix4f, -originalWidth * 2, originalHeight, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, -originalWidth * 2, originalHeight, 0)
+                            .color(backgroundColor)
+                            ;
                     vertexConsumer
-                            .addVertex(matrix4f, 0, originalHeight, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, 0, originalHeight, 0)
+                            .color(backgroundColor)
+                            ;
                     vertexConsumer
-                            .addVertex(matrix4f, 0, 0, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, 0, 0, 0)
+                            .color(backgroundColor)
+                            ;
                 } else if (diffY > 0) {
                     vertexConsumer
-                            .addVertex(matrix4f, 0, 0, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, 0, 0, 0)
+                            .color(backgroundColor)
+                            ;
                     vertexConsumer
-                            .addVertex(matrix4f, 0, -originalHeight, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, 0, -originalHeight, 0)
+                            .color(backgroundColor)
+                            ;
                     vertexConsumer
-                            .addVertex(matrix4f, -originalWidth * 2, -originalHeight, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, -originalWidth * 2, -originalHeight, 0)
+                            .color(backgroundColor)
+                            ;
                     vertexConsumer
-                            .addVertex(matrix4f, -originalWidth * 2, 0, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, -originalWidth * 2, 0, 0)
+                            .color(backgroundColor)
+                            ;
                 } else {
                     vertexConsumer
-                            .addVertex(matrix4f, 0, originalHeight / 2, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, 0, originalHeight / 2, 0)
+                            .color(backgroundColor)
+                            ;
                     vertexConsumer
-                            .addVertex(matrix4f, 0, -originalHeight / 2, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, 0, -originalHeight / 2, 0)
+                            .color(backgroundColor)
+                            ;
                     vertexConsumer
-                            .addVertex(matrix4f, -originalWidth * 2, -originalHeight / 2, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, -originalWidth * 2, -originalHeight / 2, 0)
+                            .color(backgroundColor)
+                            ;
                     vertexConsumer
-                            .addVertex(matrix4f, -originalWidth * 2, originalHeight / 2, 0)
-                            .setColor(backgroundColor)
-                            .setLight(LightTexture.FULL_BRIGHT);
+                            .vertex(matrix4f, -originalWidth * 2, originalHeight / 2, 0)
+                            .color(backgroundColor)
+                            ;
                 }
             }
             case DOWN -> {
                 vertexConsumer
-                        .addVertex(matrix4f, -originalWidth, originalHeight, 0)
-                        .setColor(backgroundColor)
-                        .setLight(LightTexture.FULL_BRIGHT);
+                        .vertex(matrix4f, -originalWidth, originalHeight, 0)
+                        .color(backgroundColor)
+                        ;
                 vertexConsumer
-                        .addVertex(matrix4f, originalWidth, originalHeight, 0)
-                        .setColor(backgroundColor)
-                        .setLight(LightTexture.FULL_BRIGHT);
+                        .vertex(matrix4f, originalWidth, originalHeight, 0)
+                        .color(backgroundColor)
+                        ;
                 vertexConsumer
-                        .addVertex(matrix4f, originalWidth, 0, 0)
-                        .setColor(backgroundColor)
-                        .setLight(LightTexture.FULL_BRIGHT);
+                        .vertex(matrix4f, originalWidth, 0, 0)
+                        .color(backgroundColor)
+                        ;
                 vertexConsumer
-                        .addVertex(matrix4f, -originalWidth, 0, 0)
-                        .setColor(backgroundColor)
-                        .setLight(LightTexture.FULL_BRIGHT);
+                        .vertex(matrix4f, -originalWidth, 0, 0)
+                        .color(backgroundColor)
+                        ;
             }
         }
     }

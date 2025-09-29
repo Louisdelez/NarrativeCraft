@@ -30,6 +30,7 @@ import fr.loudo.narrativecraft.keys.ModKeys;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.screens.components.ChoiceButtonWidget;
+import fr.loudo.narrativecraft.util.MathHelper;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.ArrayList;
 import java.util.List;
@@ -99,7 +100,7 @@ public class StoryChoicesScreen extends Screen {
     @Override
     protected void init() {
         if (!initiated) {
-            ResourceLocation soundRes = ResourceLocation.withDefaultNamespace("sfx.choice_appear");
+            ResourceLocation soundRes =new ResourceLocation("minecraft", "sfx.choice_appear");
             SoundEvent sound = SoundEvent.createVariableRangeEvent(soundRes);
             this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(sound, 1.0f, 1.0f));
         }
@@ -200,7 +201,7 @@ public class StoryChoicesScreen extends Screen {
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        t = Math.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
+        t = MathHelper.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
         for (AnimatedChoice ac : animatedChoices) {
             int newOpacity = (int) Mth.lerp(t, 5, 255);
             guiGraphics.pose().pushPose();
@@ -231,10 +232,7 @@ public class StoryChoicesScreen extends Screen {
     }
 
     @Override
-    protected void renderBlurredBackground(float partialTick) {}
-
-    @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {}
+    public void renderBackground(GuiGraphics guiGraphics) { }
 
     private record AnimatedChoice(ChoiceButtonWidget widget, int offsetX, int offsetY) {}
 }

@@ -85,10 +85,7 @@ public class KeyframeOptionScreen<T extends Keyframe, E extends AbstractKeyframe
     }
 
     @Override
-    protected void renderBlurredBackground(float partialTick) {}
-
-    @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {}
+    public void renderBackground(GuiGraphics guiGraphics) { }
 
     protected EditBox addLabeledEditBox(Component text, String defaultValue) {
         StringWidget labelWidget = ScreenUtils.text(text, this.font, INITIAL_POS_X, currentY);

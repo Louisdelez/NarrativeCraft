@@ -64,9 +64,9 @@ import net.minecraft.util.FastColor;
 public class MainScreen extends Screen {
 
     public static final ResourceLocation BACKGROUND_IMAGE =
-            ResourceLocation.withDefaultNamespace("textures/narrativecraft_mainscreen/background.png");
+           new ResourceLocation("minecraft", "textures/narrativecraft_mainscreen/background.png");
     public static final ResourceLocation MUSIC =
-            ResourceLocation.withDefaultNamespace("narrativecraft_mainscreen.music");
+           new ResourceLocation("minecraft", "narrativecraft_mainscreen.music");
 
     public static SimpleSoundInstance musicInstance = new SimpleSoundInstance(
             MainScreen.MUSIC,
@@ -384,14 +384,14 @@ public class MainScreen extends Screen {
                     guiGraphics.guiWidth() / 2
                             - minecraft.font.width(Translation.message("screen.main_screen.dev_tip")) / 2,
                     20,
-                    FastColor.ARGB32.colorFromFloat(1, 1, 1, 1));
+                    FastColor.ABGR32.color(1, 1, 1, 1));
         }
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void renderBackground(GuiGraphics guiGraphics) {
         if (pause) {
-            super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+            super.renderBackground(guiGraphics);
             return;
         }
         if (playerSession.getController() != null) return;
@@ -410,9 +410,6 @@ public class MainScreen extends Screen {
             guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0xFF000000);
         }
     }
-
-    @Override
-    protected void renderBlurredBackground(float partialTick) {}
 
     @Override
     public boolean isPauseScreen() {

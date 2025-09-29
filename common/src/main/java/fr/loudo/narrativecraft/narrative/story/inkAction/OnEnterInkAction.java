@@ -67,7 +67,7 @@ public class OnEnterInkAction extends InkAction {
         if (splitKnot.length > 2) {
             sceneName = String.join(" ", Arrays.copyOfRange(splitKnot, 2, splitKnot.length));
         } else {
-            sceneName = chapter.getSortedSceneList().getFirst().getName();
+            sceneName = chapter.getSortedSceneList().get(0).getName();
         }
         Scene scene = chapter.getSceneByName(sceneName);
         if (scene == null)

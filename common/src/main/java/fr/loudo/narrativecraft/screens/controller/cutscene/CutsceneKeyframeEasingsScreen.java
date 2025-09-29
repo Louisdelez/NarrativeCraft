@@ -27,16 +27,22 @@ import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframe;
 import fr.loudo.narrativecraft.util.Easing;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.Arrays;
+import java.util.function.Consumer;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
+import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.navigation.CommonInputs;
+import net.minecraft.client.gui.screens.OptionsSubScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.options.OptionsSubScreen;
 import net.minecraft.network.chat.Component;
 
 public class CutsceneKeyframeEasingsScreen extends OptionsSubScreen {
 
+    protected final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     private CutsceneEasingsList cutsceneEasingsList;
     private final CutsceneKeyframe keyframe;
 
@@ -49,11 +55,9 @@ public class CutsceneKeyframeEasingsScreen extends OptionsSubScreen {
         this.cutsceneEasingsList = this.layout.addToContents(new CutsceneEasingsList(this.minecraft));
     }
 
-    protected void addOptions() {}
-
     protected void repositionElements() {
         super.repositionElements();
-        this.cutsceneEasingsList.updateSize(this.width, this.layout);
+        this.cutsceneEasingsList.updateSize(this.width, this.height, this.layout.getX(), this.layout.getY());
     }
 
     @Override
@@ -65,13 +69,14 @@ public class CutsceneKeyframeEasingsScreen extends OptionsSubScreen {
         super.onClose();
     }
 
-    class CutsceneEasingsList extends ObjectSelectionList<CutsceneEasingsList.Entry> {
+    class CutsceneEasingsList extends ObjectSelectionList<CutsceneEasingsList.Entry> implements LayoutElement {
         public CutsceneEasingsList(Minecraft minecraft) {
             super(
                     minecraft,
                     CutsceneKeyframeEasingsScreen.this.width,
                     CutsceneKeyframeEasingsScreen.this.height - 33 - 53,
                     33,
+                    18,
                     18);
             String selectedEasing = keyframe.getEasing().name();
             Arrays.stream(Easing.values()).toList().forEach(easing -> {
@@ -88,6 +93,41 @@ public class CutsceneKeyframeEasingsScreen extends OptionsSubScreen {
 
         public int getRowWidth() {
             return super.getRowWidth() + 50;
+        }
+
+        @Override
+        public void setX(int x0) {
+            this.x0 = x0;
+        }
+
+        @Override
+        public void setY(int y0) {
+            this.y0 = y0;
+        }
+
+        @Override
+        public int getX() {
+            return x0;
+        }
+
+        @Override
+        public int getY() {
+            return y0;
+        }
+
+        @Override
+        public int getWidth() {
+            return width;
+        }
+
+        @Override
+        public int getHeight() {
+            return height;
+        }
+
+        @Override
+        public void visitWidgets(Consumer<AbstractWidget> consumer) {
+
         }
 
         public class Entry extends ObjectSelectionList.Entry<CutsceneEasingsList.Entry> {

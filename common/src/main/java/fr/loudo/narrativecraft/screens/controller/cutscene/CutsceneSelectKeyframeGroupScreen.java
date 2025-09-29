@@ -55,7 +55,7 @@ public class CutsceneSelectKeyframeGroupScreen extends ButtonListScreen {
                         this.cutsceneController.setSelectedGroup(keyframeGroup);
                         Vec3 keyframeLocation = keyframeGroup
                                 .getKeyframes()
-                                .getFirst()
+                                .get(0)
                                 .getKeyframeLocation()
                                 .getPosition();
                         minecraft.player.setPos(keyframeLocation);

@@ -49,7 +49,7 @@ public class OnPlayerServerConnection {
         if (player.hasPermissions(2) && NarrativeEntryInit.hasError) {
             player.sendSystemMessage(Translation.message("crash.narrative-data").withStyle(ChatFormatting.RED));
         }
-        CutsceneEditItems.init(player.registryAccess());
+        CutsceneEditItems.init();
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
         if (NarrativeCraftMod.getInstance().getNarrativeWorldOption().showMainScreen) {

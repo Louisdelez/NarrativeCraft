@@ -122,7 +122,7 @@ public class BorderInkAction extends InkAction {
                 return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(6)));
             }
         }
-        color = FastColor.ARGB32.color((int) (opacity * 255), color);
+        color = FastColor.ABGR32.color((int) (opacity * 255), color);
         return InkActionResult.ok();
     }
 

@@ -45,4 +45,24 @@ public class MathHelper {
                         + (2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3) * t2
                         + (-p0 + 3.0f * p1 - 3.0f * p2 + p3) * t3));
     }
+
+    public static int clamp(int value, int min, int max) {
+        if (value < min) return min;
+        return Math.min(value, max);
+    }
+
+    public static long clamp(long value, long min, long max) {
+        if (value < min) return min;
+        return Math.min(value, max);
+    }
+
+    public static float clamp(float value, float min, float max) {
+        if (value < min) return min;
+        return Math.min(value, max);
+    }
+
+    public static double clamp(double value, double min, double max) {
+        if (value < min) return min;
+        return Math.min(value, max);
+    }
 }

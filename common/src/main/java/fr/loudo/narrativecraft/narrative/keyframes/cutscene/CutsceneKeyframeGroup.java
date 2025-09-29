@@ -37,7 +37,7 @@ public class CutsceneKeyframeGroup extends KeyframeGroup<CutsceneKeyframe> {
 
     public void showGroupText(ServerPlayer player) {
         if (keyframes.isEmpty()) return;
-        CutsceneKeyframe keyframe = keyframes.getFirst();
+        CutsceneKeyframe keyframe = keyframes.get(0);
         keyframe.getCamera().setCustomNameVisible(true);
         keyframe.getCamera().setCustomName(Translation.message("controller.cutscene.keyframe_group.start_text", id));
         keyframe.updateEntityData(player);

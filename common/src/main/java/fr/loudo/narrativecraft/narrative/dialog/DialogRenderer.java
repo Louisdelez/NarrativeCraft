@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.narrative.dialog.animation.DialogArrowSkip;
 import fr.loudo.narrativecraft.narrative.dialog.animation.DialogScrollText;
 import fr.loudo.narrativecraft.narrative.story.text.ParsedDialog;
 import fr.loudo.narrativecraft.util.Easing;
+import fr.loudo.narrativecraft.util.MathHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.Mth;
@@ -183,7 +184,7 @@ public class DialogRenderer {
     }
 
     protected double t(float partialTick) {
-        return Math.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
+        return MathHelper.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
     }
 
     public double getDialogTransitionTime() {

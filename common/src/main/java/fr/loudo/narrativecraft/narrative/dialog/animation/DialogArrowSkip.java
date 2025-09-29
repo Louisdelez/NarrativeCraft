@@ -28,6 +28,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.util.Easing;
+import fr.loudo.narrativecraft.util.MathHelper;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -52,7 +53,7 @@ public class DialogArrowSkip {
         this.height = height;
         this.xTranslatePoint = xTranslatePoint;
         this.offset = offset;
-        this.color = FastColor.ARGB32.color((int) (0.8 * 255), color);
+        this.color = FastColor.ABGR32.color((int) (0.8 * 255), color);
         totalTick = (int) (translateTime * 20.0);
     }
 
@@ -78,11 +79,11 @@ public class DialogArrowSkip {
         double opacity;
         int originalColor = color;
         if (currentTick < totalTick) {
-            double t = Math.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
+            double t = MathHelper.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
             t = Easing.SMOOTH.interpolate(t);
             translateX = Mth.lerp(t, translateX + xTranslatePoint, translateX);
             opacity = Mth.lerp(t, 0.0, 0.8);
-            originalColor = FastColor.ARGB32.color((int) (opacity * 255.0), color);
+            originalColor = FastColor.ABGR32.color((int) (opacity * 255.0), color);
         }
         poseStack.translate(translateX, 0, 0);
         draw(poseStack, bufferSource, originalColor);
@@ -96,18 +97,18 @@ public class DialogArrowSkip {
         float xEnd = dialogRenderer.getTotalWidth() + width - offset;
 
         vertexConsumer
-                .addVertex(matrix4f, xStart, -height, 0.01f)
-                .setColor(color)
-                .setLight(LightTexture.FULL_BRIGHT);
+                .vertex(matrix4f, xStart, -height, 0.01f)
+                .color(color)
+                ;
         vertexConsumer
-                .addVertex(matrix4f, xStart, height, 0.01f)
-                .setColor(color)
-                .setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, xEnd, 0, 0.01f).setColor(color).setLight(LightTexture.FULL_BRIGHT);
+                .vertex(matrix4f, xStart, height, 0.01f)
+                .color(color)
+                ;
+        vertexConsumer.vertex(matrix4f, xEnd, 0, 0.01f).color(color);
         vertexConsumer
-                .addVertex(matrix4f, xStart, -height, 0.01f)
-                .setColor(color)
-                .setLight(LightTexture.FULL_BRIGHT);
+                .vertex(matrix4f, xStart, -height, 0.01f)
+                .color(color)
+                ;
     }
 
     public void render(GuiGraphics guiGraphics, float partialTick) {
@@ -118,7 +119,7 @@ public class DialogArrowSkip {
         poseStack.pushPose();
 
         if (currentTick < totalTick) {
-            double t = Math.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
+            double t = MathHelper.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
             t = Easing.SMOOTH.interpolate(t);
             translateX = Mth.lerp(t, xTranslatePoint, translateX);
             opacity = Mth.lerp(t, 0.0, 1.0);
@@ -129,13 +130,13 @@ public class DialogArrowSkip {
         VertexConsumer consumer = guiGraphics.bufferSource().getBuffer(NarrativeCraftMod.dialogBackgroundRenderType);
         Matrix4f matrix4f = poseStack.last().pose();
 
-        consumer.addVertex(matrix4f, -width, -height, 0.01f)
-                .setColor(FastColor.ARGB32.color((int) (opacity * 255), color));
-        consumer.addVertex(matrix4f, -width, height, 0.01f)
-                .setColor(FastColor.ARGB32.color((int) (opacity * 255), color));
-        consumer.addVertex(matrix4f, width, 0, 0.01f).setColor(FastColor.ARGB32.color((int) (opacity * 255), color));
-        consumer.addVertex(matrix4f, -width, -height, 0.01f)
-                .setColor(FastColor.ARGB32.color((int) (opacity * 255), color));
+        consumer.vertex(matrix4f, -width, -height, 0.01f)
+                .color(FastColor.ABGR32.color((int) (opacity * 255), color));
+        consumer.vertex(matrix4f, -width, height, 0.01f)
+                .color(FastColor.ABGR32.color((int) (opacity * 255), color));
+        consumer.vertex(matrix4f, width, 0, 0.01f).color(FastColor.ABGR32.color((int) (opacity * 255), color));
+        consumer.vertex(matrix4f, -width, -height, 0.01f)
+                .color(FastColor.ABGR32.color((int) (opacity * 255), color));
 
         poseStack.popPose();
     }

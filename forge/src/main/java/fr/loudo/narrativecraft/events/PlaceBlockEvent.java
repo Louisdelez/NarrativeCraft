@@ -25,21 +25,16 @@ package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
-@Mod(NarrativeCraftMod.MOD_ID)
+@Mod.EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class PlaceBlockEvent {
-
-    public PlaceBlockEvent(IEventBus eventBus) {
-        NeoForge.EVENT_BUS.addListener(PlaceBlockEvent::onPlaceBlock);
-    }
-
-    private static void onPlaceBlock(BlockEvent.EntityPlaceEvent event) {
+    @SubscribeEvent
+    public static void onPlaceBlock(BlockEvent.EntityPlaceEvent event) {
         if (event.getEntity() instanceof ServerPlayer serverPlayer
-                && event.getBlockSnapshot().getState().isAir()) {
+                && event.getBlockSnapshot().getCurrentBlock().isAir()) {
             OnPlaceBlock.placeBlock(event.getPlacedBlock(), event.getPos(), serverPlayer);
         }
     }

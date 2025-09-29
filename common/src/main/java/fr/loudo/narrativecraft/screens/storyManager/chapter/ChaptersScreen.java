@@ -61,7 +61,7 @@ public class ChaptersScreen extends StoryElementScreen {
     }
 
     protected void openFolder() {
-        Util.getPlatform().openPath(NarrativeCraftFile.chaptersDirectory.toPath());
+        Util.getPlatform().openFile(NarrativeCraftFile.chaptersDirectory);
     }
 
     @Override

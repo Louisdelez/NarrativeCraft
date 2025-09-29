@@ -25,15 +25,14 @@ package fr.loudo.narrativecraft;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.client.renderer.RenderStateShard;
+import fr.loudo.narrativecraft.mixin.accessor.RenderStateShardForgeAccessor;
 import net.minecraft.client.renderer.RenderType;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod;
 
 @Mod(NarrativeCraftMod.MOD_ID)
-public class NarrativeCraftNeoForge {
+public class NarrativeCraftForge {
 
-    public NarrativeCraftNeoForge(IEventBus eventBus) {
+    public NarrativeCraftForge() {
         NarrativeCraftMod.commonInit();
         NarrativeCraftMod.dialogBackgroundRenderType = RenderType.create(
                 "narrativecraft_dialog_background",
@@ -43,12 +42,12 @@ public class NarrativeCraftNeoForge {
                 false,
                 true,
                 RenderType.CompositeState.builder()
-                        .setShaderState(RenderStateShard.POSITION_COLOR_SHADER)
-                        .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
-                        .setTextureState(RenderStateShard.NO_TEXTURE)
-                        .setDepthTestState(RenderStateShard.NO_DEPTH_TEST)
-                        .setCullState(RenderStateShard.NO_CULL)
-                        .setWriteMaskState(RenderStateShard.COLOR_WRITE)
+                        .setShaderState(RenderStateShardForgeAccessor.getPOSITION_COLOR_SHADER())
+                        .setTransparencyState(RenderStateShardForgeAccessor.getTRANSLUCENT_TRANSPARENCY())
+                        .setTextureState(RenderStateShardForgeAccessor.getNO_TEXTURE())
+                        .setDepthTestState(RenderStateShardForgeAccessor.getNO_DEPTH_TEST())
+                        .setCullState(RenderStateShardForgeAccessor.getNO_CULL())
+                        .setWriteMaskState(RenderStateShardForgeAccessor.getCOLOR_WRITE())
                         .createCompositeState(false));
     }
 }

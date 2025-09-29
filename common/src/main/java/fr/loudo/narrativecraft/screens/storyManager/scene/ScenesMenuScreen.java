@@ -39,6 +39,7 @@ import java.util.List;
 import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -64,9 +65,10 @@ public class ScenesMenuScreen extends StoryElementScreen {
 
     @Override
     protected void addFooter() {
+        GridLayout gridlayout = new GridLayout();
+        GridLayout.RowHelper rowHelper = gridlayout.createRowHelper(1);
         int width = 200;
-        LinearLayout linearLayout =
-                this.layout.addToFooter(LinearLayout.horizontal().spacing(8));
+        LinearLayout linearLayout = this.layout.addToHeader(new LinearLayout(width, 20, LinearLayout.Orientation.HORIZONTAL), rowHelper.newCellSettings().paddingLeft(8));
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
         if (playerSession.isSessionSet() && playerSession.getScene().equals(scene)) {
@@ -125,6 +127,6 @@ public class ScenesMenuScreen extends StoryElementScreen {
 
     @Override
     protected void openFolder() {
-        Util.getPlatform().openPath(NarrativeCraftFile.getSceneFolder(scene).toPath());
+        Util.getPlatform().openFile(NarrativeCraftFile.getSceneFolder(scene));
     }
 }

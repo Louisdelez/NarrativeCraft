@@ -197,7 +197,7 @@ public class CutscenesScreen extends StoryElementScreen {
 
     @Override
     protected void openFolder() {
-        Util.getPlatform().openPath(NarrativeCraftFile.getDataFolder(scene).toPath());
+        Util.getPlatform().openFile(NarrativeCraftFile.getDataFolder(scene));
     }
 
     @Override

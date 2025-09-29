@@ -26,19 +26,15 @@ package fr.loudo.narrativecraft.events;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.keys.PressKeyListener;
 import net.minecraft.client.Minecraft;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.common.NeoForge;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
-@Mod(NarrativeCraftMod.MOD_ID)
+@Mod.EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ClientTickEventNeoForge {
-
-    public ClientTickEventNeoForge(IEventBus eventBus) {
-        NeoForge.EVENT_BUS.addListener(ClientTickEventNeoForge::onClientTick);
-    }
-
-    public static void onClientTick(ClientTickEvent.Post event) {
+    @SubscribeEvent
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) return;
         OnClientTick.clientTick(Minecraft.getInstance());
         PressKeyListener.onPressKey(Minecraft.getInstance());
     }

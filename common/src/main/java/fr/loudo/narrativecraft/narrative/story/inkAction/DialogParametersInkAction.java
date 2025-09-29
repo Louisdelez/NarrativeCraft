@@ -191,21 +191,21 @@ public class DialogParametersInkAction extends InkAction {
                 break;
             case TEXT_COLOR:
                 executeIfRenderer(dialogRenderer, renderer -> {
-                    int color = FastColor.ARGB32.color(255, (int) value1);
+                    int color = FastColor.ABGR32.color(255, (int) value1);
                     renderer.setTextColor(color);
                 });
                 executeDialogData(storyHandler, dialogData -> {
-                    int color = FastColor.ARGB32.color(255, (int) value1);
+                    int color = FastColor.ABGR32.color(255, (int) value1);
                     dialogData.setTextColor(color);
                 });
                 break;
             case BACKGROUND_COLOR:
                 executeIfRenderer(dialogRenderer, renderer -> {
-                    int color = FastColor.ARGB32.color(255, (int) value1);
+                    int color = FastColor.ABGR32.color(255, (int) value1);
                     renderer.setBackgroundColor(color);
                 });
                 executeDialogData(storyHandler, dialogData -> {
-                    int color = FastColor.ARGB32.color(255, (int) value1);
+                    int color = FastColor.ABGR32.color(255, (int) value1);
                     dialogData.setBackgroundColor(color);
                 });
                 break;

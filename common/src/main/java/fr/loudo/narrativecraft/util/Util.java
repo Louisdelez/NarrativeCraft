@@ -126,29 +126,6 @@ public class Util {
         }
     }
 
-    public static Tag getItemTag(ItemStack itemStack, RegistryAccess registryAccess) {
-        DynamicOps<Tag> ops = registryAccess.createSerializationContext(NbtOps.INSTANCE);
-        Tag tag;
-        try {
-            tag = ItemStack.CODEC.encodeStart(ops, itemStack).getOrThrow();
-        } catch (Exception exception) {
-            tag = new CompoundTag();
-        }
-        return tag;
-    }
-
-    public static ItemStack generateItemStackFromNBT(CompoundTag compoundTag, RegistryAccess registryAccess) {
-        DynamicOps<Tag> ops = registryAccess.createSerializationContext(NbtOps.INSTANCE);
-        if (compoundTag == null) {
-            return ItemStack.EMPTY;
-        }
-        try {
-            return ItemStack.CODEC.parse(ops, compoundTag).getOrThrow();
-        } catch (Exception e) {
-            return ItemStack.EMPTY;
-        }
-    }
-
     public static void addFakePlayerUUID(FakePlayer fakePlayer) {
         if (NarrativeCraftMod.server == null) return;
         ((PlayerListAccessor) NarrativeCraftMod.server.getPlayerList())

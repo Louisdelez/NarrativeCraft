@@ -97,7 +97,7 @@ public class WeatherInkAction extends InkAction {
                     level.setWeatherParameters(0, 999999, true, true);
                 }
             }
-            case null, default -> {
+            default -> {
                 return InkActionResult.error("Weather value is not correct.");
             }
         }

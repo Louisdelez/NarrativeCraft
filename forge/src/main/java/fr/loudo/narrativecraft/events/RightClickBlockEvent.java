@@ -24,20 +24,15 @@
 package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.LogicalSide;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.common.Mod;
 
-@Mod(NarrativeCraftMod.MOD_ID)
+@Mod.EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class RightClickBlockEvent {
-
-    public RightClickBlockEvent(IEventBus eventBus) {
-        NeoForge.EVENT_BUS.addListener(RightClickBlockEvent::onRightClickBlockEvent);
-    }
-
-    private static void onRightClickBlockEvent(PlayerInteractEvent.RightClickBlock event) {
+    @SubscribeEvent
+    public static void onRightClickBlockEvent(PlayerInteractEvent.RightClickBlock event) {
         if (event.getSide() == LogicalSide.CLIENT) {
             OnRightClickBlock.onRightClick(
                     event.getFace(),

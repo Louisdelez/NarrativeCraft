@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
@@ -38,7 +39,7 @@ import net.minecraft.util.FormattedCharSequence;
 public abstract class AbstractTextBoxScreen extends Screen {
 
     private static final ResourceLocation WINDOW_LOCATION =
-            ResourceLocation.withDefaultNamespace("textures/gui/advancements/window.png");
+           new ResourceLocation("minecraft", "textures/gui/advancements/window.png");
 
     protected final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
 
@@ -48,8 +49,9 @@ public abstract class AbstractTextBoxScreen extends Screen {
 
     @Override
     protected void init() {
-        LinearLayout linearLayout =
-                this.layout.addToFooter(LinearLayout.horizontal().spacing(4));
+        GridLayout gridlayout = new GridLayout();
+        GridLayout.RowHelper rowHelper = gridlayout.createRowHelper(1);
+        LinearLayout linearLayout = this.layout.addToHeader(new LinearLayout(200, 20, LinearLayout.Orientation.HORIZONTAL), rowHelper.newCellSettings().paddingLeft(4));
         linearLayout.addChild(Button.builder(Component.literal("Done"), button -> onClose())
                 .width(130)
                 .build());

@@ -42,22 +42,22 @@ public class CutsceneEditItems {
     public static ItemStack camera;
     public static ItemStack trigger;
 
-    public static void init(RegistryAccess access) {
-        camera = getItemWithTexture("", access, Items.PLAYER_HEAD, CAMERA_TEXTURE);
-        trigger = getItemWithTexture("", access, Items.PLAYER_HEAD, TRIGGER_TEXTURE);
+    public static void init() {
+        camera = getItemWithTexture("", Items.PLAYER_HEAD, CAMERA_TEXTURE);
+        trigger = getItemWithTexture("", Items.PLAYER_HEAD, TRIGGER_TEXTURE);
     }
 
     private static ItemStack getItem(String name, RegistryAccess registryAccess, Item item) {
         CompoundTag tag = Util.tagFromIdAndComponents(item, "{\"minecraft:custom_name\":\"" + name + "\"}");
-        return ItemStack.parse(registryAccess, tag).get();
+        return ItemStack.of(tag);
     }
 
     private static ItemStack getItemWithTexture(
-            String name, RegistryAccess registryAccess, Item item, Property textures) {
+            String name, Item item, Property textures) {
         CompoundTag tag = Util.tagFromIdAndComponents(
                 item,
                 "{\"minecraft:custom_name\":\"" + name + "\", \"minecraft:profile\":{properties:[{name: \""
-                        + textures.name() + "\", value: \"" + textures.value() + "\"}]}}");
-        return ItemStack.parse(registryAccess, tag).get();
+                        + textures.getName() + "\", value: \"" + textures.getValue() + "\"}]}}");
+        return ItemStack.of(tag);
     }
 }

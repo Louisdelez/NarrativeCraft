@@ -204,10 +204,7 @@ public class CutsceneControllerScreen extends Screen {
     }
 
     @Override
-    protected void renderBlurredBackground(float partialTick) {}
-
-    @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {}
+    public void renderBackground(GuiGraphics guiGraphics) { }
 
     @Override
     public boolean isPauseScreen() {

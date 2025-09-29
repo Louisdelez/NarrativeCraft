@@ -24,25 +24,21 @@
 package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.server.ServerStartedEvent;
-import net.neoforged.neoforge.event.server.ServerStoppingEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
-@Mod(NarrativeCraftMod.MOD_ID)
+@Mod.EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class LifecycleEvent {
 
-    public LifecycleEvent(IEventBus modBus) {
-        NeoForge.EVENT_BUS.addListener(LifecycleEvent::onServerStart);
-        NeoForge.EVENT_BUS.addListener(LifecycleEvent::onServerStopping);
-    }
-
-    private static void onServerStart(ServerStartedEvent startedEvent) {
+    @SubscribeEvent
+    public static void onServerStart(ServerStartedEvent startedEvent) {
         OnLifecycle.serverStart(startedEvent.getServer());
     }
 
-    private static void onServerStopping(ServerStoppingEvent stoppingEvent) {
+    @SubscribeEvent
+    public static void onServerStopping(ServerStoppingEvent stoppingEvent) {
         OnLifecycle.serverStop(stoppingEvent.getServer());
     }
 }

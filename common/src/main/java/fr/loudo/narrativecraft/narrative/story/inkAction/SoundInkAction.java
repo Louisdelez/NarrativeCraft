@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.audio.VolumeAudio;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.util.MathHelper;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -67,7 +68,7 @@ public class SoundInkAction extends InkAction {
     @Override
     public void partialTick(float partialTick) {
         if (!isRunning || totalTick == 0) return;
-        double t = Math.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
+        double t = MathHelper.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
         if (action.equals("start")) {
             volume = (float) Mth.lerp(t, 0.0, 1.0);
         } else if (action.equals("stop")) {
@@ -92,7 +93,7 @@ public class SoundInkAction extends InkAction {
         if (arguments.size() == 1) {
             return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Start or stop"));
         }
-        String typeName = arguments.getFirst();
+        String typeName = arguments.get(0);
         type = Type.valueOf(typeName.toUpperCase());
         action = arguments.get(1);
         if (!action.equals("start") && !action.equals("stop")) {
@@ -111,7 +112,7 @@ public class SoundInkAction extends InkAction {
             identifier = splitName[0];
             name = splitName[1];
         }
-        ResourceLocation location = ResourceLocation.fromNamespaceAndPath(identifier, name);
+        ResourceLocation location = new ResourceLocation(identifier, name);
         if (soundManager.getSoundEvent(location) == null) {
             return InkActionResult.warn(Translation.message(
                     "ink_action.validation.sound", type.name().toLowerCase(), name));
@@ -205,7 +206,7 @@ public class SoundInkAction extends InkAction {
     private SimpleSoundInstance getSimpleSoundInstance() {
         if (simpleSoundInstance == null) {
             simpleSoundInstance = new SimpleSoundInstance(
-                    ResourceLocation.fromNamespaceAndPath(identifier, name),
+                    new ResourceLocation(identifier, name),
                     SoundSource.MASTER,
                     volume,
                     pitch,

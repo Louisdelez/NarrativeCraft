@@ -90,7 +90,7 @@ public class DialogRenderer2D extends DialogRenderer {
                     originalScale = (float) Mth.lerp(t, scale, 0.8);
                     opacity = Mth.lerp(t, 0.8, 0.0);
                 }
-                backgroundColor = FastColor.ARGB32.color((int) (opacity * 255.0), backgroundColor);
+                backgroundColor = FastColor.ABGR32.color((int) (opacity * 255.0), backgroundColor);
             }
         }
         if (currentTick == totalTick) {

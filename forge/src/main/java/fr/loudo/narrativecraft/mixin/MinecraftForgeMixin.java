@@ -21,12 +21,20 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.platform.services;
+package fr.loudo.narrativecraft.mixin;
 
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.server.level.ServerPlayer;
+import fr.loudo.narrativecraft.events.OnLoadFinished;
+import net.minecraft.client.Minecraft;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-public interface IPacketSender {
+@Mixin(Minecraft.class)
+public class MinecraftForgeMixin {
 
-    void sendToPlayer(ServerPlayer player, CustomPacketPayload payload);
+//    @Inject(method = "onResourceLoadFinished", at = @At("HEAD"))
+//    private void narrativecraft$gameLoadFinished(CallbackInfo ci) {
+//        OnLoadFinished.loadFinished();
+//    }
 }

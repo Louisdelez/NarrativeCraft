@@ -24,21 +24,24 @@
 package fr.loudo.narrativecraft.screens.components;
 
 import java.util.List;
+import java.util.function.Consumer;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 
-public class ObjectListScreen extends ContainerObjectSelectionList<ObjectListScreen.Entry> {
+public class ObjectListScreen extends ContainerObjectSelectionList<ObjectListScreen.Entry> implements LayoutElement {
 
     private static final int BUTTON_WIDTH = 170;
     private final Screen screen;
 
     public ObjectListScreen(Minecraft minecraft, Screen screen, int width, int contentHeight, int headerHeight) {
-        super(minecraft, width, contentHeight, headerHeight, 25);
+        super(minecraft, width, contentHeight, headerHeight, 25, contentHeight);
         this.centerListVertically = false;
         this.screen = screen;
     }
@@ -50,6 +53,41 @@ public class ObjectListScreen extends ContainerObjectSelectionList<ObjectListScr
 
     public void clear() {
         children().clear();
+    }
+
+    @Override
+    public void setX(int x0) {
+        this.x0 = x0;
+    }
+
+    @Override
+    public void setY(int y0) {
+        this.y0 = y0;
+    }
+
+    @Override
+    public int getX() {
+        return x0;
+    }
+
+    @Override
+    public int getY() {
+        return y0;
+    }
+
+    @Override
+    public int getWidth() {
+        return width;
+    }
+
+    @Override
+    public int getHeight() {
+        return height;
+    }
+
+    @Override
+    public void visitWidgets(Consumer<AbstractWidget> consumer) {
+
     }
 
     protected static class Entry extends ContainerObjectSelectionList.Entry<Entry> {

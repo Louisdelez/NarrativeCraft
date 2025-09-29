@@ -79,7 +79,7 @@ public class CharacterStoryData {
         }
 
         applyBytes(characterRuntime.getEntity());
-        applyItems(level.registryAccess());
+        applyItems();
     }
 
     public void applyBytes(LivingEntity entity) {
@@ -87,14 +87,14 @@ public class CharacterStoryData {
         entity.getEntityData().set(LivingEntityAccessor.getDATA_LIVING_ENTITY_FLAGS(), livingEntityByte);
     }
 
-    public void applyItems(RegistryAccess registryAccess) {
+    public void applyItems() {
         for (ItemSlotData itemSlotData : itemSlotDataList) {
             try {
                 characterRuntime
                         .getEntity()
                         .setItemSlot(
                                 EquipmentSlot.valueOf(itemSlotData.equipmentSlot),
-                                itemSlotData.getItem(registryAccess));
+                                itemSlotData.getItem());
             } catch (Exception ignored) {
             }
         }
@@ -110,8 +110,7 @@ public class CharacterStoryData {
         for (EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
             ItemStack itemStack = entity.getItemBySlot(equipmentSlot);
             if (!itemStack.isEmpty()) {
-                Tag tag = Util.getItemTag(itemStack, entity.registryAccess());
-                Tag componentsTag = ((CompoundTag) tag).get("components");
+                Tag componentsTag = itemStack.getTag();
                 String itemData = componentsTag == null ? "" : componentsTag.toString();
                 itemSlotDataList.add(new ItemSlotData(
                         BuiltInRegistries.ITEM.getId(itemStack.getItem()), itemData, equipmentSlot.name()));
@@ -189,13 +188,11 @@ public class CharacterStoryData {
     }
 
     private record ItemSlotData(int id, String data, String equipmentSlot) {
-        public ItemStack getItem(RegistryAccess registryAccess) {
+        public ItemStack getItem() {
             Item item = BuiltInRegistries.ITEM.byId(id);
             ItemStack itemStack = new ItemStack(item);
             CompoundTag tag = Util.tagFromIdAndComponents(item, data);
-            if (tag != null) {
-                itemStack = Util.generateItemStackFromNBT(tag, registryAccess);
-            }
+            itemStack.setTag(tag);
             return itemStack;
         }
     }

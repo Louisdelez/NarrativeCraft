@@ -30,6 +30,7 @@ dependencies {
     compileOnly (group: 'io.github.kosmx.emotes', name: 'emotesAPI', version: "${emotesAPI_version}")
     compileOnly (group: 'io.github.kosmx.emotes', name: 'emotesServer', version: "${emotesAPI_version}")
     implementation "com.bladecoder.ink:blade-ink:1.2.1+nc"
+    implementation "org.jetbrains:annotations:26.0.2"
 }
 
 configurations {

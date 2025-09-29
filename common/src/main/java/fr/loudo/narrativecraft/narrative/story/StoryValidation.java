@@ -74,7 +74,7 @@ public class StoryValidation {
         return validate(
                 NarrativeCraftFile.getScriptFile(chapter),
                 chapter,
-                chapter.getSortedSceneList().getFirst());
+                chapter.getSortedSceneList().get(0));
     }
 
     private static List<ErrorLine> validateScene(Scene scene) throws IOException {

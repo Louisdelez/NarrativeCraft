@@ -35,13 +35,17 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
+import net.minecraft.client.gui.layouts.GridLayout;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
+import net.minecraft.client.gui.screens.OptionsScreen;
+import net.minecraft.client.gui.screens.OptionsSubScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.options.OptionsScreen;
-import net.minecraft.client.gui.screens.options.OptionsSubScreen;
 import net.minecraft.network.chat.Component;
 
 public class MainScreenOptionsScreen extends OptionsSubScreen {
+
+    protected final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
 
     private final NarrativeClientOption option = NarrativeCraftMod.getInstance().getNarrativeClientOptions();
     private final PlayerSession playerSession;
@@ -72,10 +76,11 @@ public class MainScreenOptionsScreen extends OptionsSubScreen {
     }
 
     @Override
-    protected void addContents() {
+    protected void init() {
         NarrativeClientOption clientOption = NarrativeCraftMod.getInstance().getNarrativeClientOptions();
-        LinearLayout linearlayout =
-                this.layout.addToContents(LinearLayout.vertical()).spacing(8);
+        GridLayout gridlayout = new GridLayout();
+        GridLayout.RowHelper rowHelper = gridlayout.createRowHelper(1);
+        LinearLayout linearlayout = this.layout.addToHeader(new LinearLayout(200, 20, LinearLayout.Orientation.VERTICAL), rowHelper.newCellSettings().paddingBottom(8));
         AbstractSliderButton abstractSliderButton =
                 new AbstractSliderButton(
                         50,
@@ -103,9 +108,7 @@ public class MainScreenOptionsScreen extends OptionsSubScreen {
                 };
 
         linearlayout.addChild(abstractSliderButton);
-        autoSkipCheck = Checkbox.builder(Translation.message("screen.main_screen.options.auto_skip"), minecraft.font)
-                .selected(clientOption.autoSkip)
-                .build();
+        autoSkipCheck = new Checkbox(0, 0, 20, 20, Translation.message("screen.main_screen.options.auto_skip"), clientOption.autoSkip);
         linearlayout.addChild(autoSkipCheck);
 
         linearlayout.addChild(Button.builder(Translation.message("screen.main_screen.minecraft_options"), button -> {
@@ -125,7 +128,4 @@ public class MainScreenOptionsScreen extends OptionsSubScreen {
                     .build());
         }
     }
-
-    @Override
-    protected void addOptions() {}
 }
