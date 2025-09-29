@@ -97,7 +97,7 @@ public class CameraAngleOptionsScreen extends KeyframeOptionScreen<CameraAngleKe
                             });
                     minecraft.setScreen(screen);
                 })
-                .bounds(littleButtons.getLast().getX() - 25, INITIAL_POS_Y - 5, 20, BUTTON_HEIGHT)
+                .bounds(littleButtons.get(littleButtons.size() - 1).getX() - 25, INITIAL_POS_Y - 5, 20, BUTTON_HEIGHT)
                 .build();
         this.addRenderableWidget(editButton);
     }

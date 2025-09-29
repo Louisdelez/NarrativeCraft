@@ -44,17 +44,18 @@ import fr.loudo.narrativecraft.serialization.*;
 import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.DefaultPlayerSkin;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.level.storage.LevelResource;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.regex.Matcher;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.DefaultPlayerSkin;
-import net.minecraft.client.resources.PlayerSkin;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.level.storage.LevelResource;
 
 public class NarrativeCraftFile {
     public static final String EXTENSION_SCRIPT_FILE = ".ink";
@@ -420,9 +421,10 @@ public class NarrativeCraftFile {
         File skinsFolder = createDirectory(characterFolder, SKINS_FOLDER_NAME);
         File dataFile = getDataFile(characterFolder);
         File mainSkinFile = createFile(skinsFolder, "main.png");
-        PlayerSkin defaultPlayerSkin = DefaultPlayerSkin.get(UUID.randomUUID());
+        UUID randomUUID = UUID.randomUUID();
+        ResourceLocation defaultPlayerSkin = DefaultPlayerSkin.getDefaultSkin(randomUUID);
         try (InputStream inputStream =
-                Minecraft.getInstance().getResourceManager().open(defaultPlayerSkin.texture())) {
+                Minecraft.getInstance().getResourceManager().open(defaultPlayerSkin)) {
             Files.copy(inputStream, mainSkinFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException ignored) {
         }
@@ -432,7 +434,7 @@ public class NarrativeCraftFile {
         }
         try {
             characterStory.setModel(
-                    CharacterModel.valueOf(defaultPlayerSkin.model().name()));
+                    CharacterModel.valueOf(DefaultPlayerSkin.getSkinModelName(randomUUID)));
         } catch (IllegalArgumentException ignored) {
         }
     }
@@ -441,9 +443,10 @@ public class NarrativeCraftFile {
         File characterFolder = getCharacterFolder(characterStory, scene);
         File mainSkinFile = createFile(characterFolder, "main.png");
         File dataFile = createFile(characterFolder, DATA_FILE_NAME);
-        PlayerSkin defaultPlayerSkin = DefaultPlayerSkin.get(UUID.randomUUID());
+        UUID randomUUID = UUID.randomUUID();
+        ResourceLocation defaultPlayerSkin = DefaultPlayerSkin.getDefaultSkin(randomUUID);
         try (InputStream inputStream =
-                Minecraft.getInstance().getResourceManager().open(defaultPlayerSkin.texture())) {
+                Minecraft.getInstance().getResourceManager().open(defaultPlayerSkin)) {
             Files.copy(inputStream, mainSkinFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException ignored) {
         }
@@ -453,7 +456,7 @@ public class NarrativeCraftFile {
         }
         try {
             characterStory.setModel(
-                    CharacterModel.valueOf(defaultPlayerSkin.model().name()));
+                    CharacterModel.valueOf(DefaultPlayerSkin.getSkinModelName(randomUUID)));
         } catch (IllegalArgumentException ignored) {
         }
     }
@@ -544,7 +547,7 @@ public class NarrativeCraftFile {
             stringBuilder.append("\n");
         }
         if (!chapters.isEmpty()) {
-            stringBuilder.append("->").append(chapters.getFirst().knotName());
+            stringBuilder.append("->").append(chapters.get(0).knotName());
         }
         try (Writer writer = new BufferedWriter(new FileWriter(mainInkFile))) {
             writer.write(stringBuilder.toString());
@@ -700,7 +703,7 @@ public class NarrativeCraftFile {
     }
 
     public static File getWorldOptionFile(String levelName) {
-        Path path = Minecraft.getInstance().getLevelSource().getLevelPath(levelName);
+        Path path = Minecraft.getInstance().getLevelSource().getBaseDir().resolve(levelName);
         File narrativecraftFolder = new File(path.toFile(), "narrativecraft");
         File dataFolder = new File(narrativecraftFolder, "data");
         return new File(dataFolder, "world_options" + NarrativeCraftFile.EXTENSION_DATA_FILE);

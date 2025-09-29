@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.screens.components.StoryElementList;
 import fr.loudo.narrativecraft.util.ImageFontConstants;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
@@ -45,7 +46,9 @@ public abstract class StoryElementScreen extends Screen {
 
     @Override
     protected void init() {
-        linearlayout = this.layout.addToHeader(LinearLayout.horizontal()).spacing(8);
+        GridLayout gridlayout = new GridLayout();
+        GridLayout.RowHelper rowHelper = gridlayout.createRowHelper(1);
+        linearlayout = this.layout.addToHeader(new LinearLayout(200, 20, LinearLayout.Orientation.HORIZONTAL), rowHelper.newCellSettings().paddingLeft(8));
         this.addTitle();
         this.addContents();
         this.addFooter();
@@ -54,7 +57,7 @@ public abstract class StoryElementScreen extends Screen {
     }
 
     protected void addTitle() {
-        linearlayout.defaultCellSetting().alignVerticallyMiddle();
+        linearlayout.defaultChildLayoutSetting().alignVerticallyMiddle();
         linearlayout.addChild(new StringWidget(this.title, this.font));
     }
 
@@ -83,7 +86,7 @@ public abstract class StoryElementScreen extends Screen {
     @Override
     protected void repositionElements() {
         this.layout.arrangeElements();
-        this.storyElementList.updateSize(this.width, this.layout);
+        this.storyElementList.updateSize(this.width, this.height, this.layout.getX(), this.layout.getY());
     }
 
     protected abstract void openFolder();

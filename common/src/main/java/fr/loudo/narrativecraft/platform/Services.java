@@ -24,7 +24,6 @@
 package fr.loudo.narrativecraft.platform;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.platform.services.IPacketSender;
 import fr.loudo.narrativecraft.platform.services.IPlatformHelper;
 import java.util.ServiceLoader;
 
@@ -41,7 +40,6 @@ public class Services {
     // another
     // mod is loaded.
     public static final IPlatformHelper PLATFORM = load(IPlatformHelper.class);
-    public static final IPacketSender PACKET_SENDER = load(IPacketSender.class);
 
     // This code is used to load a service for the current environment. Your implementation of the service must be
     // defined

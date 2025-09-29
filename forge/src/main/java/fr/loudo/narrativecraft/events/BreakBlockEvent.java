@@ -24,19 +24,14 @@
 package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
-@Mod(NarrativeCraftMod.MOD_ID)
+@Mod.EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class BreakBlockEvent {
-
-    public BreakBlockEvent(IEventBus eventBus) {
-        NeoForge.EVENT_BUS.addListener(BreakBlockEvent::onBreakBlock);
-    }
-
-    private static void onBreakBlock(BlockEvent.BreakEvent event) {
+    @SubscribeEvent
+    public static void onBreakBlock(BlockEvent.BreakEvent event) {
         OnBreakBlock.breakBlock(event.getState(), event.getPos(), event.getPlayer());
     }
 }

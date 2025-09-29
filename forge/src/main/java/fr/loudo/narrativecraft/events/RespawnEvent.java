@@ -24,19 +24,14 @@
 package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
-@Mod(NarrativeCraftMod.MOD_ID)
+@Mod.EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class RespawnEvent {
-
-    public RespawnEvent(IEventBus eventBus) {
-        NeoForge.EVENT_BUS.addListener(RespawnEvent::respawnEvent);
-    }
-
-    private static void respawnEvent(PlayerEvent.PlayerRespawnEvent event) {
+    @SubscribeEvent
+    public static void respawnEvent(PlayerEvent.PlayerRespawnEvent event) {
         OnRespawn.respawn(event.getEntity());
     }
 }

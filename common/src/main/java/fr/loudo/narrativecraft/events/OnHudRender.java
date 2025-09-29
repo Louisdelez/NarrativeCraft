@@ -87,7 +87,7 @@ public class OnHudRender {
                 debugText,
                 guiGraphics.guiWidth() - font.width(debugText) - 5,
                 5,
-                FastColor.ARGB32.color(255, 255, 255, 255));
+                FastColor.ABGR32.color(255, 255, 255, 255));
         if (!playerSession.isShowDebugHud()) return;
         storyHandler.getStoryDebugHud().render(guiGraphics, partialTick);
     }

@@ -127,6 +127,6 @@ public class AnimationsScreen extends StoryElementScreen {
     @Override
     protected void openFolder() {
         Util.getPlatform()
-                .openPath(NarrativeCraftFile.getAnimationsFolder(scene).toPath());
+                .openFile(NarrativeCraftFile.getAnimationsFolder(scene));
     }
 }

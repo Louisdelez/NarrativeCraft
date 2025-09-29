@@ -63,7 +63,7 @@ public abstract class AbstractKeyframeGroupsBase<T extends Keyframe, E extends K
                     if (j + 1 < keyframes.size()) {
                         return keyframes.get(j + 1);
                     } else if (i + 1 < keyframeGroups.size()) {
-                        return keyframeGroups.get(i + 1).getKeyframes().getFirst();
+                        return keyframeGroups.get(i + 1).getKeyframes().get(0);
                     }
                 }
             }
@@ -82,7 +82,7 @@ public abstract class AbstractKeyframeGroupsBase<T extends Keyframe, E extends K
                         return keyframes.get(j - 1);
                     } else if (i > 0) {
                         List<T> prevGroupKeyframes = keyframeGroups.get(i - 1).getKeyframes();
-                        return prevGroupKeyframes.getLast();
+                        return prevGroupKeyframes.get(keyframeGroups.size() - 1);
                     }
                 }
             }

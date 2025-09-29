@@ -36,6 +36,7 @@ import fr.loudo.narrativecraft.util.FakePlayer;
 import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -109,8 +110,8 @@ public class Playback {
         hasEnded = false;
         entityPlaybacks.clear();
 
-        ActionsData masterEntityData = animation.getActionsData().getFirst();
-        Location firstLoc = masterEntityData.getLocations().getFirst();
+        ActionsData masterEntityData = animation.getActionsData().get(0);
+        Location firstLoc = masterEntityData.getLocations().get(0);
         PlaybackData playbackData = new PlaybackData(masterEntityData, this);
         playbackData.setEntity(masterEntity);
         entityPlaybacks.add(playbackData);
@@ -122,7 +123,7 @@ public class Playback {
             ActionsData actionsData = animation.getActionsData().get(i);
             PlaybackData playbackData1 = new PlaybackData(actionsData, this);
             if (actionsData.getSpawnTick() == 0) {
-                playbackData1.spawnEntity(actionsData.getLocations().getFirst());
+                playbackData1.spawnEntity(actionsData.getLocations().get(0));
             }
             entityPlaybacks.add(playbackData1);
         }
@@ -165,13 +166,13 @@ public class Playback {
                 List<Location> movementData = actionsData.getLocations();
                 if (movementData.isEmpty()) continue;
                 if (needToRespawn(
-                        movementData.getFirst().asVec3(), movementData.getLast().asVec3())) {
+                        movementData.get(0).asVec3(), movementData.get(movementData.size() - 1).asVec3())) {
                     if (playbackData.getEntity().getUUID().equals(masterEntity.getUUID())) {
                         playbackData.killEntity();
-                        spawnMasterEntity(movementData.getFirst());
+                        spawnMasterEntity(movementData.get(0));
                     } else {
                         playbackData.killEntity();
-                        playbackData.spawnEntity(movementData.getFirst());
+                        playbackData.spawnEntity(movementData.get(0));
                     }
                 }
             }
@@ -192,7 +193,7 @@ public class Playback {
     }
 
     public void killMasterEntity() {
-        PlaybackData playbackData = entityPlaybacks.getFirst();
+        PlaybackData playbackData = entityPlaybacks.get(0);
         masterEntity.remove(Entity.RemovalReason.KILLED);
         if (masterEntity instanceof FakePlayer fakePlayer) {
             ((PlayerListAccessor) level.getServer().getPlayerList())
@@ -208,7 +209,7 @@ public class Playback {
 
     public void changeLocationByTick(int newTick, boolean seamless) {
         newTick = Math.min(
-                newTick, animation.getActionsData().getFirst().getLocations().size() - 1);
+                newTick, animation.getActionsData().get(0).getLocations().size() - 1);
         int oldTick = globalTick;
         for (PlaybackData playbackData : entityPlaybacks) {
             ActionsData actionsData = playbackData.getActionsData();
@@ -265,10 +266,10 @@ public class Playback {
     }
 
     public void actionListenerRewind(PlaybackData playbackData) {
-        List<Action> actionToBePlayed = playbackData.getActionsData().getActions().stream()
+        List<Action> actionToBePlayed = new ArrayList<>(playbackData.getActionsData().getActions().stream()
                 .filter(action -> globalTick == action.getTick())
-                .toList();
-        actionToBePlayed = actionToBePlayed.reversed();
+                .toList());
+        Collections.reverse(actionToBePlayed);
         for (Action action : actionToBePlayed) {
             if (action instanceof EmoteAction && !Services.PLATFORM.isModLoaded("emotecraft")) continue;
             if (!(action instanceof DeathAction) && playbackData.getEntity() == null) continue;
@@ -278,7 +279,7 @@ public class Playback {
                     SleepAction previousSleepAction = (SleepAction) playbackData.getActionsData().getActions().stream()
                             .filter(action1 -> globalTick <= action.getTick() && action1 instanceof SleepAction)
                             .toList()
-                            .getLast();
+                            .get(actionToBePlayed.size() - 1);
                     if (previousSleepAction != null) {
                         previousSleepAction.execute(playbackData);
                     }
@@ -299,7 +300,7 @@ public class Playback {
         characterRuntime.setEntity(masterEntity);
         moveEntitySilent(masterEntity, loc);
 
-        entityPlaybacks.getFirst().setEntity(masterEntity);
+        entityPlaybacks.get(0).setEntity(masterEntity);
     }
 
     public int getMaxTick() {
@@ -362,7 +363,7 @@ public class Playback {
     }
 
     public ActionsData getMasterEntityData() {
-        return animation.getActionsData().getFirst();
+        return animation.getActionsData().get(0);
     }
 
     public boolean isPlaying() {

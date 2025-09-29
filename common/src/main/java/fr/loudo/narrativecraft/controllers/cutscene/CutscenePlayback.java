@@ -95,7 +95,7 @@ public class CutscenePlayback {
             playerSession.setCurrentCamera(keyframeA.getKeyframeLocation());
             return;
         } else {
-            totalDelta = Math.clamp(
+            totalDelta = MathHelper.clamp(
                     (segmentTick + partialTick - keyframeA.getStartDelayTick()) / keyframeB.getPathTick(), 0.0, 1.0);
         }
 
@@ -127,7 +127,7 @@ public class CutscenePlayback {
 
     private KeyframeLocation interpolateByCatmull(double partialTick) {
         List<CutsceneKeyframe> keyframes = currentKeyframeGroup.getKeyframes();
-        if (keyframes.size() < 2) return keyframes.getLast().getKeyframeLocation();
+        if (keyframes.size() < 2) return keyframes.get(keyframes.size() - 1).getKeyframeLocation();
 
         int startIndex = 0;
         for (CutsceneKeyframe keyframe : keyframes) {
@@ -167,7 +167,7 @@ public class CutscenePlayback {
             }
             accumulatedTick += segmentDuration;
         }
-        return keyframes.getLast().getKeyframeLocation();
+        return keyframes.get(keyframes.size() - 1).getKeyframeLocation();
     }
 
     private KeyframeLocation catmullRom(
@@ -210,9 +210,9 @@ public class CutscenePlayback {
         }
         CutsceneKeyframeGroup cutsceneKeyframeGroupB = cutsceneController.getKeyframeGroupOfKeyframe(keyframeB);
         if (cutsceneKeyframeGroupB.getKeyframes().size() == 1) {
-            keyframeA = cutsceneKeyframeGroupB.getKeyframes().getFirst();
+            keyframeA = cutsceneKeyframeGroupB.getKeyframes().get(0);
         } else if (currentKeyframeGroup.getId() != cutsceneKeyframeGroupB.getId()) {
-            keyframeA = cutsceneKeyframeGroupB.getKeyframes().getFirst();
+            keyframeA = cutsceneKeyframeGroupB.getKeyframes().get(0);
             keyframeB = cutsceneController.getNextKeyframe(keyframeA);
         } else {
             keyframeA = keyframeB;

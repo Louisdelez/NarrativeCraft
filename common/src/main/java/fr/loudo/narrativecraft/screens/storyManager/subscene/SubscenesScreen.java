@@ -146,6 +146,6 @@ public class SubscenesScreen extends StoryElementScreen {
 
     @Override
     protected void openFolder() {
-        Util.getPlatform().openPath(NarrativeCraftFile.getSceneFolder(scene).toPath());
+        Util.getPlatform().openFile(NarrativeCraftFile.getSceneFolder(scene));
     }
 }

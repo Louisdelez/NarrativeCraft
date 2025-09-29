@@ -243,7 +243,7 @@ public class DialogCustomOptionsScreen extends Screen {
                 ScreenUtils.Align.HORIZONTAL);
         bcColorBox
                 .getEditBox()
-                .setValue(Integer.toHexString(FastColor.ARGB32.color(0, dialogData.getBackgroundColor())));
+                .setValue(Integer.toHexString(FastColor.ABGR32.color(0, dialogData.getBackgroundColor())));
         this.addRenderableWidget(bcColorBox.getStringWidget());
         this.addRenderableWidget(bcColorBox.getEditBox());
         currentY += bcColorBox.getEditBox().getHeight() + gap;
@@ -256,7 +256,7 @@ public class DialogCustomOptionsScreen extends Screen {
                 startX,
                 currentY,
                 ScreenUtils.Align.HORIZONTAL);
-        textColorBox.getEditBox().setValue(Integer.toHexString(FastColor.ARGB32.color(0, dialogData.getTextColor())));
+        textColorBox.getEditBox().setValue(Integer.toHexString(FastColor.ABGR32.color(0, dialogData.getTextColor())));
         this.addRenderableWidget(textColorBox.getStringWidget());
         this.addRenderableWidget(textColorBox.getEditBox());
         currentY += textColorBox.getEditBox().getHeight() + gap;
@@ -332,7 +332,7 @@ public class DialogCustomOptionsScreen extends Screen {
             dialogData.setGap(Float.parseFloat(gapBox.getEditBox().getValue()));
             dialogData.setWidth(Float.parseFloat(widthBox.getEditBox().getValue()));
             int backgroundColor = Integer.parseInt(bcColorBox.getEditBox().getValue(), 16);
-            dialogData.setBackgroundColor(FastColor.ARGB32.color(255, backgroundColor));
+            dialogData.setBackgroundColor(FastColor.ABGR32.color(255, backgroundColor));
             dialogData.setTextColor(Integer.parseInt(textColorBox.getEditBox().getValue(), 16));
             dialogData.setNoiseShakeSpeed(
                     Float.parseFloat(bobbingSpeed.getEditBox().getValue()));
@@ -366,8 +366,5 @@ public class DialogCustomOptionsScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {}
-
-    @Override
-    protected void renderBlurredBackground(float partialTick) {}
+    public void renderBackground(GuiGraphics guiGraphics) { }
 }

@@ -90,7 +90,7 @@ public class StorySaveIconGui {
         int x = width - logoWidth - 30;
         int y = height - 30;
         guiGraphics.drawString(
-                minecraft.font, logo, x, y, FastColor.ARGB32.color((int) (opacity * 255.0), 0xFFFFFF), false);
+                minecraft.font, logo, x, y, FastColor.ABGR32.color((int) (opacity * 255.0), 0xFFFFFF), false);
         if (debugMode) {
             Component message = Component.literal("Fake save (debug)");
             guiGraphics.drawString(
@@ -98,7 +98,7 @@ public class StorySaveIconGui {
                     message,
                     x - minecraft.font.width(message) / 2 - 5,
                     y - minecraft.font.lineHeight - 10,
-                    FastColor.ARGB32.color((int) (opacity * 255.0), 0xFFFFFF),
+                    FastColor.ABGR32.color((int) (opacity * 255.0), 0xFFFFFF),
                     false);
         }
     }

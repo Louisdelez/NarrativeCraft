@@ -26,19 +26,15 @@ package fr.loudo.narrativecraft.events;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.playback.PlaybackTickHandler;
 import fr.loudo.narrativecraft.narrative.recording.RecordingTickHandler;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
-@Mod(NarrativeCraftMod.MOD_ID)
+@Mod.EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ServerTickEventNeoForge {
-
-    public ServerTickEventNeoForge(IEventBus eventBus) {
-        NeoForge.EVENT_BUS.addListener(ServerTickEventNeoForge::onServerTick);
-    }
-
-    public static void onServerTick(ServerTickEvent.Post event) {
+    @SubscribeEvent
+    public static void onServerTick(TickEvent.ServerTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) return;
         RecordingTickHandler.tick(event.getServer());
         PlaybackTickHandler.tick(event.getServer());
         OnServerTick.tick(event.getServer());

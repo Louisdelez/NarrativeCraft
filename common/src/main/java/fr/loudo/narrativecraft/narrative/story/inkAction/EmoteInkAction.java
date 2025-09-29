@@ -115,7 +115,7 @@ public class EmoteInkAction extends InkAction {
         } // Not a UUID
 
         for (KeyframeAnimation animation : emotes) {
-            String emoteName = animation.getName();
+            String emoteName = animation.extraData.get("name").toString();
             emoteName = emoteName.replace("\"", "");
             if (emoteName.equalsIgnoreCase(id)) {
                 return animation;

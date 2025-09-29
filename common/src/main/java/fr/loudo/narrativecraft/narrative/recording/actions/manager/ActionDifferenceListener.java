@@ -50,7 +50,6 @@ public class ActionDifferenceListener {
             EquipmentSlot.OFFHAND,
             EquipmentSlot.HEAD,
             EquipmentSlot.CHEST,
-            EquipmentSlot.BODY,
             EquipmentSlot.LEGS,
             EquipmentSlot.FEET);
 
@@ -187,8 +186,7 @@ public class ActionDifferenceListener {
                 tick,
                 equipmentSlot.name(),
                 itemStack,
-                oldItemStack,
-                actionsData.getEntity().registryAccess());
+                oldItemStack);
         actionsData.addAction(itemChangeAction);
     }
 

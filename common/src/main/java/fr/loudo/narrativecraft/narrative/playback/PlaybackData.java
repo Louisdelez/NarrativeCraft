@@ -57,7 +57,7 @@ public class PlaybackData {
     public void tick(int globalTick) {
         if (globalTick >= actionsData.getSpawnTick()) {
             if (entity == null) {
-                spawnEntity(actionsData.getLocations().getFirst());
+                spawnEntity(actionsData.getLocations().get(0));
             }
         }
 
@@ -81,7 +81,7 @@ public class PlaybackData {
     public void changeLocationByTick(int newTick, boolean seamless) {
         if (newTick >= actionsData.getSpawnTick()) {
             if (entity == null) {
-                spawnEntity(actionsData.getLocations().getFirst());
+                spawnEntity(actionsData.getLocations().get(0));
             }
         } else {
             killEntity();

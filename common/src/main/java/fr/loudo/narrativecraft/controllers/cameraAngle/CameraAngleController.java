@@ -90,10 +90,10 @@ public class CameraAngleController extends AbstractKeyframesBase<CameraAngleKeyf
         if (environment != Environment.DEVELOPMENT) return;
         Location location = null;
         if (!characterStoryDataList.isEmpty()) {
-            location = characterStoryDataList.getFirst().getLocation();
+            location = characterStoryDataList.get(0).getLocation();
         } else if (!keyframes.isEmpty()) {
-            keyframesCounter.set(keyframes.getLast().getId());
-            location = keyframes.getFirst().getKeyframeLocation().asLocation();
+            keyframesCounter.set(keyframes.get(keyframes.size() - 1).getId());
+            location = keyframes.get(0).getKeyframeLocation().asLocation();
         }
         if (location != null) {
             playerSession.getPlayer().teleportTo(location.x(), location.y(), location.z());

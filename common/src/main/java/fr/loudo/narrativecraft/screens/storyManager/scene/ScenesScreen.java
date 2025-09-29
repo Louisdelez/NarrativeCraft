@@ -88,7 +88,7 @@ public class ScenesScreen extends StoryElementScreen {
                                     if (scene.getRank() == 1
                                             && chapter.getSortedSceneList().size() > 1) {
                                         NarrativeCraftFile.updateMasterSceneKnot(
-                                                chapter.getSortedSceneList().getFirst());
+                                                chapter.getSortedSceneList().get(0));
                                     }
                                     minecraft.setScreen(new ScenesScreen(chapter));
                                 } catch (Exception e) {
@@ -105,6 +105,6 @@ public class ScenesScreen extends StoryElementScreen {
 
     @Override
     protected void openFolder() {
-        Util.getPlatform().openPath(NarrativeCraftFile.getScenesFolder(chapter).toPath());
+        Util.getPlatform().openFile(NarrativeCraftFile.getScenesFolder(chapter));
     }
 }

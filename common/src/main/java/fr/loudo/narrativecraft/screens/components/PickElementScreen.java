@@ -30,9 +30,11 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -133,13 +135,13 @@ public class PickElementScreen extends Screen {
         doneButton.setPosition(this.width / 2 - 200 / 2, this.height - 25);
     }
 
-    public class TransferableStorySelectionList extends ObjectSelectionList<TransferableStorySelectionList.Entry> {
+    public class TransferableStorySelectionList extends ObjectSelectionList<TransferableStorySelectionList.Entry> implements LayoutElement {
 
         private TransferableStorySelectionList otherList;
 
         public TransferableStorySelectionList(
                 Minecraft minecraft, List<? extends NarrativeEntry> narrativeEntries, int width, int height) {
-            super(minecraft, width, height, 33, 18);
+            super(minecraft, width, height, 33, 18, 18);
             for (NarrativeEntry narrativeEntry : narrativeEntries) {
                 Entry entry = new Entry(narrativeEntry);
                 this.addEntry(entry);
@@ -169,6 +171,41 @@ public class PickElementScreen extends Screen {
         public boolean mouseDragged(
                 double p_313749_, double p_313887_, int p_313839_, double p_313844_, double p_313686_) {
             return super.mouseDragged(p_313749_, p_313887_, p_313839_, p_313844_, p_313686_);
+        }
+
+        @Override
+        public void setX(int x0) {
+            this.x0 = x0;
+        }
+
+        @Override
+        public void setY(int y0) {
+            this.y0 = y0;
+        }
+
+        @Override
+        public int getX() {
+            return x0;
+        }
+
+        @Override
+        public int getY() {
+            return y0;
+        }
+
+        @Override
+        public int getWidth() {
+            return width;
+        }
+
+        @Override
+        public int getHeight() {
+            return height;
+        }
+
+        @Override
+        public void visitWidgets(Consumer<AbstractWidget> consumer) {
+
         }
 
         public class Entry extends ObjectSelectionList.Entry<Entry> {

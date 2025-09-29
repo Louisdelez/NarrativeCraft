@@ -88,10 +88,10 @@ public class MainScreenController extends AbstractKeyframesBase<MainScreenKeyfra
         }
         if (environment == Environment.PRODUCTION) {
             if (!keyframes.isEmpty()) {
-                playerSession.setCurrentCamera(keyframes.getFirst().getKeyframeLocation());
+                playerSession.setCurrentCamera(keyframes.get(0).getKeyframeLocation());
             }
             if (!keyframeTriggers.isEmpty()) {
-                List<String> tags = keyframeTriggers.getFirst().getCommandsToList();
+                List<String> tags = keyframeTriggers.get(0).getCommandsToList();
                 for (String tag : tags) {
                     InkAction inkAction = InkActionRegistry.findByCommand(tag);
                     if (inkAction == null) continue;
@@ -101,18 +101,18 @@ public class MainScreenController extends AbstractKeyframesBase<MainScreenKeyfra
             return;
         }
         if (!keyframes.isEmpty()) {
-            keyframes.getFirst().showKeyframe(playerSession.getPlayer());
+            keyframes.get(0).showKeyframe(playerSession.getPlayer());
         }
         if (!keyframeTriggers.isEmpty()) {
-            keyframeTriggers.getFirst().showKeyframe(playerSession.getPlayer());
+            keyframeTriggers.get(0).showKeyframe(playerSession.getPlayer());
         }
         Location location = null;
         if (!keyframes.isEmpty()) {
-            location = keyframes.getFirst().getKeyframeLocation().asLocation();
+            location = keyframes.get(0).getKeyframeLocation().asLocation();
         } else if (!keyframeTriggers.isEmpty()) {
-            location = keyframeTriggers.getFirst().getKeyframeLocation().asLocation();
+            location = keyframeTriggers.get(0).getKeyframeLocation().asLocation();
         } else if (!characterStoryDataList.isEmpty()) {
-            location = characterStoryDataList.getFirst().getLocation();
+            location = characterStoryDataList.get(0).getLocation();
         }
         if (location != null) {
             playerSession.getPlayer().teleportTo(location.x(), location.y(), location.z());
@@ -139,16 +139,16 @@ public class MainScreenController extends AbstractKeyframesBase<MainScreenKeyfra
             return;
         }
         if (!keyframes.isEmpty()) {
-            keyframes.getFirst().hideKeyframe(playerSession.getPlayer());
+            keyframes.get(0).hideKeyframe(playerSession.getPlayer());
         }
         if (!keyframeTriggers.isEmpty()) {
-            keyframeTriggers.getFirst().hideKeyframe(playerSession.getPlayer());
+            keyframeTriggers.get(0).hideKeyframe(playerSession.getPlayer());
         }
         if (save) {
             MainScreenKeyframe oldKeyframe = mainScreenData.getKeyframe();
             KeyframeTrigger oldKeyframeTrigger = mainScreenData.getKeyframeTrigger();
-            MainScreenKeyframe keyframe = !keyframes.isEmpty() ? keyframes.getFirst() : null;
-            KeyframeTrigger keyframeTrigger = !keyframeTriggers.isEmpty() ? keyframeTriggers.getFirst() : null;
+            MainScreenKeyframe keyframe = !keyframes.isEmpty() ? keyframes.get(0) : null;
+            KeyframeTrigger keyframeTrigger = !keyframeTriggers.isEmpty() ? keyframeTriggers.get(0) : null;
             List<CharacterStoryData> oldCharacterStoryData = mainScreenData.getCharacterStoryDataList();
             mainScreenData.getCharacterStoryDataList().clear();
             try {
@@ -180,11 +180,11 @@ public class MainScreenController extends AbstractKeyframesBase<MainScreenKeyfra
     }
 
     public MainScreenKeyframe getKeyframe() {
-        return keyframes.isEmpty() ? null : keyframes.getFirst();
+        return keyframes.isEmpty() ? null : keyframes.get(0);
     }
 
     public KeyframeTrigger getKeyframeTrigger() {
-        return keyframeTriggers.isEmpty() ? null : keyframeTriggers.getFirst();
+        return keyframeTriggers.isEmpty() ? null : keyframeTriggers.get(0);
     }
 
     @Override

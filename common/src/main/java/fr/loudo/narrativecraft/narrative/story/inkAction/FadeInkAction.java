@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.util.MathHelper;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import net.minecraft.client.gui.GuiGraphics;
@@ -64,14 +65,14 @@ public class FadeInkAction extends InkAction {
     @Override
     public void render(GuiGraphics guiGraphics, float partialTick) {
         if (!isRunning) return;
-        double t = Math.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
+        double t = MathHelper.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
         int opacity = 255;
         if (currentFadeState == FadeState.FADE_IN) {
             opacity = (int) Mth.lerp(t, 0, 255);
         } else if (currentFadeState == FadeState.FADE_OUT) {
             opacity = (int) Mth.lerp(t, 255, 0);
         }
-        int newColor = FastColor.ARGB32.color(opacity, color);
+        int newColor = FastColor.ABGR32.color(opacity, color);
         guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), newColor);
     }
 

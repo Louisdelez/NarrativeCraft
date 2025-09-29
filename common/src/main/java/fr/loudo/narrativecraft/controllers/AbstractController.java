@@ -66,7 +66,7 @@ public abstract class AbstractController {
                 hudMessage,
                 width / 2 - font.width(hudMessage) / 2,
                 10,
-                FastColor.ARGB32.colorFromFloat(1, 1, 1, 1));
+                FastColor.ARGB32.color(1, 1, 1, 1));
     }
 
     public Environment getEnvironment() {

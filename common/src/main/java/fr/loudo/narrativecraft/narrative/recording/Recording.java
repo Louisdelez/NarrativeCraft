@@ -43,9 +43,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.projectile.EyeOfEnder;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
-import net.minecraft.world.entity.vehicle.VehicleEntity;
-import net.minecraft.world.item.ProjectileItem;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.Boat;
 
 public class Recording {
 
@@ -142,13 +143,14 @@ public class Recording {
 
         for (Entity entity : nearbyEntities) {
             if (!trackedUUIDs.contains(entity.getUUID())
-                    && !(entity instanceof ProjectileItem)
+                    && !(entity instanceof Projectile)
                     && !(entity instanceof EyeOfEnder)
                     && !(entity instanceof ThrowableItemProjectile)) {
                 trackedEntities.add(entity);
                 RecordingData recordingData = new RecordingData(entity, this);
                 recordingDataList.add(recordingData);
-                if (entity instanceof VehicleEntity
+                if (entity instanceof AbstractMinecart
+                        || entity instanceof Boat
                         || entity instanceof AbstractHorse
                         || entity instanceof ItemEntity) {
                     trackEntity(entity, tick);

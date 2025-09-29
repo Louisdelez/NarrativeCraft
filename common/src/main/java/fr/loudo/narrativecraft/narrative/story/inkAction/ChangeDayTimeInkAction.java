@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.util.Easing;
+import fr.loudo.narrativecraft.util.MathHelper;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.Arrays;
 import java.util.List;
@@ -55,7 +56,7 @@ public class ChangeDayTimeInkAction extends InkAction {
     public void partialTick(float partialTick) {
         if (!canBeExecuted || !isRunning || easing == null) return;
         double durationTicks = forSeconds * 20.0;
-        double t = Math.clamp((segmentTick + partialTick) / durationTicks, 0.0, 1.0);
+        double t = MathHelper.clamp((segmentTick + partialTick) / durationTicks, 0.0, 1.0);
         currentTick = (long) Mth.lerp(t, fromTick, toTick);
     }
 
@@ -138,7 +139,7 @@ public class ChangeDayTimeInkAction extends InkAction {
             case "noon" -> {
                 return 6000L;
             }
-            case null, default -> {
+            default -> {
                 try {
                     return Long.parseLong(dayTime);
                 } catch (NumberFormatException e) {

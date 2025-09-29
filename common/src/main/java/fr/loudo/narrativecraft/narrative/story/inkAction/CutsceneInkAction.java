@@ -73,8 +73,8 @@ public class CutsceneInkAction extends InkAction {
         if (controller.getKeyframeGroups().isEmpty()) {
             return InkActionResult.error("Cutscene " + cutscene.getName() + " has not keyframes ! Can't be played.");
         }
-        CutsceneKeyframeGroup keyframeGroup = controller.getKeyframeGroups().getFirst();
-        CutsceneKeyframe keyframeA = keyframeGroup.getKeyframes().getFirst();
+        CutsceneKeyframeGroup keyframeGroup = controller.getKeyframeGroups().get(0);
+        CutsceneKeyframe keyframeA = keyframeGroup.getKeyframes().get(0);
         CutsceneKeyframe keyframeB;
         if (keyframeGroup.getKeyframes().size() > 1) {
             keyframeB = keyframeGroup.getKeyframes().get(1);

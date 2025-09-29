@@ -40,11 +40,11 @@ import net.minecraft.sounds.SoundEvent;
 public class CreditScreen extends WinScreen {
 
     public static final ResourceLocation LOGO =
-            ResourceLocation.withDefaultNamespace("textures/narrativecraft_logo.png");
+           new ResourceLocation("minecraft", "textures/narrativecraft_logo.png");
 
     private static final ResourceLocation BACKGROUND_IMAGE =
-            ResourceLocation.withDefaultNamespace("textures/narrativecraft_credits/background.png");
-    private static final ResourceLocation MUSIC = ResourceLocation.withDefaultNamespace("narrativecraft_credits.music");
+           new ResourceLocation("minecraft", "textures/narrativecraft_credits/background.png");
+    private static final ResourceLocation MUSIC =new ResourceLocation("minecraft", "narrativecraft_credits.music");
 
     public static final SimpleSoundInstance MUSIC_INSTANCE =
             SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(MUSIC), 1, 1);
@@ -108,7 +108,7 @@ public class CreditScreen extends WinScreen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int p_294762_, int p_295473_, float p_296441_) {
+    public void renderBackground(GuiGraphics guiGraphics) {
         if (Util.resourceExists(BACKGROUND_IMAGE)) {
             guiGraphics.blit(
                     BACKGROUND_IMAGE,

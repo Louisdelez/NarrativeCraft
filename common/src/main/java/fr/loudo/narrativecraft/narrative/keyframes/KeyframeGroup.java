@@ -36,7 +36,7 @@ public class KeyframeGroup<T extends Keyframe> {
 
     public boolean isLastKeyframe(T keyframe) {
         if (keyframes.isEmpty()) return false;
-        return keyframes.getLast().getId() == keyframe.getId();
+        return keyframes.get(keyframes.size() - 1).getId() == keyframe.getId();
     }
 
     public void hideKeyframes(ServerPlayer player) {

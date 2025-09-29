@@ -33,7 +33,7 @@ public class RenderWorldEvent {
         RenderSystem.depthMask(false);
         RenderSystem.disableDepthTest();
         OnRenderWorld.renderWorld(
-                new PoseStack(), worldRenderContext.tickCounter().getGameTimeDeltaPartialTick(true));
+                new PoseStack(), worldRenderContext.tickDelta());
         RenderSystem.depthMask(true);
         RenderSystem.enableDepthTest();
     }

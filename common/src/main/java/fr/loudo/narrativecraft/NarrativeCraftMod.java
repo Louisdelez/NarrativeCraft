@@ -51,7 +51,7 @@ public class NarrativeCraftMod {
     private final RecordingManager recordingManager = new RecordingManager();
     private final PlaybackManager playbackManager = new PlaybackManager();
     private final NarrativeCraftLogoRenderer narrativeCraftLogoRenderer =
-            new NarrativeCraftLogoRenderer(ResourceLocation.withDefaultNamespace("textures/narrativecraft_logo.png"));
+            new NarrativeCraftLogoRenderer(new ResourceLocation("textures/narrativecraft_logo.png"));
     private NarrativeClientOption narrativeClientOptions = new NarrativeClientOption();
     private NarrativeWorldOption narrativeWorldOption = new NarrativeWorldOption();
 

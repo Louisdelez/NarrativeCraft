@@ -83,7 +83,7 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                                             animation,
                                             animation
                                                             .getActionsData()
-                                                            .getFirst()
+                                                            .get(0)
                                                             .getLocations()
                                                             .size()
                                                     - 1));
@@ -106,7 +106,7 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                                                 animation,
                                                 animation
                                                                 .getActionsData()
-                                                                .getFirst()
+                                                                .get(0)
                                                                 .getLocations()
                                                                 .size()
                                                         - 1);
@@ -129,9 +129,9 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                                 && cutscene.getAnimations().isEmpty()) continue;
                         Button button1 = Button.builder(Component.literal(cutscene.getName()), button2 -> {
                                     CutsceneKeyframe lastKeyframe = cutscene.getKeyframeGroups()
-                                            .getLast()
+                                            .get(cutscene.getKeyframeGroups().size() - 1)
                                             .getKeyframes()
-                                            .getLast();
+                                            .get(cutscene.getKeyframeGroups().get(cutscene.getKeyframeGroups().size() - 1).getKeyframes().size() - 1);
                                     int lastLocIndex =
                                             (lastKeyframe.getTick() + 2 + lastKeyframe.getTransitionDelayTick());
                                     for (Subscene subscene : cutscene.getSubscenes()) {
@@ -142,7 +142,7 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                                                             lastLocIndex,
                                                             animation
                                                                             .getActionsData()
-                                                                            .getFirst()
+                                                                            .get(0)
                                                                             .getLocations()
                                                                             .size()
                                                                     - 1));
@@ -155,7 +155,7 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                                                         lastLocIndex,
                                                         animation
                                                                         .getActionsData()
-                                                                        .getFirst()
+                                                                        .get(0)
                                                                         .getLocations()
                                                                         .size()
                                                                 - 1));
@@ -178,7 +178,7 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
     }
 
     private void spawnEntity(Animation animation, int index) {
-        List<Action> actions = animation.getActionsData().getFirst().getActions().stream()
+        List<Action> actions = animation.getActionsData().get(0).getActions().stream()
                 .filter(action -> index >= action.getTick()
                         && (action instanceof ItemChangeAction
                                 || action instanceof LivingEntityByteAction
@@ -194,12 +194,12 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
             characterStoryData.spawn(
                     cameraAngleController.getPlayerSession().getPlayer().level(), Environment.DEVELOPMENT);
             PlaybackData playbackData =
-                    new PlaybackData(animation.getActionsData().getFirst(), null);
+                    new PlaybackData(animation.getActionsData().get(0), null);
             playbackData.setEntity(characterStoryData.getCharacterRuntime().getEntity());
             for (Action action : actions) {
                 action.execute(playbackData);
             }
-            characterStoryData.applyItems(minecraft.player.registryAccess());
+            characterStoryData.applyItems();
             characterStoryData.applyBytes((LivingEntity) playbackData.getEntity());
             cameraAngleController.getCharacterStoryDataList().add(characterStoryData);
             cameraAngleController

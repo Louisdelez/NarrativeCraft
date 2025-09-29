@@ -56,7 +56,7 @@ public class CharacterChangePoseScreen extends Screen {
 
     @Override
     protected void init() {
-        List<Pose> poseList = List.of(Pose.STANDING, Pose.CROUCHING, Pose.SLEEPING, Pose.FALL_FLYING, Pose.SHOOTING);
+        List<Pose> poseList = List.of(Pose.STANDING, Pose.CROUCHING, Pose.SLEEPING, Pose.FALL_FLYING);
         int gap = 3;
         int startY = this.height / 2 - gap - 5 * poseList.size() - 20;
         int startX = this.width - 80 - 10;
@@ -74,25 +74,6 @@ public class CharacterChangePoseScreen extends Screen {
                         } else {
                             entityData.set(EntityAccessor.getDATA_SHARED_FLAGS_ID(), (byte) (currentMask & ~0x02));
                             characterStoryData.setEntityByte((byte) (currentMask & ~0x02));
-                        }
-                        if (pose == Pose.SHOOTING) {
-                            byte byteToAdd = 0;
-                            if (!livingEntity
-                                    .getItemBySlot(EquipmentSlot.OFFHAND)
-                                    .isEmpty()) {
-                                byteToAdd = 1;
-                            } else if (!livingEntity
-                                    .getItemBySlot(EquipmentSlot.MAINHAND)
-                                    .isEmpty()) {
-                                byteToAdd = 3;
-                            }
-                            if (currentLivingEntityByte == 0) {
-                                entityData.set(LivingEntityAccessor.getDATA_LIVING_ENTITY_FLAGS(), byteToAdd);
-                                characterStoryData.setLivingEntityByte(byteToAdd);
-                            } else {
-                                entityData.set(LivingEntityAccessor.getDATA_LIVING_ENTITY_FLAGS(), (byte) 0);
-                                characterStoryData.setLivingEntityByte((byte) 0);
-                            }
                         }
                     })
                     .width(80)
@@ -116,8 +97,5 @@ public class CharacterChangePoseScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {}
-
-    @Override
-    protected void renderBlurredBackground(float partialTick) {}
+    public void renderBackground(GuiGraphics guiGraphics) { }
 }

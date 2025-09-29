@@ -44,7 +44,7 @@ public abstract class SoundEngineMixin implements VolumeAudio {
     @Shadow
     protected abstract float calculateVolume(SoundInstance sound);
 
-    // Code owned by Mojang. Don't exist on 1.21.1, so I had to redo it.
+    // Code owned by Mojang. Don't exist on 1.20.1, so I had to redo it.
     @Override
     public void narrativecraft$setVolume(SoundInstance soundInstance, float volume) {
         if (this.loaded) {

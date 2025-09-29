@@ -84,7 +84,7 @@ public class CharacterSkinController {
                     DynamicTexture texture = new DynamicTexture(nativeImage);
                     minecraft
                             .getTextureManager()
-                            .register(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, path), texture);
+                            .register(new ResourceLocation(NarrativeCraftMod.MOD_ID, path), texture);
                 } catch (IOException ignored) {
                 }
             });
@@ -99,7 +99,7 @@ public class CharacterSkinController {
             minecraft.execute(() -> {
                 minecraft
                         .getTextureManager()
-                        .release(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, path));
+                        .release(new ResourceLocation(NarrativeCraftMod.MOD_ID, path));
             });
         }
         cachedSkins.clear();

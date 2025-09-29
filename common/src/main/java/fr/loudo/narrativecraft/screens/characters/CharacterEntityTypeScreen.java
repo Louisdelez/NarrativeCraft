@@ -26,19 +26,27 @@ package fr.loudo.narrativecraft.screens.characters;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import java.util.List;
+import java.util.function.Consumer;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.layouts.GridLayout;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
+import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.navigation.CommonInputs;
+import net.minecraft.client.gui.screens.OptionsSubScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.options.OptionsSubScreen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
 
 public class CharacterEntityTypeScreen extends OptionsSubScreen {
+
+    protected final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
 
     private EntityTypeList entityTypeList;
     private final List<EntityType<?>> entityTypes;
@@ -51,10 +59,16 @@ public class CharacterEntityTypeScreen extends OptionsSubScreen {
     }
 
     @Override
+    protected void init() {
+        addTitle();
+        addContents();
+    }
+
     protected void addTitle() {
-        LinearLayout linearlayout =
-                this.layout.addToHeader(LinearLayout.horizontal()).spacing(8);
-        linearlayout.defaultCellSetting().alignVerticallyMiddle();
+        GridLayout gridlayout = new GridLayout();
+        GridLayout.RowHelper rowHelper = gridlayout.createRowHelper(1);
+        LinearLayout linearlayout = this.layout.addToHeader(new LinearLayout(200, 20, LinearLayout.Orientation.HORIZONTAL), rowHelper.newCellSettings().paddingLeft(8));
+        linearlayout.defaultChildLayoutSetting().alignVerticallyMiddle();
         linearlayout.addChild(new StringWidget(this.title, this.font));
     }
 
@@ -65,7 +79,7 @@ public class CharacterEntityTypeScreen extends OptionsSubScreen {
     @Override
     protected void repositionElements() {
         super.repositionElements();
-        this.entityTypeList.updateSize(this.width, this.layout);
+        this.entityTypeList.updateSize(this.width, this.height, this.layout.getX(), this.layout.getY());
     }
 
     @Override
@@ -80,17 +94,15 @@ public class CharacterEntityTypeScreen extends OptionsSubScreen {
         characterStory.updateEntityType(entityType);
     }
 
-    @Override
-    protected void addOptions() {}
-
-    class EntityTypeList extends ObjectSelectionList<CharacterEntityTypeScreen.EntityTypeList.Entry> {
+    class EntityTypeList extends ObjectSelectionList<CharacterEntityTypeScreen.EntityTypeList.Entry> implements LayoutElement {
         public EntityTypeList(Minecraft minecraft) {
             super(
                     minecraft,
                     CharacterEntityTypeScreen.this.width,
                     CharacterEntityTypeScreen.this.height - 33 - 53,
                     33,
-                    18);
+                    18
+            ,18);
             int selectedEntityTypeId = characterStory.getEntityTypeId();
             entityTypes.forEach(entityType -> {
                 CharacterEntityTypeScreen.EntityTypeList.Entry entry =
@@ -107,6 +119,41 @@ public class CharacterEntityTypeScreen extends OptionsSubScreen {
 
         public int getRowWidth() {
             return super.getRowWidth() + 50;
+        }
+
+        @Override
+        public void setX(int x0) {
+            this.x0 = x0;
+        }
+
+        @Override
+        public void setY(int y0) {
+            this.y0 = y0;
+        }
+
+        @Override
+        public int getX() {
+            return x0;
+        }
+
+        @Override
+        public int getY() {
+            return y0;
+        }
+
+        @Override
+        public int getWidth() {
+            return width;
+        }
+
+        @Override
+        public int getHeight() {
+            return height;
+        }
+
+        @Override
+        public void visitWidgets(Consumer<AbstractWidget> consumer) {
+
         }
 
         public class Entry extends ObjectSelectionList.Entry<CharacterEntityTypeScreen.EntityTypeList.Entry> {

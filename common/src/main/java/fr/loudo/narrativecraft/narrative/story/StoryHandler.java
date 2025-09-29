@@ -74,14 +74,14 @@ public class StoryHandler {
         Chapter firstChapter =
                 NarrativeCraftMod.getInstance().getChapterManager().getChapterByIndex(1);
         playerSession.setChapter(firstChapter);
-        playerSession.setScene(firstChapter.getSortedSceneList().getFirst());
+        playerSession.setScene(firstChapter.getSortedSceneList().get(0));
         storyDebugHud = new StoryDebugHud(playerSession);
     }
 
     public StoryHandler(Chapter chapter, PlayerSession playerSession) {
         this.playerSession = playerSession;
         playerSession.setChapter(chapter);
-        playerSession.setScene(chapter.getSortedSceneList().getFirst());
+        playerSession.setScene(chapter.getSortedSceneList().get(0));
         storyDebugHud = new StoryDebugHud(playerSession);
     }
 
@@ -301,7 +301,7 @@ public class StoryHandler {
         if (subListId <= tags.size()) {
             newTags.addAll(tags.subList(subListId, tags.size()));
         }
-        if (!newTags.isEmpty() && newTags.getFirst().equalsIgnoreCase("save")) {
+        if (!newTags.isEmpty() && newTags.get(0).equalsIgnoreCase("save")) {
             newTags = newTags.subList(1, newTags.size());
         }
         newTags.addAll(save.getTagsRunning());
@@ -327,13 +327,12 @@ public class StoryHandler {
             story.choosePathString(scene.knotName());
         } catch (Exception e) {
             // If the scene was added in-game after a save was created, then load the latest scene
-            story.choosePathString(NarrativeCraftMod.getInstance()
+            List<Scene> scenes = NarrativeCraftMod.getInstance()
                     .getChapterManager()
                     .getChapters()
-                    .getFirst()
-                    .getSortedSceneList()
-                    .getLast()
-                    .knotName());
+                    .get(0)
+                    .getSortedSceneList();
+            story.choosePathString(scenes.get(scenes.size() - 1).knotName());
         }
     }
 

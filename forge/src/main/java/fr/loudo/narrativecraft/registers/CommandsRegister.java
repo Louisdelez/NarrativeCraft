@@ -25,18 +25,13 @@ package fr.loudo.narrativecraft.registers;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.commands.*;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
-@Mod(NarrativeCraftMod.MOD_ID)
+@Mod.EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class CommandsRegister {
-
-    public CommandsRegister(IEventBus eventBus) {
-        NeoForge.EVENT_BUS.addListener(CommandsRegister::register);
-    }
-
+    @SubscribeEvent
     public static void register(RegisterCommandsEvent event) {
         PlayerSessionCommand.register(event.getDispatcher());
         RecordCommand.register(event.getDispatcher());
@@ -46,3 +41,4 @@ public class CommandsRegister {
         LinkCommand.register(event.getDispatcher());
     }
 }
+
