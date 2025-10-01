@@ -30,7 +30,7 @@ import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import java.util.List;
 import java.util.function.Consumer;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.layouts.LinearLayout;
+import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -68,9 +68,9 @@ public class ChooseCharacterScreen extends GenericSelectionScreen<CharacterStory
     }
 
     @Override
-    protected void addCustomTitleButtons(LinearLayout layout) {
+    protected void addCustomTitleButtons(GridLayout.RowHelper rowHelper) {
         if (scene == null) return;
-        layout.addChild(Button.builder(
+        rowHelper.addChild(Button.builder(
                         characterType == CharacterType.NPC ? Component.literal("<- MAIN") : Component.literal("NPC ->"),
                         button -> {
                             Screen screen = new ChooseCharacterScreen(

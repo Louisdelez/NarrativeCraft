@@ -25,50 +25,68 @@ package fr.loudo.narrativecraft.screens.components;
 
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.util.Translation;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.ObjectSelectionList;
-import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
-import net.minecraft.client.gui.layouts.LayoutElement;
-import net.minecraft.client.gui.navigation.CommonInputs;
-import net.minecraft.client.gui.screens.OptionsSubScreen;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
-
 import java.io.File;
 import java.util.List;
 import java.util.function.Consumer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
+import net.minecraft.client.gui.navigation.CommonInputs;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
 
-public class ChangeSkinLinkScreen extends OptionsSubScreen {
+public class ChangeSkinLinkScreen extends Screen {
 
     protected final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
 
+    private final Screen lastScreen;
     private SkinList skinList;
     private final CharacterRuntime characterRuntime;
     private final Consumer<String> stringCallback;
 
     public ChangeSkinLinkScreen(Screen lastScreen, CharacterRuntime characterRuntime, Consumer<String> stringCallback) {
-        super(
-                lastScreen,
-                Minecraft.getInstance().options,
-                Translation.message(
-                        "screen.change_skin_link.title",
-                        characterRuntime.getCharacterStory().getName()));
+        super(Translation.message(
+                "screen.change_skin_link.title",
+                characterRuntime.getCharacterStory().getName()));
+        this.lastScreen = lastScreen;
         this.characterRuntime = characterRuntime;
         this.stringCallback = stringCallback;
     }
 
-    protected void addContents() {
-        this.skinList = this.layout.addToContents(new SkinList(
-                this.minecraft, characterRuntime.getCharacterSkinController().getSkins()));
+    @Override
+    protected void init() {
+        this.addTitle();
+        this.addContents();
+        this.addFooter();
+        this.layout.visitWidgets(this::addRenderableWidget);
+        this.repositionElements();
+        super.init();
     }
 
-    protected void addOptions() {}
+    private void addTitle() {
+        layout.addToHeader(new StringWidget(this.title, this.font));
+    }
+
+    protected void addContents() {
+        this.skinList = new SkinList(
+                this.minecraft, characterRuntime.getCharacterSkinController().getSkins());
+        addRenderableWidget(skinList);
+    }
+
+    private void addFooter() {
+        this.layout.addToFooter(Button.builder(CommonComponents.GUI_DONE, p_345997_ -> this.onClose())
+                .width(200)
+                .build());
+    }
 
     protected void repositionElements() {
-        super.repositionElements();
-        this.skinList.updateSize(this.width, this.height, this.layout.getX(), this.layout.getY());
+        this.layout.arrangeElements();
+        this.skinList.updateSize(
+                this.width, this.height, this.layout.getHeaderHeight(), this.height - this.layout.getFooterHeight());
     }
 
     @Override
@@ -86,9 +104,15 @@ public class ChangeSkinLinkScreen extends OptionsSubScreen {
         stringCallback.accept(skin);
     }
 
-    class SkinList extends ObjectSelectionList<SkinList.Entry> implements LayoutElement {
+    class SkinList extends ObjectSelectionList<SkinList.Entry> {
         public SkinList(Minecraft minecraft, List<File> skins) {
-            super(minecraft, ChangeSkinLinkScreen.this.width, ChangeSkinLinkScreen.this.height - 33 - 53, 33, 18, 18);
+            super(
+                    minecraft,
+                    ChangeSkinLinkScreen.this.width,
+                    ChangeSkinLinkScreen.this.height,
+                    32,
+                    ChangeSkinLinkScreen.this.height - 65,
+                    18);
             String selectedSkin;
             if (characterRuntime.getCharacterSkinController().getCurrentSkin() != null) {
                 selectedSkin = characterRuntime
@@ -112,41 +136,6 @@ public class ChangeSkinLinkScreen extends OptionsSubScreen {
 
         public int getRowWidth() {
             return super.getRowWidth() + 50;
-        }
-
-        @Override
-        public void setX(int x0) {
-            this.x0 = x0;
-        }
-
-        @Override
-        public void setY(int y0) {
-            this.y0 = y0;
-        }
-
-        @Override
-        public int getX() {
-            return x0;
-        }
-
-        @Override
-        public int getY() {
-            return y0;
-        }
-
-        @Override
-        public int getWidth() {
-            return width;
-        }
-
-        @Override
-        public int getHeight() {
-            return height;
-        }
-
-        @Override
-        public void visitWidgets(Consumer<AbstractWidget> consumer) {
-
         }
 
         public class Entry extends ObjectSelectionList.Entry<Entry> {

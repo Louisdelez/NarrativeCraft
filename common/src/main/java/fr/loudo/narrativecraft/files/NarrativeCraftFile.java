@@ -44,18 +44,17 @@ import fr.loudo.narrativecraft.serialization.*;
 import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.DefaultPlayerSkin;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.level.storage.LevelResource;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.regex.Matcher;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.DefaultPlayerSkin;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.level.storage.LevelResource;
 
 public class NarrativeCraftFile {
     public static final String EXTENSION_SCRIPT_FILE = ".ink";
@@ -433,8 +432,7 @@ public class NarrativeCraftFile {
             gson.toJson(characterStory, writer);
         }
         try {
-            characterStory.setModel(
-                    CharacterModel.valueOf(DefaultPlayerSkin.getSkinModelName(randomUUID)));
+            characterStory.setModel(CharacterModel.valueOf(DefaultPlayerSkin.getSkinModelName(randomUUID)));
         } catch (IllegalArgumentException ignored) {
         }
     }
@@ -455,8 +453,7 @@ public class NarrativeCraftFile {
             gson.toJson(characterStory, writer);
         }
         try {
-            characterStory.setModel(
-                    CharacterModel.valueOf(DefaultPlayerSkin.getSkinModelName(randomUUID)));
+            characterStory.setModel(CharacterModel.valueOf(DefaultPlayerSkin.getSkinModelName(randomUUID)));
         } catch (IllegalArgumentException ignored) {
         }
     }

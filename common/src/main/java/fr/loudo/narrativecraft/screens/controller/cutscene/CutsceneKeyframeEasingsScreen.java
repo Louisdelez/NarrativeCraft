@@ -28,7 +28,6 @@ import fr.loudo.narrativecraft.util.Easing;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.Arrays;
 import java.util.function.Consumer;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -126,9 +125,7 @@ public class CutsceneKeyframeEasingsScreen extends OptionsSubScreen {
         }
 
         @Override
-        public void visitWidgets(Consumer<AbstractWidget> consumer) {
-
-        }
+        public void visitWidgets(Consumer<AbstractWidget> consumer) {}
 
         public class Entry extends ObjectSelectionList.Entry<CutsceneEasingsList.Entry> {
             private final Easing easing;

@@ -28,14 +28,11 @@ import java.util.List;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
-import net.minecraft.client.gui.layouts.LayoutElement;
-import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
@@ -71,19 +68,19 @@ public class GenericSelectionScreen<T extends NarrativeEntry> extends Screen {
     }
 
     protected void addTitle() {
-        GridLayout gridlayout = new GridLayout();
-        GridLayout.RowHelper rowHelper = gridlayout.createRowHelper(1);
-        LinearLayout linearlayout = this.layout.addToHeader(new LinearLayout(200, 20, LinearLayout.Orientation.HORIZONTAL), rowHelper.newCellSettings().paddingLeft(8));
-        linearlayout.defaultChildLayoutSetting().alignVerticallyMiddle();
-        linearlayout.addChild(new StringWidget(this.title, this.font));
+        GridLayout gridlayout = this.layout.addToHeader(new GridLayout()).spacing(4);
+        gridlayout.defaultCellSetting().alignVerticallyMiddle();
+        GridLayout.RowHelper rowHelper = gridlayout.createRowHelper(2);
+        rowHelper.addChild(new StringWidget(this.title, this.font));
 
-        addCustomTitleButtons(linearlayout);
+        addCustomTitleButtons(rowHelper);
     }
 
-    protected void addCustomTitleButtons(LinearLayout layout) {}
+    protected void addCustomTitleButtons(GridLayout.RowHelper rowHelper) {}
 
     protected void addContents() {
-        this.selectionList = this.layout.addToContents(new SelectionList<>(this.minecraft, this));
+        this.selectionList = new SelectionList<>(this.minecraft, this);
+        addRenderableWidget(selectionList);
     }
 
     protected void addFooter() {
@@ -94,7 +91,8 @@ public class GenericSelectionScreen<T extends NarrativeEntry> extends Screen {
 
     protected void repositionElements() {
         this.layout.arrangeElements();
-        this.selectionList.updateSize(this.width, this.height, this.layout.getX(), this.layout.getY());
+        this.selectionList.updateSize(
+                this.width, this.height, this.layout.getHeaderHeight(), this.height - this.layout.getFooterHeight());
     }
 
     @Override
@@ -116,11 +114,11 @@ public class GenericSelectionScreen<T extends NarrativeEntry> extends Screen {
         return currentSelection;
     }
 
-    static class SelectionList<T extends NarrativeEntry> extends ObjectSelectionList<SelectionList<T>.Entry> implements LayoutElement {
+    static class SelectionList<T extends NarrativeEntry> extends ObjectSelectionList<SelectionList<T>.Entry> {
         private final GenericSelectionScreen<T> parentScreen;
 
         public SelectionList(Minecraft minecraft, GenericSelectionScreen<T> parentScreen) {
-            super(minecraft, parentScreen.width, parentScreen.height - 33 - 53, 33, 18, 18);
+            super(minecraft, parentScreen.width, parentScreen.height, 32, parentScreen.height - 65, 18);
             this.parentScreen = parentScreen;
 
             String selectedName = "";
@@ -141,45 +139,6 @@ public class GenericSelectionScreen<T extends NarrativeEntry> extends Screen {
             if (this.getSelected() != null) {
                 this.centerScrollOn(this.getSelected());
             }
-        }
-
-        public int getRowWidth() {
-            return super.getRowWidth() + 50;
-        }
-
-        @Override
-        public void setX(int x0) {
-            this.x0 = x0;
-        }
-
-        @Override
-        public void setY(int y0) {
-            this.y0 = y0;
-        }
-
-        @Override
-        public int getX() {
-            return x0;
-        }
-
-        @Override
-        public int getY() {
-            return y0;
-        }
-
-        @Override
-        public int getWidth() {
-            return width;
-        }
-
-        @Override
-        public int getHeight() {
-            return height;
-        }
-
-        @Override
-        public void visitWidgets(Consumer<AbstractWidget> consumer) {
-
         }
 
         public class Entry extends ObjectSelectionList.Entry<Entry> {

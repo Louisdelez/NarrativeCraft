@@ -33,14 +33,12 @@ import fr.loudo.narrativecraft.screens.components.StoryElementList;
 import fr.loudo.narrativecraft.screens.storyManager.StoryElementScreen;
 import fr.loudo.narrativecraft.util.ImageFontConstants;
 import fr.loudo.narrativecraft.util.Translation;
-import net.minecraft.Util;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.layouts.GridLayout;
-import net.minecraft.client.gui.layouts.LinearLayout;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.Util;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.layouts.GridLayout;
 
 public class StoryOptionsScreen extends StoryElementScreen {
 
@@ -53,10 +51,9 @@ public class StoryOptionsScreen extends StoryElementScreen {
 
     @Override
     protected void addTitle() {
-        GridLayout gridlayout = new GridLayout();
+        GridLayout gridlayout = this.layout.addToHeader(new GridLayout());
         GridLayout.RowHelper rowHelper = gridlayout.createRowHelper(1);
-        linearlayout = this.layout.addToHeader(new LinearLayout(200, 20, LinearLayout.Orientation.HORIZONTAL), rowHelper.newCellSettings().paddingLeft(8));
-        linearlayout.addChild(Button.builder(ImageFontConstants.FOLDER, button -> {
+        rowHelper.addChild(Button.builder(ImageFontConstants.FOLDER, button -> {
                     openFolder();
                 })
                 .width(25)
@@ -102,6 +99,6 @@ public class StoryOptionsScreen extends StoryElementScreen {
                         })
                         .build()));
 
-        this.storyElementList = this.layout.addToContents(new StoryElementList(this.minecraft, this, entries, true));
+        this.storyElementList = new StoryElementList(this.minecraft, this, entries, true);
     }
 }

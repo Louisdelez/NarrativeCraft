@@ -204,7 +204,7 @@ public class CutsceneControllerScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics) { }
+    public void renderBackground(GuiGraphics guiGraphics) {}
 
     @Override
     public boolean isPauseScreen() {

@@ -166,7 +166,8 @@ public class Playback {
                 List<Location> movementData = actionsData.getLocations();
                 if (movementData.isEmpty()) continue;
                 if (needToRespawn(
-                        movementData.get(0).asVec3(), movementData.get(movementData.size() - 1).asVec3())) {
+                        movementData.get(0).asVec3(),
+                        movementData.get(movementData.size() - 1).asVec3())) {
                     if (playbackData.getEntity().getUUID().equals(masterEntity.getUUID())) {
                         playbackData.killEntity();
                         spawnMasterEntity(movementData.get(0));

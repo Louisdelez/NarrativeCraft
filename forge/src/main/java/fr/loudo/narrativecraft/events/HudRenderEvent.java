@@ -33,12 +33,9 @@ public class HudRenderEvent {
     @SubscribeEvent
     public static void onHudRender(RenderGuiEvent.Post event) {
         OnHudRender.controllerHudInfo(event.getGuiGraphics());
-        OnHudRender.inkActionRender(
-                event.getGuiGraphics(), event.getPartialTick());
+        OnHudRender.inkActionRender(event.getGuiGraphics(), event.getPartialTick());
         OnHudRender.dialogRender(event.getGuiGraphics(), event.getPartialTick());
-        OnHudRender.saveIconRender(
-                event.getGuiGraphics(), event.getPartialTick());
-        OnHudRender.storyDebugRender(
-                event.getGuiGraphics(), event.getPartialTick());
+        OnHudRender.saveIconRender(event.getGuiGraphics(), event.getPartialTick());
+        OnHudRender.storyDebugRender(event.getGuiGraphics(), event.getPartialTick());
     }
 }

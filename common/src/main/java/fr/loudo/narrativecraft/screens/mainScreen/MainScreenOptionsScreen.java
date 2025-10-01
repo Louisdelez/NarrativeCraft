@@ -80,7 +80,9 @@ public class MainScreenOptionsScreen extends OptionsSubScreen {
         NarrativeClientOption clientOption = NarrativeCraftMod.getInstance().getNarrativeClientOptions();
         GridLayout gridlayout = new GridLayout();
         GridLayout.RowHelper rowHelper = gridlayout.createRowHelper(1);
-        LinearLayout linearlayout = this.layout.addToHeader(new LinearLayout(200, 20, LinearLayout.Orientation.VERTICAL), rowHelper.newCellSettings().paddingBottom(8));
+        LinearLayout linearlayout = this.layout.addToHeader(
+                new LinearLayout(200, 20, LinearLayout.Orientation.VERTICAL),
+                rowHelper.newCellSettings().paddingBottom(8));
         AbstractSliderButton abstractSliderButton =
                 new AbstractSliderButton(
                         50,
@@ -108,7 +110,8 @@ public class MainScreenOptionsScreen extends OptionsSubScreen {
                 };
 
         linearlayout.addChild(abstractSliderButton);
-        autoSkipCheck = new Checkbox(0, 0, 20, 20, Translation.message("screen.main_screen.options.auto_skip"), clientOption.autoSkip);
+        autoSkipCheck = new Checkbox(
+                0, 0, 20, 20, Translation.message("screen.main_screen.options.auto_skip"), clientOption.autoSkip);
         linearlayout.addChild(autoSkipCheck);
 
         linearlayout.addChild(Button.builder(Translation.message("screen.main_screen.minecraft_options"), button -> {

@@ -41,4 +41,3 @@ public class CommandsRegister {
         LinkCommand.register(event.getDispatcher());
     }
 }
-

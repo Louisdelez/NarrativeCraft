@@ -24,8 +24,8 @@
 package fr.loudo.narrativecraft.items;
 
 import com.mojang.authlib.properties.Property;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import fr.loudo.narrativecraft.util.Util;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -43,21 +43,22 @@ public class CutsceneEditItems {
     public static ItemStack trigger;
 
     public static void init() {
-        camera = getItemWithTexture("", Items.PLAYER_HEAD, CAMERA_TEXTURE);
-        trigger = getItemWithTexture("", Items.PLAYER_HEAD, TRIGGER_TEXTURE);
+        camera = getItemWithTexture(Items.PLAYER_HEAD, CAMERA_TEXTURE);
+        trigger = getItemWithTexture(Items.PLAYER_HEAD, TRIGGER_TEXTURE);
     }
 
-    private static ItemStack getItem(String name, RegistryAccess registryAccess, Item item) {
-        CompoundTag tag = Util.tagFromIdAndComponents(item, "{\"minecraft:custom_name\":\"" + name + "\"}");
-        return ItemStack.of(tag);
-    }
+    private static ItemStack getItemWithTexture(Item item, Property textures) {
+        String nbt = String.format(
+                "{SkullOwner:{Id:[I;1855608559,1888174995,-1344221247,-1537215184],Properties:{textures:[{Value:\"%s\"}]}}}",
+                textures.getValue());
+        CompoundTag tag = null;
+        try {
+            tag = Util.nbtFromString(nbt);
+        } catch (CommandSyntaxException ignored) {
+        }
 
-    private static ItemStack getItemWithTexture(
-            String name, Item item, Property textures) {
-        CompoundTag tag = Util.tagFromIdAndComponents(
-                item,
-                "{\"minecraft:custom_name\":\"" + name + "\", \"minecraft:profile\":{properties:[{name: \""
-                        + textures.getName() + "\", value: \"" + textures.getValue() + "\"}]}}");
-        return ItemStack.of(tag);
+        ItemStack itemStack = new ItemStack(item);
+        itemStack.setTag(tag);
+        return itemStack;
     }
 }

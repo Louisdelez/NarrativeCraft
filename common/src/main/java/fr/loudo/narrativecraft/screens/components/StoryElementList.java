@@ -27,62 +27,24 @@ import fr.loudo.narrativecraft.util.ImageFontConstants;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.ContainerObjectSelectionList;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.layouts.LayoutElement;
-import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
-public class StoryElementList extends ContainerObjectSelectionList<StoryElementList.Entry> implements LayoutElement {
+public class StoryElementList extends ObjectSelectionList<StoryElementList.Entry> {
 
     public StoryElementList(Minecraft minecraft, Screen screen, List<StoryEntryData> entriesData, boolean editButton) {
-        super(minecraft, 240, screen.width, screen.height, 25, screen.height);
+        super(minecraft, screen.width, screen.height, 32, screen.height - 65, 24);
+        this.setRenderSelection(false);
         for (StoryEntryData data : entriesData) {
             this.addEntry(new Entry(data, screen, editButton));
         }
     }
-
-    @Override
-    public void setX(int x0) {
-        this.x0 = x0;
-    }
-
-    @Override
-    public void setY(int y0) {
-        this.y0 = y0;
-    }
-
-    @Override
-    public int getX() {
-        return x0;
-    }
-
-    @Override
-    public int getY() {
-        return y0;
-    }
-
-    @Override
-    public int getWidth() {
-        return width;
-    }
-
-    @Override
-    public int getHeight() {
-        return height;
-    }
-
-    @Override
-    public void visitWidgets(Consumer<AbstractWidget> consumer) {}
 
     public static class StoryEntryData {
         public final Button mainButton;
@@ -108,7 +70,7 @@ public class StoryElementList extends ContainerObjectSelectionList<StoryElementL
         }
     }
 
-    public static class Entry extends ContainerObjectSelectionList.Entry<Entry> {
+    public static class Entry extends ObjectSelectionList.Entry<Entry> {
         private final int gap = 5;
         private final Button mainButton;
         private final List<Button> buttons;
@@ -188,13 +150,34 @@ public class StoryElementList extends ContainerObjectSelectionList<StoryElementL
         }
 
         @Override
-        public List<? extends GuiEventListener> children() {
-            return buttons;
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            for (Button btn : buttons) {
+                if (btn.mouseClicked(mouseX, mouseY, button)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         @Override
-        public List<? extends NarratableEntry> narratables() {
-            return buttons;
+        public boolean mouseReleased(double mouseX, double mouseY, int button) {
+            for (Button btn : buttons) {
+                btn.mouseReleased(mouseX, mouseY, button);
+            }
+            return false;
+        }
+
+        @Override
+        public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+            for (Button btn : buttons) {
+                btn.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+            }
+            return false;
+        }
+
+        @Override
+        public Component getNarration() {
+            return mainButton.getMessage();
         }
     }
 }

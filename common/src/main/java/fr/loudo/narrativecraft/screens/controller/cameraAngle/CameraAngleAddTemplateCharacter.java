@@ -131,7 +131,13 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                                     CutsceneKeyframe lastKeyframe = cutscene.getKeyframeGroups()
                                             .get(cutscene.getKeyframeGroups().size() - 1)
                                             .getKeyframes()
-                                            .get(cutscene.getKeyframeGroups().get(cutscene.getKeyframeGroups().size() - 1).getKeyframes().size() - 1);
+                                            .get(cutscene.getKeyframeGroups()
+                                                            .get(cutscene.getKeyframeGroups()
+                                                                            .size()
+                                                                    - 1)
+                                                            .getKeyframes()
+                                                            .size()
+                                                    - 1);
                                     int lastLocIndex =
                                             (lastKeyframe.getTick() + 2 + lastKeyframe.getTransitionDelayTick());
                                     for (Subscene subscene : cutscene.getSubscenes()) {

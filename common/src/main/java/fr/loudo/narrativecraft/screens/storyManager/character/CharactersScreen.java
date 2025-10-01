@@ -144,7 +144,7 @@ public class CharactersScreen extends StoryElementScreen {
                 })
                 .toList();
 
-        this.storyElementList = this.layout.addToContents(new StoryElementList(this.minecraft, this, entries, true));
+        this.storyElementList = new StoryElementList(this.minecraft, this, entries, true);
     }
 
     @Override
@@ -152,8 +152,7 @@ public class CharactersScreen extends StoryElementScreen {
         if (scene == null) {
             net.minecraft.Util.getPlatform().openFile(NarrativeCraftFile.characterDirectory);
         } else {
-            net.minecraft.Util.getPlatform()
-                    .openFile(NarrativeCraftFile.getNpcFolder(scene));
+            net.minecraft.Util.getPlatform().openFile(NarrativeCraftFile.getNpcFolder(scene));
         }
     }
 }

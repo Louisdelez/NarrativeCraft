@@ -39,12 +39,11 @@ import net.minecraft.sounds.SoundEvent;
 
 public class CreditScreen extends WinScreen {
 
-    public static final ResourceLocation LOGO =
-           new ResourceLocation("minecraft", "textures/narrativecraft_logo.png");
+    public static final ResourceLocation LOGO = new ResourceLocation("minecraft", "textures/narrativecraft_logo.png");
 
     private static final ResourceLocation BACKGROUND_IMAGE =
-           new ResourceLocation("minecraft", "textures/narrativecraft_credits/background.png");
-    private static final ResourceLocation MUSIC =new ResourceLocation("minecraft", "narrativecraft_credits.music");
+            new ResourceLocation("minecraft", "textures/narrativecraft_credits/background.png");
+    private static final ResourceLocation MUSIC = new ResourceLocation("minecraft", "narrativecraft_credits.music");
 
     public static final SimpleSoundInstance MUSIC_INSTANCE =
             SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(MUSIC), 1, 1);

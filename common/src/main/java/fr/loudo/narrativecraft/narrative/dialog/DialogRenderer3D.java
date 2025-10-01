@@ -30,7 +30,6 @@ import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.dialog.geometric.DialogTail;
 import fr.loudo.narrativecraft.util.Easing;
 import fr.loudo.narrativecraft.util.Position2D;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.Direction;
 import net.minecraft.util.FastColor;
@@ -241,148 +240,76 @@ public class DialogRenderer3D extends DialogRenderer {
 
         switch (side) {
             case UP -> {
-                vertexConsumer
-                        .vertex(matrix4f, -originalWidth, 0, 0)
-                        .color(backgroundColor)
-                        ;
-                vertexConsumer
-                        .vertex(matrix4f, originalWidth, 0, 0)
-                        .color(backgroundColor)
-                        ;
+                vertexConsumer.vertex(matrix4f, -originalWidth, 0, 0).color(backgroundColor);
+                vertexConsumer.vertex(matrix4f, originalWidth, 0, 0).color(backgroundColor);
                 vertexConsumer
                         .vertex(matrix4f, originalWidth, -originalHeight, 0)
-                        .color(backgroundColor)
-                        ;
+                        .color(backgroundColor);
                 vertexConsumer
                         .vertex(matrix4f, -originalWidth, -originalHeight, 0)
-                        .color(backgroundColor)
-                        ;
+                        .color(backgroundColor);
             }
             case RIGHT -> {
                 if (diffY < 0) {
-                    vertexConsumer
-                            .vertex(matrix4f, 0, 0, 0)
-                            .color(backgroundColor)
-                            ;
-                    vertexConsumer
-                            .vertex(matrix4f, 0, originalHeight, 0)
-                            .color(backgroundColor)
-                            ;
+                    vertexConsumer.vertex(matrix4f, 0, 0, 0).color(backgroundColor);
+                    vertexConsumer.vertex(matrix4f, 0, originalHeight, 0).color(backgroundColor);
                     vertexConsumer
                             .vertex(matrix4f, originalWidth * 2, originalHeight, 0)
-                            .color(backgroundColor)
-                            ;
-                    vertexConsumer
-                            .vertex(matrix4f, originalWidth * 2, 0, 0)
-                            .color(backgroundColor)
-                            ;
+                            .color(backgroundColor);
+                    vertexConsumer.vertex(matrix4f, originalWidth * 2, 0, 0).color(backgroundColor);
                 } else if (diffY > 0) {
-                    vertexConsumer
-                            .vertex(matrix4f, 0, -originalHeight, 0)
-                            .color(backgroundColor)
-                            ;
-                    vertexConsumer
-                            .vertex(matrix4f, 0, 0, 0)
-                            .color(backgroundColor)
-                            ;
-                    vertexConsumer
-                            .vertex(matrix4f, originalWidth * 2, 0, 0)
-                            .color(backgroundColor)
-                            ;
+                    vertexConsumer.vertex(matrix4f, 0, -originalHeight, 0).color(backgroundColor);
+                    vertexConsumer.vertex(matrix4f, 0, 0, 0).color(backgroundColor);
+                    vertexConsumer.vertex(matrix4f, originalWidth * 2, 0, 0).color(backgroundColor);
                     vertexConsumer
                             .vertex(matrix4f, originalWidth * 2, -originalHeight, 0)
-                            .color(backgroundColor)
-                            ;
+                            .color(backgroundColor);
                 } else {
-                    vertexConsumer
-                            .vertex(matrix4f, 0, -originalHeight / 2, 0)
-                            .color(backgroundColor)
-                            ;
-                    vertexConsumer
-                            .vertex(matrix4f, 0, originalHeight / 2, 0)
-                            .color(backgroundColor)
-                            ;
+                    vertexConsumer.vertex(matrix4f, 0, -originalHeight / 2, 0).color(backgroundColor);
+                    vertexConsumer.vertex(matrix4f, 0, originalHeight / 2, 0).color(backgroundColor);
                     vertexConsumer
                             .vertex(matrix4f, originalWidth * 2, originalHeight / 2, 0)
-                            .color(backgroundColor)
-                            ;
+                            .color(backgroundColor);
                     vertexConsumer
                             .vertex(matrix4f, originalWidth * 2, -originalHeight / 2, 0)
-                            .color(backgroundColor)
-                            ;
+                            .color(backgroundColor);
                 }
             }
             case LEFT -> {
                 if (diffY < 0) {
-                    vertexConsumer
-                            .vertex(matrix4f, -originalWidth * 2, 0, 0)
-                            .color(backgroundColor)
-                            ;
+                    vertexConsumer.vertex(matrix4f, -originalWidth * 2, 0, 0).color(backgroundColor);
                     vertexConsumer
                             .vertex(matrix4f, -originalWidth * 2, originalHeight, 0)
-                            .color(backgroundColor)
-                            ;
-                    vertexConsumer
-                            .vertex(matrix4f, 0, originalHeight, 0)
-                            .color(backgroundColor)
-                            ;
-                    vertexConsumer
-                            .vertex(matrix4f, 0, 0, 0)
-                            .color(backgroundColor)
-                            ;
+                            .color(backgroundColor);
+                    vertexConsumer.vertex(matrix4f, 0, originalHeight, 0).color(backgroundColor);
+                    vertexConsumer.vertex(matrix4f, 0, 0, 0).color(backgroundColor);
                 } else if (diffY > 0) {
-                    vertexConsumer
-                            .vertex(matrix4f, 0, 0, 0)
-                            .color(backgroundColor)
-                            ;
-                    vertexConsumer
-                            .vertex(matrix4f, 0, -originalHeight, 0)
-                            .color(backgroundColor)
-                            ;
+                    vertexConsumer.vertex(matrix4f, 0, 0, 0).color(backgroundColor);
+                    vertexConsumer.vertex(matrix4f, 0, -originalHeight, 0).color(backgroundColor);
                     vertexConsumer
                             .vertex(matrix4f, -originalWidth * 2, -originalHeight, 0)
-                            .color(backgroundColor)
-                            ;
-                    vertexConsumer
-                            .vertex(matrix4f, -originalWidth * 2, 0, 0)
-                            .color(backgroundColor)
-                            ;
+                            .color(backgroundColor);
+                    vertexConsumer.vertex(matrix4f, -originalWidth * 2, 0, 0).color(backgroundColor);
                 } else {
-                    vertexConsumer
-                            .vertex(matrix4f, 0, originalHeight / 2, 0)
-                            .color(backgroundColor)
-                            ;
-                    vertexConsumer
-                            .vertex(matrix4f, 0, -originalHeight / 2, 0)
-                            .color(backgroundColor)
-                            ;
+                    vertexConsumer.vertex(matrix4f, 0, originalHeight / 2, 0).color(backgroundColor);
+                    vertexConsumer.vertex(matrix4f, 0, -originalHeight / 2, 0).color(backgroundColor);
                     vertexConsumer
                             .vertex(matrix4f, -originalWidth * 2, -originalHeight / 2, 0)
-                            .color(backgroundColor)
-                            ;
+                            .color(backgroundColor);
                     vertexConsumer
                             .vertex(matrix4f, -originalWidth * 2, originalHeight / 2, 0)
-                            .color(backgroundColor)
-                            ;
+                            .color(backgroundColor);
                 }
             }
             case DOWN -> {
                 vertexConsumer
                         .vertex(matrix4f, -originalWidth, originalHeight, 0)
-                        .color(backgroundColor)
-                        ;
+                        .color(backgroundColor);
                 vertexConsumer
                         .vertex(matrix4f, originalWidth, originalHeight, 0)
-                        .color(backgroundColor)
-                        ;
-                vertexConsumer
-                        .vertex(matrix4f, originalWidth, 0, 0)
-                        .color(backgroundColor)
-                        ;
-                vertexConsumer
-                        .vertex(matrix4f, -originalWidth, 0, 0)
-                        .color(backgroundColor)
-                        ;
+                        .color(backgroundColor);
+                vertexConsumer.vertex(matrix4f, originalWidth, 0, 0).color(backgroundColor);
+                vertexConsumer.vertex(matrix4f, -originalWidth, 0, 0).color(backgroundColor);
             }
         }
     }

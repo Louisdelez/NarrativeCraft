@@ -66,7 +66,8 @@ public class RightClickBlockAction extends Action {
                     new BlockHitResult(new Vec3(x, y, z), Direction.valueOf(directionName), blockPos, inside);
             UseOnContext useOnContext = new UseOnContext(fakePlayer, InteractionHand.valueOf(handName), blockHitResult);
 
-            InteractionResult result = blockState.use(fakePlayer.level(), fakePlayer, InteractionHand.valueOf(handName), blockHitResult);
+            InteractionResult result =
+                    blockState.use(fakePlayer.level(), fakePlayer, InteractionHand.valueOf(handName), blockHitResult);
             if (!result.consumesAction() && itemStack.isDamageableItem()) {
                 itemStack.getItem().useOn(useOnContext);
             }

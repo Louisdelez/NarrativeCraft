@@ -29,8 +29,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class NarrativeCraftLogoRenderer {
 
-    public static final ResourceLocation LOGO =
-           new ResourceLocation("minecraft", "textures/narrativecraft_logo.png");
+    public static final ResourceLocation LOGO = new ResourceLocation("minecraft", "textures/narrativecraft_logo.png");
 
     private final ResourceLocation resourceLocation;
     private int[] logoRes;
