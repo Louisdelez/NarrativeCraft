@@ -57,7 +57,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 
 public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyframe, CutsceneKeyframeGroup> {
 
@@ -209,8 +208,15 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         if (environment == Environment.DEVELOPMENT) {
             playerSession.setCurrentCamera(null);
         } else if (environment == Environment.PRODUCTION) {
-            playerSession.setCurrentCamera(
-                    keyframeGroups.get(keyframeGroups.size() - 1).getKeyframes().get(keyframeGroups.get(keyframeGroups.size() - 1).getKeyframes().size() - 1).getKeyframeLocation());
+            playerSession.setCurrentCamera(keyframeGroups
+                    .get(keyframeGroups.size() - 1)
+                    .getKeyframes()
+                    .get(keyframeGroups
+                                    .get(keyframeGroups.size() - 1)
+                                    .getKeyframes()
+                                    .size()
+                            - 1)
+                    .getKeyframeLocation());
         }
         playerSession.getPlaybackManager().getPlaybacks().removeAll(playbacks);
         if (environment != Environment.DEVELOPMENT) return;
@@ -458,7 +464,8 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
 
     public CutsceneKeyframe getLastKeyframeLastGroup() {
         if (keyframeGroups.isEmpty()) return null;
-        List<CutsceneKeyframe> keyframes = keyframeGroups.get(keyframeGroups.size() - 1).getKeyframes();
+        List<CutsceneKeyframe> keyframes =
+                keyframeGroups.get(keyframeGroups.size() - 1).getKeyframes();
         if (keyframes.isEmpty()) return null;
         return keyframes.get(keyframes.size() - 1);
     }

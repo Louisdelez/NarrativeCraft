@@ -61,7 +61,9 @@ public class WorldOptionsScreen extends StoryElementScreen {
     protected void addTitle() {
         GridLayout gridlayout = new GridLayout();
         GridLayout.RowHelper rowHelper = gridlayout.createRowHelper(1);
-        linearlayout = this.layout.addToHeader(new LinearLayout(200, 20, LinearLayout.Orientation.HORIZONTAL), rowHelper.newCellSettings().paddingLeft(8));
+        linearlayout = this.layout.addToHeader(
+                new LinearLayout(200, 20, LinearLayout.Orientation.HORIZONTAL),
+                rowHelper.newCellSettings().paddingLeft(8));
         linearlayout.defaultChildLayoutSetting().alignVerticallyMiddle();
         linearlayout.addChild(new StringWidget(this.title, this.font));
     }
@@ -83,7 +85,7 @@ public class WorldOptionsScreen extends StoryElementScreen {
                         val -> worldOption.showCreditsScreen = val,
                         "screen.world_options.show_credits_screen"));
 
-        this.storyElementList = this.layout.addToContents(new StoryElementList(this.minecraft, this, entries, true));
+        this.storyElementList = new StoryElementList(this.minecraft, this, entries, true);
     }
 
     private StoryElementList.StoryEntryData createToggleButton(

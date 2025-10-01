@@ -40,7 +40,6 @@ import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.GridLayout;
-import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
@@ -65,25 +64,24 @@ public class ScenesMenuScreen extends StoryElementScreen {
 
     @Override
     protected void addFooter() {
-        GridLayout gridlayout = new GridLayout();
-        GridLayout.RowHelper rowHelper = gridlayout.createRowHelper(1);
+        GridLayout gridlayout = this.layout.addToFooter(new GridLayout()).spacing(8);
+        GridLayout.RowHelper rowHelper = gridlayout.createRowHelper(2);
         int width = 200;
-        LinearLayout linearLayout = this.layout.addToHeader(new LinearLayout(width, 20, LinearLayout.Orientation.HORIZONTAL), rowHelper.newCellSettings().paddingLeft(8));
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
         if (playerSession.isSessionSet() && playerSession.getScene().equals(scene)) {
             width = 100;
-            linearLayout.addChild(Button.builder(CommonComponents.GUI_BACK, (p_345997_) -> {
+            rowHelper.addChild(Button.builder(CommonComponents.GUI_BACK, (p_345997_) -> {
                         ScenesScreen screen = new ScenesScreen(scene.getChapter());
                         this.minecraft.setScreen(screen);
                     })
                     .width(width)
                     .build());
-            linearLayout.addChild(Button.builder(CommonComponents.GUI_DONE, (p_345997_) -> minecraft.setScreen(null))
+            rowHelper.addChild(Button.builder(CommonComponents.GUI_DONE, (p_345997_) -> minecraft.setScreen(null))
                     .width(width)
                     .build());
         } else {
-            linearLayout.addChild(Button.builder(CommonComponents.GUI_BACK, (p_345997_) -> this.onClose())
+            layout.addToFooter(Button.builder(CommonComponents.GUI_BACK, (p_345997_) -> this.onClose())
                     .width(width)
                     .build());
         }
@@ -122,7 +120,7 @@ public class ScenesMenuScreen extends StoryElementScreen {
                         .build());
         List<StoryElementList.StoryEntryData> entries =
                 List.of(animation, cameraAngle, cutscene, interaction, npc, subscene);
-        this.storyElementList = this.layout.addToContents(new StoryElementList(this.minecraft, this, entries, true));
+        this.storyElementList = new StoryElementList(this.minecraft, this, entries, true);
     }
 
     @Override

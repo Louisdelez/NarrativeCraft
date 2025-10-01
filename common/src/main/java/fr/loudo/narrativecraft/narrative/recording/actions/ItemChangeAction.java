@@ -28,7 +28,6 @@ import fr.loudo.narrativecraft.narrative.playback.PlaybackData;
 import fr.loudo.narrativecraft.narrative.recording.actions.manager.ActionType;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.List;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -46,11 +45,7 @@ public class ItemChangeAction extends Action {
     private final String oldData;
     private final String equipmentSlot;
 
-    public ItemChangeAction(
-            int waitTick,
-            String equipmentSlot,
-            ItemStack itemStack,
-            ItemStack oldItemStack) {
+    public ItemChangeAction(int waitTick, String equipmentSlot, ItemStack itemStack, ItemStack oldItemStack) {
         super(waitTick, ActionType.ITEM_CHANGE);
         this.itemId = BuiltInRegistries.ITEM.getId(itemStack.getItem());
         this.oldItemId = BuiltInRegistries.ITEM.getId(oldItemStack.getItem());

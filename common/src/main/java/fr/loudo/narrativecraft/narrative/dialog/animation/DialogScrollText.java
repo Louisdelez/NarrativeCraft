@@ -246,7 +246,7 @@ public class DialogScrollText {
 
     private void playLetterSound() {
         float pitch = 0.8F + new Random().nextFloat() * 0.4F;
-        ResourceLocation soundRes =new ResourceLocation("minecraft", "sfx.dialog_sound");
+        ResourceLocation soundRes = new ResourceLocation("minecraft", "sfx.dialog_sound");
         SoundEvent soundEvent = SoundEvent.createVariableRangeEvent(soundRes);
         minecraft.player.playSound(soundEvent, 1.0F, pitch);
     }

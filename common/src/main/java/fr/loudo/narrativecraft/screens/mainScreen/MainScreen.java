@@ -64,9 +64,8 @@ import net.minecraft.util.FastColor;
 public class MainScreen extends Screen {
 
     public static final ResourceLocation BACKGROUND_IMAGE =
-           new ResourceLocation("minecraft", "textures/narrativecraft_mainscreen/background.png");
-    public static final ResourceLocation MUSIC =
-           new ResourceLocation("minecraft", "narrativecraft_mainscreen.music");
+            new ResourceLocation("minecraft", "textures/narrativecraft_mainscreen/background.png");
+    public static final ResourceLocation MUSIC = new ResourceLocation("minecraft", "narrativecraft_mainscreen.music");
 
     public static SimpleSoundInstance musicInstance = new SimpleSoundInstance(
             MainScreen.MUSIC,

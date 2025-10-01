@@ -37,7 +37,7 @@ import net.minecraft.resources.ResourceLocation;
 public class FinishedStoryScreen extends Screen {
 
     private static final ResourceLocation WINDOW_LOCATION =
-           new ResourceLocation("minecraft", "textures/gui/advancements/window.png");
+            new ResourceLocation("minecraft", "textures/gui/advancements/window.png");
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     private final PlayerSession playerSession;
 

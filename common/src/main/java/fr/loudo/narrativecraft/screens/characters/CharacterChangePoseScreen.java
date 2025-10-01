@@ -33,7 +33,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 
@@ -97,5 +96,5 @@ public class CharacterChangePoseScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics) { }
+    public void renderBackground(GuiGraphics guiGraphics) {}
 }

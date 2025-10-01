@@ -1,3 +1,26 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
@@ -5,6 +28,9 @@ import fr.loudo.narrativecraft.mixin.accessor.PlayerInfoAccessor;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.util.Util;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -15,14 +41,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 @Mixin(AbstractClientPlayer.class)
 public class AbstractClientPlayerMixin {
 
-    @Shadow private PlayerInfo playerInfo;
+    @Shadow
+    private PlayerInfo playerInfo;
 
     @Inject(method = "getSkinTextureLocation", at = @At("HEAD"), cancellable = true)
     private void narrativecraft$getSkinOfCharacter(CallbackInfoReturnable<ResourceLocation> cir) {
@@ -34,17 +57,23 @@ public class AbstractClientPlayerMixin {
         List<CharacterRuntime> characterRuntimes = new ArrayList<>(playerSession.getCharacterRuntimes());
         for (CharacterRuntime characterRuntime : characterRuntimes) {
             if (characterRuntime.getEntity() == null) continue;
-            if (!this.playerInfo.getProfile()
+            if (!this.playerInfo
+                    .getProfile()
                     .getName()
                     .equals(characterRuntime.getCharacterStory().getName())) continue;
-            ((PlayerInfoAccessor)playerInfo).setSkinModel(characterRuntime.getCharacterStory().getModel().name().toLowerCase());
+            ((PlayerInfoAccessor) playerInfo)
+                    .setSkinModel(characterRuntime
+                            .getCharacterStory()
+                            .getModel()
+                            .name()
+                            .toLowerCase());
             File currentSkin = characterRuntime.getCharacterSkinController().getCurrentSkin();
             if (currentSkin == null) return;
             ResourceLocation skinLocation = new ResourceLocation(
                     NarrativeCraftMod.MOD_ID,
                     "character/"
                             + Util.snakeCase(
-                            characterRuntime.getCharacterStory().getName()) + "/"
+                                    characterRuntime.getCharacterStory().getName()) + "/"
                             + Util.snakeCase(currentSkin.getName()));
 
             cir.setReturnValue(skinLocation);

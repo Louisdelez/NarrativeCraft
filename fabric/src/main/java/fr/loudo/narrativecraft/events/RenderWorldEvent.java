@@ -32,8 +32,7 @@ public class RenderWorldEvent {
     public static void renderWorld(WorldRenderContext worldRenderContext) {
         RenderSystem.depthMask(false);
         RenderSystem.disableDepthTest();
-        OnRenderWorld.renderWorld(
-                new PoseStack(), worldRenderContext.tickDelta());
+        OnRenderWorld.renderWorld(new PoseStack(), worldRenderContext.tickDelta());
         RenderSystem.depthMask(true);
         RenderSystem.enableDepthTest();
     }

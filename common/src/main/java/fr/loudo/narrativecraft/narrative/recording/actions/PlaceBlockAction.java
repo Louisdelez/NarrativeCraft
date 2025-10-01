@@ -53,8 +53,8 @@ public class PlaceBlockAction extends Action {
 
     @Override
     public void execute(PlaybackData playbackData) {
-        BlockState blockState =
-                Util.getBlockStateFromData(data, playbackData.getEntity().level().registryAccess());
+        BlockState blockState = Util.getBlockStateFromData(
+                data, playbackData.getEntity().level().registryAccess());
         if (blockState == null) return;
         BlockPos blockPos = new BlockPos(x, y, z);
         playbackData.getLevel().setBlock(blockPos, blockState, 3);
@@ -72,8 +72,8 @@ public class PlaceBlockAction extends Action {
 
     public void rewind(PlaybackData playbackData) {
         BlockPos blockPos = getBlockPos();
-        BlockState blockState =
-                Util.getBlockStateFromData(data, playbackData.getEntity().level().registryAccess());
+        BlockState blockState = Util.getBlockStateFromData(
+                data, playbackData.getEntity().level().registryAccess());
         if (blockState != null) {
             if (blockState.getBlock() instanceof BedBlock) {
                 if (blockState.getValue(BedBlock.PART) == BedPart.FOOT) {

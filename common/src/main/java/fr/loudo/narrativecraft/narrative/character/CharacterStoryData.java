@@ -31,7 +31,6 @@ import fr.loudo.narrativecraft.narrative.recording.Location;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -92,9 +91,7 @@ public class CharacterStoryData {
             try {
                 characterRuntime
                         .getEntity()
-                        .setItemSlot(
-                                EquipmentSlot.valueOf(itemSlotData.equipmentSlot),
-                                itemSlotData.getItem());
+                        .setItemSlot(EquipmentSlot.valueOf(itemSlotData.equipmentSlot), itemSlotData.getItem());
             } catch (Exception ignored) {
             }
         }

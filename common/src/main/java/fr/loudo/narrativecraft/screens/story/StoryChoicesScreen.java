@@ -100,7 +100,7 @@ public class StoryChoicesScreen extends Screen {
     @Override
     protected void init() {
         if (!initiated) {
-            ResourceLocation soundRes =new ResourceLocation("minecraft", "sfx.choice_appear");
+            ResourceLocation soundRes = new ResourceLocation("minecraft", "sfx.choice_appear");
             SoundEvent sound = SoundEvent.createVariableRangeEvent(soundRes);
             this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(sound, 1.0f, 1.0f));
         }
@@ -232,7 +232,7 @@ public class StoryChoicesScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics) { }
+    public void renderBackground(GuiGraphics guiGraphics) {}
 
     private record AnimatedChoice(ChoiceButtonWidget widget, int offsetX, int offsetY) {}
 }

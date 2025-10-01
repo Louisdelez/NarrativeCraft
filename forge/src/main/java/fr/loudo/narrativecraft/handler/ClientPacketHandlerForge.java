@@ -23,6 +23,4 @@
 
 package fr.loudo.narrativecraft.handler;
 
-public class ClientPacketHandlerForge {
-
-}
+public class ClientPacketHandlerForge {}

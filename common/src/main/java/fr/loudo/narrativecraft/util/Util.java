@@ -26,7 +26,6 @@ package fr.loudo.narrativecraft.util;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.font.GlyphInfo;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.serialization.DynamicOps;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.mixin.accessor.FontAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.PlayerAccessor;
@@ -64,7 +63,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 

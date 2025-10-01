@@ -366,5 +366,5 @@ public class DialogCustomOptionsScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics) { }
+    public void renderBackground(GuiGraphics guiGraphics) {}
 }

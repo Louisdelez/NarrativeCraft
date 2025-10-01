@@ -25,7 +25,6 @@ package fr.loudo.narrativecraft.screens.components;
 
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StringWidget;
-import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
@@ -51,11 +50,7 @@ public abstract class ButtonListScreen extends Screen {
     }
 
     protected void addTitle() {
-        GridLayout gridlayout = new GridLayout();
-        GridLayout.RowHelper rowHelper = gridlayout.createRowHelper(1);
-        linearlayout = this.layout.addToHeader(new LinearLayout(200, 20, LinearLayout.Orientation.HORIZONTAL), rowHelper.newCellSettings().paddingLeft(8));
-        linearlayout.defaultChildLayoutSetting().alignVerticallyMiddle();
-        linearlayout.addChild(new StringWidget(this.title, this.font));
+        layout.addToHeader(new StringWidget(this.title, this.font));
     }
 
     protected abstract void addContents();
@@ -69,8 +64,9 @@ public abstract class ButtonListScreen extends Screen {
     @Override
     protected void init() {
         addTitle();
-        this.objectListScreen = this.layout.addToContents(new ObjectListScreen(
-                this.minecraft, this, this.width, layout.getHeaderHeight(), layout.getHeaderHeight()));
+        this.objectListScreen = new ObjectListScreen(
+                this.minecraft, this, this.width, layout.getHeaderHeight(), layout.getHeaderHeight());
+        addRenderableWidget(objectListScreen);
         addContents();
         addFooter();
         this.layout.visitWidgets(this::addRenderableWidget);
@@ -81,7 +77,11 @@ public abstract class ButtonListScreen extends Screen {
     protected void repositionElements() {
         this.layout.arrangeElements();
         if (this.objectListScreen != null) {
-            this.objectListScreen.updateSize(this.width, this.height, this.layout.getX(), this.layout.getY());
+            this.objectListScreen.updateSize(
+                    this.width,
+                    this.height,
+                    this.layout.getHeaderHeight(),
+                    this.height - this.layout.getFooterHeight());
         }
     }
 }

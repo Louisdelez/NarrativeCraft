@@ -103,7 +103,7 @@ public class CameraAngleScreen extends StoryElementScreen {
                 })
                 .toList();
 
-        this.storyElementList = this.layout.addToContents(new StoryElementList(this.minecraft, this, entries, true));
+        this.storyElementList = new StoryElementList(this.minecraft, this, entries, true);
     }
 
     @Override
