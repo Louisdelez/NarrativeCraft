@@ -325,11 +325,9 @@ public class Playback {
 
     private void moveEntitySilent(Entity entity, Location location) {
         if (entity == null) return;
-        entity.setXRot(location.pitch());
-        entity.setYRot(location.yaw());
-        entity.setYHeadRot(location.yaw());
+        entity.moveTo(location.x(), location.y(), location.z(), location.yaw(), location.pitch());
         entity.setOnGround(location.onGround());
-        entity.teleportTo(location.x(), location.y(), location.z());
+        entity.setYHeadRot(location.yaw());
     }
 
     public boolean entityInPlayback(Entity entity) {

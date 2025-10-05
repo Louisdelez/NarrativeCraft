@@ -62,7 +62,11 @@ public abstract class AbstractController {
         Font font = minecraft.font;
         int width = minecraft.getWindow().getGuiScaledWidth();
         guiGraphics.drawString(
-                font, hudMessage, width / 2 - font.width(hudMessage) / 2, 10, FastColor.ARGB32.color(1, 1, 1, 1));
+                font,
+                hudMessage,
+                width / 2 - font.width(hudMessage) / 2,
+                10,
+                FastColor.ARGB32.color(255, 255, 255, 255));
     }
 
     public Environment getEnvironment() {

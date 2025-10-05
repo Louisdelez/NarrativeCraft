@@ -25,12 +25,11 @@ package fr.loudo.narrativecraft.narrative.dialog.animation;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.util.Easing;
 import fr.loudo.narrativecraft.util.MathHelper;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
@@ -72,7 +71,7 @@ public class DialogArrowSkip {
         }
     }
 
-    public void render(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, float partialTick) {
+    public void render(PoseStack poseStack, VertexConsumer consumer, float partialTick) {
         if (!isRunning) return;
         double translateX = -dialogRenderer.getPaddingX() * 2 + offset;
         double opacity;
@@ -85,20 +84,19 @@ public class DialogArrowSkip {
             originalColor = FastColor.ABGR32.color((int) (opacity * 255.0), color);
         }
         poseStack.translate(translateX, 0, 0);
-        draw(poseStack, bufferSource, originalColor);
+        draw(poseStack, consumer, originalColor);
     }
 
-    private void draw(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, int color) {
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(NarrativeCraftMod.dialogBackgroundRenderType);
+    private void draw(PoseStack poseStack, VertexConsumer consumer, int color) {
         Matrix4f matrix4f = poseStack.last().pose();
 
         float xStart = dialogRenderer.getTotalWidth() - width - offset;
         float xEnd = dialogRenderer.getTotalWidth() + width - offset;
 
-        vertexConsumer.vertex(matrix4f, xStart, -height, 0.01f).color(color);
-        vertexConsumer.vertex(matrix4f, xStart, height, 0.01f).color(color);
-        vertexConsumer.vertex(matrix4f, xEnd, 0, 0.01f).color(color);
-        vertexConsumer.vertex(matrix4f, xStart, -height, 0.01f).color(color);
+        consumer.vertex(matrix4f, xStart, -height, 0.01f).color(color).endVertex();
+        consumer.vertex(matrix4f, xStart, height, 0.01f).color(color).endVertex();
+        consumer.vertex(matrix4f, xEnd, 0, 0.01f).color(color).endVertex();
+        consumer.vertex(matrix4f, xStart, -height, 0.01f).color(color).endVertex();
     }
 
     public void render(GuiGraphics guiGraphics, float partialTick) {
@@ -117,13 +115,21 @@ public class DialogArrowSkip {
 
         poseStack.translate((float) translateX + offset, 0, 0);
 
-        VertexConsumer consumer = guiGraphics.bufferSource().getBuffer(NarrativeCraftMod.dialogBackgroundRenderType);
+        VertexConsumer consumer = guiGraphics.bufferSource().getBuffer(RenderType.gui());
         Matrix4f matrix4f = poseStack.last().pose();
 
-        consumer.vertex(matrix4f, -width, -height, 0.01f).color(FastColor.ABGR32.color((int) (opacity * 255), color));
-        consumer.vertex(matrix4f, -width, height, 0.01f).color(FastColor.ABGR32.color((int) (opacity * 255), color));
-        consumer.vertex(matrix4f, width, 0, 0.01f).color(FastColor.ABGR32.color((int) (opacity * 255), color));
-        consumer.vertex(matrix4f, -width, -height, 0.01f).color(FastColor.ABGR32.color((int) (opacity * 255), color));
+        consumer.vertex(matrix4f, -width, -height, 0.01f)
+                .color(FastColor.ABGR32.color((int) (opacity * 255), color))
+                .endVertex();
+        consumer.vertex(matrix4f, -width, height, 0.01f)
+                .color(FastColor.ABGR32.color((int) (opacity * 255), color))
+                .endVertex();
+        consumer.vertex(matrix4f, width, 0, 0.01f)
+                .color(FastColor.ABGR32.color((int) (opacity * 255), color))
+                .endVertex();
+        consumer.vertex(matrix4f, -width, -height, 0.01f)
+                .color(FastColor.ABGR32.color((int) (opacity * 255), color))
+                .endVertex();
 
         poseStack.popPose();
     }

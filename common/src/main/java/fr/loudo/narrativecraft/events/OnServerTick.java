@@ -25,9 +25,11 @@ package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
+import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -43,6 +45,10 @@ public class OnServerTick {
                 inkAction.tick();
             }
             playerSession.getInkActions().removeAll(toRemove);
+            for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+                server.getPlayerList().broadcastAll(new ClientboundRotateHeadPacket(characterRuntime.getEntity(), (byte)
+                        (characterRuntime.getEntity().getYHeadRot() * 256 / 360)));
+            }
         }
     }
 }

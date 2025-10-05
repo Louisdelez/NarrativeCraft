@@ -34,8 +34,6 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StringWidget;
-import net.minecraft.client.gui.layouts.GridLayout;
-import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -59,13 +57,7 @@ public class WorldOptionsScreen extends StoryElementScreen {
 
     @Override
     protected void addTitle() {
-        GridLayout gridlayout = new GridLayout();
-        GridLayout.RowHelper rowHelper = gridlayout.createRowHelper(1);
-        linearlayout = this.layout.addToHeader(
-                new LinearLayout(200, 20, LinearLayout.Orientation.HORIZONTAL),
-                rowHelper.newCellSettings().paddingLeft(8));
-        linearlayout.defaultChildLayoutSetting().alignVerticallyMiddle();
-        linearlayout.addChild(new StringWidget(this.title, this.font));
+        layout.addToHeader(new StringWidget(this.title, this.font));
     }
 
     @Override

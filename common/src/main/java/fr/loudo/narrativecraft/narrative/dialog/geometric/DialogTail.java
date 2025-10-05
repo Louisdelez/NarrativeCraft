@@ -25,10 +25,8 @@ package fr.loudo.narrativecraft.narrative.dialog.geometric;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer3D;
 import net.minecraft.client.Camera;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
@@ -45,8 +43,7 @@ public class DialogTail {
         this.offset = offset;
     }
 
-    public void render(
-            PoseStack poseStack, float partialTick, MultiBufferSource.BufferSource bufferSource, Camera camera) {
+    public void render(PoseStack poseStack, float partialTick, VertexConsumer consumer, Camera camera) {
 
         TailDirection tailDirection = TailDirection.TOP;
         if (dialog.getDialogOffset().x > 0) {
@@ -83,24 +80,22 @@ public class DialogTail {
             }
         }
 
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(NarrativeCraftMod.dialogBackgroundRenderType);
         Matrix4f matrix4f = poseStack.last().pose();
 
         float topRight = -width / 2 + offset;
         float topLeft = width / 2 + offset;
 
         switch (tailDirection) {
-            case TOP -> drawTailTop(matrix4f, vertexConsumer, topRight, topLeft);
-            case BOTTOM -> drawTailBottom(matrix4f, vertexConsumer, topRight, topLeft);
-            case RIGHT -> drawTailRight(matrix4f, vertexConsumer);
-            case RIGHT_UP_CORNER -> drawTailUpRightCorner(matrix4f, vertexConsumer);
-            case RIGHT_DOWN_CORNER -> drawTailDownRightCorner(matrix4f, vertexConsumer);
-            case LEFT -> drawTailLeft(matrix4f, vertexConsumer);
-            case LEFT_UP_CORNER -> drawTailUpLeftCorner(matrix4f, vertexConsumer);
-            case LEFT_DOWN_CORNER -> drawTailDownLeftCorner(matrix4f, vertexConsumer);
+            case TOP -> drawTailTop(matrix4f, consumer, topRight, topLeft);
+            case BOTTOM -> drawTailBottom(matrix4f, consumer, topRight, topLeft);
+            case RIGHT -> drawTailRight(matrix4f, consumer);
+            case RIGHT_UP_CORNER -> drawTailUpRightCorner(matrix4f, consumer);
+            case RIGHT_DOWN_CORNER -> drawTailDownRightCorner(matrix4f, consumer);
+            case LEFT -> drawTailLeft(matrix4f, consumer);
+            case LEFT_UP_CORNER -> drawTailUpLeftCorner(matrix4f, consumer);
+            case LEFT_DOWN_CORNER -> drawTailDownLeftCorner(matrix4f, consumer);
         }
 
-        bufferSource.endBatch();
         poseStack.popPose();
     }
 
@@ -128,59 +123,119 @@ public class DialogTail {
         RIGHT_DOWN_CORNER
     }
 
-    void drawTailTop(Matrix4f matrix4f, VertexConsumer vertexConsumer, float topRight, float topLeft) {
-        vertexConsumer.vertex(matrix4f, 0, -dialog.getHeight() - height, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, -topRight, -dialog.getHeight(), 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, -topLeft, -dialog.getHeight(), 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, -topRight, -dialog.getHeight(), 0).color(dialog.getBackgroundColor());
+    void drawTailTop(Matrix4f matrix4f, VertexConsumer buffer, float topRight, float topLeft) {
+        buffer.vertex(matrix4f, 0, -dialog.getHeight() - height, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, -topRight, -dialog.getHeight(), 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, -topLeft, -dialog.getHeight(), 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, -topRight, -dialog.getHeight(), 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
     }
 
-    void drawTailBottom(Matrix4f matrix4f, VertexConsumer vertexConsumer, float topRight, float topLeft) {
-        vertexConsumer.vertex(matrix4f, -topRight, 0, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, -topLeft, 0, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, 0, height, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, -topRight, 0, 0).color(dialog.getBackgroundColor());
+    void drawTailBottom(Matrix4f matrix4f, VertexConsumer buffer, float topRight, float topLeft) {
+        buffer.vertex(matrix4f, -topRight, 0, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, -topLeft, 0, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, 0, height, 0).color(dialog.getBackgroundColor()).endVertex();
+        buffer.vertex(matrix4f, -topRight, 0, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
     }
 
-    void drawTailLeft(Matrix4f matrix4f, VertexConsumer vertexConsumer) {
-        vertexConsumer.vertex(matrix4f, -height, 0, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, 0, -width / 2, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, 0, width / 2, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, 0, -width / 2, 0).color(dialog.getBackgroundColor());
+    void drawTailLeft(Matrix4f matrix4f, VertexConsumer buffer) {
+        buffer.vertex(matrix4f, -height, 0, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, 0, -width / 2, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, 0, width / 2, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, 0, -width / 2, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
     }
 
-    void drawTailRight(Matrix4f matrix4f, VertexConsumer vertexConsumer) {
-        vertexConsumer.vertex(matrix4f, height, 0, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, 0, width / 2, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, 0, -width / 2, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, 0, width / 2, 0).color(dialog.getBackgroundColor());
+    void drawTailRight(Matrix4f matrix4f, VertexConsumer buffer) {
+        buffer.vertex(matrix4f, height, 0, 0).color(dialog.getBackgroundColor()).endVertex();
+        buffer.vertex(matrix4f, 0, width / 2, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, 0, -width / 2, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, 0, width / 2, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
     }
 
-    void drawTailUpRightCorner(Matrix4f matrix4f, VertexConsumer vertexConsumer) {
-        vertexConsumer.vertex(matrix4f, height / 2, -4, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, -width, -width / 2, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, 0, width / 2, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, height / 2, -4, 0).color(dialog.getBackgroundColor());
+    void drawTailUpRightCorner(Matrix4f matrix4f, VertexConsumer buffer) {
+        buffer.vertex(matrix4f, height / 2, -4, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, -width, -width / 2, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, 0, width / 2, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, height / 2, -4, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
     }
 
-    void drawTailDownRightCorner(Matrix4f matrix4f, VertexConsumer vertexConsumer) {
-        vertexConsumer.vertex(matrix4f, height / 2, 4, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, 0, -width / 2, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, -width, width / 2, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, height / 2, 4, 0).color(dialog.getBackgroundColor());
+    void drawTailDownRightCorner(Matrix4f matrix4f, VertexConsumer buffer) {
+        buffer.vertex(matrix4f, height / 2, 4, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, 0, -width / 2, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, -width, width / 2, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, height / 2, 4, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
     }
 
-    void drawTailUpLeftCorner(Matrix4f matrix4f, VertexConsumer vertexConsumer) {
-        vertexConsumer.vertex(matrix4f, -height / 2, -4, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, 0, width / 2, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, width, -width / 2, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, -height / 2, -4, 0).color(dialog.getBackgroundColor());
+    void drawTailUpLeftCorner(Matrix4f matrix4f, VertexConsumer buffer) {
+        buffer.vertex(matrix4f, -height / 2, -4, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, 0, width / 2, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, width, -width / 2, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, -height / 2, -4, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
     }
 
-    void drawTailDownLeftCorner(Matrix4f matrix4f, VertexConsumer vertexConsumer) {
-        vertexConsumer.vertex(matrix4f, -height / 2, 4, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, width, width / 2, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, width, -width * 2, 0).color(dialog.getBackgroundColor());
-        vertexConsumer.vertex(matrix4f, -height / 2, 4, 0).color(dialog.getBackgroundColor());
+    void drawTailDownLeftCorner(Matrix4f matrix4f, VertexConsumer buffer) {
+        buffer.vertex(matrix4f, -height / 2, 4, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, width, width / 2, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, width, -width * 2, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
+        buffer.vertex(matrix4f, -height / 2, 4, 0)
+                .color(dialog.getBackgroundColor())
+                .endVertex();
     }
 }

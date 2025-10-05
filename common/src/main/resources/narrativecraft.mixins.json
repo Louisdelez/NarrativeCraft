@@ -27,6 +27,7 @@
     "ClientLevelMixin",
     "GameRendererMixin",
     "KeyboardHandlerMixin",
+    "LevelRendererMixin",
     "MinecraftCommonMixin",
     "OptionsMixin",
     "SoundEngineMixin",

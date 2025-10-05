@@ -372,7 +372,7 @@ public class MainScreen extends Screen {
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        super.render(guiGraphics, mouseX, mouseY, partialTicks);
+        this.renderBackground(guiGraphics);
         if (narrativeCraftLogo.logoExists()) {
             narrativeCraftLogo.render(guiGraphics, initialX, initialY - narrativeCraftLogo.getImageHeight() - gap - 5);
         }
@@ -385,6 +385,7 @@ public class MainScreen extends Screen {
                     20,
                     FastColor.ABGR32.color(1, 1, 1, 1));
         }
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
 
     @Override
