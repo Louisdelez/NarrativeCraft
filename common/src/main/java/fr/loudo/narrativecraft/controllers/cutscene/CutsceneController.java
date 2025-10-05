@@ -452,11 +452,13 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
                 vertexConsumer
                         .vertex(matrix4f, (float) x1, (float) y1, (float) z1)
                         .color(1.0F, 1.0F, 0.0F, 1.0F)
-                        .normal(0, 1, 0);
+                        .normal(0, 1, 0)
+                        .endVertex();
                 vertexConsumer
-                        .vertex(matrix4f, (float) x1, (float) y1, (float) z1)
+                        .vertex(matrix4f, (float) x2, (float) y2, (float) z2)
                         .color(1.0F, 1.0F, 0.0F, 1.0F)
-                        .normal(0, 1, 0);
+                        .normal(0, 1, 0)
+                        .endVertex();
             }
             client.renderBuffers().bufferSource().endBatch();
         }

@@ -63,6 +63,12 @@ public class CreditScreen extends WinScreen {
     }
 
     @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        this.renderBackground(guiGraphics);
+    }
+
+    @Override
     public void onClose() {
         super.onClose();
         minecraft.getSoundManager().stop(MUSIC_INSTANCE);

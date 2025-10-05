@@ -24,7 +24,9 @@
 package fr.loudo.narrativecraft.util;
 
 import com.mojang.authlib.GameProfile;
-import java.util.UUID;
+import java.util.Set;
+import net.minecraft.network.Connection;
+import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.PlayerChatMessage;
@@ -37,38 +39,40 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.stats.Stat;
 import net.minecraft.world.damagesource.DamageSource;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.RelativeMovement;
 
 // FakePlayer class from
 // https://github.com/mt1006/mc-mocap-mod/blob/1.21.1/common/src/main/java/net/mt1006/mocap/utils/FakePlayer.java
 public class FakePlayer extends ServerPlayer {
-
-    public FakePlayer(ServerLevel level, GameProfile profile) {
-        super(level.getServer(), level, profile);
+    public FakePlayer(ServerLevel level, GameProfile name) {
+        super(level.getServer(), level, name);
         this.connection = new FakePlayerNetHandler(level.getServer(), this);
         setInvulnerable(true);
     }
 
-    public static FakePlayer createRandom(ServerLevel level) {
-        UUID uuid = UUID.randomUUID();
-        return new FakePlayer(level, new GameProfile(uuid, uuid.toString()));
+    @Override
+    public Entity changeDimension(ServerLevel p_20118_) {
+        return null;
     }
 
     @Override
-    public void displayClientMessage(@NotNull Component chatComponent, boolean actionBar) {}
+    public void displayClientMessage(Component chatComponent, boolean actionBar) {}
 
     @Override
-    public void awardStat(@NotNull Stat stat, int amount) {}
+    public void awardStat(Stat stat, int amount) {}
 
     @Override
-    public void die(@NotNull DamageSource source) {}
+    public void die(DamageSource source) {}
 
     @Override
     public void tick() {}
 
+    @Override
+    public void updateOptions(ServerboundClientInformationPacket packet) {}
+
     private static class FakePlayerNetHandler extends ServerGamePacketListenerImpl {
-        private static final net.minecraft.network.Connection DUMMY_CONNECTION =
-                new DummyConnection(PacketFlow.CLIENTBOUND);
+        private static final Connection DUMMY_CONNECTION = new Connection(PacketFlow.CLIENTBOUND);
 
         public FakePlayerNetHandler(MinecraftServer server, ServerPlayer player) {
             super(server, DUMMY_CONNECTION, player);
@@ -111,6 +115,9 @@ public class FakePlayer extends ServerPlayer {
         public void handleSetCommandMinecart(ServerboundSetCommandMinecartPacket packet) {}
 
         @Override
+        public void handlePickItem(ServerboundPickItemPacket packet) {}
+
+        @Override
         public void handleRenameItem(ServerboundRenameItemPacket packet) {}
 
         @Override
@@ -132,6 +139,12 @@ public class FakePlayer extends ServerPlayer {
         public void handleEditBook(ServerboundEditBookPacket packet) {}
 
         @Override
+        public void handleEntityTagQuery(ServerboundEntityTagQuery packet) {}
+
+        @Override
+        public void handleBlockEntityTagQuery(ServerboundBlockEntityTagQuery packet) {}
+
+        @Override
         public void handleMovePlayer(ServerboundMovePlayerPacket packet) {}
 
         @Override
@@ -150,10 +163,19 @@ public class FakePlayer extends ServerPlayer {
         public void handleTeleportToEntityPacket(ServerboundTeleportToEntityPacket packet) {}
 
         @Override
+        public void handleResourcePackResponse(ServerboundResourcePackPacket packet) {}
+
+        @Override
         public void handlePaddleBoat(ServerboundPaddleBoatPacket packet) {}
 
         @Override
+        public void onDisconnect(Component message) {}
+
+        @Override
         public void send(Packet<?> packet) {}
+
+        @Override
+        public void send(Packet<?> packet, PacketSendListener sendListener) {}
 
         @Override
         public void handleSetCarriedItem(ServerboundSetCarriedItemPacket packet) {}
@@ -192,13 +214,25 @@ public class FakePlayer extends ServerPlayer {
         public void handleSignUpdate(ServerboundSignUpdatePacket packet) {}
 
         @Override
+        public void handleKeepAlive(ServerboundKeepAlivePacket packet) {}
+
+        @Override
         public void handlePlayerAbilities(ServerboundPlayerAbilitiesPacket packet) {}
+
+        @Override
+        public void handleClientInformation(ServerboundClientInformationPacket packet) {}
+
+        @Override
+        public void handleCustomPayload(ServerboundCustomPayloadPacket packet) {}
 
         @Override
         public void handleChangeDifficulty(ServerboundChangeDifficultyPacket packet) {}
 
         @Override
         public void handleLockDifficulty(ServerboundLockDifficultyPacket packet) {}
+
+        @Override
+        public void teleport(double x, double y, double z, float yaw, float pitch, Set<RelativeMovement> relativeSet) {}
 
         @Override
         public void ackBlockChangesUpTo(int sequence) {}
@@ -210,6 +244,9 @@ public class FakePlayer extends ServerPlayer {
         public void handleChatAck(ServerboundChatAckPacket packet) {}
 
         @Override
+        public void addPendingMessage(PlayerChatMessage message) {}
+
+        @Override
         public void sendPlayerChatMessage(PlayerChatMessage message, ChatType.Bound boundChatType) {}
 
         @Override
@@ -217,11 +254,5 @@ public class FakePlayer extends ServerPlayer {
 
         @Override
         public void handleChatSessionUpdate(ServerboundChatSessionUpdatePacket packet) {}
-    }
-
-    private static class DummyConnection extends net.minecraft.network.Connection {
-        public DummyConnection(PacketFlow packetFlow) {
-            super(packetFlow);
-        }
     }
 }

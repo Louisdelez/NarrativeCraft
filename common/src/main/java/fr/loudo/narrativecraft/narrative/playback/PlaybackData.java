@@ -134,11 +134,9 @@ public class PlaybackData {
 
     private void moveEntity(Location current, Location next, boolean silent) {
         if (entity == null) return;
-        entity.setXRot(current.pitch());
-        entity.setYRot(current.yaw());
+        entity.moveTo(current.x(), current.y(), current.z(), current.yaw(), current.pitch());
         entity.setYHeadRot(current.yaw());
         entity.setOnGround(current.onGround());
-        entity.teleportTo(current.x(), current.y(), current.z());
         if (!silent) {
             entity.move(MoverType.SELF, Location.deltaLocation(current, next).asVec3());
         }

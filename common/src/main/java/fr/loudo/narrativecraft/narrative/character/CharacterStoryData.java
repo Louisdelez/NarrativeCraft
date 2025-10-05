@@ -34,10 +34,7 @@ import java.util.List;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -67,9 +64,7 @@ public class CharacterStoryData {
         characterRuntime.getCharacterSkinController().setSkinName(skinName);
         characterRuntime.getCharacterSkinController().cacheSkins();
         characterRuntime.setEntity(Util.createEntityFromCharacter(characterRuntime.getCharacterStory(), level));
-        characterRuntime.getEntity().teleportTo(location.x(), location.y(), location.z());
-        characterRuntime.getEntity().setXRot(location.pitch());
-        characterRuntime.getEntity().setYRot(location.yaw());
+        characterRuntime.getEntity().moveTo(location.x(), location.y(), location.z(), location.yaw(), location.pitch());
         characterRuntime.getEntity().setYHeadRot(location.yaw());
         characterRuntime.getEntity().setOnGround(location.onGround());
         try {

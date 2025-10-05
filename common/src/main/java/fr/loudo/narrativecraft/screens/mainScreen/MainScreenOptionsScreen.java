@@ -32,15 +32,16 @@ import fr.loudo.narrativecraft.screens.credits.CreditScreen;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.Locale;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
-import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.OptionsScreen;
 import net.minecraft.client.gui.screens.OptionsSubScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 public class MainScreenOptionsScreen extends OptionsSubScreen {
@@ -78,11 +79,8 @@ public class MainScreenOptionsScreen extends OptionsSubScreen {
     @Override
     protected void init() {
         NarrativeClientOption clientOption = NarrativeCraftMod.getInstance().getNarrativeClientOptions();
-        GridLayout gridlayout = new GridLayout();
-        GridLayout.RowHelper rowHelper = gridlayout.createRowHelper(1);
-        LinearLayout linearlayout = this.layout.addToHeader(
-                new LinearLayout(200, 20, LinearLayout.Orientation.VERTICAL),
-                rowHelper.newCellSettings().paddingBottom(8));
+        GridLayout gridLayout = this.layout.addToContents(new GridLayout()).spacing(8);
+        GridLayout.RowHelper rowHelper = gridLayout.createRowHelper(1);
         AbstractSliderButton abstractSliderButton =
                 new AbstractSliderButton(
                         50,
@@ -109,12 +107,12 @@ public class MainScreenOptionsScreen extends OptionsSubScreen {
                     }
                 };
 
-        linearlayout.addChild(abstractSliderButton);
+        rowHelper.addChild(abstractSliderButton);
         autoSkipCheck = new Checkbox(
                 0, 0, 20, 20, Translation.message("screen.main_screen.options.auto_skip"), clientOption.autoSkip);
-        linearlayout.addChild(autoSkipCheck);
+        rowHelper.addChild(autoSkipCheck);
 
-        linearlayout.addChild(Button.builder(Translation.message("screen.main_screen.minecraft_options"), button -> {
+        rowHelper.addChild(Button.builder(Translation.message("screen.main_screen.minecraft_options"), button -> {
                     OptionsScreen screen = new OptionsScreen(this, minecraft.options);
                     minecraft.setScreen(screen);
                 })
@@ -123,12 +121,30 @@ public class MainScreenOptionsScreen extends OptionsSubScreen {
 
         StoryHandler storyHandler = playerSession.getStoryHandler();
         if (storyHandler == null || !storyHandler.isRunning()) {
-            linearlayout.addChild(Button.builder(Component.literal("Credits"), button -> {
+            rowHelper.addChild(Button.builder(Component.literal("Credits"), button -> {
                         CreditScreen creditScreen = new CreditScreen(playerSession, true, false);
                         minecraft.setScreen(creditScreen);
                     })
                     .width(200)
                     .build());
         }
+
+        this.layout.addToFooter(Button.builder(CommonComponents.GUI_DONE, p_345997_ -> this.onClose())
+                .width(200)
+                .build());
+
+        this.layout.arrangeElements();
+        this.layout.visitWidgets(this::addRenderableWidget);
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        this.renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+    }
+
+    @Override
+    protected void repositionElements() {
+        this.layout.arrangeElements();
     }
 }
