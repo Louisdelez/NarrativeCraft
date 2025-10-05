@@ -46,13 +46,20 @@ public class NarrativeCraftForge {
                 true,
                 RenderType.CompositeState.builder()
                         .setShaderState(new RenderStateShard.ShaderStateShard(GameRenderer::getPositionColorShader))
-                        .setTransparencyState(new RenderStateShard.TransparencyStateShard("translucent_transparency", () -> {
-                            RenderSystem.enableBlend();
-                            RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-                        }, () -> {
-                            RenderSystem.disableBlend();
-                            RenderSystem.defaultBlendFunc();
-                        }))
+                        .setTransparencyState(new RenderStateShard.TransparencyStateShard(
+                                "translucent_transparency",
+                                () -> {
+                                    RenderSystem.enableBlend();
+                                    RenderSystem.blendFuncSeparate(
+                                            GlStateManager.SourceFactor.SRC_ALPHA,
+                                            GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+                                            GlStateManager.SourceFactor.ONE,
+                                            GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+                                },
+                                () -> {
+                                    RenderSystem.disableBlend();
+                                    RenderSystem.defaultBlendFunc();
+                                }))
                         .setTextureState(new RenderStateShard.EmptyTextureStateShard(() -> {}, () -> {}))
                         .setDepthTestState(new RenderStateShard.DepthTestStateShard("always", 519))
                         .setCullState(new RenderStateShard.CullStateShard(false))
