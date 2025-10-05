@@ -39,8 +39,8 @@ import net.minecraft.network.chat.Component;
 
 public class CutsceneControllerScreen extends Screen {
 
-    private final Component pauseText = Component.literal("⏸");
-    private final Component playText = Component.literal("▶");
+    private final Component pauseText = Component.literal("\u23F8");
+    private final Component playText = Component.literal("\u25B6");
 
     private final int BUTTON_HEIGHT = 20;
 
