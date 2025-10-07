@@ -40,7 +40,7 @@ public class EntityRightClick {
             Entity entity,
             @Nullable EntityHitResult entityHitResult) {
 
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             NarrativeCraftMod.server.execute(() -> OnEntityRightClick.entityRightClick(player, entity));
         }
 
