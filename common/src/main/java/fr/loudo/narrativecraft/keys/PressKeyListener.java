@@ -48,6 +48,10 @@ public class PressKeyListener {
                 playerSession.getPlayer().sendSystemMessage(Translation.message("session.controller_set"));
                 return;
             }
+            if (NarrativeCraftMod.getInstance().getRecordingManager().isRecording(playerSession.getPlayer())) {
+                playerSession.getPlayer().sendSystemMessage(Translation.message("record.cant_access"));
+                return;
+            }
             if (playerSession.isSessionSet()) {
                 minecraft.setScreen(new ScenesMenuScreen(playerSession.getScene()));
             } else {
