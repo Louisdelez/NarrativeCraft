@@ -69,7 +69,10 @@ public class CharacterManager {
         List<EntityType<?>> finalList = new ArrayList<>();
         for (EntityType<?> entityType : BuiltInRegistries.ENTITY_TYPE.stream().toList()) {
             String key = BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath();
-            if (entityType.getCategory() != MobCategory.MISC || key.equals("player") || key.equals("villager") || key.equals("mannequin")) {
+            if (entityType.getCategory() != MobCategory.MISC
+                    || key.equals("player")
+                    || key.equals("villager")
+                    || key.equals("mannequin")) {
                 finalList.add(entityType);
             }
         }
