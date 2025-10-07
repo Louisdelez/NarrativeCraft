@@ -53,7 +53,7 @@ public class AbstractHorseMixin {
             if (recording == null || !recording.isRecording()) return;
             AbstractHorse horse = (AbstractHorse) (Object) this;
             RecordingData recordingData = recording.getRecordingDataFromEntity(horse);
-            if (recordingData == null || horse.level().isClientSide) return;
+            if (recordingData == null || horse.level().isClientSide()) return;
             ActionDifferenceListener actionDifferenceListener = recordingData.getActionDifferenceListener();
             actionDifferenceListener.abstractHorseEntityByteListener(
                     horse.getEntityData().get(DATA_ID_FLAGS));

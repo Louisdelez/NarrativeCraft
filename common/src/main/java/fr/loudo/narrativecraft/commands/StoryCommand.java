@@ -90,7 +90,9 @@ public class StoryCommand {
                 return Command.SINGLE_SUCCESS;
             }
             for (ErrorLine errorLine : results) {
-                Minecraft.getInstance().player.displayClientMessage(errorLine.toMessage(), false);
+                Minecraft.getInstance()
+                        .execute(() ->
+                                Minecraft.getInstance().player.displayClientMessage(errorLine.toMessage(), false));
             }
             if (!errorLines.isEmpty()) {
                 player.sendSystemMessage(Translation.message(

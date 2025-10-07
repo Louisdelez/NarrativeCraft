@@ -53,7 +53,7 @@ public abstract class AbstractBoatMixin {
             if (recording == null || !recording.isRecording()) return;
             AbstractBoat boat = (AbstractBoat) (Object) this;
             RecordingData recordingData = recording.getRecordingDataFromEntity(boat);
-            if (recordingData == null || boat.level().isClientSide) return;
+            if (recordingData == null || boat.level().isClientSide()) return;
             ActionDifferenceListener actionDifferenceListener = recordingData.getActionDifferenceListener();
             actionDifferenceListener.abstractBoatEntityBubbleListener(getBubbleTime());
             actionDifferenceListener.abstractBoatEntityPaddleListener(getPaddleState(0), getPaddleState(1));

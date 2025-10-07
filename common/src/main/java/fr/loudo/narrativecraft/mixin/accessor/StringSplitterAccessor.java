@@ -21,16 +21,15 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.mixin.invoker;
+package fr.loudo.narrativecraft.mixin.accessor;
 
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.font.FontSet;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.StringSplitter;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Invoker;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(Font.class)
-public interface FontInvoker {
-    @Invoker
-    FontSet callGetFontSet(ResourceLocation fontLocation);
+@Mixin(StringSplitter.class)
+public interface StringSplitterAccessor {
+
+    @Accessor
+    StringSplitter.WidthProvider getWidthProvider();
 }

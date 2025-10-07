@@ -33,8 +33,10 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
-import net.minecraft.client.resources.PlayerSkin;
+import net.minecraft.core.ClientAsset;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.PlayerModelType;
+import net.minecraft.world.entity.player.PlayerSkin;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -58,12 +60,10 @@ public class PlayerInfoMixin {
         List<CharacterRuntime> characterRuntimes = new ArrayList<>(playerSession.getCharacterRuntimes());
         for (CharacterRuntime characterRuntime : characterRuntimes) {
             if (characterRuntime.getEntity() == null) continue;
-            if (!this.profile
-                    .getName()
-                    .equals(characterRuntime.getCharacterStory().getName())) continue;
-            PlayerSkin.Model model = PlayerSkin.Model.WIDE;
+            if (!this.profile.name().equals(characterRuntime.getCharacterStory().getName())) continue;
+            PlayerModelType model = PlayerModelType.WIDE;
             try {
-                model = PlayerSkin.Model.valueOf(
+                model = PlayerModelType.valueOf(
                         characterRuntime.getCharacterStory().getModel().name());
             } catch (IllegalArgumentException ignored) {
             }
@@ -76,8 +76,8 @@ public class PlayerInfoMixin {
                                     characterRuntime.getCharacterStory().getName()) + "/"
                             + Util.snakeCase(currentSkin.getName()));
 
-            PlayerSkin playerSkin = new PlayerSkin(skinLocation, null, null, null, model, true);
-
+            PlayerSkin playerSkin =
+                    PlayerSkin.insecure(new ClientAsset.ResourceTexture(skinLocation, skinLocation), null, null, model);
             cir.setReturnValue(playerSkin);
         }
     }

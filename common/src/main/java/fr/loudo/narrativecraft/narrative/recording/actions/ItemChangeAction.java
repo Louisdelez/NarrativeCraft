@@ -93,7 +93,8 @@ public class ItemChangeAction extends Action {
                 itemStack = Util.generateItemStackFromNBT(tag, entity.registryAccess());
             }
         }
-        entity.getServer()
+        entity.level()
+                .getServer()
                 .getPlayerList()
                 .broadcastAll(new ClientboundSetEquipmentPacket(
                         entity.getId(), List.of(new Pair<>(EquipmentSlot.valueOf(equipmentSlot), itemStack))));

@@ -35,6 +35,8 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
 import org.joml.Vector2f;
@@ -113,7 +115,7 @@ public class ChoiceButtonWidget extends AbstractButton {
     }
 
     @Override
-    public void onPress() {
+    public void onPress(InputWithModifiers inputWithModifiers) {
         if (!canPress) return;
         onPress.accept(index);
     }
@@ -122,12 +124,12 @@ public class ChoiceButtonWidget extends AbstractButton {
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
         if (this.active && this.visible) {
-            if (this.isValidClickButton(button)) {
-                boolean flag = this.isMouseOver(mouseX, mouseY);
+            if (this.isValidClickButton(event.buttonInfo())) {
+                boolean flag = this.isMouseOver(event.x(), event.y());
                 if (flag) {
-                    this.onClick(mouseX, mouseY);
+                    this.onClick(event, isDoubleClick);
                     return true;
                 }
             }

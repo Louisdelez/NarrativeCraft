@@ -74,7 +74,13 @@ public class MinecraftCommandInkAction extends InkAction {
     protected InkActionResult doExecute(PlayerSession playerSession) {
         CommandSourceStack commandSourceStack = getCommandSourceStack(playerSession);
         try {
-            playerSession.getPlayer().getServer().getCommands().getDispatcher().execute(command, commandSourceStack);
+            playerSession
+                    .getPlayer()
+                    .level()
+                    .getServer()
+                    .getCommands()
+                    .getDispatcher()
+                    .execute(command, commandSourceStack);
         } catch (CommandSyntaxException e) {
             return InkActionResult.error(
                     Translation.message(WRONG_ARGUMENT_TEXT, "Command can't be executed: " + e.getMessage()));
@@ -93,7 +99,7 @@ public class MinecraftCommandInkAction extends InkAction {
                 4,
                 player.getName().getString(),
                 player.getDisplayName(),
-                player.getServer(),
+                player.level().getServer(),
                 player);
     }
 

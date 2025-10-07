@@ -50,7 +50,7 @@ dependencies {
             prefer '1.2.1+nc'
         }
     }
-    additionalRuntimeClasspath 'com.bladecoder.ink:blade-ink:1.2.1+nc'
+    implementation 'com.bladecoder.ink:blade-ink:1.2.1+nc'
     compileOnly("io.github.kosmx.emotes:emotesAPI:${emotesAPI_version}") {
         exclude group: 'com.google.guava', module: 'guava'
     }

@@ -61,11 +61,11 @@ public record SkipArrow2dGui(
     }
 
     @Override
-    public void buildVertices(VertexConsumer consumer, float z) {
-        consumer.addVertexWith2DPose(this.pose(), -width, -height, z + 1.0f).setColor(color);
-        consumer.addVertexWith2DPose(this.pose(), -width, height, z + 1.0f).setColor(color);
-        consumer.addVertexWith2DPose(this.pose(), width, 0, z + 1.0f).setColor(color);
-        consumer.addVertexWith2DPose(this.pose(), -width, -height, z + 1.0f).setColor(color);
+    public void buildVertices(VertexConsumer consumer) {
+        consumer.addVertexWith2DPose(this.pose(), -width, -height).setColor(color);
+        consumer.addVertexWith2DPose(this.pose(), -width, height).setColor(color);
+        consumer.addVertexWith2DPose(this.pose(), width, 0).setColor(color);
+        consumer.addVertexWith2DPose(this.pose(), -width, -height).setColor(color);
     }
 
     private static ScreenRectangle getBounds(

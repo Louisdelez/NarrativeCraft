@@ -37,7 +37,7 @@ public class EntityRightClick {
     }
 
     public static void onEntityRightClick(PlayerInteractEvent.EntityInteractSpecific event) {
-        if (event.getLevel().isClientSide) {
+        if (event.getLevel().isClientSide()) {
             OnEntityRightClick.entityRightClick(event.getEntity(), event.getTarget());
         }
     }

@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.ResourceLocation;
 
 public class ModKeys {
 
@@ -53,7 +54,11 @@ public class ModKeys {
 
     private static KeyMapping registerKey(String translationKey, int code) {
         KeyMapping key = new KeyMapping(
-                translationKey, InputConstants.Type.KEYSYM, code, "key.categories." + NarrativeCraftMod.MOD_ID);
+                translationKey,
+                InputConstants.Type.KEYSYM,
+                code,
+                new KeyMapping.Category(
+                        ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "key.categories")));
         ALL_KEYS.add(key);
         return key;
     }

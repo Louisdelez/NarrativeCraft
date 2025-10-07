@@ -127,7 +127,7 @@ public class DialogRenderer3D extends DialogRenderer {
             if (dialogStarting && !dialogStopping) dialogStarting = false;
         }
         poseStack.translate(position.x, position.y, position.z);
-        poseStack.mulPose(minecraft.getEntityRenderDispatcher().cameraOrientation());
+        poseStack.mulPose(minecraft.getEntityRenderDispatcher().camera.rotation());
         poseStack.scale(originalScale * 0.025F, -originalScale * 0.025F, originalScale * 0.025F);
 
         renderDialogBackground(poseStack, partialTick);

@@ -267,12 +267,14 @@ public class StoryHandler {
     }
 
     public void showCurrentDialog() {
-        try {
-            showDialog(dialogText);
-        } catch (Exception e) {
-            stop();
-            showCrash(e);
-        }
+        minecraft.execute(() -> {
+            try {
+                showDialog(dialogText);
+            } catch (Exception e) {
+                stop();
+                showCrash(e);
+            }
+        });
     }
 
     public Matcher getDialogMatcher(String dialog) {

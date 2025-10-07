@@ -16,9 +16,9 @@
     "Utf8StringMixin",
     "accessor.AbstractBoatAccessor",
     "accessor.AbstractHorseAccessor",
+    "accessor.AvatarAccessor",
     "accessor.EntityAccessor",
     "accessor.LivingEntityAccessor",
-    "accessor.PlayerAccessor",
     "accessor.PlayerListAccessor",
     "invoker.ArmorStandInvoker",
     "invoker.LivingEntityInvoker"
@@ -34,9 +34,8 @@
     "PlayerInfoMixin",
     "WinScreenMixin",
     "WorldSelectionListMixin",
-    "accessor.FontAccessor",
+    "accessor.StringSplitterAccessor",
     "accessor.WinScreenAccessor",
-    "invoker.FontInvoker",
     "invoker.WinScreenInvoker"
   ],
   "server": [],

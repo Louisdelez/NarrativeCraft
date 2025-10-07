@@ -34,6 +34,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
@@ -77,15 +78,15 @@ public class PickElementScreen extends Screen {
         this.moveButton = this.addRenderableWidget(Button.builder(Component.literal("◀"), button -> {
                     if (availableList.getSelected() != null) {
                         TransferableStorySelectionList.Entry selected = availableList.getSelected();
-                        availableList.children().remove(selected);
-                        selectedList.children().add(selected);
+                        availableList.removeEntry(selected);
+                        selectedList.addEntry(selected);
                         selectedList.setSelected(selected);
                         availableList.setSelected(null);
                         moveButton.setMessage(Component.literal("◀"));
                     } else if (selectedList.getSelected() != null) {
                         TransferableStorySelectionList.Entry selected = selectedList.getSelected();
-                        selectedList.children().remove(selected);
-                        availableList.children().add(selected);
+                        selectedList.removeEntry(selected);
+                        availableList.addEntry(selected);
                         availableList.setSelected(selected);
                         selectedList.setSelected(null);
                         moveButton.setMessage(Component.literal("▶"));
@@ -133,6 +134,8 @@ public class PickElementScreen extends Screen {
                 selectedList.getX() + selectedList.getWidth() / 2 - this.font.width(selectedMessage) / 2,
                 selectedList.getY() - 15);
         doneButton.setPosition(this.width / 2 - 200 / 2, this.height - 25);
+        availableList.refreshScrollAmount();
+        selectedList.refreshScrollAmount();
     }
 
     public class TransferableStorySelectionList extends ObjectSelectionList<TransferableStorySelectionList.Entry> {
@@ -146,6 +149,21 @@ public class PickElementScreen extends Screen {
                 Entry entry = new Entry(narrativeEntry);
                 this.addEntry(entry);
             }
+        }
+
+        @Override
+        public int getRowWidth() {
+            return this.width - 4;
+        }
+
+        @Override
+        public void removeEntry(Entry entry) {
+            super.removeEntry(entry);
+        }
+
+        @Override
+        public int addEntry(Entry entry) {
+            return super.addEntry(entry);
         }
 
         public void setOtherList(TransferableStorySelectionList otherList) {
@@ -163,7 +181,6 @@ public class PickElementScreen extends Screen {
             if (otherList != null && selected != null) {
                 otherList.setSelected(null);
                 if (Objects.equals(otherList, PickElementScreen.this.selectedList)) {
-                    ;
                     PickElementScreen.this.moveButton.setMessage(Component.literal("▶"));
                 } else {
                     PickElementScreen.this.moveButton.setMessage(Component.literal("◀"));
@@ -173,9 +190,8 @@ public class PickElementScreen extends Screen {
         }
 
         @Override
-        public boolean mouseDragged(
-                double p_313749_, double p_313887_, int p_313839_, double p_313844_, double p_313686_) {
-            return super.mouseDragged(p_313749_, p_313887_, p_313839_, p_313844_, p_313686_);
+        public boolean mouseDragged(MouseButtonEvent p_446509_, double p_313749_, double p_313887_) {
+            return super.mouseDragged(p_446509_, p_313749_, p_313887_);
         }
 
         public class Entry extends ObjectSelectionList.Entry<Entry> {
@@ -192,23 +208,10 @@ public class PickElementScreen extends Screen {
             }
 
             @Override
-            public void render(
-                    GuiGraphics guiGraphics,
-                    int index,
-                    int top,
-                    int left,
-                    int width,
-                    int height,
-                    int mouseX,
-                    int mouseY,
-                    boolean hovering,
-                    float partialTick) {
+            public void renderContent(GuiGraphics guiGraphics, int i, int i1, boolean b, float v) {
+                int centerX = this.getContentX() + this.getWidth() / 2;
                 guiGraphics.drawCenteredString(
-                        minecraft.font,
-                        narrativeEntry.getName(),
-                        left + 4 + TransferableStorySelectionList.this.width / 2,
-                        top + height / 2 - 4,
-                        -1);
+                        minecraft.font, narrativeEntry.getName(), centerX, this.getContentYMiddle() - 9 / 2, -1);
             }
 
             public NarrativeEntry getNarrativeEntry() {

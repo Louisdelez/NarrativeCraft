@@ -24,27 +24,25 @@
 package fr.loudo.narrativecraft.util;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.blaze3d.font.GlyphInfo;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.DynamicOps;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.mixin.accessor.FontAccessor;
-import fr.loudo.narrativecraft.mixin.accessor.PlayerAccessor;
+import fr.loudo.narrativecraft.mixin.accessor.AvatarAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.PlayerListAccessor;
-import fr.loudo.narrativecraft.mixin.invoker.FontInvoker;
+import fr.loudo.narrativecraft.mixin.accessor.StringSplitterAccessor;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.platform.Services;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
 import java.util.UUID;
 import javax.imageio.ImageIO;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.font.FontSet;
-import net.minecraft.client.gui.screens.PauseScreen;
-import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.StringSplitter;
+import net.minecraft.client.gui.Font;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -184,7 +182,7 @@ public class Util {
         if (BuiltInRegistries.ENTITY_TYPE.getId(characterStory.getEntityType())
                 == BuiltInRegistries.ENTITY_TYPE.getId(EntityType.PLAYER)) {
             entity = new FakePlayer((ServerLevel) level, gameProfile);
-            entity.getEntityData().set(PlayerAccessor.getDATA_PLAYER_MODE_CUSTOMISATION(), (byte) 0b01111111);
+            entity.getEntityData().set(AvatarAccessor.getDATA_PLAYER_MODE_CUSTOMISATION(), (byte) 0b01111111);
         } else {
             entity = (LivingEntity) characterStory.getEntityType().create(level, EntitySpawnReason.MOB_SUMMONED);
             if (entity instanceof Mob mob) mob.setNoAi(true);
@@ -209,15 +207,13 @@ public class Util {
     }
 
     public static void disconnectPlayer(Minecraft minecraft) {
-        PauseScreen.disconnectFromWorld(minecraft, ClientLevel.DEFAULT_QUIT_MESSAGE);
+        minecraft.disconnectWithSavingScreen();
     }
 
     public static float getLetterWidth(int letterCode, Minecraft minecraft) {
-        Style style = Style.EMPTY;
-        FontSet fontset = ((FontInvoker) minecraft.font).callGetFontSet(style.getFont());
-        GlyphInfo glyph = fontset.getGlyphInfo(letterCode, ((FontAccessor) minecraft.font).getFilterFishyGlyphs());
-        boolean bold = style.isBold();
-        return glyph.getAdvance(bold);
+        Font font = minecraft.font;
+        StringSplitter splitter = font.getSplitter();
+        return ((StringSplitterAccessor) splitter).getWidthProvider().getWidth(letterCode, Style.EMPTY);
     }
 
     public static int[] getImageResolution(ResourceLocation resourceLocation) {

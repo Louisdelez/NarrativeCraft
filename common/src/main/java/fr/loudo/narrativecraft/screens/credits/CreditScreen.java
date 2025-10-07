@@ -32,6 +32,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.WinScreen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
@@ -104,12 +105,12 @@ public class CreditScreen extends WinScreen {
     }
 
     @Override
-    public boolean keyPressed(int p_169469_, int p_169470_, int p_169471_) {
-        if (p_169469_ == InputConstants.KEY_ESCAPE) {
+    public boolean keyPressed(KeyEvent event) {
+        if (event.key() == InputConstants.KEY_ESCAPE) {
             minecraft.setScreen(null);
             onClose();
         }
-        return super.keyPressed(p_169469_, p_169470_, p_169471_);
+        return super.keyPressed(event);
     }
 
     @Override

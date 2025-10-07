@@ -53,6 +53,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -406,17 +407,17 @@ public class MainScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(KeyEvent event) {
         if (!pause) userFloodedKeyboard++;
-        if (keyCode == InputConstants.KEY_LCONTROL && !pause) {
+        if (event.key() == InputConstants.KEY_LCONTROL && !pause) {
             showDevBtnCount++;
             if (showDevBtnCount == 5) {
                 this.addRenderableWidget(devButton);
             }
         }
-        if (keyCode == InputConstants.KEY_ESCAPE && !pause) {
+        if (event.key() == InputConstants.KEY_ESCAPE && !pause) {
             return false;
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(event);
     }
 }
