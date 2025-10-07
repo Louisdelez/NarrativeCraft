@@ -192,6 +192,9 @@ public class MainScreen extends Screen {
         }
 
         int totalButtons = storyFinished ? 5 : 4;
+        if (!NarrativeCraftFile.saveExists()) {
+            totalButtons = 3;
+        }
         if (pause) totalButtons = 5;
         int totalHeight = buttonHeight * totalButtons + gap * (totalButtons - 1);
         initialY = height / 2 - totalHeight / 2;
