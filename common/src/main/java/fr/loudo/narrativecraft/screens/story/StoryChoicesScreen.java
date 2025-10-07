@@ -187,7 +187,8 @@ public class StoryChoicesScreen extends Screen {
             if (keyCode == choiceKeys.get(i).getDefaultKey().getValue()) {
                 minecraft.setScreen(null);
                 try {
-                    storyHandler.getStory().chooseChoiceIndex(i);
+                    int finalI = i;
+                    NarrativeCraftMod.server.execute(() -> storyHandler.chooseChoiceAndNext(finalI));
                 } catch (Exception e) {
                     storyHandler.stop();
                     Util.sendCrashMessage(minecraft.player, e);

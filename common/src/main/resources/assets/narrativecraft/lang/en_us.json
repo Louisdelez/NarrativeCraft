@@ -61,6 +61,7 @@
   "narrativecraft.record.save.stop_record_before_save": "Please, stop your record before saving.",
   "narrativecraft.record.save.fail": "Error while saving animation %s for scene %s of chapter %d!",
   "narrativecraft.record.start.with_subscenes": "With subscene(s) %s.",
+  "narrativecraft.record.cant_access": "You are recording, you can't access that.",
 
   "narrativecraft.playback.animation.play": "Playing animation %s...",
   "narrativecraft.playback.animation.stop": "Stopped animation %s.",
@@ -186,6 +187,7 @@
   "narrativecraft.screen.main_screen.pause.restart_scene": "Restart scene",
   "narrativecraft.screen.main_screen.pause.skip_cutscene": "Skip cutscene",
   "narrativecraft.screen.main_screen.pause.leave": "Leave",
+  "narrativecraft.screen.main_screen.no_error_but_warns": "The story validation returned no error, but only warns, this message appears because you may forgot to load a resource pack from the owner, continue? (For more information, check your logs)",
   "narrativecraft.screen.main_screen.options.dialog_speed": "Text speed: %s",
   "narrativecraft.screen.main_screen.options.auto_skip": "Auto-skip",
 

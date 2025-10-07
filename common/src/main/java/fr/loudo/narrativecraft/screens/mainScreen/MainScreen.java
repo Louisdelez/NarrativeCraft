@@ -115,21 +115,35 @@ public class MainScreen extends Screen {
         minecraft.getSoundManager().stop(musicInstance);
         try {
             List<ErrorLine> errorLines = StoryValidation.validate();
-            if (errorLines.stream().map(ErrorLine::isWarn).toList().isEmpty()) {
+            List<ErrorLine> warns = errorLines.stream().filter(ErrorLine::isWarn).toList();
+            List<ErrorLine> errors = errorLines.stream().filter(errorLine -> !errorLine.isWarn()).toList();
+            if (errors.isEmpty() && warns.isEmpty()) {
                 NarrativeCraftMod.server.execute(storyHandler::start);
+                return;
+            }
+            if (!warns.isEmpty()) {
+                ConfirmScreen screen = new ConfirmScreen(t -> {
+                    if (!t) {
+                        minecraft.setScreen(this);
+                        return;
+                    }
+                    minecraft.setScreen(null);
+                    NarrativeCraftMod.server.execute(storyHandler::start);
+                }, Component.empty(), Translation.message("screen.main_screen.no_error_but_warns"));
+                minecraft.setScreen(screen);
             } else {
-                NarrativeCraftMod.LOGGER.error(" ");
-                NarrativeCraftMod.LOGGER.error("Story can't start: ");
-                for (ErrorLine errorLine : errorLines) {
-                    NarrativeCraftMod.LOGGER.error(
-                            "{} {} {}", errorLine.getFileName(), errorLine.getLineText(), errorLine.getMessage());
-                }
-                NarrativeCraftMod.LOGGER.error(" ");
                 CrashScreen crashScreen = new CrashScreen(
                         playerSession,
                         Translation.message("validation.from_main_screen").getString());
                 minecraft.setScreen(crashScreen);
             }
+            NarrativeCraftMod.LOGGER.error(" ");
+            NarrativeCraftMod.LOGGER.error("Story can't start: ");
+            for (ErrorLine errorLine : errorLines) {
+                NarrativeCraftMod.LOGGER.error(
+                        "{} {} {}", errorLine.getFileName(), errorLine.getLineText(), errorLine.getMessage());
+            }
+            NarrativeCraftMod.LOGGER.error(" ");
         } catch (Exception e) {
             CrashScreen crashScreen = new CrashScreen(playerSession, e.getMessage());
             minecraft.setScreen(crashScreen);
@@ -177,6 +191,9 @@ public class MainScreen extends Screen {
 
         int totalButtons = storyFinished ? 5 : 4;
         if (pause) totalButtons = 5;
+        if (!NarrativeCraftFile.saveExists()) {
+            totalButtons = 3;
+        }
         int totalHeight = buttonHeight * totalButtons + gap * (totalButtons - 1);
         initialY = height / 2 - totalHeight / 2;
         if (narrativeCraftLogo.logoExists()) initialY += narrativeCraftLogo.getImageHeight() / 2 + gap;
@@ -317,19 +334,19 @@ public class MainScreen extends Screen {
         if (pause) {
             startY += buttonHeight + gap;
             Button quitButton = Button.builder(Translation.message("screen.main_screen.pause.leave"), button -> {
-                        boolean debugMod = playerSession.getStoryHandler().isDebugMode();
-                        NarrativeCraftMod.server.execute(() -> {
-                            playerSession.getStoryHandler().stop();
-                        });
-                        if (NarrativeCraftMod.getInstance().getNarrativeWorldOption().showMainScreen && !debugMod) {
-                            MainScreen mainScreen = new MainScreen(playerSession, false, false);
-                            minecraft.setScreen(mainScreen);
-                        } else {
-                            minecraft.setScreen(null);
-                        }
-                    })
-                    .bounds(initialX, startY, buttonWidth, buttonHeight)
-                    .build();
+                boolean debugMod = playerSession.getStoryHandler().isDebugMode();
+                NarrativeCraftMod.server.execute(() -> {
+                    playerSession.getStoryHandler().stop();
+                    if (NarrativeCraftMod.getInstance().getNarrativeWorldOption().showMainScreen && !debugMod) {
+                        MainScreen mainScreen = new MainScreen(playerSession, false, false);
+                        minecraft.execute(() -> minecraft.setScreen(mainScreen));
+                    } else {
+                        minecraft.execute(() -> minecraft.setScreen(null));
+                    }
+                });
+            })
+            .bounds(initialX, startY, buttonWidth, buttonHeight)
+            .build();
             this.addRenderableWidget(quitButton);
         } else {
             startY += buttonHeight + gap;

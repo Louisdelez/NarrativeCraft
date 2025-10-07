@@ -58,6 +58,10 @@ public class OpenScreenCommand {
             playerSession.getPlayer().sendSystemMessage(Translation.message("session.controller_set"));
             return 0;
         }
+        if (NarrativeCraftMod.getInstance().getRecordingManager().isRecording(playerSession.getPlayer())) {
+            playerSession.getPlayer().sendSystemMessage(Translation.message("record.cant_access"));
+            return 0;
+        }
         StoryOptionsScreen screen = new StoryOptionsScreen(playerSession);
         Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
         return Command.SINGLE_SUCCESS;
@@ -72,6 +76,10 @@ public class OpenScreenCommand {
             return 0;
         }
         if (playerSession.getStoryHandler() != null) return 0;
+        if (NarrativeCraftMod.getInstance().getRecordingManager().isRecording(playerSession.getPlayer())) {
+            playerSession.getPlayer().sendSystemMessage(Translation.message("record.cant_access"));
+            return 0;
+        }
         ChaptersScreen chaptersScreen = new ChaptersScreen();
         Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(chaptersScreen));
         // Services.PACKET_SENDER.sendToPlayer(player, new OpenChaptersScreenPacket("", 13));
@@ -86,6 +94,10 @@ public class OpenScreenCommand {
             playerSession.getPlayer().sendSystemMessage(Translation.message("session.controller_set"));
             return 0;
         }
+        if (NarrativeCraftMod.getInstance().getRecordingManager().isRecording(playerSession.getPlayer())) {
+            playerSession.getPlayer().sendSystemMessage(Translation.message("record.cant_access"));
+            return 0;
+        }
         CharactersScreen screen = new CharactersScreen(null);
         Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
         return Command.SINGLE_SUCCESS;
@@ -98,6 +110,10 @@ public class OpenScreenCommand {
         if (playerSession.getStoryHandler() != null) return 0;
         if (playerSession.getController() != null) {
             playerSession.getPlayer().sendSystemMessage(Translation.message("session.controller_set"));
+            return 0;
+        }
+        if (NarrativeCraftMod.getInstance().getRecordingManager().isRecording(playerSession.getPlayer())) {
+            playerSession.getPlayer().sendSystemMessage(Translation.message("record.cant_access"));
             return 0;
         }
         MainScreen screen = new MainScreen(playerSession, false, false);
