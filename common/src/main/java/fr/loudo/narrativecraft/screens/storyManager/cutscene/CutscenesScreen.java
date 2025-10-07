@@ -51,6 +51,7 @@ import net.minecraft.network.chat.Component;
 public class CutscenesScreen extends StoryElementScreen {
 
     private final Scene scene;
+    private boolean shiftPressed;
 
     private Button settingsButton;
 
@@ -92,12 +93,10 @@ public class CutscenesScreen extends StoryElementScreen {
                             })
                             .build();
                     settingsButton = createSettingsButton(cutscene);
-                    //                    settingsButton.setTooltip(Tooltip.create(
-                    //                            hasShiftDown()
-                    //                                    ?
-                    // Translation.message("screen.story_manager.animation_cutscene_link")
-                    //                                    :
-                    // Translation.message("screen.story_manager.subscene_cutscene_link")));
+                    settingsButton.setTooltip(Tooltip.create(
+                            shiftPressed
+                                    ? Translation.message("screen.story_manager.animation_cutscene_link")
+                                    : Translation.message("screen.story_manager.subscene_cutscene_link")));
                     return new StoryElementList.StoryEntryData(
                             button,
                             List.of(settingsButton),
@@ -134,7 +133,7 @@ public class CutscenesScreen extends StoryElementScreen {
                 .toList();
         return Button.builder(ImageFontConstants.SETTINGS, button -> {
                     PickElementScreen screen;
-                    if (true) {
+                    if (shiftPressed) {
                         screen = new PickElementScreen(
                                 this,
                                 Translation.message(
@@ -208,6 +207,7 @@ public class CutscenesScreen extends StoryElementScreen {
             settingsButton.setTooltip(
                     Tooltip.create(Translation.message("screen.story_manager.animation_cutscene_link")));
         }
+        shiftPressed = event.hasShiftDown();
         return super.keyPressed(event);
     }
 
@@ -217,6 +217,7 @@ public class CutscenesScreen extends StoryElementScreen {
             settingsButton.setTooltip(
                     Tooltip.create(Translation.message("screen.story_manager.subscene_cutscene_link")));
         }
+        shiftPressed = event.hasShiftDown();
         return super.keyReleased(event);
     }
 }

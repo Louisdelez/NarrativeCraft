@@ -207,7 +207,7 @@ public class Util {
     }
 
     public static void disconnectPlayer(Minecraft minecraft) {
-        minecraft.disconnectWithSavingScreen();
+        minecraft.disconnectFromWorld(Component.empty());
     }
 
     public static float getLetterWidth(int letterCode, Minecraft minecraft) {
