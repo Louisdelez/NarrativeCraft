@@ -29,6 +29,7 @@
     "KeyboardHandlerMixin",
     "LevelRendererMixin",
     "MinecraftCommonMixin",
+    "ModelManagerMixin",
     "OptionsMixin",
     "SoundEngineMixin",
     "SoundManagerMixin",
