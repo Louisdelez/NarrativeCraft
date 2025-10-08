@@ -35,6 +35,7 @@ public class CharacterStory extends NarrativeEntry {
 
     private transient EntityType<?> entityType;
 
+    private MainCharacterAttribute mainCharacterAttribute = new MainCharacterAttribute();
     private String birthDate;
     private CharacterType characterType;
     private CharacterModel model;
@@ -108,5 +109,16 @@ public class CharacterStory extends NarrativeEntry {
             entityType = EntityType.PLAYER;
         }
         return entityType;
+    }
+
+    public MainCharacterAttribute getMainCharacterAttribute() {
+        if (mainCharacterAttribute == null) {
+            mainCharacterAttribute = new MainCharacterAttribute();
+        }
+        return mainCharacterAttribute;
+    }
+
+    public void setMainCharacterAttribute(MainCharacterAttribute mainCharacterAttribute) {
+        this.mainCharacterAttribute = mainCharacterAttribute;
     }
 }

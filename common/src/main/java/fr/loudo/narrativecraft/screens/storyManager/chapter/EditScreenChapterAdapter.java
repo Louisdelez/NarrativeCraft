@@ -34,6 +34,7 @@ import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import org.jetbrains.annotations.Nullable;
 
 public class EditScreenChapterAdapter implements EditScreenAdapter<Chapter> {
@@ -45,6 +46,7 @@ public class EditScreenChapterAdapter implements EditScreenAdapter<Chapter> {
 
     @Override
     public void buildFromScreen(
+            Screen screen,
             Map<String, Object> extraFields,
             Minecraft minecraft,
             @Nullable Chapter existing,

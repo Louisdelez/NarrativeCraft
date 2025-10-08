@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -35,6 +36,8 @@ import org.jetbrains.annotations.Nullable;
  * @param <T>
  */
 public interface EditScreenAdapter<T extends NarrativeEntry> {
+
+    Minecraft minecraft = Minecraft.getInstance();
 
     /**
      * Init extra fields to EditInfoScreen.
@@ -52,6 +55,7 @@ public interface EditScreenAdapter<T extends NarrativeEntry> {
      * If it returns an existing one, then its to edit it.
      */
     void buildFromScreen(
+            Screen screen,
             Map<String, Object> extraFields,
             Minecraft minecraft,
             @Nullable T existing,

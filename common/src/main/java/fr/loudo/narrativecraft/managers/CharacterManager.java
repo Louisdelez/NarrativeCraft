@@ -78,4 +78,15 @@ public class CharacterManager {
         }
         return finalList;
     }
+
+    public CharacterStory getMainCharacter() {
+        List<CharacterStory> mainCharacters = characterStories.stream()
+                .filter(characterStory ->
+                        characterStory.getMainCharacterAttribute().isMainCharacter())
+                .toList();
+        if (mainCharacters.isEmpty()) {
+            return null;
+        }
+        return mainCharacters.get(0);
+    }
 }

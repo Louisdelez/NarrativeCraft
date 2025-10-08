@@ -200,6 +200,17 @@ public class NarrativeEntryInit {
             }
             characterManager.addCharacter(characterStory);
         }
+        if (characterManager.getMainCharacter() == null
+                && !characterManager.getCharacterStories().isEmpty()) {
+            CharacterStory characterStory =
+                    characterManager.getCharacterStories().get(0);
+            characterManager
+                    .getCharacterStories()
+                    .get(0)
+                    .getMainCharacterAttribute()
+                    .setMainCharacter(true);
+            NarrativeCraftFile.updateCharacterData(characterStory, characterStory);
+        }
         if (NarrativeCraftMod.firstTime) {
             CharacterStory steve = new CharacterStory(
                     "Steve", "Steve from Minecraft.", "17", "05", "2009", CharacterModel.WIDE, CharacterType.MAIN);

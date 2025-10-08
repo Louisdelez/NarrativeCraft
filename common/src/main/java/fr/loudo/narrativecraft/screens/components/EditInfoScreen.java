@@ -73,7 +73,7 @@ public class EditInfoScreen<T extends NarrativeEntry> extends Screen {
             "Easter egg message! No just kidding, not rare at all...",
             "Play Until Then",
             "Play Life Is Strange (NOT Double Exposure)",
-            "Do their placeholders have a meaning anymore?",
+            "Do these placeholders have a meaning anymore?",
             "Watch Frieren!",
             "Play Signalis",
             "The pain of your absence is sharp and haunting\nAnd i would give anything not to know it; anything but never knowing you at all, which would be worse",
@@ -171,6 +171,7 @@ public class EditInfoScreen<T extends NarrativeEntry> extends Screen {
                         return;
                     }
                     adapter.buildFromScreen(
+                            this,
                             extraFields,
                             this.minecraft,
                             narrativeEntry,
@@ -189,6 +190,30 @@ public class EditInfoScreen<T extends NarrativeEntry> extends Screen {
                 .bounds(centerX, centerY, WIDGET_WIDTH, BUTTON_HEIGHT)
                 .build();
         this.addRenderableWidget(backButton);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public ScreenUtils.LabelBox getNameBox() {
+        return nameBox;
+    }
+
+    public ScreenUtils.MultilineLabelBox getDescriptionBox() {
+        return descriptionBox;
     }
 
     @Override

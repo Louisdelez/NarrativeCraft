@@ -34,6 +34,7 @@ import fr.loudo.narrativecraft.util.Util;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.Screen;
 import org.jetbrains.annotations.Nullable;
 
 public class EditScreenSceneAdapter implements EditScreenAdapter<Scene> {
@@ -72,6 +73,7 @@ public class EditScreenSceneAdapter implements EditScreenAdapter<Scene> {
 
     @Override
     public void buildFromScreen(
+            Screen screen,
             Map<String, Object> extraFields,
             Minecraft minecraft,
             @Nullable Scene existing,

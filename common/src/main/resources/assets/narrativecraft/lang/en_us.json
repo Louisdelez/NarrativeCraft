@@ -35,6 +35,8 @@
   "narrativecraft.global.interaction": "Interaction",
   "narrativecraft.global.dev_env": "Welcome in the development environment! Have fun creating :p",
   "narrativecraft.global.line": "Line",
+  "narrativecraft.global.advanced": "Advanced",
+  "narrativecraft.global.main": "Main",
 
   "narrativecraft.file.main_ink_warning": "Main ink file, do not write here! If you need to write variables or functions, they have their own separated files.",
   "narrativecraft.file.vars_placeholder": "Write your variables here.",
@@ -162,7 +164,6 @@
   "narrativecraft.screen.keyframe_option.rotation": "Rotation: %d",
   "narrativecraft.screen.keyframe_option.fov": "Zoom: %.2f",
   "narrativecraft.screen.keyframe_option.update": "Update",
-  "narrativecraft.screen.keyframe_option.advanced": "Advanced",
   "narrativecraft.screen.keyframe_option.play_from_here": "Play here",
   "narrativecraft.screen.keyframe_option.start_delay": "Start delay:",
   "narrativecraft.screen.keyframe_option.path_time": "Path time:",
@@ -190,6 +191,10 @@
   "narrativecraft.screen.main_screen.no_error_but_warns": "The story validation returned no error, but only warns, this message appears because you may forgot to load a resource pack from the owner, continue? (For more information, check your logs)",
   "narrativecraft.screen.main_screen.options.dialog_speed": "Text speed: %s",
   "narrativecraft.screen.main_screen.options.auto_skip": "Auto-skip",
+
+  "narrativecraft.screen.character_advanced.main_character": "Is this the main character?",
+  "narrativecraft.screen.character_advanced.same_skin_as_player": "Does they have the same skin as the player?",
+  "narrativecraft.screen.character_advanced.player_same_skin_as_their": "Does the player wear their skin?",
 
   "narrativecraft.screen.chapter_manager.title": "Chapters List",
   "narrativecraft.screen.scene_manager.title": "Scene list of chapter %d",
