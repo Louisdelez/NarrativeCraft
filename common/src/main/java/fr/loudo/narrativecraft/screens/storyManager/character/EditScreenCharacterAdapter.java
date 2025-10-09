@@ -103,16 +103,6 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
                 attribute = new MainCharacterAttribute(entry.getMainCharacterAttribute());
             }
         }
-        Button advancedBtn = Button.builder(Translation.message("global.advanced"), button -> {
-                    screen.setName(screen.getNameBox().getEditBox().getValue());
-                    screen.setDescription(
-                            screen.getDescriptionBox().getMultiLineEditBox().getValue());
-                    CharacterAdvancedScreen screen1 = new CharacterAdvancedScreen(screen, attribute);
-                    minecraft.setScreen(screen1);
-                })
-                .width(60)
-                .build();
-        screen.extraFields.put("advancedBtn", advancedBtn);
 
         if (entry != null) {
             if (scene == null) {
@@ -161,15 +151,22 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
         }
 
         Button modelButton = (Button) screen.extraFields.get("modelBtn");
-        Button advancedBtn = (Button) screen.extraFields.get("advancedBtn");
+        Button advancedBtn = Button.builder(Translation.message("global.advanced"), button -> {
+                    screen.setName(screen.getNameBox().getEditBox().getValue());
+                    screen.setDescription(
+                            screen.getDescriptionBox().getMultiLineEditBox().getValue());
+                    CharacterAdvancedScreen screen1 = new CharacterAdvancedScreen(screen, attribute);
+                    minecraft.setScreen(screen1);
+                })
+                .width(83)
+                .build();
         Component label = Component.literal("Model");
         StringWidget modelText = ScreenUtils.text(
                 label, screen.getFont(), x, y + modelButton.getHeight() / 2 - screen.getFont().lineHeight / 2);
         screen.addRenderableWidget(modelText);
         modelButton.setPosition(x + modelText.getWidth() + 5, y);
+        advancedBtn.setPosition(modelButton.getX() + modelButton.getWidth() + 5, y);
         screen.addRenderableWidget(modelButton);
-        y += modelButton.getHeight() + screen.GAP;
-        advancedBtn.setPosition(x, y);
         screen.addRenderableWidget(advancedBtn);
     }
 
