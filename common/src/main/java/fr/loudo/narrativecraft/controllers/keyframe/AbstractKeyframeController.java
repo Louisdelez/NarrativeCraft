@@ -41,6 +41,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Base controller providing common functionality for keyframes,
@@ -75,6 +76,8 @@ public abstract class AbstractKeyframeController<T extends Keyframe> extends Abs
             playerSession.getPlayer().setGameMode(lastGameType);
             minecraft.options.hideGui = false;
             showKeyframes(playerSession.getPlayer());
+            Vec3 pos = playerSession.getPlayer().position();
+            playerSession.getPlayer().teleportTo(pos.x, pos.y - 5.0 - playerSession.getPlayer().getEyeHeight(), pos.z);
             return;
         }
         if (keyframe == null) return;
