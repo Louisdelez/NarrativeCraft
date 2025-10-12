@@ -40,6 +40,7 @@ public class OnEntityRightClick {
     public static void entityRightClick(Player player, Entity entity) {
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
+        if (playerSession == null) return;
 
         if (playerSession.getController() instanceof AbstractKeyframeController<?> controller) {
             CharacterRuntime characterRuntime = controller.getCharacterFromEntity(entity);

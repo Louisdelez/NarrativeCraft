@@ -48,6 +48,7 @@ public class KeyboardHandlerMixin {
         if (player == null) return;
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
+        if (playerSession == null) return;
         if (playerSession.getCurrentCamera() == null) {
             instance.hideGui = !instance.hideGui;
         } else {
