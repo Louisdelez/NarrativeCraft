@@ -36,6 +36,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.CameraAngle;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.character.CharacterModel;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
@@ -110,6 +111,7 @@ public class NarrativeEntryInit {
             initSubscenes(scene);
             initCutscenes(scene);
             initCameraAngleGroups(scene);
+            initInteraction(scene);
             chapter.addScene(scene);
         }
     }
@@ -164,6 +166,19 @@ public class NarrativeEntryInit {
         if (cameraAngleGroups == null) return;
         cameraAngleGroups.forEach(group -> group.setScene(scene));
         scene.getCameraAngles().addAll(cameraAngleGroups);
+    }
+
+    private static void initInteraction(Scene scene) throws IOException {
+        File interactionFile = NarrativeCraftFile.getInteractionFile(scene);
+        String content = Files.readString(interactionFile.toPath());
+        Type type = new TypeToken<List<Interaction>>() {}.getType();
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(CharacterStoryData.class, new CharacterStoryDataSerializer(scene))
+                .create();
+        List<Interaction> interactions = gson.fromJson(content, type);
+        if (interactions == null) return;
+        interactions.forEach(interaction -> interaction.setScene(scene));
+        scene.setInteractions(interactions);
     }
 
     private static void initNpcs(Scene scene) throws Exception {

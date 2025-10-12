@@ -37,6 +37,7 @@
   "narrativecraft.global.line": "Line",
   "narrativecraft.global.advanced": "Advanced",
   "narrativecraft.global.main": "Main",
+  "narrativecraft.global.stitch": "Stitch",
 
   "narrativecraft.file.main_ink_warning": "Main ink file, do not write here! If you need to write variables or functions, they have their own separated files.",
   "narrativecraft.file.vars_placeholder": "Write your variables here.",
@@ -98,6 +99,10 @@
   "narrativecraft.camera_angle.keyframe_no_exists": "Camera angle keyframe %s does not exists in %s.",
   "narrativecraft.camera_angle.name_no_empty": "The name cannot be empty.",
 
+  "narrativecraft.interaction.already_exists": "Interaction %s already exists in %s.",
+  "narrativecraft.interaction.no_exists": "Interaction %s does not exists in %s.",
+  "narrativecraft.interaction.area_trigger.already_exists": "Area trigger %s already exists in %s.",
+
   "narrativecraft.character.already_exists": "Character %s already exists in the story.",
   "narrativecraft.character.no_exists": "Character %s does not exists.",
   "narrativecraft.character.must_link_character": "You must choose a character.",
@@ -106,6 +111,7 @@
 
   "narrativecraft.controller.confirm_leaving": "Are you sure you want to leave without saving?",
   "narrativecraft.controller.saved": "Successfully saved!",
+  "narrativecraft.controller.add_character": "Add character to %s",
 
   "narrativecraft.controller.cutscene.hud_tick": "Cutscene controller scene %s. Tick %s/%s",
   "narrativecraft.controller.cutscene.hud_no_calculated_tick": "Cutscene controller scene %s. Tick %s",
@@ -122,8 +128,15 @@
   "narrativecraft.controller.cutscene.settings.group_selected": "Keyframe Group #%d selected.",
 
   "narrativecraft.controller.camera_angle.hud": "Camera angle controller scene %s",
-  "narrativecraft.controller.camera_angle.add_character": "Add character to %s",
   "narrativecraft.controller.camera_angle.template_character": "Add template character to %s",
+
+  "narrativecraft.controller.interaction.hud": "Interaction controller scene %s",
+  "narrativecraft.controller.interaction.change_stitch": "Change stitch",
+  "narrativecraft.controller.interaction.add_entity_interaction": "Add entity interaction",
+  "narrativecraft.controller.interaction.area_trigger_list": "Area triggers",
+
+  "narrativecraft.controller.area_trigger.pos_1_set": "Position 1 set",
+  "narrativecraft.controller.area_trigger.pos_2_set": "Position 2 set",
 
   "narrativecraft.controller.main_screen.hud": "Main Screen controller",
   "narrativecraft.controller.main_screen.only_one_keyframe": "Only one keyframe authorized",
@@ -138,6 +151,8 @@
   "narrativecraft.tooltip.cutscene_settings": "Cutscene settings",
   "narrativecraft.tooltip.save": "Save",
   "narrativecraft.tooltip.leave_without_saving": "Leave without saving",
+  "narrativecraft.tooltip.area_trigger.loc_1": "Location 1",
+  "narrativecraft.tooltip.area_trigger.loc_2": "Location 2",
 
   "narrativecraft.screen.story_manager.chapter_list": "Chapters",
   "narrativecraft.screen.story_manager.scene_list": "Scenes of chapter %s",
@@ -146,6 +161,7 @@
   "narrativecraft.screen.story_manager.subscene_list": "Subscenes of scene %s",
   "narrativecraft.screen.story_manager.cutscene_list": "Cutscenes of scene %s",
   "narrativecraft.screen.story_manager.camera_angle_list": "Camera angles of scene %s",
+  "narrativecraft.screen.story_manager.interaction_list": "Interactions of scene %s",
   "narrativecraft.screen.story_manager.characters": "Characters",
   "narrativecraft.screen.story_manager.npcs": "Npcs of scene %s",
   "narrativecraft.screen.story_manager.link_animation_character": "Link animation to character",

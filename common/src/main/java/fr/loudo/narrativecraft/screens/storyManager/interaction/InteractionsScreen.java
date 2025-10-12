@@ -21,14 +21,14 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.screens.storyManager.cameraAngle;
+package fr.loudo.narrativecraft.screens.storyManager.interaction;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.controllers.cameraAngle.CameraAngleController;
+import fr.loudo.narrativecraft.controllers.interaction.InteractionController;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.CameraAngle;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.Interaction;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.components.StoryElementList;
 import fr.loudo.narrativecraft.screens.storyManager.StoryElementScreen;
@@ -40,12 +40,12 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
-public class CameraAngleScreen extends StoryElementScreen {
+public class InteractionsScreen extends StoryElementScreen {
 
     private final Scene scene;
 
-    public CameraAngleScreen(Scene scene) {
-        super(Translation.message("screen.story_manager.camera_angle_list", scene.getName()));
+    public InteractionsScreen(Scene scene) {
+        super(Translation.message("screen.story_manager.interaction_list", scene.getName()));
         this.scene = scene;
     }
 
@@ -53,8 +53,8 @@ public class CameraAngleScreen extends StoryElementScreen {
     protected void addTitle() {
         super.addTitle();
         initAddButton(button -> {
-            EditInfoScreen<CameraAngle> screen =
-                    new EditInfoScreen<>(this, null, new EditScreenCameraAngleAdapter(scene));
+            EditInfoScreen<Interaction> screen =
+                    new EditInfoScreen<>(this, null, new EditScreenInteractionAdapter(scene));
             this.minecraft.setScreen(screen);
         });
         initFolderButton();
@@ -73,11 +73,11 @@ public class CameraAngleScreen extends StoryElementScreen {
 
     @Override
     protected void addContents() {
-        List<StoryElementList.StoryEntryData> entries = scene.getCameraAngles().stream()
-                .map(cameraAngle -> {
-                    Button button = Button.builder(Component.literal(cameraAngle.getName()), button1 -> {
-                                NarrativeCraftMod.server.execute(() -> new CameraAngleController(
-                                                Environment.DEVELOPMENT, minecraft.player, cameraAngle)
+        List<StoryElementList.StoryEntryData> entries = scene.getInteractions().stream()
+                .map(interaction -> {
+                    Button button = Button.builder(Component.literal(interaction.getName()), button1 -> {
+                                NarrativeCraftMod.server.execute(() -> new InteractionController(
+                                                Environment.DEVELOPMENT, minecraft.player, interaction)
                                         .startSession());
                                 minecraft.setScreen(null);
                             })
@@ -87,17 +87,17 @@ public class CameraAngleScreen extends StoryElementScreen {
                             button,
                             () -> {
                                 minecraft.setScreen(new EditInfoScreen<>(
-                                        this, cameraAngle, new EditScreenCameraAngleAdapter(scene)));
+                                        this, interaction, new EditScreenInteractionAdapter(scene)));
                             },
                             () -> {
                                 try {
-                                    scene.removeCameraAngleGroup(cameraAngle);
-                                    NarrativeCraftFile.updateCameraAngles(scene);
+                                    scene.removeInteraction(interaction);
+                                    NarrativeCraftFile.updateInteractionsFile(scene);
                                 } catch (Exception e) {
-                                    scene.addCameraAngleGroup(cameraAngle);
+                                    scene.addInteraction(interaction);
                                     fr.loudo.narrativecraft.util.Util.sendCrashMessage(minecraft.player, e);
                                 }
-                                minecraft.setScreen(new CameraAngleScreen(scene));
+                                minecraft.setScreen(new InteractionsScreen(scene));
                             });
                 })
                 .toList();

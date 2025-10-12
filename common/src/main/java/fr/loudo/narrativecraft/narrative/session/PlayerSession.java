@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.narrative.session;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.controllers.AbstractController;
+import fr.loudo.narrativecraft.controllers.interaction.InteractionController;
 import fr.loudo.narrativecraft.gui.StorySaveIconGui;
 import fr.loudo.narrativecraft.managers.PlaybackManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
@@ -49,6 +50,7 @@ public class PlayerSession {
     private final List<CharacterRuntime> characterRuntimes = new ArrayList<>();
     private final InkTagHandler inkTagHandler;
     private final StorySaveIconGui storySaveIconGui = new StorySaveIconGui(0.2, 0.9, 0.2);
+    private final List<InteractionController> interactionControllers = new ArrayList<>();
     private AbstractController controller;
     private DialogRenderer dialogRenderer;
     private KeyframeLocation currentCamera;
@@ -223,5 +225,9 @@ public class PlayerSession {
 
     public void setShowDebugHud(boolean showDebugHud) {
         this.showDebugHud = showDebugHud;
+    }
+
+    public List<InteractionController> getInteractionControllers() {
+        return interactionControllers;
     }
 }

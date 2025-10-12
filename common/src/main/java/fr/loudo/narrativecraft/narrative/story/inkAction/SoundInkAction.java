@@ -55,9 +55,12 @@ public class SoundInkAction extends InkAction {
 
     @Override
     public void tick() {
+        if (!soundManager.isActive(simpleSoundInstance)) {
+            isRunning = false;
+        }
         if (!isRunning || totalTick == 0) return;
         currentTick++;
-        isRunning = currentTick <= totalTick || action.equals("start") || soundManager.isActive(simpleSoundInstance);
+        isRunning = currentTick <= totalTick || action.equals("start");
         if (!isRunning) {
             soundManager.stop(simpleSoundInstance);
         }

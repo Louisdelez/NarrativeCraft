@@ -173,7 +173,9 @@ public class MainScreen extends Screen {
     @Override
     protected void init() {
         boolean storyFinished = NarrativeCraftMod.getInstance().getNarrativeWorldOption().finishedStory;
-        minecraft.options.hideGui = true;
+        if (playerSession.getCurrentCamera() != null) {
+            minecraft.options.hideGui = true;
+        }
         showDevBtnCount = 0;
         StorySave save = null;
         try {

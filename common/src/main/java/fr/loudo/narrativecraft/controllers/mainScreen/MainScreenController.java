@@ -144,6 +144,7 @@ public class MainScreenController extends AbstractKeyframesBase<MainScreenKeyfra
         if (!keyframeTriggers.isEmpty()) {
             keyframeTriggers.getFirst().hideKeyframe(playerSession.getPlayer());
         }
+        playerSession.getCharacterRuntimes().clear();
         if (save) {
             MainScreenKeyframe oldKeyframe = mainScreenData.getKeyframe();
             KeyframeTrigger oldKeyframeTrigger = mainScreenData.getKeyframeTrigger();

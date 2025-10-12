@@ -27,6 +27,7 @@ import com.bladecoder.ink.runtime.Story;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.controllers.AbstractController;
+import fr.loudo.narrativecraft.controllers.interaction.InteractionController;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.hud.StoryDebugHud;
 import fr.loudo.narrativecraft.narrative.Environment;
@@ -39,6 +40,7 @@ import fr.loudo.narrativecraft.narrative.dialog.*;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandlerException;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.story.inkAction.GameplayInkAction;
 import fr.loudo.narrativecraft.options.NarrativeClientOption;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.screens.components.CrashScreen;
@@ -98,7 +100,12 @@ public class StoryHandler {
     }
 
     public boolean isFinished() {
-        return !story.canContinue() && story.getCurrentChoices().isEmpty() && !story.hasError() && !hasError;
+        return !story.canContinue()
+                && story.getCurrentChoices().isEmpty()
+                && !story.hasError()
+                && !hasError
+                && playerSession.getInkActions().stream()
+                        .noneMatch(inkAction -> inkAction instanceof GameplayInkAction);
     }
 
     public void start() {
@@ -136,6 +143,9 @@ public class StoryHandler {
         for (InkAction inkAction : playerSession.getInkActions()) {
             inkAction.stop();
         }
+        for (InteractionController interactionController : playerSession.getInteractionControllers()) {
+            interactionController.stopSession(false);
+        }
         playerSession.getInkActions().clear();
         for (Playback playback : playerSession.getPlaybackManager().getPlaybacks()) {
             playback.stop(true);
@@ -151,6 +161,7 @@ public class StoryHandler {
         }
         playerSession.setCurrentCamera(null);
         playerSession.getCharacterRuntimes().clear();
+        playerSession.getInteractionControllers().clear();
         playerSession.setDialogRenderer(null);
         playerSession.setStoryHandler(null);
         playerSession.getInkTagHandler().getTagsToExecute().clear();
@@ -163,6 +174,17 @@ public class StoryHandler {
             minecraft.execute(() -> minecraft.setScreen(creditScreen));
             worldOption.finishedStory = true;
             NarrativeCraftFile.updateWorldOptions(worldOption);
+        }
+    }
+
+    public void playStitch(String stitch) {
+        try {
+            story.choosePathString(playerSession.getScene().knotName() + "." + stitch);
+            playerSession.getInkActions().removeIf(inkAction -> inkAction instanceof GameplayInkAction);
+            next();
+        } catch (Exception e) {
+            stop();
+            showCrash(e);
         }
     }
 

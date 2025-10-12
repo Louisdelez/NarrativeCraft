@@ -21,28 +21,21 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.handler.ClientPacketHandlerNeoForge;
-import fr.loudo.narrativecraft.network.OpenChaptersScreenPacket;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+public class StitchInteraction {
 
-@Mod(NarrativeCraftMod.MOD_ID)
-public class RegisterPayloadEvent {
+    private String stitch;
 
-    public RegisterPayloadEvent(IEventBus modEventBus) {
-        modEventBus.addListener(RegisterPayloadEvent::register);
+    public StitchInteraction(String stitch) {
+        this.stitch = stitch;
     }
 
-    private static void register(RegisterPayloadHandlersEvent event) {
-        final PayloadRegistrar registrar = event.registrar("1");
-        registrar.playToClient(
-                OpenChaptersScreenPacket.TYPE,
-                OpenChaptersScreenPacket.STREAM_CODEC,
-                ClientPacketHandlerNeoForge::handleOpenChaptersScreen);
+    public String getStitch() {
+        return stitch;
+    }
+
+    public void setStitch(String stitch) {
+        this.stitch = stitch;
     }
 }

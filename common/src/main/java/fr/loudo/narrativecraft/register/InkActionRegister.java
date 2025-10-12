@@ -109,5 +109,12 @@ public class InkActionRegister {
                 InkAction.Side.CLIENT,
                 "shake %strength% %decay_rate% %speed%",
                 command -> command.startsWith("shake")));
+        InkActionRegistry.register(() -> new InteractionInkAction(
+                "interaction",
+                InkAction.Side.SERVER,
+                "interaction <summon, remove> %interaction_name%",
+                command -> command.startsWith("interaction")));
+        InkActionRegistry.register(() -> new GameplayInkAction(
+                "gameplay", InkAction.Side.SERVER, "gameplay", command -> command.startsWith("gameplay")));
     }
 }

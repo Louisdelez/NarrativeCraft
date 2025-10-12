@@ -85,6 +85,7 @@ public class NarrativeCraftFile {
     public static final String CAMERA_ANGLES_FILE_NAME = "camera_angles" + EXTENSION_DATA_FILE;
     public static final String CUTSCENES_FILE_NAME = "cutscenes" + EXTENSION_DATA_FILE;
     public static final String SUBSCENES_FILE_NAME = "subscenes" + EXTENSION_DATA_FILE;
+    public static final String INTERACTION_FILE_NAME = "interactions" + EXTENSION_DATA_FILE;
 
     // DATA
     public static final String DIALOG_FILE_NAME = "dialog" + EXTENSION_DATA_FILE;
@@ -290,6 +291,7 @@ public class NarrativeCraftFile {
         createFile(dataFolder, CUTSCENES_FILE_NAME);
         createFile(dataFolder, SUBSCENES_FILE_NAME);
         createFile(dataFolder, CAMERA_ANGLES_FILE_NAME);
+        createFile(dataFolder, INTERACTION_FILE_NAME);
 
         String content = String.format(
                 "{\"name\":\"%s\",\"description\":\"%s\",\"rank\":%s}",
@@ -384,6 +386,16 @@ public class NarrativeCraftFile {
                 .create();
         try (Writer writer = new BufferedWriter(new FileWriter(cameraAngelGroupFile))) {
             gson.toJson(scene.getCameraAngles(), writer);
+        }
+    }
+
+    public static void updateInteractionsFile(Scene scene) throws IOException {
+        File interactionsFile = getInteractionFile(scene);
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(CharacterStoryData.class, new CharacterStoryDataSerializer(scene))
+                .create();
+        try (Writer writer = new BufferedWriter(new FileWriter(interactionsFile))) {
+            gson.toJson(scene.getInteractions(), writer);
         }
     }
 
@@ -580,6 +592,10 @@ public class NarrativeCraftFile {
 
     public static File getCameraAngelGroupFile(Scene scene) {
         return createFile(getDataFolder(scene), CAMERA_ANGLES_FILE_NAME);
+    }
+
+    public static File getInteractionFile(Scene scene) {
+        return createFile(getDataFolder(scene), INTERACTION_FILE_NAME);
     }
 
     public static File getDataFolder(Scene scene) {

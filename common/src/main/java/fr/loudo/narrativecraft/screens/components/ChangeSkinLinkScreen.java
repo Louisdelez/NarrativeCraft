@@ -121,7 +121,7 @@ public class ChangeSkinLinkScreen extends OptionsSubScreen {
                         ChangeSkinLinkScreen.this.font,
                         this.skin.getName().split("\\.")[0],
                         SkinList.this.width / 2,
-                        i + i1 / 2 - 4,
+                        this.getContentYMiddle() - 9 / 2,
                         -1);
             }
 

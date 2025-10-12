@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.CameraAngle;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.ArrayList;
@@ -42,8 +43,8 @@ public class Scene extends NarrativeEntry {
     private final List<Cutscene> cutscenes = new ArrayList<>();
     private final List<Subscene> subscenes = new ArrayList<>();
     private final List<CameraAngle> cameraAngles = new ArrayList<>();
-
     private final List<CharacterStory> npcs = new ArrayList<>();
+    private List<Interaction> interactions = new ArrayList<>();
 
     private int rank;
 
@@ -120,6 +121,15 @@ public class Scene extends NarrativeEntry {
         cameraAngles.remove(cameraAngleGroup);
     }
 
+    public void addInteraction(Interaction interaction) {
+        if (interactions.contains(interaction)) return;
+        interactions.add(interaction);
+    }
+
+    public void removeInteraction(Interaction interaction) {
+        interactions.remove(interaction);
+    }
+
     public CameraAngle getCameraAngleByName(String name) {
         for (CameraAngle cameraAngle : cameraAngles) {
             if (cameraAngle.getName().equalsIgnoreCase(name)) {
@@ -136,6 +146,24 @@ public class Scene extends NarrativeEntry {
             }
         }
         return false;
+    }
+
+    public boolean interactionExists(String name) {
+        for (Interaction interaction : interactions) {
+            if (interaction.getName().equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Interaction getInteractionByName(String name) {
+        for (Interaction interaction : interactions) {
+            if (interaction.getName().equalsIgnoreCase(name)) {
+                return interaction;
+            }
+        }
+        return null;
     }
 
     public void addNpc(CharacterStory characterStory) {
@@ -181,6 +209,17 @@ public class Scene extends NarrativeEntry {
 
     public void removeAnimation(Animation animation) {
         animations.remove(animation);
+    }
+
+    public List<Interaction> getInteractions() {
+        if (interactions == null) {
+            interactions = new ArrayList<>();
+        }
+        return interactions;
+    }
+
+    public void setInteractions(List<Interaction> interactions) {
+        this.interactions = interactions;
     }
 
     public Chapter getChapter() {

@@ -21,19 +21,21 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.screens.controller.cameraAngle;
+package fr.loudo.narrativecraft.screens.controller.interaction;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.controllers.cameraAngle.CameraAngleController;
+import fr.loudo.narrativecraft.controllers.interaction.InteractionController;
 import fr.loudo.narrativecraft.mixin.accessor.EntityAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.LivingEntityAccessor;
 import fr.loudo.narrativecraft.narrative.Environment;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.CharacterInteraction;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.EntityInteraction;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.recording.Location;
 import fr.loudo.narrativecraft.screens.components.ChooseCharacterScreen;
 import fr.loudo.narrativecraft.screens.components.EntryBoxScreen;
+import fr.loudo.narrativecraft.screens.storyManager.areaTrigger.AreaTriggersScreen;
 import fr.loudo.narrativecraft.util.ImageFontConstants;
-import fr.loudo.narrativecraft.util.ScreenUtils;
 import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -42,16 +44,17 @@ import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.Vec3;
 
-public class CameraAngleControllerScreen extends Screen {
+public class InteractionControllerScreen extends Screen {
 
     private final int BUTTON_HEIGHT = 20;
     private final int BUTTON_WIDTH = 30;
-    private final CameraAngleController cameraAngleController;
+    private final InteractionController controller;
 
-    public CameraAngleControllerScreen(CameraAngleController cameraAngleController) {
-        super(Component.literal("Camera Angle Controller Screen"));
-        this.cameraAngleController = cameraAngleController;
+    public InteractionControllerScreen(InteractionController controller) {
+        super(Component.literal("Interaction Controller Screen"));
+        this.controller = controller;
     }
 
     @Override
@@ -61,61 +64,27 @@ public class CameraAngleControllerScreen extends Screen {
         int startX = (this.width - totalWidth) / 2;
         int y = this.height - 50;
 
-        Button addKeyframe = Button.builder(ImageFontConstants.ADD_KEYFRAME, button -> {
-                    EntryBoxScreen screen = new EntryBoxScreen(this, Translation.message("global.name"), name -> {
-                        if (name.isEmpty()) {
-                            ScreenUtils.sendToast(
-                                    Translation.message("global.error"),
-                                    Translation.message(
-                                            "camera_angle.name_no_empty",
-                                            name,
-                                            cameraAngleController
-                                                    .getCameraAngle()
-                                                    .getName()));
-                        } else if (cameraAngleController.getKeyframeByName(name) != null) {
-                            ScreenUtils.sendToast(
-                                    Translation.message("global.error"),
-                                    Translation.message(
-                                            "camera_angle.already_exists",
-                                            name,
-                                            cameraAngleController
-                                                    .getCameraAngle()
-                                                    .getName()));
-                        } else {
-                            cameraAngleController.createKeyframe(name);
-                            onClose();
-                        }
-                    });
-                    minecraft.setScreen(screen);
-                })
-                .bounds(startX, y, BUTTON_WIDTH, BUTTON_HEIGHT)
-                .build();
-        addKeyframe.setTooltip(Tooltip.create(Translation.message("tooltip.create_keyframe")));
-        this.addRenderableWidget(addKeyframe);
-
         Button addCharacter = Button.builder(ImageFontConstants.CHARACTER_ADD, button -> {
                     ChooseCharacterScreen screen = new ChooseCharacterScreen(
                             this,
                             Translation.message(
                                             "controller.add_character",
-                                            cameraAngleController
-                                                    .getCameraAngle()
-                                                    .getName())
+                                            controller.getInteraction().getName())
                                     .getString(),
                             null,
-                            cameraAngleController.getCameraAngle().getScene(),
+                            controller.getInteraction().getScene(),
                             characterStory -> {
                                 if (characterStory == null) {
                                     onClose();
                                     return;
                                 }
                                 Location location =
-                                        cameraAngleController.getPlayerSession().getPlayerPosition();
+                                        controller.getPlayerSession().getPlayerPosition();
                                 CharacterStoryData characterStoryData = new CharacterStoryData(
                                         characterStory,
                                         location,
-                                        false,
-                                        cameraAngleController.getCameraAngle().getScene());
+                                        true,
+                                        controller.getInteraction().getScene());
                                 characterStoryData.setItems(minecraft.player);
                                 characterStoryData.setEntityByte(
                                         minecraft.player.getEntityData().get(EntityAccessor.getDATA_SHARED_FLAGS_ID()));
@@ -124,39 +93,62 @@ public class CameraAngleControllerScreen extends Screen {
                                         .getEntityData()
                                         .get(LivingEntityAccessor.getDATA_LIVING_ENTITY_FLAGS()));
                                 characterStoryData.spawn(
-                                        cameraAngleController
+                                        controller
                                                 .getPlayerSession()
                                                 .getPlayer()
                                                 .level(),
                                         Environment.DEVELOPMENT);
-                                cameraAngleController
-                                        .getCharacterStoryDataList()
-                                        .add(characterStoryData);
+                                controller.getCharacterStoryDataList().add(characterStoryData);
                                 minecraft.setScreen(null);
-                                cameraAngleController
+                                controller
                                         .getPlayerSession()
                                         .getCharacterRuntimes()
                                         .add(characterStoryData.getCharacterRuntime());
+                                CharacterInteraction characterInteraction =
+                                        new CharacterInteraction("", characterStoryData);
+                                EntryBoxScreen screen1 = new EntryBoxScreen(
+                                        null, Translation.message("global.stitch"), characterInteraction::setStitch);
+                                controller.getCharacterInteractions().add(characterInteraction);
+                                minecraft.setScreen(screen1);
                             });
                     minecraft.setScreen(screen);
                 })
-                .bounds(startX + (BUTTON_WIDTH + spacing) * 1, y, BUTTON_WIDTH, BUTTON_HEIGHT)
+                .bounds(startX, y, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build();
         addCharacter.setTooltip(Tooltip.create(Translation.message("tooltip.add_character")));
         this.addRenderableWidget(addCharacter);
 
-        Button recordMenu = Button.builder(ImageFontConstants.SETTINGS, button -> {
-                    CameraAngleAddTemplateCharacter cameraAngleAddRecord =
-                            new CameraAngleAddTemplateCharacter(this, cameraAngleController);
-                    minecraft.setScreen(cameraAngleAddRecord);
+        Button addEntityInteractionBtn = Button.builder(ImageFontConstants.EYE_OPEN, button -> {
+                    EntryBoxScreen screen = new EntryBoxScreen(this, Translation.message("global.stitch"), s -> {
+                        Vec3 position = controller
+                                .getPlayerSession()
+                                .getPlayerPosition()
+                                .asVec3();
+                        // position = position.add(0, controller.getPlayerSession().getPlayer().getEyeHeight() / 2.0,
+                        // 0);
+                        EntityInteraction entityInteraction = new EntityInteraction(s, position);
+                        controller.getEntityInteractions().add(entityInteraction);
+                        entityInteraction.spawn(controller.getPlayerSession().getPlayer(), controller.getEnvironment());
+                    });
+                    minecraft.setScreen(screen);
+                })
+                .bounds(startX + (BUTTON_WIDTH + spacing) * 1, y, BUTTON_WIDTH, BUTTON_HEIGHT)
+                .build();
+        addEntityInteractionBtn.setTooltip(
+                Tooltip.create(Translation.message("controller.interaction.add_entity_interaction")));
+        this.addRenderableWidget(addEntityInteractionBtn);
+
+        Button areaTriggerMode = Button.builder(ImageFontConstants.BOX, button -> {
+                    AreaTriggersScreen screen = new AreaTriggersScreen(this, controller);
+                    minecraft.setScreen(screen);
                 })
                 .bounds(startX + (BUTTON_WIDTH + spacing) * 2, y, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build();
-        recordMenu.setTooltip(Tooltip.create(Translation.message("tooltip.template_character")));
-        this.addRenderableWidget(recordMenu);
+        areaTriggerMode.setTooltip(Tooltip.create(Translation.message("controller.interaction.area_trigger_list")));
+        this.addRenderableWidget(areaTriggerMode);
 
         Button saveButton = Button.builder(ImageFontConstants.SAVE, button -> {
-                    NarrativeCraftMod.server.execute(() -> cameraAngleController.stopSession(true));
+                    NarrativeCraftMod.server.execute(() -> controller.stopSession(true));
                     this.onClose();
                 })
                 .bounds(startX + (BUTTON_WIDTH + spacing) * 3, y, BUTTON_WIDTH, BUTTON_HEIGHT)
@@ -168,7 +160,7 @@ public class CameraAngleControllerScreen extends Screen {
                             b -> {
                                 if (b) {
                                     NarrativeCraftMod.server.execute(() -> {
-                                        cameraAngleController.stopSession(false);
+                                        controller.stopSession(false);
                                     });
                                     this.onClose();
                                 } else {

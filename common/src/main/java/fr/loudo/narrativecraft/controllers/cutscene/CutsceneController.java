@@ -213,6 +213,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         }
         playerSession.getPlaybackManager().getPlaybacks().removeAll(playbacks);
         if (environment != Environment.DEVELOPMENT) return;
+        playerSession.getCharacterRuntimes().clear();
         for (CutsceneKeyframeGroup keyframeGroup : keyframeGroups) {
             keyframeGroup.hideKeyframes(playerSession.getPlayer());
         }

@@ -112,6 +112,7 @@ public class CameraAngleController extends AbstractKeyframesBase<CameraAngleKeyf
         playerSession.setController(null);
         Minecraft.getInstance().options.hideGui = false;
         if (environment != Environment.DEVELOPMENT) return;
+        playerSession.getCharacterRuntimes().clear();
         for (CameraAngleKeyframe cameraAngleKeyframe : keyframes) {
             cameraAngleKeyframe.hideKeyframe(playerSession.getPlayer());
         }

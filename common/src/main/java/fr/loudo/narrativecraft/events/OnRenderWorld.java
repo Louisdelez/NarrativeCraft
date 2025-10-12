@@ -27,6 +27,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
+import fr.loudo.narrativecraft.controllers.interaction.InteractionController;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -39,6 +40,9 @@ public class OnRenderWorld {
         if (playerSession == null) return;
         if (playerSession.getController() instanceof CutsceneController controller) {
             controller.drawLinesBetweenKeyframes(poseStack);
+        }
+        if (playerSession.getController() instanceof InteractionController controller) {
+            controller.showAreaTriggers(poseStack);
         }
         if (playerSession.getDialogRenderer() != null) {
             playerSession.getDialogRenderer().render(poseStack, partialTick);
