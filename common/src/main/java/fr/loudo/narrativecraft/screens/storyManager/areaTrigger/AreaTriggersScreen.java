@@ -78,13 +78,13 @@ public class AreaTriggersScreen extends StoryElementScreen {
                     Button button = Button.builder(Component.literal(areaTrigger.getName()), button1 -> {
                                 interactionController.setAreaTriggerEditing(areaTrigger);
                                 Vec3 oldLoc1 = new Vec3(
-                                        areaTrigger.getLocation1().x,
-                                        areaTrigger.getLocation1().y,
-                                        areaTrigger.getLocation1().z);
+                                        areaTrigger.getPosition1().x,
+                                        areaTrigger.getPosition1().y,
+                                        areaTrigger.getPosition1().z);
                                 Vec3 oldLoc2 = new Vec3(
-                                        areaTrigger.getLocation2().x,
-                                        areaTrigger.getLocation2().y,
-                                        areaTrigger.getLocation2().z);
+                                        areaTrigger.getPosition2().x,
+                                        areaTrigger.getPosition2().y,
+                                        areaTrigger.getPosition2().z);
                                 AreaTriggerControllerScreen screen = new AreaTriggerControllerScreen(
                                         interactionController, areaTrigger, oldLoc1, oldLoc2);
                                 minecraft.setScreen(screen);

@@ -30,6 +30,7 @@ import fr.loudo.narrativecraft.gui.StorySaveIconGui;
 import fr.loudo.narrativecraft.managers.PlaybackManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.AreaTrigger;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
@@ -37,6 +38,7 @@ import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandler;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.recording.Location;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.narrative.story.inkAction.GameplayInkAction;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.server.level.ServerPlayer;
@@ -51,10 +53,12 @@ public class PlayerSession {
     private final InkTagHandler inkTagHandler;
     private final StorySaveIconGui storySaveIconGui = new StorySaveIconGui(0.2, 0.9, 0.2);
     private final List<InteractionController> interactionControllers = new ArrayList<>();
+    private final List<AreaTrigger> areaTriggersEntered = new ArrayList<>();
     private AbstractController controller;
     private DialogRenderer dialogRenderer;
     private KeyframeLocation currentCamera;
     private StoryHandler storyHandler;
+    private AreaTrigger lastAreaTriggerEntered;
     private Chapter chapter;
     private Scene scene;
     private boolean showDebugHud;
@@ -161,6 +165,34 @@ public class PlayerSession {
                         || playback.hasEnded()
                         || playback.getCharacterRuntime().getEntity() == null
                         || !playback.getCharacterRuntime().getEntity().isAlive());
+    }
+
+    public boolean isOnGameplay() {
+        return !inkActions.stream()
+                .filter(inkAction -> inkAction instanceof GameplayInkAction)
+                .toList()
+                .isEmpty();
+    }
+
+    public List<AreaTrigger> getAreaTriggersEntered() {
+        return areaTriggersEntered;
+    }
+
+    public void addAreaTriggerEntered(AreaTrigger areaTrigger) {
+        if (areaTriggersEntered.contains(areaTrigger)) return;
+        areaTriggersEntered.add(areaTrigger);
+    }
+
+    public void removeAreaTriggerEntered(AreaTrigger areaTrigger) {
+        areaTriggersEntered.remove(areaTrigger);
+    }
+
+    public AreaTrigger getLastAreaTriggerEntered() {
+        return lastAreaTriggerEntered;
+    }
+
+    public void setLastAreaTriggerEntered(AreaTrigger lastAreaTriggerEntered) {
+        this.lastAreaTriggerEntered = lastAreaTriggerEntered;
     }
 
     public List<CharacterRuntime> getCharacterRuntimes() {

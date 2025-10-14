@@ -153,6 +153,7 @@
   "narrativecraft.tooltip.leave_without_saving": "Leave without saving",
   "narrativecraft.tooltip.area_trigger.loc_1": "Location 1",
   "narrativecraft.tooltip.area_trigger.loc_2": "Location 2",
+  "narrativecraft.tooltip.area_trigger.is_unique_explanation": "Trigger the stitch only the first time the player enters the area.",
 
   "narrativecraft.screen.story_manager.chapter_list": "Chapters",
   "narrativecraft.screen.story_manager.scene_list": "Scenes of chapter %s",
@@ -168,6 +169,7 @@
   "narrativecraft.screen.story_manager.subscene_cutscene_link": "Link subscene to cutscene",
   "narrativecraft.screen.story_manager.animation_cutscene_link": "Link animation to cutscene",
   "narrativecraft.screen.story_manager.subscene_animation_link": "Link animation to subscene",
+  "narrativecraft.screen.story_manager.area_trigger.is_unique": "Is unique?",
   "narrativecraft.screen.edit_info.name_must": "You must have a name!",
   "narrativecraft.screen.pick.subscene.title": "%s selector for subscene %s",
   "narrativecraft.screen.pick.cutscene.title": "%s selector for cutscene %s",

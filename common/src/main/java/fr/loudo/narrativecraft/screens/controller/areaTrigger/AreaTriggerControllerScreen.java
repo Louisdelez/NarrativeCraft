@@ -70,7 +70,7 @@ public class AreaTriggerControllerScreen extends Screen {
         int y = this.height - 50;
 
         Button location1Btn = Button.builder(Component.literal("1"), button -> {
-                    areaTrigger.setLocation1(minecraft.player.position());
+                    areaTrigger.setPosition1(minecraft.player.position());
                 })
                 .bounds(startX, y, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build();
@@ -78,7 +78,7 @@ public class AreaTriggerControllerScreen extends Screen {
         this.addRenderableWidget(location1Btn);
 
         Button location2Btn = Button.builder(Component.literal("2"), button -> {
-                    areaTrigger.setLocation2(minecraft.player.position());
+                    areaTrigger.setPosition2(minecraft.player.position());
                 })
                 .bounds(startX + (BUTTON_WIDTH + spacing), y, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build();
@@ -99,8 +99,8 @@ public class AreaTriggerControllerScreen extends Screen {
                                 if (b) {
                                     interactionController.setAreaTriggerEditing(null);
                                     minecraft.setScreen(new AreaTriggersScreen(null, interactionController));
-                                    areaTrigger.setLocation1(AreaTriggerControllerScreen.oldLoc1);
-                                    areaTrigger.setLocation2(AreaTriggerControllerScreen.oldLoc2);
+                                    areaTrigger.setPosition1(AreaTriggerControllerScreen.oldLoc1);
+                                    areaTrigger.setPosition2(AreaTriggerControllerScreen.oldLoc2);
                                 } else {
                                     minecraft.setScreen(this);
                                 }

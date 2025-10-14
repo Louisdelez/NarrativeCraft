@@ -58,6 +58,7 @@ public class GameplayInkAction extends InkAction {
         StoryHandler storyHandler = playerSession.getStoryHandler();
         if (storyHandler == null) return InkActionResult.ignored();
         if (playerSession.getDialogRenderer() != null) {
+            playerSession.setDialogRenderer(null);
             playerSession.getDialogRenderer().setRunDialogStopped(() -> {
                 playerSession.setDialogRenderer(null);
                 execute(playerSession);
@@ -66,7 +67,6 @@ public class GameplayInkAction extends InkAction {
             playerSession.getDialogRenderer().stop();
             return InkActionResult.ok();
         }
-        playerSession.setCurrentCamera(null);
         if (storyHandler.characterInStory(mainCharacter)) {
             CharacterRuntime characterRuntime = storyHandler.getCharacterRuntimeFromCharacter(mainCharacter);
             if (characterRuntime == null) {
@@ -74,6 +74,7 @@ public class GameplayInkAction extends InkAction {
             }
             Vec3 position = characterRuntime.getEntity().position();
             Entity entity = characterRuntime.getEntity();
+            // TODO: better teleport, chance of damage fall not null
             playerSession
                     .getPlayer()
                     .connection
@@ -83,8 +84,8 @@ public class GameplayInkAction extends InkAction {
         if (playerSession.getController() != null) {
             playerSession.getController().stopSession(false);
         }
+        playerSession.setCurrentCamera(null);
         playerSession.getInkActions().removeIf(inkAction -> inkAction instanceof CameraAngleInkAction);
-
         return InkActionResult.ok();
     }
 

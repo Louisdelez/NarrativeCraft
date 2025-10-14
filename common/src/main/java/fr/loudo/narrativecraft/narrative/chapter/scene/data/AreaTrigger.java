@@ -39,20 +39,22 @@ public class AreaTrigger extends SceneData {
 
     private double x1, y1, z1;
     private double x2, y2, z2;
+    private boolean isUnique;
     private String stitch;
 
-    public AreaTrigger(String name, String description, Scene scene, String stitch) {
+    public AreaTrigger(String name, String description, Scene scene, String stitch, boolean isUnique) {
         super(name, description, scene);
         this.stitch = stitch;
+        this.isUnique = isUnique;
     }
 
-    public void setLocation1(Location location) {
+    public void setPosition1(Location location) {
         this.x1 = (int) location.x() - 0.5;
         this.y1 = (int) location.y() - 0.5;
         this.z1 = (int) location.z() - 0.5;
     }
 
-    public void setLocation1(Vec3 vec3) {
+    public void setPosition1(Vec3 vec3) {
         this.x1 = (int) vec3.x();
         this.y1 = (int) vec3.y();
         this.z1 = (int) vec3.z();
@@ -63,17 +65,17 @@ public class AreaTrigger extends SceneData {
             z1 -= 1.0;
         }
         if (x2 == 0 && y2 == 0 && z2 == 0) {
-            setLocation2(new Vec3(x1 + 1.0, y1, z1 + 1.0));
+            setPosition2(new Vec3(x1 + 1.0, y1, z1 + 1.0));
         }
     }
 
-    public void setLocation2(Location location) {
+    public void setPosition2(Location location) {
         this.x2 = (int) location.x() - 0.5;
         this.y2 = (int) location.y() - 0.5;
         this.z2 = (int) location.z() - 0.5;
     }
 
-    public void setLocation2(Vec3 vec3) {
+    public void setPosition2(Vec3 vec3) {
         this.x2 = (int) vec3.x();
         this.y2 = (int) vec3.y();
         this.z2 = (int) vec3.z();
@@ -85,11 +87,11 @@ public class AreaTrigger extends SceneData {
         }
     }
 
-    public Vec3 getLocation1() {
+    public Vec3 getPosition1() {
         return new Vec3(x1, y1, z1);
     }
 
-    public Vec3 getLocation2() {
+    public Vec3 getPosition2() {
         return new Vec3(x2, y2, z2);
     }
 
@@ -99,6 +101,14 @@ public class AreaTrigger extends SceneData {
 
     public void setStitch(String stitch) {
         this.stitch = stitch;
+    }
+
+    public boolean isUnique() {
+        return isUnique;
+    }
+
+    public void setUnique(boolean unique) {
+        isUnique = unique;
     }
 
     public void drawSquareLine(PoseStack poseStack) {
@@ -125,7 +135,7 @@ public class AreaTrigger extends SceneData {
         maxZ -= camPos.z;
 
         Matrix4f matrix = matrix4f.pose();
-        float r = 1.0F, g = 1.0F, b = 0.0F, a = 1.0F;
+        float r = 0.09F, g = 0.38F, b = 0.85F, a = 1.0F;
 
         Vec3 p000 = new Vec3(minX, minY, minZ);
         Vec3 p001 = new Vec3(minX, minY, maxZ);
@@ -162,5 +172,23 @@ public class AreaTrigger extends SceneData {
         vertex.addVertex(matrix, (float) b.x, (float) b.y, (float) b.z)
                 .setColor(r, g, bcol, alpha)
                 .setNormal(0, 1, 0);
+    }
+
+    public static boolean isInside(AreaTrigger areaTrigger, Vec3 pPosition) {
+        Vec3 pos1 = areaTrigger.getPosition1();
+        Vec3 pos2 = areaTrigger.getPosition2();
+        double minX = Math.min(pos1.x, pos2.x);
+        double maxX = Math.max(pos1.x, pos2.x);
+        double minY = Math.min(pos1.y, pos2.y);
+        double maxY = Math.max(pos1.y, pos2.y);
+        double minZ = Math.min(pos1.z, pos2.z);
+        double maxZ = Math.max(pos1.z, pos2.z);
+
+        return pPosition.x >= minX
+                && pPosition.x <= maxX
+                && pPosition.y >= minY
+                && pPosition.y <= maxY
+                && pPosition.z >= minZ
+                && pPosition.z <= maxZ;
     }
 }

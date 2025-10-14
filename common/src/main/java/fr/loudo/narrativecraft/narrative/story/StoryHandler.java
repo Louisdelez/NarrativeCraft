@@ -104,14 +104,15 @@ public class StoryHandler {
                 && story.getCurrentChoices().isEmpty()
                 && !story.hasError()
                 && !hasError
-                && playerSession.getInkActions().stream()
-                        .noneMatch(inkAction -> inkAction instanceof GameplayInkAction);
+                && !playerSession.isOnGameplay();
     }
 
     public void start() {
         if (playerSession.getController() != null) {
             playerSession.getController().stopSession(false);
         }
+        playerSession.getAreaTriggersEntered().clear();
+        playerSession.setLastAreaTriggerEntered(null);
         playerSession.setStoryHandler(this);
         firstLoad = true;
         try {
@@ -160,10 +161,12 @@ public class StoryHandler {
             controller.stopSession(false);
         }
         playerSession.setCurrentCamera(null);
-        playerSession.getCharacterRuntimes().clear();
-        playerSession.getInteractionControllers().clear();
         playerSession.setDialogRenderer(null);
         playerSession.setStoryHandler(null);
+        playerSession.getCharacterRuntimes().clear();
+        playerSession.getAreaTriggersEntered().clear();
+        playerSession.setLastAreaTriggerEntered(null);
+        playerSession.getInteractionControllers().clear();
         playerSession.getInkTagHandler().getTagsToExecute().clear();
     }
 

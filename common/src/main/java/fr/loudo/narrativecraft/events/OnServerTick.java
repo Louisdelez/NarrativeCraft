@@ -25,11 +25,15 @@ package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
+import fr.loudo.narrativecraft.controllers.interaction.InteractionController;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.AreaTrigger;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.Vec3;
 
 public class OnServerTick {
     public static void tick(MinecraftServer server) {
@@ -43,6 +47,35 @@ public class OnServerTick {
                 inkAction.tick();
             }
             playerSession.getInkActions().removeAll(toRemove);
+            StoryHandler storyHandler = playerSession.getStoryHandler();
+
+            if (storyHandler == null) continue;
+
+            // AreaTrigger detection
+            if (!playerSession.isOnGameplay()) continue;
+            if (playerSession.getCurrentCamera() != null) continue;
+            Vec3 pPosition = playerSession.getPlayer().position();
+            AreaTrigger areaTriggerInside = null;
+            for (InteractionController interactionController : playerSession.getInteractionControllers()) {
+                for (AreaTrigger areaTrigger : interactionController.getAreaTriggers()) {
+                    if (AreaTrigger.isInside(areaTrigger, pPosition)) {
+                        areaTriggerInside = areaTrigger;
+                    }
+                }
+            }
+            // What happens:
+            // Player enter the area trigger, trigger one time
+            // Exit, and when enter the area trigger again if it's not unique, trigger again
+            // This prevents infinite trigger when the player is inside the area trigger.
+            if (areaTriggerInside != null && !areaTriggerInside.equals(playerSession.getLastAreaTriggerEntered())) {
+                if (areaTriggerInside.isUnique()
+                        && playerSession.getAreaTriggersEntered().contains(areaTriggerInside)) continue;
+                storyHandler.playStitch(areaTriggerInside.getStitch());
+                playerSession.addAreaTriggerEntered(areaTriggerInside);
+                playerSession.setLastAreaTriggerEntered(areaTriggerInside);
+            } else if (areaTriggerInside == null && playerSession.getLastAreaTriggerEntered() != null) {
+                playerSession.setLastAreaTriggerEntered(null);
+            }
         }
     }
 }

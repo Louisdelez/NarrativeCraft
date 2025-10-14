@@ -99,7 +99,7 @@ public class InteractionController extends AbstractController {
             Vec3 vec3 = interaction.getEntityInteractions().get(0).getPosition();
             locToTp = new Location(vec3.x(), vec3.y(), vec3.z(), 0, 0, false);
         } else if (!areaTriggers.isEmpty()) {
-            Vec3 vec3 = areaTriggers.get(0).getLocation1();
+            Vec3 vec3 = areaTriggers.get(0).getPosition1();
             locToTp = new Location(vec3.x(), vec3.y(), vec3.z(), 0, 0, false);
         }
         if (locToTp != null) {

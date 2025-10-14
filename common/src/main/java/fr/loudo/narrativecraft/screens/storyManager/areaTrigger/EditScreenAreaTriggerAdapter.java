@@ -32,6 +32,8 @@ import fr.loudo.narrativecraft.util.ScreenUtils;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Checkbox;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,6 +55,12 @@ public class EditScreenAreaTriggerAdapter implements EditScreenAdapter<AreaTrigg
                 Translation.message("global.stitch"), minecraft.font, 110, 20, 0, 0, ScreenUtils.Align.HORIZONTAL);
         screen.extraFields.put("stitchBox", stitch.getEditBox());
         screen.extraFields.put("stitch", stitch);
+        Checkbox isUniqueBox = Checkbox.builder(
+                        Translation.message("screen.story_manager.area_trigger.is_unique"), minecraft.font)
+                .selected(entry != null && entry.isUnique())
+                .build();
+        isUniqueBox.setTooltip(Tooltip.create(Translation.message("tooltip.area_trigger.is_unique_explanation")));
+        screen.extraFields.put("uniqueBox", isUniqueBox);
     }
 
     @Override
@@ -64,6 +72,10 @@ public class EditScreenAreaTriggerAdapter implements EditScreenAdapter<AreaTrigg
         if (entry != null) {
             stitch.getEditBox().setValue(entry.getStitch());
         }
+        y += stitch.getEditBox().getHeight() + screen.GAP;
+        Checkbox isUniqueBox = (Checkbox) screen.extraFields.get("uniqueBox");
+        screen.addRenderableWidget(isUniqueBox);
+        isUniqueBox.setPosition(x, y);
     }
 
     @Override
@@ -75,6 +87,7 @@ public class EditScreenAreaTriggerAdapter implements EditScreenAdapter<AreaTrigg
             String name,
             String description) {
         ScreenUtils.LabelBox stitch = (ScreenUtils.LabelBox) extraFields.get("stitch");
+        Checkbox isUniqueBox = (Checkbox) extraFields.get("uniqueBox");
         if (existing == null) {
             if (interactionController.areaTriggerExists(name)) {
                 ScreenUtils.sendToast(
@@ -86,12 +99,14 @@ public class EditScreenAreaTriggerAdapter implements EditScreenAdapter<AreaTrigg
                     name,
                     description,
                     interaction.getScene(),
-                    stitch.getEditBox().getValue());
+                    stitch.getEditBox().getValue(),
+                    isUniqueBox.selected());
             interactionController.getAreaTriggers().add(areaTrigger);
         } else {
             existing.setName(name);
             existing.setDescription(description);
             existing.setStitch(stitch.getEditBox().getValue());
+            existing.setUnique(isUniqueBox.selected());
         }
         minecraft.setScreen(new AreaTriggersScreen(lastScreen, interactionController));
     }
