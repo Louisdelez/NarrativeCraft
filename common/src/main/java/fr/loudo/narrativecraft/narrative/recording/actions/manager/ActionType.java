@@ -47,7 +47,8 @@ public enum ActionType {
     ABSTRACT_BOAT_PADDLE(BoatPaddleAction.class),
     DEATH(DeathAction.class),
     RESPAWN(RespawnAction.class),
-    ITEM_PICKUP(ItemPickUpAction.class);
+    ITEM_PICKUP(ItemPickUpAction.class),
+    CONTAINER_MENU_CLOSE(ContainerMenuClosedAction.class);
 
     private final Class<? extends Action> actionClass;
 

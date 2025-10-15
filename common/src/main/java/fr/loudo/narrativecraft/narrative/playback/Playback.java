@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -317,6 +318,9 @@ public class Playback {
         if (killEntity) {
             for (PlaybackData playbackData : entityPlaybacks) {
                 if (playbackData.getEntity() == null) continue;
+                if (playbackData.getEntity() instanceof ServerPlayer serverPlayer) {
+                    serverPlayer.doCloseContainer();
+                }
                 playbackData.getActionsData().reset(playbackData.getEntity());
                 playbackData.killEntity();
             }
