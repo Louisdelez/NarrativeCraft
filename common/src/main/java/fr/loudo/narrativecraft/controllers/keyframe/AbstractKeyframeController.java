@@ -77,7 +77,9 @@ public abstract class AbstractKeyframeController<T extends Keyframe> extends Abs
             minecraft.options.hideGui = false;
             showKeyframes(playerSession.getPlayer());
             Vec3 pos = playerSession.getPlayer().position();
-            playerSession.getPlayer().teleportTo(pos.x, pos.y - 5.0 - playerSession.getPlayer().getEyeHeight(), pos.z);
+            playerSession
+                    .getPlayer()
+                    .teleportTo(pos.x, pos.y - 5.0 - playerSession.getPlayer().getEyeHeight(), pos.z);
             return;
         }
         if (keyframe == null) return;
