@@ -197,10 +197,10 @@ public class MainScreen extends Screen {
         }
 
         int totalButtons = storyFinished ? 5 : 4;
-        if (!NarrativeCraftFile.saveExists()) {
+        if (pause) totalButtons = 5;
+        if (!NarrativeCraftFile.saveExists() && !pause) {
             totalButtons = 3;
         }
-        if (pause) totalButtons = 5;
         int totalHeight = buttonHeight * totalButtons + gap * (totalButtons - 1);
         initialY = height / 2 - totalHeight / 2;
         if (narrativeCraftLogo.logoExists()) initialY += narrativeCraftLogo.getImageHeight() / 2 + gap;
@@ -293,10 +293,26 @@ public class MainScreen extends Screen {
                                 } else {
                                     storyHandler = new StoryHandler(playerSession);
                                 }
-                                NarrativeCraftMod.server.execute(() -> {
-                                    playerSession.getStoryHandler().stop();
-                                    storyHandler.start();
-                                });
+                                try {
+                                    List<ErrorLine> results = StoryValidation.validate();
+                                    List<ErrorLine> errorLines =
+                                            results.stream().filter(errorLine -> !errorLine.isWarn()).toList();
+                                    if (errorLines.isEmpty()) {
+                                        NarrativeCraftMod.server.execute(() -> {
+                                            playerSession.getStoryHandler().stop();
+                                            storyHandler.start();
+                                        });
+                                    } else {
+                                        NarrativeCraftMod.server.execute(() -> {
+                                            playerSession.getStoryHandler().stop();
+                                        });
+                                        for (ErrorLine errorLine : results) {
+                                            minecraft.player.displayClientMessage(errorLine.toMessage(), false);
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    Util.sendCrashMessage(minecraft.player, e);
+                                }
                             })
                     .bounds(initialX, startY, buttonWidth, buttonHeight)
                     .build();
@@ -377,6 +393,7 @@ public class MainScreen extends Screen {
             minecraft.setScreen(screen);
         }
     }
+
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {

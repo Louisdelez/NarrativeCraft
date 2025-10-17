@@ -100,5 +100,10 @@ public class StoryDebugHud {
 
         String sceneName = playerSession.getScene().getName();
         guiGraphics.drawString(minecraft.font, sceneName, x, minecraft.font.lineHeight + 23, color);
+
+        String stitchName = playerSession.getStitch();
+        if (stitchName != null) {
+            guiGraphics.drawString(minecraft.font, stitchName, x, minecraft.font.lineHeight + 35, color);
+        }
     }
 }
