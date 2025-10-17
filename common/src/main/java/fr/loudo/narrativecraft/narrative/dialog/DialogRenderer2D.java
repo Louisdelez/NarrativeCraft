@@ -139,7 +139,7 @@ public class DialogRenderer2D extends DialogRenderer {
             }
         }
 
-        poseStack.pushPose();
+        poseStack.popPose();
     }
 
     public int getWidthBox() {

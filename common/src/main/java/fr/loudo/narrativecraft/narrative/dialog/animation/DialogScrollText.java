@@ -172,7 +172,19 @@ public class DialogScrollText {
     }
 
     public String getLongerTextLine() {
-        return lines.stream().max(Comparator.comparingInt(String::length)).orElse("");
+        float longerSentenceWidth = 0;
+        String longerText = "";
+        for (String line : lines) {
+            float width = 0;
+            for (int i = 0; i < line.length(); i++) {
+                width += Util.getLetterWidth(line.codePointAt(i), minecraft);
+            }
+            if (width > longerSentenceWidth) {
+                longerSentenceWidth = width;
+                longerText = line;
+            }
+        }
+        return longerText;
     }
 
     public void setText(String text) {
