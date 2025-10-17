@@ -81,8 +81,9 @@ public class InkTagHandler {
             if (storyHandler.isFinished() && storyHandler.getDialogText().isEmpty()) {
                 storyHandler.stopAndFinishScreen();
             } else if (!storyHandler.isFinished()
-                    && storyHandler.getDialogText().isEmpty()) {
+                    && storyHandler.getDialogText().isEmpty() && storyHandler.getStory().getCurrentChoices().isEmpty()) {
                 storyHandler.next();
+                run = null;
             } else {
                 storyHandler.showCurrentDialog();
             }
