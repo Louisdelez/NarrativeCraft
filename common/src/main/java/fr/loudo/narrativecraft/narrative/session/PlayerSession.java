@@ -61,6 +61,7 @@ public class PlayerSession {
     private AreaTrigger lastAreaTriggerEntered;
     private Chapter chapter;
     private Scene scene;
+    private String stitch;
     private boolean showDebugHud;
 
     public PlayerSession(ServerPlayer player) {
@@ -221,6 +222,14 @@ public class PlayerSession {
 
     public void setScene(Scene scene) {
         this.scene = scene;
+    }
+
+    public String getStitch() {
+        return stitch;
+    }
+
+    public void setStitch(String stitch) {
+        this.stitch = stitch;
     }
 
     public AbstractController getController() {

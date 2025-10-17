@@ -276,6 +276,14 @@ public class StoryHandler {
                 dialogRenderer.stop();
                 return;
             }
+            String currentStitch = story.getState().getCurrentStitch();
+            if (currentStitch != null
+                    && !currentStitch.equalsIgnoreCase(playerSession.getStitch())
+                    && dialogRenderer != null) {
+                playerSession.setStitch(story.getState().getCurrentStitch());
+                dialogRenderer.stop();
+                return;
+            }
             // Handles dialog stopping animation, to executes tags AFTER the animation disappeared.
             // And for that, it checks if the new dialog character is the same as the old dialog (dialog renderer)
             if (dialogRenderer == null || sameCharacterTalking(dialogText)) {
@@ -283,6 +291,7 @@ public class StoryHandler {
             } else {
                 dialogRenderer.stop();
             }
+            playerSession.setStitch(story.getState().getCurrentStitch());
             playerSession.clearKilledCharacters();
             playerSession.clearPlaybacksNotPlaying();
         } catch (Exception e) {
@@ -468,7 +477,7 @@ public class StoryHandler {
     private boolean sameCharacterTalking(String dialog) {
         DialogRenderer dialogRenderer = playerSession.getDialogRenderer();
         Matcher matcher = getDialogMatcher(dialog);
-        if (dialog.isEmpty()) return true;
+        if (dialog.isEmpty()) return false;
         if (dialogRenderer instanceof DialogRenderer2D && !matcher.matches()) return true;
         if (!(dialogRenderer instanceof DialogRenderer3D)) return false;
         String characterName = "";
