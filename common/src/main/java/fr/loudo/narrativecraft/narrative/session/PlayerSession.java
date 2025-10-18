@@ -62,6 +62,7 @@ public class PlayerSession {
     private Chapter chapter;
     private Scene scene;
     private String stitch;
+    private int lookingAtEntityId;
     private boolean showDebugHud;
 
     public PlayerSession(ServerPlayer player) {
@@ -230,6 +231,14 @@ public class PlayerSession {
 
     public void setStitch(String stitch) {
         this.stitch = stitch;
+    }
+
+    public int getLookingAtEntityId() {
+        return lookingAtEntityId;
+    }
+
+    public void setLookingAtEntityId(int lookingAtEntityId) {
+        this.lookingAtEntityId = lookingAtEntityId;
     }
 
     public AbstractController getController() {

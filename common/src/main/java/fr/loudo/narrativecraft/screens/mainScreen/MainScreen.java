@@ -297,8 +297,9 @@ public class MainScreen extends Screen {
                                 }
                                 try {
                                     List<ErrorLine> results = StoryValidation.validate();
-                                    List<ErrorLine> errorLines =
-                                            results.stream().filter(errorLine -> !errorLine.isWarn()).toList();
+                                    List<ErrorLine> errorLines = results.stream()
+                                            .filter(errorLine -> !errorLine.isWarn())
+                                            .toList();
                                     if (errorLines.isEmpty()) {
                                         NarrativeCraftMod.server.execute(() -> {
                                             playerSession.getStoryHandler().stop();
@@ -395,7 +396,6 @@ public class MainScreen extends Screen {
             minecraft.setScreen(screen);
         }
     }
-
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {

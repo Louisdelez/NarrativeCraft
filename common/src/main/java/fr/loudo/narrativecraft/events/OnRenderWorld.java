@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
 import fr.loudo.narrativecraft.controllers.interaction.InteractionController;
+import fr.loudo.narrativecraft.narrative.interaction.InteractionEyeRenderer;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -52,5 +53,6 @@ public class OnRenderWorld {
             inkAction.partialTick(partialTick);
             inkAction.render(poseStack, partialTick);
         }
+        InteractionEyeRenderer.render(poseStack, partialTick, playerSession.getLookingAtEntityId());
     }
 }

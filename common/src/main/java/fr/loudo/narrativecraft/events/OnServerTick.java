@@ -27,12 +27,15 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.controllers.interaction.InteractionController;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.AreaTrigger;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.CharacterInteraction;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.EntityInteraction;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
 public class OnServerTick {
@@ -75,6 +78,46 @@ public class OnServerTick {
                 playerSession.setLastAreaTriggerEntered(areaTriggerInside);
             } else if (areaTriggerInside == null && playerSession.getLastAreaTriggerEntered() != null) {
                 playerSession.setLastAreaTriggerEntered(null);
+            }
+
+            // If player is looking to an interaction
+            playerSession.setLookingAtEntityId(-1);
+            for (InteractionController interactionController : playerSession.getInteractionControllers()) {
+                for (CharacterInteraction characterInteraction : interactionController.getCharacterInteractions()) {
+                    if (characterInteraction
+                                    .getCharacterStoryData()
+                                    .getCharacterRuntime()
+                                    .getEntity()
+                            instanceof LivingEntity livingEntity) {
+                        if (pPosition.distanceTo(livingEntity.position()) <= 5.0
+                                && livingEntity.isLookingAtMe(
+                                        player,
+                                        0.2,
+                                        true,
+                                        false,
+                                        livingEntity.getY() + livingEntity.getBbHeight() / 2)) {
+                            playerSession.setLookingAtEntityId(livingEntity.getId());
+                        }
+                    }
+                }
+                for (EntityInteraction entityInteraction : interactionController.getEntityInteractions()) {
+                    if (pPosition.distanceTo(entityInteraction.getArmorStand().position()) <= 5.0
+                            && entityInteraction
+                                    .getArmorStand()
+                                    .isLookingAtMe(
+                                            player,
+                                            0.2,
+                                            true,
+                                            false,
+                                            entityInteraction.getArmorStand().getY()
+                                                    + entityInteraction
+                                                                    .getArmorStand()
+                                                                    .getBbHeight()
+                                                            / 2)) {
+                        playerSession.setLookingAtEntityId(
+                                entityInteraction.getArmorStand().getId());
+                    }
+                }
             }
         }
     }
