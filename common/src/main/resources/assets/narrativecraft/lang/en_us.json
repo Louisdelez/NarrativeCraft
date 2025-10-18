@@ -211,8 +211,9 @@
   "narrativecraft.screen.main_screen.options.auto_skip": "Auto-skip",
 
   "narrativecraft.screen.character_advanced.main_character": "Is this the main character?",
-  "narrativecraft.screen.character_advanced.same_skin_as_player": "Does they have the same skin as the player?",
-  "narrativecraft.screen.character_advanced.player_same_skin_as_their": "Does the player wear their skin?",
+  "narrativecraft.screen.character_advanced.same_skin_as_player": "Same skin as player",
+  "narrativecraft.screen.character_advanced.player_same_skin_as_their": "Player wear their skin",
+  "narrativecraft.screen.character_advanced.skin_from_folder": "Skin from folder",
 
   "narrativecraft.screen.chapter_manager.title": "Chapters List",
   "narrativecraft.screen.scene_manager.title": "Scene list of chapter %d",

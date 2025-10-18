@@ -60,23 +60,34 @@ public class CharacterAdvancedScreen extends Screen {
                 })
                 .selected(mainCharacterAttribute.isMainCharacter())
                 .build();
-        Checkbox sameSkinAsPlayerCheck = Checkbox.builder(
-                        Translation.message("screen.character_advanced.same_skin_as_player"), minecraft.font)
-                .onValueChange((checkbox, b) -> {
-                    mainCharacterAttribute.setSameSkinAsPlayer(b);
+        Component skinShowBtnComponent;
+        if (mainCharacterAttribute.isSameSkinAsTheir()) {
+            skinShowBtnComponent = Translation.message("screen.character_advanced.player_same_skin_as_their");
+        } else if (mainCharacterAttribute.isSameSkinAsPlayer()) {
+            skinShowBtnComponent = Translation.message("screen.character_advanced.same_skin_as_player");
+        } else {
+            skinShowBtnComponent = Translation.message("screen.character_advanced.skin_from_folder");
+        }
+        Button skinShowBtn = Button.builder(skinShowBtnComponent, button -> {
+                    Component newMode = button.getMessage();
+                    if (newMode.equals(Translation.message("screen.character_advanced.skin_from_folder"))) {
+                        button.setMessage(Translation.message("screen.character_advanced.same_skin_as_player"));
+                        mainCharacterAttribute.setSameSkinAsPlayer(true);
+                        mainCharacterAttribute.setSameSkinAsTheir(false);
+                    } else if (newMode.equals(Translation.message("screen.character_advanced.same_skin_as_player"))) {
+                        button.setMessage(Translation.message("screen.character_advanced.player_same_skin_as_their"));
+                        mainCharacterAttribute.setSameSkinAsPlayer(false);
+                        mainCharacterAttribute.setSameSkinAsTheir(true);
+                    } else {
+                        button.setMessage(Translation.message("screen.character_advanced.skin_from_folder"));
+                        mainCharacterAttribute.setSameSkinAsPlayer(false);
+                        mainCharacterAttribute.setSameSkinAsTheir(false);
+                    }
                 })
-                .selected(mainCharacterAttribute.isSameSkinAsPlayer())
-                .build();
-        Checkbox playerSameSkinAsTheir = Checkbox.builder(
-                        Translation.message("screen.character_advanced.player_same_skin_as_their"), minecraft.font)
-                .onValueChange((checkbox, b) -> {
-                    mainCharacterAttribute.setSameSkinAsTheir(b);
-                })
-                .selected(mainCharacterAttribute.isSameSkinAsTheir())
+                .width(200)
                 .build();
         linearLayout.addChild(mainCharacterCheck);
-        linearLayout.addChild(sameSkinAsPlayerCheck);
-        linearLayout.addChild(playerSameSkinAsTheir);
+        linearLayout.addChild(skinShowBtn);
         layout.addToFooter(Button.builder(CommonComponents.GUI_DONE, button -> onClose())
                 .width(200)
                 .build());
