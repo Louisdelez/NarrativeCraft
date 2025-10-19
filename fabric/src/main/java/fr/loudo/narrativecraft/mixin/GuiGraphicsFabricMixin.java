@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.mixin;
 
+import fr.loudo.narrativecraft.gui.Fill2dGui;
 import fr.loudo.narrativecraft.gui.ICustomGuiRender;
 import fr.loudo.narrativecraft.gui.IGuiTextAccessor;
 import fr.loudo.narrativecraft.gui.SkipArrow2dGui;
@@ -64,6 +65,20 @@ public abstract class GuiGraphicsFabricMixin implements ICustomGuiRender {
                 new Matrix3x2f(pose),
                 width,
                 height,
+                color,
+                this.scissorStack.peek()));
+    }
+
+    @Override
+    public void narrativecraft$fill(float x1, float y1, float x2, float y2, int color) {
+        this.guiRenderState.submitGuiElement(new Fill2dGui(
+                RenderPipelines.GUI,
+                TextureSetup.noTexture(),
+                new Matrix3x2f(pose),
+                x1,
+                y1,
+                x2,
+                y2,
                 color,
                 this.scissorStack.peek()));
     }

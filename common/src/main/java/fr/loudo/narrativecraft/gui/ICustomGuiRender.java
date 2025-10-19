@@ -28,5 +28,7 @@ import net.minecraft.client.gui.Font;
 public interface ICustomGuiRender {
     void narrativecraft$drawDialogSkip(float width, float height, int color);
 
+    void narrativecraft$fill(float x1, float y1, float x2, float y2, int color);
+
     void narrativecraft$drawStringFloat(String text, Font font, float x, float y, int color, boolean drawShadow);
 }

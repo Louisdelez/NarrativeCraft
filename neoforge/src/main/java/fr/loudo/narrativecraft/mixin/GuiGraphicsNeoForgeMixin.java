@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.mixin;
 
+import fr.loudo.narrativecraft.gui.Fill2dGui;
 import fr.loudo.narrativecraft.gui.ICustomGuiRender;
 import fr.loudo.narrativecraft.gui.IGuiTextAccessor;
 import fr.loudo.narrativecraft.gui.SkipArrow2dGui;
@@ -58,13 +59,26 @@ public abstract class GuiGraphicsNeoForgeMixin implements ICustomGuiRender {
 
     @Override
     public void narrativecraft$drawDialogSkip(float width, float height, int color) {
-
         this.guiRenderState.submitGuiElement(new SkipArrow2dGui(
                 RenderPipelines.GUI,
                 TextureSetup.noTexture(),
                 new Matrix3x2f(this.pose),
                 width,
                 height,
+                color,
+                this.peekScissorStack()));
+    }
+
+    @Override
+    public void narrativecraft$fill(float x1, float y1, float x2, float y2, int color) {
+        this.guiRenderState.submitGuiElement(new Fill2dGui(
+                RenderPipelines.GUI,
+                TextureSetup.noTexture(),
+                new Matrix3x2f(this.pose),
+                x1,
+                y1,
+                x2,
+                y2,
                 color,
                 this.peekScissorStack()));
     }
