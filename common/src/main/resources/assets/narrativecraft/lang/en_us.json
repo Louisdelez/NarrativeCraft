@@ -40,7 +40,7 @@
   "narrativecraft.global.stitch": "Stitch",
 
   "narrativecraft.file.main_ink_warning": "Main ink file, do not write here! If you need to write variables or functions, they have their own separated files.",
-  "narrativecraft.file.vars_placeholder": "Write your variables here.",
+  "narrativecraft.file.vars_placeholder": "Write your global variables here.",
   "narrativecraft.file.funcs_placeholder": "Write your functions here.",
 
   "narrativecraft.story.stopped": "Story stopped.",

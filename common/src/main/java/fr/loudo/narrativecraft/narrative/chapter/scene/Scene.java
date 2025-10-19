@@ -58,6 +58,10 @@ public class Scene extends NarrativeEntry {
         return "chapter_" + chapter.getIndex() + "_" + Util.snakeCase(name.toLowerCase());
     }
 
+    public String folderName() {
+        return chapter.getIndex() + "_" + rank + "_" + Util.snakeCase(name);
+    }
+
     public Animation getAnimationByName(String name) {
         for (Animation animation : animations) {
             if (animation.getName().equalsIgnoreCase(name)) {
