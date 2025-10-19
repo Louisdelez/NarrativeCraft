@@ -54,7 +54,7 @@ public class DialogScrollText {
     private final List<LetterLocation> lettersRenderer = new ArrayList<>();
     private TextEffectAnimation textEffectAnimation;
     private List<String> lines = new ArrayList<>();
-    private int currentLine, currentCharIndex;
+    private int currentLine, currentCharIndex, index;
     private float currentX, currentY;
 
     private float tickAccumulator = 0.0f;
@@ -69,6 +69,7 @@ public class DialogScrollText {
     public void reset() {
         currentLine = 0;
         currentCharIndex = 0;
+        index = 0;
         tickAccumulator = 0.0f;
         currentY = 0;
         if (dialogRenderer instanceof DialogRenderer2D) {
@@ -95,11 +96,12 @@ public class DialogScrollText {
     }
 
     public void tick() {
+        textEffectAnimation.tick();
+        if (!textEffectAnimation.canTick(index)) return;
         if (!isFinished() && !dialogRenderer.isAnimating()) {
             tickAccumulator += 1.0f;
             populateLetters();
         }
-        textEffectAnimation.tick();
     }
 
     public void render(PoseStack poseStack, MultiBufferSource.BufferSource source, float partialTick) {
@@ -233,6 +235,7 @@ public class DialogScrollText {
         if (currentCharIndex >= currentLineText.length() && lines.size() > 1 && currentLine < lines.size() - 1) {
             moveToNextLine();
         }
+        index++;
 
         return letter;
     }

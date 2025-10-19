@@ -37,7 +37,7 @@ public record ParsedDialog(String cleanedText, List<TextEffect> effects) {
         List<TextEffect> effects = new ArrayList<>();
         StringBuilder cleanText = new StringBuilder();
 
-        Pattern pattern = Pattern.compile("\\[(\\w+)((?:\\s+\\w+=[^\\]\\s]+)*?)\\](.*?)\\[/\\1\\]");
+        Pattern pattern = Pattern.compile("\\[(\\w+)((?:\\s+\\w+=[^\\]\\s]+)*?)\\](?:(.*?)\\[/\\1\\]|([^\\[]*))");
         Matcher matcher = pattern.matcher(dialogContent);
 
         int currentIndex = 0;
@@ -48,6 +48,9 @@ public record ParsedDialog(String cleanedText, List<TextEffect> effects) {
             String effectName = matcher.group(1);
             String paramString = matcher.group(2).trim();
             String innerText = matcher.group(3);
+            if (innerText == null) {
+                innerText = matcher.group(4);
+            }
 
             DialogAnimationType type;
             try {
