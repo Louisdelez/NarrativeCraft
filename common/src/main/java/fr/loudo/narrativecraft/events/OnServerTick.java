@@ -84,6 +84,7 @@ public class OnServerTick {
             playerSession.setLookingAtEntityId(-1);
             for (InteractionController interactionController : playerSession.getInteractionControllers()) {
                 for (CharacterInteraction characterInteraction : interactionController.getCharacterInteractions()) {
+                    if (characterInteraction.getStitch().isEmpty()) continue;
                     if (characterInteraction
                                     .getCharacterStoryData()
                                     .getCharacterRuntime()
@@ -101,6 +102,7 @@ public class OnServerTick {
                     }
                 }
                 for (EntityInteraction entityInteraction : interactionController.getEntityInteractions()) {
+                    if (entityInteraction.getStitch().isEmpty()) continue;
                     if (pPosition.distanceTo(entityInteraction.getArmorStand().position()) <= 5.0
                             && entityInteraction
                                     .getArmorStand()
