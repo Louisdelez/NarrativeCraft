@@ -195,6 +195,7 @@ public class NarrativeEntryInit {
                 throw new Exception(String.format(
                         "NPC %s of scene %s couldn't be initialized", characterFolder.getName(), scene.getName()));
             }
+            characterStory.setCharacterType(CharacterType.NPC);
             scene.addNpc(characterStory);
         }
     }
@@ -213,6 +214,7 @@ public class NarrativeEntryInit {
             if (characterStory == null) {
                 throw new Exception(String.format("Character %s couldn't be initialized", characterFolder.getName()));
             }
+            characterStory.setCharacterType(CharacterType.MAIN);
             characterManager.addCharacter(characterStory);
         }
         if (characterManager.getMainCharacter() == null
