@@ -180,6 +180,9 @@ public class TextInkAction extends InkAction {
                     return InkActionResult.error(Translation.message(NOT_VALID_BOOLEAN, arguments.get(5)));
                 }
             }
+            case "remove" -> {
+                return InkActionResult.ok();
+            }
             case "edit" -> {
                 if (arguments.size() == 3) {
                     return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Text"));
@@ -387,6 +390,10 @@ public class TextInkAction extends InkAction {
                 }
             });
             target.editTextCount++;
+        });
+
+        map.put("remove", (target, source) -> {
+           target.isRunning = false;
         });
 
         map.put("spacing", (target, source) -> target.attribute.setSpacing(source.attribute.getSpacing()));
