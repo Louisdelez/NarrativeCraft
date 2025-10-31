@@ -39,8 +39,7 @@ public class TextEffectAnimation {
     private final Map<Integer, Vector2f> oldLetterOffsets = new HashMap<>();
     private int tickCounter;
 
-    public TextEffectAnimation(String text) {
-        ParsedDialog parsedDialog = ParsedDialog.parse(text);
+    public TextEffectAnimation(ParsedDialog parsedDialog) {
         dialogLetterEffectList = TextEffect.apply(parsedDialog.effects());
     }
 

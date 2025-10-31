@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.register;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionRegistry;
 import fr.loudo.narrativecraft.narrative.story.inkAction.*;
+import fr.loudo.narrativecraft.narrative.story.inkAction.text.TextInkAction;
 
 public class InkActionRegister {
     public static void register() {
@@ -116,5 +117,7 @@ public class InkActionRegister {
                 command -> command.startsWith("interaction")));
         InkActionRegistry.register(() -> new GameplayInkAction(
                 "gameplay", InkAction.Side.SERVER, "gameplay", command -> command.startsWith("gameplay")));
+        InkActionRegistry.register(() -> new TextInkAction(
+                "text", InkAction.Side.CLIENT, "text <id> <...arguments>", command -> command.startsWith("text")));
     }
 }

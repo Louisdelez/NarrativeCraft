@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.util.FadeState;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import net.minecraft.client.gui.GuiGraphics;
@@ -36,7 +37,7 @@ import net.minecraft.util.Mth;
 public class FadeInkAction extends InkAction {
 
     private double fadeInSeconds, staySeconds, fadeOutSeconds;
-    private int color, totalTick, currentTick;
+    private int color, totalTick;
     private FadeState currentFadeState;
 
     public FadeInkAction(String id, Side side, String syntax, CommandMatcher matcher) {
@@ -46,9 +47,9 @@ public class FadeInkAction extends InkAction {
     @Override
     public void tick() {
         if (!isRunning) return;
-        currentTick++;
-        if (currentTick >= totalTick) {
-            currentTick = 0;
+        tick++;
+        if (tick >= totalTick) {
+            tick = 0;
             if (currentFadeState == FadeState.FADE_IN) {
                 currentFadeState = FadeState.STAY;
                 totalTick = (int) (staySeconds * 20.0);
@@ -64,7 +65,7 @@ public class FadeInkAction extends InkAction {
     @Override
     public void render(GuiGraphics guiGraphics, float partialTick) {
         if (!isRunning) return;
-        double t = Math.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
+        double t = Math.clamp((tick + partialTick) / totalTick, 0.0, 1.0);
         int opacity = 255;
         if (currentFadeState == FadeState.FADE_IN) {
             opacity = (int) Mth.lerp(t, 0, 255);
@@ -125,13 +126,10 @@ public class FadeInkAction extends InkAction {
     protected InkActionResult doExecute(PlayerSession playerSession) {
         currentFadeState = FadeState.FADE_IN;
         totalTick = (int) (fadeInSeconds * 20.0);
+        if (fadeInSeconds == 0 && staySeconds == 0 && fadeOutSeconds == 0) {
+            playerSession.getInkActions().removeIf(inkAction -> inkAction instanceof FadeInkAction);
+        }
         return InkActionResult.ok();
-    }
-
-    public enum FadeState {
-        FADE_IN,
-        STAY,
-        FADE_OUT
     }
 
     @Override

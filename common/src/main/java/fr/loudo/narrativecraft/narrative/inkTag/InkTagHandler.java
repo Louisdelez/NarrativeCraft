@@ -66,6 +66,9 @@ public class InkTagHandler {
                 throw new InkTagHandlerException(inkAction.getClass(), result.errorMessage());
             }
             result = inkAction.execute(playerSession);
+            if (result.isError()) {
+                throw new InkTagHandlerException(inkAction.getClass(), result.errorMessage());
+            }
             if (result.isIgnore()) {
                 inkAction.setRunning(false);
             }

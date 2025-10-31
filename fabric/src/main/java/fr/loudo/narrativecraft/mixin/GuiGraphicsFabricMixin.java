@@ -34,6 +34,7 @@ import net.minecraft.client.gui.render.state.GuiRenderState;
 import net.minecraft.client.gui.render.state.GuiTextRenderState;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.locale.Language;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.ARGB;
 import org.joml.Matrix3x2f;
@@ -90,6 +91,26 @@ public abstract class GuiGraphicsFabricMixin implements ICustomGuiRender {
             GuiTextRenderState guiTextRenderState = new GuiTextRenderState(
                     font,
                     Language.getInstance().getVisualOrder(FormattedText.of(text)),
+                    new Matrix3x2f(this.pose),
+                    (int) x,
+                    (int) y,
+                    color,
+                    0,
+                    drawShadow,
+                    this.scissorStack.peek());
+            ((IGuiTextAccessor) (Object) guiTextRenderState).narrativecraft$setFloatX(x);
+            ((IGuiTextAccessor) (Object) guiTextRenderState).narrativecraft$setFloatY(y);
+            this.guiRenderState.submitText(guiTextRenderState);
+        }
+    }
+
+    @Override
+    public void narrativecraft$drawStringFloat(
+            Component text, Font font, float x, float y, int color, boolean drawShadow) {
+        if (ARGB.alpha(color) != 0) {
+            GuiTextRenderState guiTextRenderState = new GuiTextRenderState(
+                    font,
+                    text.getVisualOrderText(),
                     new Matrix3x2f(this.pose),
                     (int) x,
                     (int) y,

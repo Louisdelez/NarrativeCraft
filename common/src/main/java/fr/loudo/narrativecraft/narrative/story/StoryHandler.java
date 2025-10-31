@@ -286,7 +286,9 @@ public class StoryHandler {
             }
             // Handles dialog stopping animation, to executes tags AFTER the animation disappeared.
             // And for that, it checks if the new dialog character is the same as the old dialog (dialog renderer)
-            if (dialogRenderer == null || sameCharacterTalking(dialogText)) {
+            if (dialogRenderer == null
+                    || (sameCharacterTalking(dialogText)
+                            && story.getCurrentTags().isEmpty())) {
                 playerSession.getInkTagHandler().execute();
             } else {
                 dialogRenderer.stop();

@@ -25,9 +25,11 @@ package fr.loudo.narrativecraft.mixin;
 
 import com.mojang.authlib.GameProfile;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.util.Util;
 import java.io.File;
 import net.minecraft.client.Minecraft;
@@ -45,8 +47,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerInfo.class)
 public class PlayerInfoMixin {
-
-    private static final PlayerSkin playerSkin = Minecraft.getInstance().player.getSkin();
 
     @Shadow
     @Final
@@ -66,6 +66,31 @@ public class PlayerInfoMixin {
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
         if (playerSession == null) return;
+        StoryHandler storyHandler = playerSession.getStoryHandler();
+        if (storyHandler == null) return;
+        if (minecraft.player.getGameProfile().equals(this.profile)) {
+            CharacterStory mainCharacter =
+                    NarrativeCraftMod.getInstance().getCharacterManager().getMainCharacter();
+            if (mainCharacter != null) {
+                ResourceLocation mainCharacterSkin = NarrativeCraftFile.getMainCharacterSkin();
+                PlayerModelType playerModelType;
+                if (mainCharacterSkin != null) {
+                    try {
+                        playerModelType =
+                                PlayerModelType.valueOf(mainCharacter.getModel().name());
+                    } catch (IllegalArgumentException exception) {
+                        playerModelType = PlayerModelType.WIDE;
+                    }
+                    PlayerSkin playerSkin = PlayerSkin.insecure(
+                            new ClientAsset.ResourceTexture(mainCharacterSkin, mainCharacterSkin),
+                            null,
+                            null,
+                            playerModelType);
+                    callbackInfo.setReturnValue(playerSkin);
+                    return;
+                }
+            }
+        }
 
         for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
             if (characterRuntime.getEntity() == null) continue;
@@ -91,14 +116,6 @@ public class PlayerInfoMixin {
 
             PlayerSkin playerSkin = PlayerSkin.insecure(
                     new ClientAsset.ResourceTexture(skinLocation, skinLocation), null, null, playerModelType);
-
-            String playerName = minecraft.player.getName().getString();
-            if (this.profile.name().equals(playerName)
-                    && mainCharacterAttribute.isMainCharacter()
-                    && mainCharacterAttribute.isSameSkinAsTheir()) {
-                callbackInfo.setReturnValue(playerSkin);
-                return;
-            }
 
             if (this.profile.name().equals(characterStory.getName())) {
                 if (mainCharacterAttribute.isMainCharacter() && mainCharacterAttribute.isSameSkinAsPlayer()) {

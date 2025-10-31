@@ -6,8 +6,8 @@
   "compatibilityLevel": "JAVA_18",
   "mixins": [
     "AbstractBoatMixin",
-    "AbstractHorseMixin",
     "AbstractContainerMenuMixin",
+    "AbstractHorseMixin",
     "EntityMixin",
     "ItemStackMixin",
     "LevelSummaryMixin",
@@ -31,6 +31,7 @@
     "GuiTextRenderStateMixin",
     "KeyboardHandlerMixin",
     "MinecraftCommonMixin",
+    "MouseHandlerMixin",
     "OptionsMixin",
     "PlayerInfoMixin",
     "WinScreenMixin",

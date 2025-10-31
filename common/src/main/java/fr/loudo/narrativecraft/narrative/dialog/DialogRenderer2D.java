@@ -123,8 +123,8 @@ public class DialogRenderer2D extends DialogRenderer {
         poseStack.translate(widthBox / 2.0f - 4.0F, heightBox / 2.0F);
 
         if (!dialogStopping) {
-            dialogScrollText.render(guiGraphics, partialTick);
-            if (dialogScrollText.isFinished()) {
+            dialogScrollTextDialog.render(guiGraphics, partialTick);
+            if (dialogScrollTextDialog.isFinished()) {
                 if (!dialogAutoSkipping) {
                     dialogAutoSkipping = true;
                     currentTick = 0;

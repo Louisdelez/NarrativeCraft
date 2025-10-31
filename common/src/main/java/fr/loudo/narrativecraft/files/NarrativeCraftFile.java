@@ -32,9 +32,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
-import fr.loudo.narrativecraft.narrative.character.CharacterModel;
-import fr.loudo.narrativecraft.narrative.character.CharacterStory;
-import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
+import fr.loudo.narrativecraft.narrative.character.*;
 import fr.loudo.narrativecraft.narrative.data.MainScreenData;
 import fr.loudo.narrativecraft.narrative.dialog.DialogData;
 import fr.loudo.narrativecraft.narrative.story.StorySave;
@@ -52,6 +50,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.DefaultPlayerSkin;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.PlayerSkin;
 import net.minecraft.world.level.storage.LevelResource;
@@ -820,5 +819,18 @@ public class NarrativeCraftFile {
         try (Writer writer = new BufferedWriter(new FileWriter(dialogFile))) {
             new Gson().toJson(dialogData, writer);
         }
+    }
+
+    public static ResourceLocation getMainCharacterSkin() {
+        CharacterStory characterStory =
+                NarrativeCraftMod.getInstance().getCharacterManager().getMainCharacter();
+        if (characterStory == null) return null;
+        CharacterRuntime characterRuntime = new CharacterRuntime(characterStory, null, null, null);
+        CharacterSkinController characterSkinController = new CharacterSkinController(characterRuntime, null, null);
+        File mainSkinFile = characterSkinController.getMainSkinFile();
+        if (mainSkinFile == null) return null;
+        return ResourceLocation.fromNamespaceAndPath(
+                NarrativeCraftMod.MOD_ID,
+                "character/" + Util.snakeCase(characterStory.getName()) + "/" + Util.snakeCase(mainSkinFile.getName()));
     }
 }

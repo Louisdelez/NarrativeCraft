@@ -47,7 +47,6 @@ public class SoundInkAction extends InkAction {
     private float volume = 1.0F, pitch = 1.0F;
     private boolean isLooping;
     private double fadeTime;
-    private int currentTick, totalTick;
 
     public SoundInkAction(String id, Side side, String syntax, CommandMatcher matcher) {
         super(id, side, syntax, matcher);
@@ -59,8 +58,8 @@ public class SoundInkAction extends InkAction {
             isRunning = false;
         }
         if (!isRunning || totalTick == 0) return;
-        currentTick++;
-        isRunning = currentTick <= totalTick || action.equals("start");
+        tick++;
+        isRunning = tick <= totalTick || action.equals("start");
         if (!isRunning) {
             soundManager.stop(simpleSoundInstance);
         }
@@ -69,7 +68,7 @@ public class SoundInkAction extends InkAction {
     @Override
     public void partialTick(float partialTick) {
         if (!isRunning || totalTick == 0) return;
-        double t = Math.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
+        double t = Math.clamp((tick + partialTick) / totalTick, 0.0, 1.0);
         if (action.equals("start")) {
             volume = (float) Mth.lerp(t, 0.0, 1.0);
         } else if (action.equals("stop")) {

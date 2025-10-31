@@ -176,8 +176,8 @@ public class DialogRenderer3D extends DialogRenderer {
 
         if (!dialogStopping) {
             dialogEntityBobbing.partialTick(partialTick);
-            dialogScrollText.render(poseStack, minecraft.renderBuffers().bufferSource(), partialTick);
-            if (dialogScrollText.isFinished()) {
+            dialogScrollTextDialog.render(poseStack, minecraft.renderBuffers().bufferSource(), partialTick);
+            if (dialogScrollTextDialog.isFinished()) {
                 if (!dialogAutoSkipping) {
                     dialogAutoSkipping = true;
                     currentTick = 0;

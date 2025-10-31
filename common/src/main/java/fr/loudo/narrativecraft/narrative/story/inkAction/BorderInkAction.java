@@ -41,7 +41,7 @@ public class BorderInkAction extends InkAction {
 
     private float up, right, down, left;
     private float upInterpolated, rightInterpolated, downInterpolated, leftInterpolated;
-    private int color, totalTick, currentTick;
+    private int color;
     private double opacity;
     private Easing easing;
     private String fadeAction;
@@ -52,11 +52,11 @@ public class BorderInkAction extends InkAction {
 
     @Override
     public void tick() {
-        if (currentTick == totalTick && fadeAction.equals("out")) {
+        if (tick == totalTick && fadeAction.equals("out")) {
             isRunning = false;
         }
-        if (currentTick < totalTick) {
-            currentTick++;
+        if (tick < totalTick) {
+            tick++;
         }
     }
 
@@ -76,16 +76,16 @@ public class BorderInkAction extends InkAction {
         float down = this.down;
         float left = this.left;
 
-        if (fadeAction.equals("out") && currentTick == totalTick) {
+        if (fadeAction.equals("out") && tick == totalTick) {
             up = 0;
             right = 0;
             down = 0;
             left = 0;
         }
 
-        if (currentTick < totalTick) {
-            double t = Math.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
-            t = Easing.SMOOTH.interpolate(t);
+        if (tick < totalTick) {
+            double t = Math.clamp((tick + partialTick) / totalTick, 0.0, 1.0);
+            t = easing.interpolate(t);
             if (fadeAction.equals("in")) {
                 up = (float) Mth.lerp(t, 0, this.up);
                 right = (float) Mth.lerp(t, 0, this.right);
@@ -121,6 +121,7 @@ public class BorderInkAction extends InkAction {
     @Override
     protected InkActionResult doValidate(List<String> arguments, Scene scene) {
         fadeAction = "";
+        easing = Easing.SMOOTH;
         if (arguments.size() == 1) {
             return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Up value missing"));
         }
@@ -138,10 +139,13 @@ public class BorderInkAction extends InkAction {
                 return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(2)));
             }
             easing = Easing.SMOOTH;
-            try {
-                easing = Easing.valueOf(arguments.get(3).toUpperCase());
-            } catch (IllegalArgumentException e) {
-                return InkActionResult.error(Translation.message(WRONG_EASING_VALUE, Arrays.toString(Easing.values())));
+            if (arguments.size() > 3) {
+                try {
+                    easing = Easing.valueOf(arguments.get(3).toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    return InkActionResult.error(
+                            Translation.message(WRONG_EASING_VALUE, Arrays.toString(Easing.values())));
+                }
             }
             return InkActionResult.ok();
         }
@@ -210,7 +214,6 @@ public class BorderInkAction extends InkAction {
             return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(8)));
         }
         if (arguments.size() == 9) return InkActionResult.ok();
-        easing = Easing.SMOOTH;
         try {
             easing = Easing.valueOf(arguments.get(9).toUpperCase());
         } catch (IllegalArgumentException e) {
@@ -231,6 +234,7 @@ public class BorderInkAction extends InkAction {
                     this.left = borderInkAction.leftInterpolated;
                     this.opacity = borderInkAction.opacity;
                     this.color = borderInkAction.color;
+                    this.easing = borderInkAction.easing;
                 }
             }
         }
