@@ -393,7 +393,7 @@ public class TextInkAction extends InkAction {
         });
 
         map.put("remove", (target, source) -> {
-           target.isRunning = false;
+            target.isRunning = false;
         });
 
         map.put("spacing", (target, source) -> target.attribute.setSpacing(source.attribute.getSpacing()));

@@ -73,7 +73,8 @@ public class MinecraftCommandInkAction extends InkAction {
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
         CommandSourceStack commandSourceStack = getCommandSourceStack(playerSession);
-        command = command.replace("__username__", playerSession.getPlayer().getName().getString());
+        command = command.replace(
+                "__username__", playerSession.getPlayer().getName().getString());
         try {
             playerSession
                     .getPlayer()

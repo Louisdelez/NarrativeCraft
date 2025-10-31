@@ -50,29 +50,9 @@ public class OnEntityRightClick {
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
         if (playerSession == null) return;
 
-        // Trigger a stitch on an interaction
         StoryHandler storyHandler = playerSession.getStoryHandler();
         if (storyHandler != null) {
-            for (InteractionController interactionController : playerSession.getInteractionControllers()) {
-                String stitch = "";
-                CharacterRuntime characterRuntime = interactionController.getCharacterFromEntity(entity);
-                if (characterRuntime != null) {
-                    CharacterInteraction characterInteraction =
-                            interactionController.getCharacterInteractionFromCharacter(
-                                    interactionController.getCharacterStoryDataFromEntity(
-                                            characterRuntime.getEntity()));
-                    if (characterInteraction != null) {
-                        stitch = characterInteraction.getStitch();
-                    }
-                }
-                EntityInteraction entityInteraction = interactionController.getEntityInteraction(entity);
-                if (entityInteraction != null) {
-                    stitch = entityInteraction.getStitch();
-                }
-                if (!stitch.isEmpty()) {
-                    storyHandler.playStitch(stitch);
-                }
-            }
+            storyHandler.interactWith(entity);
         }
 
         AbstractController controller = playerSession.getController();

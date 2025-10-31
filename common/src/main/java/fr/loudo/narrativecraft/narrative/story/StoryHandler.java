@@ -33,6 +33,8 @@ import fr.loudo.narrativecraft.hud.StoryDebugHud;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.CharacterInteraction;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.EntityInteraction;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
@@ -400,6 +402,29 @@ public class StoryHandler {
             CrashScreen screen = new CrashScreen(playerSession, exception.getMessage());
             minecraft.execute(() -> minecraft.setScreen(screen));
         }
+    }
+
+    public boolean interactWith(Entity entity) {
+        for (InteractionController interactionController : playerSession.getInteractionControllers()) {
+            String stitch = "";
+            CharacterRuntime characterRuntime = interactionController.getCharacterFromEntity(entity);
+            if (characterRuntime != null) {
+                CharacterInteraction characterInteraction = interactionController.getCharacterInteractionFromCharacter(
+                        interactionController.getCharacterStoryDataFromEntity(characterRuntime.getEntity()));
+                if (characterInteraction != null) {
+                    stitch = characterInteraction.getStitch();
+                }
+            }
+            EntityInteraction entityInteraction = interactionController.getEntityInteraction(entity);
+            if (entityInteraction != null) {
+                stitch = entityInteraction.getStitch();
+            }
+            if (!stitch.isEmpty()) {
+                playStitch(stitch);
+                return true;
+            }
+        }
+        return false;
     }
 
     public void save(boolean showLogo) {
