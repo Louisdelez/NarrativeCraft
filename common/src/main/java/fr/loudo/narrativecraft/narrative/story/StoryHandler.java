@@ -114,6 +114,7 @@ public class StoryHandler {
         playerSession.getAreaTriggersEntered().clear();
         playerSession.setLastAreaTriggerEntered(null);
         playerSession.setStoryHandler(this);
+        minecraft.options.hideGui = false;
         firstLoad = true;
         try {
             story = new Story(NarrativeCraftFile.storyContent());

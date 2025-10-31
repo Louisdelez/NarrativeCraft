@@ -43,6 +43,7 @@ import net.minecraft.util.Mth;
 public class TextInkAction extends InkAction {
 
     private String action;
+    private int editTextCount;
     private Attribute attribute;
     private final DialogScrollTextInkAction dialogScrollTextInkAction;
     private int waitUntilEndTick;
@@ -385,6 +386,7 @@ public class TextInkAction extends InkAction {
                     target.dialogScrollTextInkAction.forceFinish();
                 }
             });
+            target.editTextCount++;
         });
 
         map.put("spacing", (target, source) -> target.attribute.setSpacing(source.attribute.getSpacing()));
@@ -446,11 +448,12 @@ public class TextInkAction extends InkAction {
             target.attribute.setNoTyping(false);
             target.dialogScrollTextInkAction.setMuteSound(false);
             target.isRunning = true;
-            if (!target.dialogScrollTextInkAction.isFinished()) {
+            if (!target.dialogScrollTextInkAction.isFinished() || target.editTextCount == 0) {
                 Minecraft.getInstance().execute(target.dialogScrollTextInkAction::reset);
             } else {
                 target.waitUntilEndTick = source.dialogScrollTextInkAction.getEndAt();
             }
+            target.editTextCount++;
         });
 
         map.put("scale", (target, source) -> {

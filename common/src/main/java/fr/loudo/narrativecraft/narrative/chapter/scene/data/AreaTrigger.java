@@ -32,6 +32,7 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
@@ -48,43 +49,27 @@ public class AreaTrigger extends SceneData {
         this.isUnique = isUnique;
     }
 
-    public void setPosition1(Location location) {
-        this.x1 = (int) location.x() - 0.5;
-        this.y1 = (int) location.y() - 0.5;
-        this.z1 = (int) location.z() - 0.5;
-    }
-
     public void setPosition1(Vec3 vec3) {
-        this.x1 = (int) vec3.x();
-        this.y1 = (int) vec3.y();
-        this.z1 = (int) vec3.z();
-        if (x1 < x2 || x2 == x1) {
-            x1 -= 1.0;
-        }
-        if (z1 < z2 || z2 == z1) {
-            z1 -= 1.0;
-        }
-        if (x2 == 0 && y2 == 0 && z2 == 0) {
-            setPosition2(new Vec3(x1 + 1.0, y1, z1 + 1.0));
-        }
-    }
-
-    public void setPosition2(Location location) {
-        this.x2 = (int) location.x() - 0.5;
-        this.y2 = (int) location.y() - 0.5;
-        this.z2 = (int) location.z() - 0.5;
+        this.x1 = Math.floor(vec3.x());
+        this.y1 = Math.floor(vec3.y());
+        this.z1 = Math.floor(vec3.z());
     }
 
     public void setPosition2(Vec3 vec3) {
-        this.x2 = (int) vec3.x();
-        this.y2 = (int) vec3.y();
-        this.z2 = (int) vec3.z();
-        if (x2 < x1 || x2 == x1) {
-            x2 -= 1.0;
-        }
-        if (z2 < z1 || z2 == z1) {
-            z2 -= 1.0;
-        }
+        this.x2 = Math.floor(vec3.x());
+        this.y2 = Math.floor(vec3.y());
+        this.z2 = Math.floor(vec3.z());
+    }
+
+    public AABB getBoundingBox() {
+        double minX = Math.min(x1, x2);
+        double minY = Math.min(y1, y2);
+        double minZ = Math.min(z1, z2);
+        double maxX = Math.max(x1, x2) + 1.0;
+        double maxY = Math.max(y1, y2) + 1.0;
+        double maxZ = Math.max(z1, z2) + 1.0;
+
+        return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     public Vec3 getPosition1() {
