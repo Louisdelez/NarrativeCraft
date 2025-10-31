@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.controllers.interaction.InteractionController;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.AreaTrigger;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.CharacterInteraction;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.EntityInteraction;
+import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import java.util.ArrayList;
@@ -51,6 +52,19 @@ public class OnServerTick {
             }
             playerSession.getInkActions().removeAll(toRemove);
             StoryHandler storyHandler = playerSession.getStoryHandler();
+
+            KeyframeLocation location = playerSession.getCurrentCamera();
+            if (location != null) {
+                playerSession
+                        .getPlayer()
+                        .connection
+                        .teleport(
+                                location.getX(),
+                                location.getY(),
+                                location.getZ(),
+                                location.getYaw(),
+                                location.getPitch());
+            }
 
             if (storyHandler == null) continue;
 

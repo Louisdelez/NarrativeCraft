@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.GameType;
 
 public class PlayerSession {
 
@@ -62,6 +63,7 @@ public class PlayerSession {
     private Chapter chapter;
     private Scene scene;
     private String stitch;
+    private GameType lastGameType;
     private int lookingAtEntityId;
     private boolean showDebugHud;
 
@@ -263,6 +265,16 @@ public class PlayerSession {
 
     public void setCurrentCamera(KeyframeLocation currentCamera) {
         this.currentCamera = currentCamera;
+        if (currentCamera == null) {
+            if (lastGameType != null) {
+                player.setGameMode(lastGameType);
+            }
+            return;
+        }
+        if (player.gameMode() != GameType.SPECTATOR) {
+            this.lastGameType = player.gameMode();
+        }
+        player.setGameMode(GameType.SPECTATOR);
     }
 
     public StorySaveIconGui getStorySaveIconGui() {
