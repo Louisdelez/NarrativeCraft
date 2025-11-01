@@ -53,13 +53,6 @@ public class CharacterAdvancedScreen extends Screen {
     @Override
     protected void init() {
         LinearLayout linearLayout = layout.addToContents(LinearLayout.vertical().spacing(5));
-        Checkbox mainCharacterCheck = Checkbox.builder(
-                        Translation.message("screen.character_advanced.main_character"), minecraft.font)
-                .onValueChange((checkbox, b) -> {
-                    mainCharacterAttribute.setMainCharacter(b);
-                })
-                .selected(mainCharacterAttribute.isMainCharacter())
-                .build();
         Component skinShowBtnComponent;
         if (mainCharacterAttribute.isSameSkinAsTheir()) {
             skinShowBtnComponent = Translation.message("screen.character_advanced.player_same_skin_as_their");
@@ -86,8 +79,17 @@ public class CharacterAdvancedScreen extends Screen {
                 })
                 .width(200)
                 .build();
-        linearLayout.addChild(mainCharacterCheck);
+        skinShowBtn.active = mainCharacterAttribute.isMainCharacter();
+        Checkbox mainCharacterCheck = Checkbox.builder(
+                        Translation.message("screen.character_advanced.main_character"), minecraft.font)
+                .onValueChange((checkbox, b) -> {
+                    mainCharacterAttribute.setMainCharacter(b);
+                    skinShowBtn.active = b;
+                })
+                .selected(mainCharacterAttribute.isMainCharacter())
+                .build();
         linearLayout.addChild(skinShowBtn);
+        linearLayout.addChild(mainCharacterCheck);
         layout.addToFooter(Button.builder(CommonComponents.GUI_DONE, button -> onClose())
                 .width(200)
                 .build());

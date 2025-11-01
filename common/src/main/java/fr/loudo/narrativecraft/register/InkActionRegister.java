@@ -118,6 +118,9 @@ public class InkActionRegister {
         InkActionRegistry.register(() -> new GameplayInkAction(
                 "gameplay", InkAction.Side.SERVER, "gameplay", command -> command.startsWith("gameplay")));
         InkActionRegistry.register(() -> new TextInkAction(
-                "text", InkAction.Side.CLIENT, "text <id> <...arguments>", command -> command.startsWith("text")));
+                "text",
+                InkAction.Side.CLIENT,
+                "text %id% <create|remove|edit|position|color|scale|spacing|width|fade|fadein|fadeout|type|font|sound> %...values%",
+                command -> command.startsWith("text")));
     }
 }

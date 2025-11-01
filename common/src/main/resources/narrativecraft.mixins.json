@@ -12,7 +12,6 @@
     "ItemStackMixin",
     "LevelSummaryMixin",
     "LivingEntityMixin",
-    "PlayerMixin",
     "ServerLevelMixin",
     "ServerPlayerCommonMixin",
     "Utf8StringMixin",

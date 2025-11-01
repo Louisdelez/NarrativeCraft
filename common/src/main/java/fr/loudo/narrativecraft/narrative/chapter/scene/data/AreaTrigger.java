@@ -52,6 +52,11 @@ public class AreaTrigger extends SceneData {
         this.x1 = Math.floor(vec3.x());
         this.y1 = Math.floor(vec3.y());
         this.z1 = Math.floor(vec3.z());
+        if (x2 == 0 && y2 == 0 && z2 == 0) {
+            this.x2 = Math.floor(vec3.x());
+            this.y2 = Math.floor(vec3.y());
+            this.z2 = Math.floor(vec3.z());
+        }
     }
 
     public void setPosition2(Vec3 vec3) {

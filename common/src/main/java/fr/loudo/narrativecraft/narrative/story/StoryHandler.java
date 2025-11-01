@@ -35,6 +35,7 @@ import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.CharacterInteraction;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.EntityInteraction;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.StitchInteraction;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
@@ -186,8 +187,10 @@ public class StoryHandler {
     public void playStitch(String stitch) {
         try {
             story.choosePathString(playerSession.getScene().knotName() + "." + stitch);
-            playerSession.getInkActions().removeIf(inkAction -> inkAction instanceof GameplayInkAction);
             next();
+            if (playerSession.getCurrentCamera() != null) {
+                playerSession.getInkActions().removeIf(inkAction -> inkAction instanceof GameplayInkAction);
+            }
         } catch (Exception e) {
             stop();
             showCrash(e);
@@ -406,21 +409,28 @@ public class StoryHandler {
 
     public boolean interactWith(Entity entity) {
         for (InteractionController interactionController : playerSession.getInteractionControllers()) {
-            String stitch = "";
+            StitchInteraction stitchInteraction = null;
             CharacterRuntime characterRuntime = interactionController.getCharacterFromEntity(entity);
             if (characterRuntime != null) {
                 CharacterInteraction characterInteraction = interactionController.getCharacterInteractionFromCharacter(
                         interactionController.getCharacterStoryDataFromEntity(characterRuntime.getEntity()));
                 if (characterInteraction != null) {
-                    stitch = characterInteraction.getStitch();
+                    stitchInteraction = characterInteraction;
                 }
             }
             EntityInteraction entityInteraction = interactionController.getEntityInteraction(entity);
             if (entityInteraction != null) {
-                stitch = entityInteraction.getStitch();
+                stitchInteraction = entityInteraction;
             }
-            if (!stitch.isEmpty()) {
-                playStitch(stitch);
+            if (stitchInteraction != null) {
+                boolean sameInteraction = (playerSession.getLastInteraction() != null
+                        && playerSession.getLastInteraction().getStitch().equals(stitchInteraction.getStitch()));
+                if (playerSession.getDialogRenderer() != null) {
+                    if (sameInteraction) return true;
+                    playerSession.setDialogRenderer(null);
+                }
+                playerSession.setLastInteraction(stitchInteraction);
+                playStitch(stitchInteraction.getStitch());
                 return true;
             }
         }

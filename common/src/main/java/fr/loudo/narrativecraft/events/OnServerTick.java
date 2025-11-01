@@ -99,6 +99,14 @@ public class OnServerTick {
             for (InteractionController interactionController : playerSession.getInteractionControllers()) {
                 for (CharacterInteraction characterInteraction : interactionController.getCharacterInteractions()) {
                     if (characterInteraction.getStitch().isEmpty()) continue;
+                    if (playerSession.getDialogRenderer() != null
+                            && playerSession.getLastInteraction() != null
+                            && playerSession
+                                    .getLastInteraction()
+                                    .getStitch()
+                                    .equals(characterInteraction.getStitch())) {
+                        continue;
+                    }
                     if (characterInteraction
                                     .getCharacterStoryData()
                                     .getCharacterRuntime()
@@ -117,12 +125,17 @@ public class OnServerTick {
                 }
                 for (EntityInteraction entityInteraction : interactionController.getEntityInteractions()) {
                     if (entityInteraction.getStitch().isEmpty()) continue;
+                    if (playerSession.getDialogRenderer() != null
+                            && playerSession.getLastInteraction() != null
+                            && playerSession.getLastInteraction().getStitch().equals(entityInteraction.getStitch())) {
+                        continue;
+                    }
                     if (pPosition.distanceTo(entityInteraction.getArmorStand().position()) <= 5.0
                             && entityInteraction
                                     .getArmorStand()
                                     .isLookingAtMe(
                                             player,
-                                            0.2,
+                                            0.05,
                                             true,
                                             false,
                                             entityInteraction.getArmorStand().getY()

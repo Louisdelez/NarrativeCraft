@@ -35,7 +35,6 @@ import java.util.List;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
-// TODO: interpolation between cam and player
 public class GameplayInkAction extends InkAction {
 
     public GameplayInkAction(String id, Side side, String syntax, CommandMatcher matcher) {
@@ -58,7 +57,6 @@ public class GameplayInkAction extends InkAction {
         StoryHandler storyHandler = playerSession.getStoryHandler();
         if (storyHandler == null) return InkActionResult.ignored();
         if (playerSession.getDialogRenderer() != null) {
-            playerSession.setDialogRenderer(null);
             playerSession.getDialogRenderer().setRunDialogStopped(() -> {
                 playerSession.setDialogRenderer(null);
                 execute(playerSession);

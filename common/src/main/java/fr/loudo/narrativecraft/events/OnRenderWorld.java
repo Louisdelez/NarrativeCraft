@@ -40,19 +40,29 @@ public class OnRenderWorld {
                 .getSessionByPlayer(Minecraft.getInstance().player);
         if (playerSession == null) return;
         if (playerSession.getController() instanceof CutsceneController controller) {
+            poseStack.pushPose();
             controller.drawLinesBetweenKeyframes(poseStack);
+            poseStack.popPose();
         }
         if (playerSession.getController() instanceof InteractionController controller) {
+            poseStack.pushPose();
             controller.showAreaTriggers(poseStack);
+            poseStack.popPose();
         }
         if (playerSession.getDialogRenderer() != null) {
+            poseStack.pushPose();
             playerSession.getDialogRenderer().render(poseStack, partialTick);
+            poseStack.popPose();
         }
         List<InkAction> inkActionsClient = playerSession.getClientSideInkActions();
         for (InkAction inkAction : inkActionsClient) {
             inkAction.partialTick(partialTick);
+            poseStack.pushPose();
             inkAction.render(poseStack, partialTick);
+            poseStack.popPose();
         }
+        poseStack.pushPose();
         InteractionEyeRenderer.render(poseStack, partialTick, playerSession.getLookingAtEntityId());
+        poseStack.popPose();
     }
 }

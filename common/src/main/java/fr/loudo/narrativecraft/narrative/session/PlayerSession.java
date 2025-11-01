@@ -31,6 +31,7 @@ import fr.loudo.narrativecraft.managers.PlaybackManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.AreaTrigger;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.StitchInteraction;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
@@ -60,6 +61,7 @@ public class PlayerSession {
     private KeyframeLocation currentCamera;
     private StoryHandler storyHandler;
     private AreaTrigger lastAreaTriggerEntered;
+    private StitchInteraction lastInteraction;
     private Chapter chapter;
     private Scene scene;
     private String stitch;
@@ -193,6 +195,14 @@ public class PlayerSession {
 
     public AreaTrigger getLastAreaTriggerEntered() {
         return lastAreaTriggerEntered;
+    }
+
+    public StitchInteraction getLastInteraction() {
+        return lastInteraction;
+    }
+
+    public void setLastInteraction(StitchInteraction lastInteraction) {
+        this.lastInteraction = lastInteraction;
     }
 
     public void setLastAreaTriggerEntered(AreaTrigger lastAreaTriggerEntered) {

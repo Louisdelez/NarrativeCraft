@@ -29,7 +29,6 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.util.Util;
 import java.io.File;
 import net.minecraft.client.Minecraft;
@@ -66,12 +65,11 @@ public class PlayerInfoMixin {
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
         if (playerSession == null) return;
-        StoryHandler storyHandler = playerSession.getStoryHandler();
-        if (storyHandler == null) return;
         if (minecraft.player.getGameProfile().equals(this.profile)) {
             CharacterStory mainCharacter =
                     NarrativeCraftMod.getInstance().getCharacterManager().getMainCharacter();
-            if (mainCharacter != null) {
+            if (mainCharacter != null
+                    && mainCharacter.getMainCharacterAttribute().isSameSkinAsTheir()) {
                 ResourceLocation mainCharacterSkin = NarrativeCraftFile.getMainCharacterSkin();
                 PlayerModelType playerModelType;
                 if (mainCharacterSkin != null) {
@@ -118,7 +116,9 @@ public class PlayerInfoMixin {
                     new ClientAsset.ResourceTexture(skinLocation, skinLocation), null, null, playerModelType);
 
             if (this.profile.name().equals(characterStory.getName())) {
-                if (mainCharacterAttribute.isMainCharacter() && mainCharacterAttribute.isSameSkinAsPlayer()) {
+                if (mainCharacterAttribute.isMainCharacter()
+                        && mainCharacterAttribute.isSameSkinAsPlayer()
+                        && playerSession.getStoryHandler() != null) {
                     callbackInfo.setReturnValue(minecraft.player.getSkin());
                     return;
                 }

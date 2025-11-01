@@ -28,6 +28,8 @@ import fr.loudo.narrativecraft.narrative.recording.Recording;
 import fr.loudo.narrativecraft.narrative.recording.actions.ActionsData;
 import fr.loudo.narrativecraft.narrative.recording.actions.ItemPickUpAction;
 import fr.loudo.narrativecraft.narrative.recording.actions.RidingAction;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -62,5 +64,16 @@ public class ServerPlayerCommonMixin {
                 recording.getTick(),
                 recording.getActionDataFromEntity(itemEntity).getEntityIdRecording());
         recording.getActionDataFromEntity(player).addAction(action);
+    }
+
+    @Inject(method = "attack", at = @At("HEAD"), cancellable = true)
+    private void narrativecraft$attack(Entity targetEntity, CallbackInfo ci) {
+        ServerPlayer player = (ServerPlayer) (Object) this;
+        PlayerSession playerSession =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
+        StoryHandler storyHandler = playerSession.getStoryHandler();
+        if (storyHandler != null && storyHandler.interactWith(targetEntity)) {
+            ci.cancel();
+        }
     }
 }
