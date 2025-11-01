@@ -116,8 +116,7 @@ public class PlayerInfoMixin {
                     new ClientAsset.ResourceTexture(skinLocation, skinLocation), null, null, playerModelType);
 
             if (this.profile.name().equals(characterStory.getName())) {
-                if (mainCharacterAttribute.isMainCharacter()
-                        && mainCharacterAttribute.isSameSkinAsPlayer()) {
+                if (mainCharacterAttribute.isMainCharacter() && mainCharacterAttribute.isSameSkinAsPlayer()) {
                     callbackInfo.setReturnValue(minecraft.player.getSkin());
                     return;
                 }
