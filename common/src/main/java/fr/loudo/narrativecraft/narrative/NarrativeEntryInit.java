@@ -233,11 +233,13 @@ public class NarrativeEntryInit {
                     "Steve", "Steve from Minecraft.", "17", "05", "2009", CharacterModel.WIDE, CharacterType.MAIN);
             CharacterStory alex = new CharacterStory(
                     "Alex", "Alex from Minecraft.", "22", "08", "2014", CharacterModel.SLIM, CharacterType.MAIN);
+            steve.getMainCharacterAttribute().setMainCharacter(true);
             characterManager.addCharacter(steve);
             characterManager.addCharacter(alex);
             NarrativeCraftFile.createCharacterFolder(steve);
             NarrativeCraftFile.createCharacterFolder(alex);
             if (new Random().nextInt(0, 500) >= 445) {
+                steve.getMainCharacterAttribute().setMainCharacter(false);
                 CharacterStory herobrine = new CharacterStory(
                         "Herobrine",
                         "You can't escape me. §kYour story is now mine...",
@@ -246,6 +248,7 @@ public class NarrativeEntryInit {
                         "9999",
                         CharacterModel.WIDE,
                         CharacterType.MAIN);
+                herobrine.getMainCharacterAttribute().setMainCharacter(true);
                 characterManager.addCharacter(herobrine);
                 NarrativeCraftFile.createCharacterFolder(herobrine);
             }
