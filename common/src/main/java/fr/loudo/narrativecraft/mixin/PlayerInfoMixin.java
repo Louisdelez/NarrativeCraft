@@ -117,8 +117,7 @@ public class PlayerInfoMixin {
 
             if (this.profile.name().equals(characterStory.getName())) {
                 if (mainCharacterAttribute.isMainCharacter()
-                        && mainCharacterAttribute.isSameSkinAsPlayer()
-                        && playerSession.getStoryHandler() != null) {
+                        && mainCharacterAttribute.isSameSkinAsPlayer()) {
                     callbackInfo.setReturnValue(minecraft.player.getSkin());
                     return;
                 }
