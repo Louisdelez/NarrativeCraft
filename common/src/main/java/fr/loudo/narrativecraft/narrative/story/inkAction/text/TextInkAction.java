@@ -134,7 +134,7 @@ public class TextInkAction extends InkAction {
             return originalOpacity;
         }
 
-        double t = Math.clamp((tick + partialTick) / totalTick, 0.0, 1.0);
+        double t = Mth.clamp((tick + partialTick) / totalTick, 0.0, 1.0);
 
         return switch (fadeState) {
             case FADE_IN -> Mth.lerp(t, 0.0, originalOpacity);

@@ -66,9 +66,9 @@ import net.minecraft.util.ARGB;
 public class MainScreen extends Screen {
 
     public static final ResourceLocation BACKGROUND_IMAGE =
-            ResourceLocation.withDefaultNamespace("textures/narrativecraft_mainscreen/background.png");
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/mainscreen/background.png");
     public static final ResourceLocation MUSIC =
-            ResourceLocation.withDefaultNamespace("narrativecraft_mainscreen.music");
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "narrativecraft_mainscreen.music");
 
     public static SimpleSoundInstance musicInstance = new SimpleSoundInstance(
             MainScreen.MUSIC,

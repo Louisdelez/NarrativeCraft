@@ -21,17 +21,32 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client;
+package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.screens.storyManager.chapter.ChaptersScreen;
-import net.minecraft.client.Minecraft;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-// STANDBY: only for testing
-public class ClientPacketHandlerCommon {
-    public static void openChaptersScreen() {
-        Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.player != null) {
-            minecraft.setScreen(new ChaptersScreen());
+@Mixin(Player.class)
+public class PlayerMixin {
+    @Inject(method = "attack", at = @At("HEAD"), cancellable = true)
+    private void narrativecraft$attack(Entity targetEntity, CallbackInfo ci) {
+        Player player = (Player) (Object) this;
+        PlayerSession playerSession =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
+        StoryHandler storyHandler = playerSession.getStoryHandler();
+        if (storyHandler != null) {
+            NarrativeCraftMod.server.execute(() -> {
+                if (storyHandler.interactWith(targetEntity)) {
+                    ci.cancel();
+                }
+            });
         }
     }
 }

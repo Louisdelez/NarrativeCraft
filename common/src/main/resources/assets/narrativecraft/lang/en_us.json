@@ -79,6 +79,7 @@
 
   "narrativecraft.scene.rank": "Rank",
   "narrativecraft.scene.already_exists": "Scene %s already exists in this chapter.",
+  "narrativecraft.scene.no_exists": "Scene %s does not exists in this chapter.",
   "narrativecraft.scene.rank_above_scenes_size": "Your rank value is above the size of scenes.",
   "narrativecraft.scene.rank_no_under_one": "Rank value cannot be under 1.",
 

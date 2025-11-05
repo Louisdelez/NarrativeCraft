@@ -84,7 +84,7 @@ public class BorderInkAction extends InkAction {
         }
 
         if (tick < totalTick) {
-            double t = Math.clamp((tick + partialTick) / totalTick, 0.0, 1.0);
+            double t = Mth.clamp((tick + partialTick) / totalTick, 0.0, 1.0);
             t = easing.interpolate(t);
             if (fadeAction.equals("in")) {
                 up = (float) Mth.lerp(t, 0, this.up);

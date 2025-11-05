@@ -72,7 +72,6 @@ public class GameplayInkAction extends InkAction {
             }
             Vec3 position = characterRuntime.getEntity().position();
             Entity entity = characterRuntime.getEntity();
-            // TODO: better teleport, chance of damage fall not null
             playerSession
                     .getPlayer()
                     .connection

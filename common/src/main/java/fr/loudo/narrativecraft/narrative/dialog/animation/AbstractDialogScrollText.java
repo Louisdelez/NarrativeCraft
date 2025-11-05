@@ -44,7 +44,8 @@ public abstract class AbstractDialogScrollText {
     protected float currentX;
     protected float currentY;
     protected float tickAccumulator = 0.0f;
-    protected ResourceLocation letterSound = ResourceLocation.withDefaultNamespace("sfx.dialog_sound");
+    protected ResourceLocation letterSound =
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sfx.dialog_sound");
 
     protected int textColor = 0xFFFFFF;
     protected float textSpeed = 1.0f;

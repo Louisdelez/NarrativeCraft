@@ -61,8 +61,10 @@ public class OnRenderWorld {
             inkAction.render(poseStack, partialTick);
             poseStack.popPose();
         }
-        poseStack.pushPose();
-        InteractionEyeRenderer.render(poseStack, partialTick, playerSession.getLookingAtEntityId());
-        poseStack.popPose();
+        if (playerSession.getCurrentCamera() == null && playerSession.isOnGameplay()) {
+            poseStack.pushPose();
+            InteractionEyeRenderer.render(poseStack, partialTick, playerSession.getLookingAtEntityId());
+            poseStack.popPose();
+        }
     }
 }

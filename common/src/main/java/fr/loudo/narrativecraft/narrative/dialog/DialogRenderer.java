@@ -182,7 +182,7 @@ public class DialogRenderer {
     }
 
     protected double t(float partialTick) {
-        return Math.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
+        return Mth.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
     }
 
     public double getDialogTransitionTime() {

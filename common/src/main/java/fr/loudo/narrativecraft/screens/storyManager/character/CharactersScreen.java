@@ -87,7 +87,7 @@ public class CharactersScreen extends StoryElementScreen {
                         .collect(Collectors.toList())
                 : scene.getNpcs();
         CharacterStory mainCharacter = characterManager.getMainCharacter();
-        if (mainCharacter != null) {
+        if (mainCharacter != null && scene == null) {
             characterStories.addFirst(mainCharacter);
         }
 

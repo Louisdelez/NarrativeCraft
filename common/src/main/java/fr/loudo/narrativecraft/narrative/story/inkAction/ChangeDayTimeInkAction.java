@@ -55,7 +55,7 @@ public class ChangeDayTimeInkAction extends InkAction {
     public void partialTick(float partialTick) {
         if (!canBeExecuted || !isRunning || easing == null) return;
         double durationTicks = forSeconds * 20.0;
-        double t = Math.clamp((segmentTick + partialTick) / durationTicks, 0.0, 1.0);
+        double t = Mth.clamp((segmentTick + partialTick) / durationTicks, 0.0, 1.0);
         tick = (long) Mth.lerp(t, fromTick, toTick);
     }
 

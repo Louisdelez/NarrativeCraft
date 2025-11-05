@@ -95,7 +95,7 @@ public class CutscenePlayback {
             playerSession.setCurrentCamera(keyframeA.getKeyframeLocation());
             return;
         } else {
-            totalDelta = Math.clamp(
+            totalDelta = Mth.clamp(
                     (segmentTick + partialTick - keyframeA.getStartDelayTick()) / keyframeB.getPathTick(), 0.0, 1.0);
         }
 

@@ -529,11 +529,15 @@ public class StoryHandler {
                 .equalsIgnoreCase(characterName);
     }
 
-    private DialogRenderer getDialogRenderer(String dialog, CharacterStory characterStory) {
+    private DialogRenderer getDialogRenderer(String dialog, CharacterStory characterStory) throws Exception {
         DialogRenderer dialogRenderer;
         if (characterStory != null) {
-            CharacterRuntime characterRuntime = playerSession.getCharacterRuntimeByCharacter(characterStory);
-            dialogRenderer = new DialogRenderer3D(dialog, characterStory.getName(), dialogData, characterRuntime);
+            List<CharacterRuntime> characterRuntimes = playerSession.getCharacterRuntimesByCharacter(characterStory);
+            if (characterRuntimes.isEmpty())
+                throw new Exception("Dialog cannot be instantiated as " + characterStory.getName()
+                        + " is not present in the world!");
+            dialogRenderer =
+                    new DialogRenderer3D(dialog, characterStory.getName(), dialogData, characterRuntimes.getFirst());
             DialogRenderer3D dialogRenderer3D = (DialogRenderer3D) dialogRenderer;
             dialogRenderer3D.setDialogEntityBobbing(new DialogEntityBobbing(
                     dialogRenderer3D, dialogData.getNoiseShakeSpeed(), dialogData.getNoiseShakeStrength()));

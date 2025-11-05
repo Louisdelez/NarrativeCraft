@@ -65,7 +65,7 @@ public class FadeInkAction extends InkAction {
     @Override
     public void render(GuiGraphics guiGraphics, float partialTick) {
         if (!isRunning) return;
-        double t = Math.clamp((tick + partialTick) / totalTick, 0.0, 1.0);
+        double t = Mth.clamp((tick + partialTick) / totalTick, 0.0, 1.0);
         int opacity = 255;
         if (currentFadeState == FadeState.FADE_IN) {
             opacity = (int) Mth.lerp(t, 0, 255);

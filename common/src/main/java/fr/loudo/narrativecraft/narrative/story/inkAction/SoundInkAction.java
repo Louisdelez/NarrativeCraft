@@ -68,7 +68,7 @@ public class SoundInkAction extends InkAction {
     @Override
     public void partialTick(float partialTick) {
         if (!isRunning || totalTick == 0) return;
-        double t = Math.clamp((tick + partialTick) / totalTick, 0.0, 1.0);
+        double t = Mth.clamp((tick + partialTick) / totalTick, 0.0, 1.0);
         if (action.equals("start")) {
             volume = (float) Mth.lerp(t, 0.0, 1.0);
         } else if (action.equals("stop")) {

@@ -147,16 +147,17 @@ public class PlayerSession {
         return inkTagHandler;
     }
 
-    public CharacterRuntime getCharacterRuntimeByCharacter(CharacterStory characterStory) {
+    public List<CharacterRuntime> getCharacterRuntimesByCharacter(CharacterStory characterStory) {
         clearKilledCharacters();
+        List<CharacterRuntime> characterRuntimes1 = new ArrayList<>();
         for (CharacterRuntime characterRuntime : characterRuntimes) {
             if (characterRuntime.getEntity() == null
                     || !characterRuntime.getEntity().isAlive()) continue;
             if (characterRuntime.getCharacterStory().getName().equalsIgnoreCase(characterStory.getName())) {
-                return characterRuntime;
+                characterRuntimes1.add(characterRuntime);
             }
         }
-        return null;
+        return characterRuntimes1;
     }
 
     public void clearKilledCharacters() {

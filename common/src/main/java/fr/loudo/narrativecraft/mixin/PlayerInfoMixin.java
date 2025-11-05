@@ -65,7 +65,7 @@ public class PlayerInfoMixin {
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
         if (playerSession == null) return;
-        if (minecraft.player.getGameProfile().equals(this.profile)) {
+        if (minecraft.player.getGameProfile().equals(this.profile) && playerSession.getStoryHandler() != null) {
             CharacterStory mainCharacter =
                     NarrativeCraftMod.getInstance().getCharacterManager().getMainCharacter();
             if (mainCharacter != null
