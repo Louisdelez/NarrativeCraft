@@ -58,7 +58,10 @@ public abstract class MinecraftCommonMixin {
     private void narrativecraft$pauseGame(Minecraft instance, Screen old) {
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(instance.player);
-        if (playerSession == null) return;
+        if (playerSession == null) {
+            instance.setScreen(old);
+            return;
+        }
         StoryHandler storyHandler = playerSession.getStoryHandler();
         if (storyHandler == null) {
             instance.setScreen(old);
