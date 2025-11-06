@@ -27,9 +27,7 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
 
 public class ErrorLine {
     private final boolean isWarn;
@@ -93,21 +91,22 @@ public class ErrorLine {
             }
 
             if (fileName != null) {
-                //TODO: reimplement for multiplayer update
-//                ClickEvent clickEvent;
-//                if (scene != null) {
-//                    clickEvent = new ClickEvent.OpenFile(NarrativeCraftFile.getScriptFile(scene));
-//                } else {
-//                    clickEvent = new ClickEvent.OpenFile(NarrativeCraftFile.getScriptFile(chapter));
-//                }
+                // TODO: reimplement for multiplayer update
+                //                ClickEvent clickEvent;
+                //                if (scene != null) {
+                //                    clickEvent = new ClickEvent.OpenFile(NarrativeCraftFile.getScriptFile(scene));
+                //                } else {
+                //                    clickEvent = new ClickEvent.OpenFile(NarrativeCraftFile.getScriptFile(chapter));
+                //                }
 
                 result = result.copy()
                         .append(Component.literal("(" + fileName + ")")
                                 .withStyle(ChatFormatting.GRAY)
                                 .withStyle(style -> style.withBold(false)))
-//                                        .withClickEvent(clickEvent)
-//                                        .withHoverEvent(
-//                                                new HoverEvent.ShowText(Translation.message("validation.quick_edit")))))
+                        //                                        .withClickEvent(clickEvent)
+                        //                                        .withHoverEvent(
+                        //                                                new
+                        // HoverEvent.ShowText(Translation.message("validation.quick_edit")))))
                         .append("\n");
             }
 

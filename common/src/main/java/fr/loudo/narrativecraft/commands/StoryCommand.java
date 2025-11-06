@@ -41,7 +41,6 @@ import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.List;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -53,7 +52,8 @@ public class StoryCommand {
         dispatcher.register(Commands.literal("nc")
                 .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
                 .then(Commands.literal("story")
-                        .then(Commands.literal("validate").executes(commandContext -> validateStory(commandContext, true)))
+                        .then(Commands.literal("validate")
+                                .executes(commandContext -> validateStory(commandContext, true)))
                         .then(Commands.literal("play")
                                 .then(Commands.argument("chapter_index", IntegerArgumentType.integer())
                                         .suggests(NarrativeCraftMod.getInstance()
@@ -77,7 +77,8 @@ public class StoryCommand {
         ServerPlayer player = context.getSource().getPlayer();
         if (fullValidation) {
             player.sendSystemMessage(Component.empty());
-            player.sendSystemMessage(Translation.message("validation.validating").withStyle(ChatFormatting.YELLOW));
+            player.sendSystemMessage(
+                    Translation.message("validation.validating").withStyle(ChatFormatting.YELLOW));
         }
         try {
             List<ErrorLine> results = StoryValidation.validate();
