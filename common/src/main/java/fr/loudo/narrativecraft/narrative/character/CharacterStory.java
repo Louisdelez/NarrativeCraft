@@ -39,6 +39,7 @@ public class CharacterStory extends NarrativeEntry {
     private String birthDate;
     private CharacterType characterType;
     private CharacterModel model;
+    private boolean showNametag = true;
     private int entityTypeId;
 
     public CharacterStory(
@@ -102,6 +103,14 @@ public class CharacterStory extends NarrativeEntry {
 
     public int getEntityTypeId() {
         return entityTypeId;
+    }
+
+    public boolean showNametag() {
+        return showNametag;
+    }
+
+    public void setShowNametag(boolean showNametag) {
+        this.showNametag = showNametag;
     }
 
     public EntityType<?> getEntityType() {

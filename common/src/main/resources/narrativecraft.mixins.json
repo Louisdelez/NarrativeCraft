@@ -26,6 +26,7 @@
     "invoker.LivingEntityInvoker"
   ],
   "client": [
+    "AvatarRendererMixin",
     "CameraMixin",
     "ClientLevelMixin",
     "GameRendererMixin",

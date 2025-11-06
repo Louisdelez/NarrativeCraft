@@ -23,6 +23,8 @@
 
 package fr.loudo.narrativecraft.screens.characters;
 
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.narrative.character.MainCharacterAttribute;
 import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.client.gui.components.Button;
@@ -38,11 +40,13 @@ public class CharacterAdvancedScreen extends Screen {
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     private final Screen lastScreen;
     private final MainCharacterAttribute mainCharacterAttribute;
+    private final CharacterStory characterStory;
 
-    public CharacterAdvancedScreen(Screen lastScreen, MainCharacterAttribute mainCharacterAttribute) {
+    public CharacterAdvancedScreen(Screen lastScreen, CharacterStory characterStory) {
         super(Component.literal("Character Advanced Screen"));
         this.lastScreen = lastScreen;
-        this.mainCharacterAttribute = mainCharacterAttribute;
+        this.characterStory = characterStory;
+        this.mainCharacterAttribute = characterStory.getMainCharacterAttribute();
     }
 
     @Override
@@ -53,43 +57,55 @@ public class CharacterAdvancedScreen extends Screen {
     @Override
     protected void init() {
         LinearLayout linearLayout = layout.addToContents(LinearLayout.vertical().spacing(5));
-        Component skinShowBtnComponent;
-        if (mainCharacterAttribute.isSameSkinAsTheir()) {
-            skinShowBtnComponent = Translation.message("screen.character_advanced.player_same_skin_as_their");
-        } else if (mainCharacterAttribute.isSameSkinAsPlayer()) {
-            skinShowBtnComponent = Translation.message("screen.character_advanced.same_skin_as_player");
-        } else {
-            skinShowBtnComponent = Translation.message("screen.character_advanced.skin_from_folder");
+        if (mainCharacterAttribute != null && characterStory.getCharacterType() == CharacterType.MAIN) {
+            Component skinShowBtnComponent;
+            if (mainCharacterAttribute.isSameSkinAsTheir()) {
+                skinShowBtnComponent = Translation.message("screen.character_advanced.player_same_skin_as_their");
+            } else if (mainCharacterAttribute.isSameSkinAsPlayer()) {
+                skinShowBtnComponent = Translation.message("screen.character_advanced.same_skin_as_player");
+            } else {
+                skinShowBtnComponent = Translation.message("screen.character_advanced.skin_from_folder");
+            }
+            Button skinShowBtn = Button.builder(skinShowBtnComponent, button -> {
+                        Component newMode = button.getMessage();
+                        if (newMode.equals(Translation.message("screen.character_advanced.skin_from_folder"))) {
+                            button.setMessage(Translation.message("screen.character_advanced.same_skin_as_player"));
+                            mainCharacterAttribute.setSameSkinAsPlayer(true);
+                            mainCharacterAttribute.setSameSkinAsTheir(false);
+                        } else if (newMode.equals(
+                                Translation.message("screen.character_advanced.same_skin_as_player"))) {
+                            button.setMessage(
+                                    Translation.message("screen.character_advanced.player_same_skin_as_their"));
+                            mainCharacterAttribute.setSameSkinAsPlayer(false);
+                            mainCharacterAttribute.setSameSkinAsTheir(true);
+                        } else {
+                            button.setMessage(Translation.message("screen.character_advanced.skin_from_folder"));
+                            mainCharacterAttribute.setSameSkinAsPlayer(false);
+                            mainCharacterAttribute.setSameSkinAsTheir(false);
+                        }
+                    })
+                    .width(200)
+                    .build();
+            skinShowBtn.active = mainCharacterAttribute.isMainCharacter();
+            Checkbox mainCharacterCheck = Checkbox.builder(
+                            Translation.message("screen.character_advanced.main_character"), minecraft.font)
+                    .onValueChange((checkbox, b) -> {
+                        mainCharacterAttribute.setMainCharacter(b);
+                        skinShowBtn.active = b;
+                    })
+                    .selected(mainCharacterAttribute.isMainCharacter())
+                    .build();
+            linearLayout.addChild(skinShowBtn);
+            linearLayout.addChild(mainCharacterCheck);
         }
-        Button skinShowBtn = Button.builder(skinShowBtnComponent, button -> {
-                    Component newMode = button.getMessage();
-                    if (newMode.equals(Translation.message("screen.character_advanced.skin_from_folder"))) {
-                        button.setMessage(Translation.message("screen.character_advanced.same_skin_as_player"));
-                        mainCharacterAttribute.setSameSkinAsPlayer(true);
-                        mainCharacterAttribute.setSameSkinAsTheir(false);
-                    } else if (newMode.equals(Translation.message("screen.character_advanced.same_skin_as_player"))) {
-                        button.setMessage(Translation.message("screen.character_advanced.player_same_skin_as_their"));
-                        mainCharacterAttribute.setSameSkinAsPlayer(false);
-                        mainCharacterAttribute.setSameSkinAsTheir(true);
-                    } else {
-                        button.setMessage(Translation.message("screen.character_advanced.skin_from_folder"));
-                        mainCharacterAttribute.setSameSkinAsPlayer(false);
-                        mainCharacterAttribute.setSameSkinAsTheir(false);
-                    }
-                })
-                .width(200)
-                .build();
-        skinShowBtn.active = mainCharacterAttribute.isMainCharacter();
-        Checkbox mainCharacterCheck = Checkbox.builder(
-                        Translation.message("screen.character_advanced.main_character"), minecraft.font)
+        Checkbox showNametagCheckBox = Checkbox.builder(
+                        Translation.message("screen.character_advanced.show_nametag"), minecraft.font)
                 .onValueChange((checkbox, b) -> {
-                    mainCharacterAttribute.setMainCharacter(b);
-                    skinShowBtn.active = b;
+                    characterStory.setShowNametag(b);
                 })
-                .selected(mainCharacterAttribute.isMainCharacter())
+                .selected(characterStory.showNametag())
                 .build();
-        linearLayout.addChild(skinShowBtn);
-        linearLayout.addChild(mainCharacterCheck);
+        linearLayout.addChild(showNametagCheckBox);
         layout.addToFooter(Button.builder(CommonComponents.GUI_DONE, button -> onClose())
                 .width(200)
                 .build());

@@ -151,23 +151,25 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
         }
 
         Button modelButton = (Button) screen.extraFields.get("modelBtn");
-        Button advancedBtn = Button.builder(Translation.message("global.advanced"), button -> {
-                    screen.setName(screen.getNameBox().getEditBox().getValue());
-                    screen.setDescription(
-                            screen.getDescriptionBox().getMultiLineEditBox().getValue());
-                    CharacterAdvancedScreen screen1 = new CharacterAdvancedScreen(screen, attribute);
-                    minecraft.setScreen(screen1);
-                })
-                .width(83)
-                .build();
         Component label = Component.literal("Model");
         StringWidget modelText = ScreenUtils.text(
                 label, screen.getFont(), x, y + modelButton.getHeight() / 2 - screen.getFont().lineHeight / 2);
         screen.addRenderableWidget(modelText);
-        modelButton.setPosition(x + modelText.getWidth() + 5, y);
-        advancedBtn.setPosition(modelButton.getX() + modelButton.getWidth() + 5, y);
         screen.addRenderableWidget(modelButton);
-        screen.addRenderableWidget(advancedBtn);
+        modelButton.setPosition(x + modelText.getWidth() + 5, y);
+        if (entry != null) {
+            Button advancedBtn = Button.builder(Translation.message("global.advanced"), button -> {
+                        screen.setName(screen.getNameBox().getEditBox().getValue());
+                        screen.setDescription(
+                                screen.getDescriptionBox().getMultiLineEditBox().getValue());
+                        CharacterAdvancedScreen screen1 = new CharacterAdvancedScreen(screen, entry);
+                        minecraft.setScreen(screen1);
+                    })
+                    .width(83)
+                    .build();
+            advancedBtn.setPosition(modelButton.getX() + modelButton.getWidth() + 5, y);
+            screen.addRenderableWidget(advancedBtn);
+        }
     }
 
     @Override
@@ -224,15 +226,18 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
             List<Chapter> chapters =
                     NarrativeCraftMod.getInstance().getChapterManager().getChapters();
             try {
-                newCharacter.setMainCharacterAttribute(attribute);
+                newCharacter.setShowNametag(existing.showNametag());
                 if (scene == null) {
+                    newCharacter.setMainCharacterAttribute(attribute);
                     NarrativeCraftFile.updateCharacterData(existing, newCharacter);
                 } else {
+                    newCharacter.setMainCharacterAttribute(null);
                     NarrativeCraftFile.updateCharacterData(existing, newCharacter, scene);
                 }
                 existing.setName(newCharacter.getName());
                 existing.setDescription(newCharacter.getDescription());
                 existing.setMainCharacterAttribute(newCharacter.getMainCharacterAttribute());
+                existing.setShowNametag(newCharacter.showNametag());
                 if (scene == null) {
                     existing.setBirthDate(newCharacter.getBirthDate());
                 }
@@ -256,6 +261,7 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
 
     private void updateMainCharacter(CharacterStory currentMainCharacter, CharacterStory newCharacter)
             throws IOException {
+        if (attribute == null) return;
         if (currentMainCharacter != null
                 && attribute.isMainCharacter()
                 && !currentMainCharacter.getName().equalsIgnoreCase(newCharacter.getName())) {
