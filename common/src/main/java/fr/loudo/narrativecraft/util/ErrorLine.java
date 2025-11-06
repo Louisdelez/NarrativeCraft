@@ -93,20 +93,21 @@ public class ErrorLine {
             }
 
             if (fileName != null) {
-                ClickEvent clickEvent;
-                if (scene != null) {
-                    clickEvent = new ClickEvent.OpenFile(NarrativeCraftFile.getScriptFile(scene));
-                } else {
-                    clickEvent = new ClickEvent.OpenFile(NarrativeCraftFile.getScriptFile(chapter));
-                }
+                //TODO: reimplement for multiplayer update
+//                ClickEvent clickEvent;
+//                if (scene != null) {
+//                    clickEvent = new ClickEvent.OpenFile(NarrativeCraftFile.getScriptFile(scene));
+//                } else {
+//                    clickEvent = new ClickEvent.OpenFile(NarrativeCraftFile.getScriptFile(chapter));
+//                }
 
                 result = result.copy()
                         .append(Component.literal("(" + fileName + ")")
                                 .withStyle(ChatFormatting.GRAY)
-                                .withStyle(style -> style.withBold(false)
-                                        .withClickEvent(clickEvent)
-                                        .withHoverEvent(
-                                                new HoverEvent.ShowText(Translation.message("validation.quick_edit")))))
+                                .withStyle(style -> style.withBold(false)))
+//                                        .withClickEvent(clickEvent)
+//                                        .withHoverEvent(
+//                                                new HoverEvent.ShowText(Translation.message("validation.quick_edit")))))
                         .append("\n");
             }
 
