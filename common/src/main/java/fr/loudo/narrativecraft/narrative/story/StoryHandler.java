@@ -50,12 +50,15 @@ import fr.loudo.narrativecraft.screens.components.CrashScreen;
 import fr.loudo.narrativecraft.screens.credits.CreditScreen;
 import fr.loudo.narrativecraft.screens.story.StoryChoicesScreen;
 import fr.loudo.narrativecraft.util.InkUtil;
+import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 
 public class StoryHandler {
@@ -400,7 +403,13 @@ public class StoryHandler {
     public void showCrash(Exception exception) {
         if (debugMode) {
             NarrativeCraftMod.LOGGER.error("Error occurred on the story: ", exception);
-            Util.sendCrashMessage(playerSession.getPlayer(), exception);
+            playerSession
+                    .getPlayer()
+                    .sendSystemMessage(
+                            Translation.message("crash.story-runtime").withStyle(ChatFormatting.RED));
+            playerSession
+                    .getPlayer()
+                    .sendSystemMessage(Component.literal(exception.getMessage()).withStyle(ChatFormatting.RED));
         } else {
             CrashScreen screen = new CrashScreen(playerSession, exception.getMessage());
             minecraft.execute(() -> minecraft.setScreen(screen));
