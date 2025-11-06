@@ -410,7 +410,7 @@ public class Playback {
         return id;
     }
 
-    public Environment getEnvironnement() {
+    public Environment getEnvironment() {
         return environment;
     }
 
