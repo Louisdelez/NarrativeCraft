@@ -168,8 +168,7 @@ public class PlayerSession {
     public void clearPlaybacksNotPlaying() {
         playbackManager
                 .getPlaybacks()
-                .removeIf(playback -> !playback.isPlaying()
-                        || playback.hasEnded()
+                .removeIf(playback -> playback.hasEnded()
                         || playback.getCharacterRuntime().getEntity() == null
                         || !playback.getCharacterRuntime().getEntity().isAlive());
     }

@@ -87,7 +87,6 @@ public class Playback {
             storyHandler.killCharacter(animation.getCharacter());
         } else {
             masterEntity = characterRuntime.getEntity();
-            characterRuntime.setEntity(masterEntity);
         }
         start();
     }

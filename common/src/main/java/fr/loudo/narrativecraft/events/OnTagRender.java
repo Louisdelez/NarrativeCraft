@@ -37,6 +37,7 @@ public class OnTagRender {
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
         if (playerSession == null) return false;
+        if (playerSession.getStoryHandler() == null) return false;
 
         for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
             if (characterRuntime.getEntity().getName().getString().equals(name.getString())) {
