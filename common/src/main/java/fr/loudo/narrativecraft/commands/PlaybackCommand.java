@@ -99,6 +99,8 @@ public class PlaybackCommand {
                 Environment.RECORDING,
                 false);
         playback.start();
+        playerSession.getCharacterRuntimes().add(playback.getCharacterRuntime());
+        playback.setOnStop(() -> playerSession.getCharacterRuntimes().remove(playback.getCharacterRuntime()));
         context.getSource()
                 .sendSuccess(() -> Translation.message("playback.animation.play", animation.getName()), false);
         playerSession.getPlaybackManager().addPlayback(playback);
@@ -120,6 +122,10 @@ public class PlaybackCommand {
         }
         subscene.start(context.getSource().getLevel(), Environment.RECORDING, false);
         playerSession.getPlaybackManager().getPlaybacks().addAll(subscene.getPlaybacks());
+        for (Playback playback : subscene.getPlaybacks()) {
+            playerSession.getCharacterRuntimes().add(playback.getCharacterRuntime());
+            playback.setOnStop(() -> playerSession.getCharacterRuntimes().remove(playback.getCharacterRuntime()));
+        }
         context.getSource().sendSuccess(() -> Translation.message("playback.subscene.play", subscene.getName()), false);
         return Command.SINGLE_SUCCESS;
     }

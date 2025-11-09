@@ -100,9 +100,12 @@ public class EmoteInkAction extends InkAction {
         if (!Services.PLATFORM.isModLoaded("emotecraft")) return InkActionResult.ignored();
         StoryHandler storyHandler = playerSession.getStoryHandler();
         if (storyHandler == null) return InkActionResult.ignored();
-        CharacterRuntime characterRuntime = storyHandler.getCharacterRuntimeFromCharacter(characterStory);
-        if (characterRuntime == null || characterRuntime.getEntity() == null) return InkActionResult.ignored();
-        ServerEmoteAPI.playEmote(characterRuntime.getEntity().getUUID(), emote, forced);
+        List<CharacterRuntime> characterRuntimes = storyHandler.getCharacterRuntimeFromCharacter(characterStory);
+        if (characterRuntimes.isEmpty()) return InkActionResult.ignored();
+        for (CharacterRuntime characterRuntime : characterRuntimes) {
+            if (characterRuntime == null || characterRuntime.getEntity() == null) continue;
+            ServerEmoteAPI.playEmote(characterRuntime.getEntity().getUUID(), emote, forced);
+        }
         return InkActionResult.ok();
     }
 

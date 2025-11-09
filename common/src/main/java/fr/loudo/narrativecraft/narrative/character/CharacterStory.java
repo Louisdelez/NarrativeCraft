@@ -39,7 +39,7 @@ public class CharacterStory extends NarrativeEntry {
     private String birthDate;
     private CharacterType characterType;
     private CharacterModel model;
-    private boolean showNametag = true;
+    private boolean showNametag;
     private int entityTypeId;
 
     public CharacterStory(
@@ -56,6 +56,7 @@ public class CharacterStory extends NarrativeEntry {
         this.model = model;
         this.entityType = EntityType.PLAYER;
         this.entityTypeId = BuiltInRegistries.ENTITY_TYPE.getId(entityType);
+        showNametag = characterType == CharacterType.MAIN;
     }
 
     public void updateEntityType(EntityType<?> entityType) {

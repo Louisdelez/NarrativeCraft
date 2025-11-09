@@ -209,13 +209,14 @@ public class StoryHandler {
         return false;
     }
 
-    public CharacterRuntime getCharacterRuntimeFromCharacter(CharacterStory characterStory) {
+    public List<CharacterRuntime> getCharacterRuntimeFromCharacter(CharacterStory characterStory) {
+        List<CharacterRuntime> characterRuntimes = new ArrayList<>();
         for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
             if (characterRuntime.getCharacterStory().getName().equals(characterStory.getName())) {
-                return characterRuntime;
+                characterRuntimes.add(characterRuntime);
             }
         }
-        return null;
+        return characterRuntimes;
     }
 
     public void killCharacter(CharacterStory characterStory) {
@@ -432,6 +433,9 @@ public class StoryHandler {
                 stitchInteraction = entityInteraction;
             }
             if (stitchInteraction != null) {
+                if (stitchInteraction.getStitch().isEmpty()) {
+                    return false;
+                }
                 boolean sameInteraction = (playerSession.getLastInteraction() != null
                         && playerSession.getLastInteraction().getStitch().equals(stitchInteraction.getStitch()));
                 if (playerSession.getDialogRenderer() != null) {

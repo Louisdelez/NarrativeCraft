@@ -53,6 +53,7 @@ public class Playback {
     private final Level level;
     private final Environment environment;
     private final List<PlaybackData> entityPlaybacks = new ArrayList<>();
+    private Runnable onStop;
 
     private LivingEntity masterEntity;
     private boolean isPlaying, hasEnded, isUnique;
@@ -76,17 +77,18 @@ public class Playback {
             start();
             return;
         }
-        CharacterRuntime characterRuntime = storyHandler.getCharacterRuntimeFromCharacter(this.getCharacter());
-        if (characterRuntime == null || characterRuntime.getEntity() == null) {
-            start();
-            return;
-        }
-        if (needToRespawn(
-                characterRuntime.getEntity().position(),
-                animation.getFirstLocation().asVec3())) {
-            storyHandler.killCharacter(animation.getCharacter());
-        } else {
-            masterEntity = characterRuntime.getEntity();
+        List<CharacterRuntime> characterRuntimes = storyHandler.getCharacterRuntimeFromCharacter(this.getCharacter());
+        for (CharacterRuntime characterRuntime1 : characterRuntimes) {
+            if (characterRuntime1.getEntity() != null
+                    && !characterRuntime1.getEntity().isRemoved()) {
+                if (needToRespawn(
+                        characterRuntime1.getEntity().position(),
+                        animation.getFirstLocation().asVec3())) {
+                    storyHandler.killCharacter(animation.getCharacter());
+                } else {
+                    masterEntity = characterRuntime1.getEntity();
+                }
+            }
         }
         start();
     }
@@ -322,6 +324,7 @@ public class Playback {
                 playbackData.killEntity();
             }
         }
+        if (onStop != null) onStop.run();
     }
 
     private void moveEntitySilent(Entity entity, Location location) {
@@ -427,5 +430,13 @@ public class Playback {
 
     public void setUnique(boolean unique) {
         isUnique = unique;
+    }
+
+    public Runnable getOnStop() {
+        return onStop;
+    }
+
+    public void setOnStop(Runnable onStop) {
+        this.onStop = onStop;
     }
 }

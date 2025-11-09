@@ -66,12 +66,12 @@ public class GameplayInkAction extends InkAction {
             return InkActionResult.ok();
         }
         if (storyHandler.characterInStory(mainCharacter)) {
-            CharacterRuntime characterRuntime = storyHandler.getCharacterRuntimeFromCharacter(mainCharacter);
-            if (characterRuntime == null) {
+            List<CharacterRuntime> characterRuntimes = storyHandler.getCharacterRuntimeFromCharacter(mainCharacter);
+            if (characterRuntimes.isEmpty()) {
                 return InkActionResult.error("Main character was found in the story, but his entity was not...");
             }
-            Vec3 position = characterRuntime.getEntity().position();
-            Entity entity = characterRuntime.getEntity();
+            Vec3 position = characterRuntimes.getFirst().getEntity().position();
+            Entity entity = characterRuntimes.getFirst().getEntity();
             playerSession
                     .getPlayer()
                     .connection
