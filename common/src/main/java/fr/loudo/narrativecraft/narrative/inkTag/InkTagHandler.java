@@ -48,19 +48,6 @@ public class InkTagHandler {
             String tag = tagsToExecute.get(i);
             InkAction inkAction = InkActionRegistry.findByCommand(tag);
             if (inkAction == null) continue;
-            inkAction.setBlockEndTask(() -> {
-                inkAction.setRunning(false);
-                try {
-                    execute();
-                } catch (InkTagHandlerException e) {
-                    if (playerSession.getStoryHandler() == null) {
-                        Util.sendCrashMessage(playerSession.getPlayer(), e);
-                    } else {
-                        playerSession.getStoryHandler().showCrash(e);
-                        playerSession.getStoryHandler().stop();
-                    }
-                }
-            });
             result = inkAction.validate(tag, playerSession.getScene());
             if (result.isError()) {
                 throw new InkTagHandlerException(inkAction.getClass(), result.errorMessage());
@@ -68,6 +55,21 @@ public class InkTagHandler {
             result = inkAction.execute(playerSession);
             if (result.isError()) {
                 throw new InkTagHandlerException(inkAction.getClass(), result.errorMessage());
+            }
+            if (result.isBlock()) {
+                inkAction.setBlockEndTask(() -> {
+                    inkAction.setRunning(false);
+                    try {
+                        execute();
+                    } catch (InkTagHandlerException e) {
+                        if (playerSession.getStoryHandler() == null) {
+                            Util.sendCrashMessage(playerSession.getPlayer(), e);
+                        } else {
+                            playerSession.getStoryHandler().showCrash(e);
+                            playerSession.getStoryHandler().stop();
+                        }
+                    }
+                });
             }
             if (result.isIgnore()) {
                 inkAction.setRunning(false);
