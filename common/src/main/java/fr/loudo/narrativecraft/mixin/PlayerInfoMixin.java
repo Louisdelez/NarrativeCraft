@@ -31,6 +31,7 @@ import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.util.Util;
 import java.io.File;
+import java.util.ArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.core.ClientAsset;
@@ -90,7 +91,7 @@ public class PlayerInfoMixin {
             }
         }
 
-        for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+        for (CharacterRuntime characterRuntime : new ArrayList<>(playerSession.getCharacterRuntimes())) {
             if (characterRuntime.getEntity() == null) continue;
 
             CharacterStory characterStory = characterRuntime.getCharacterStory();

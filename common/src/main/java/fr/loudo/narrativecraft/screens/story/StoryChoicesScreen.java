@@ -61,7 +61,8 @@ public class StoryChoicesScreen extends Screen {
         super(Component.literal("Choice screen"));
         this.playerSession = playerSession;
         storyHandler = playerSession.getStoryHandler();
-        this.choiceList = playerSession.getStoryHandler().getStory().getCurrentChoices();
+        List<Choice> choices = playerSession.getStoryHandler().getStory().getCurrentChoices();
+        this.choiceList = choices.subList(0, Math.min(choices.size(), 4));
         this.animatedChoices = new ArrayList<>();
         initiated = !animate;
         totalTick = (int) (APPEAR_TIME * 20.0);
@@ -69,7 +70,7 @@ public class StoryChoicesScreen extends Screen {
 
     public StoryChoicesScreen(List<Choice> choiceList, boolean animate) {
         super(Component.literal("Choice screen"));
-        this.choiceList = choiceList;
+        this.choiceList = choiceList.subList(0, Math.min(choiceList.size(), 4));
         this.animatedChoices = new ArrayList<>();
         initiated = !animate;
         totalTick = (int) (APPEAR_TIME * 20.0);

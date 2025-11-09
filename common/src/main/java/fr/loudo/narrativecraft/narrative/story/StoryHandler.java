@@ -236,7 +236,7 @@ public class StoryHandler {
             story.chooseChoiceIndex(choiceIndex);
             playerSession.setDialogRenderer(null);
             next();
-            if (dialogText.isEmpty() && !isFinished()) {
+            if (dialogText.isEmpty() && !isFinished() && story.getCurrentTags().isEmpty()) {
                 throw new Exception("Empty dialog after a choice cannot be rendered!");
             }
         } catch (Exception e) {

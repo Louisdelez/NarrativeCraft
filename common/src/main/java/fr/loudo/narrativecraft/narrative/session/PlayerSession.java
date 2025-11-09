@@ -170,7 +170,7 @@ public class PlayerSession {
                 .getPlaybacks()
                 .removeIf(playback -> playback.hasEnded()
                         || playback.getCharacterRuntime().getEntity() == null
-                        || !playback.getCharacterRuntime().getEntity().isAlive());
+                        || playback.getCharacterRuntime().getEntity().isRemoved());
     }
 
     public boolean isOnGameplay() {

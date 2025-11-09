@@ -85,6 +85,12 @@ public class InkTagHandler {
         if (storyHandler != null && tagsToExecute.isEmpty() && result.isOk()) {
             if (storyHandler.isFinished() && storyHandler.getDialogText().isEmpty()) {
                 storyHandler.stopAndFinishScreen();
+            } else if (storyHandler.getDialogText().isEmpty()
+                    && storyHandler
+                            .getStory()
+                            .canContinue()) { // Handle conditional block (for some reason it returns empty dialog when
+                // going in a condition, have to next twice to get it)
+                storyHandler.next();
             } else if (!storyHandler.isFinished()
                     && storyHandler.getDialogText().isEmpty()
                     && storyHandler.getStory().getCurrentChoices().isEmpty()
