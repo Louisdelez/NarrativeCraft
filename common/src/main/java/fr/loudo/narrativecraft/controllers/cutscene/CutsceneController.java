@@ -557,32 +557,42 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
     }
 
     private int calculateTotalTick() {
+        int totalTick = 0;
+
         if (!playbacks.isEmpty()) {
-            int total = 0;
-            int count = 0;
+            int maxPlaybackTick = 0;
 
             for (Subscene subscene : cutscene.getSubscenes()) {
-                for (Playback playback : subscene.getPlaybacks()) {
-                    total += playback.getMaxTick();
-                    count++;
+                for (Playback p : subscene.getPlaybacks()) {
+                    maxPlaybackTick = Math.max(maxPlaybackTick, p.getMaxTick());
                 }
             }
 
-            for (Playback playback : playbacks) {
-                total += playback.getMaxTick();
-                count++;
+            for (Playback p : playbacks) {
+                maxPlaybackTick = Math.max(maxPlaybackTick, p.getMaxTick());
             }
 
-            if (count == 0) return 0;
-            totalTick = total / count;
+            int additionalTick = 0;
+            for (CutsceneKeyframeGroup group : keyframeGroups) {
+                for (CutsceneKeyframe kf : group.getKeyframes()) {
+                    if (kf.getTick() >= maxPlaybackTick) {
+                        additionalTick += kf.getPathTick() + kf.getTransitionDelayTick();
+                    }
+                }
+            }
+
+            totalTick = maxPlaybackTick + additionalTick;
         } else {
             CutsceneKeyframe keyframe = getLastKeyframeLastGroup();
             if (keyframe != null) {
                 totalTick = keyframe.getTick();
             }
         }
+
+        this.totalTick = totalTick;
         return totalTick;
     }
+
 
     public boolean isPlaying() {
         return isPlaying;
