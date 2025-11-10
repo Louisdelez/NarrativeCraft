@@ -293,7 +293,7 @@ public class Playback {
     }
 
     private void spawnMasterEntity(Location loc) {
-        if (masterEntity != null && masterEntity.isAlive()) {
+        if (masterEntity != null && !masterEntity.isRemoved()) {
             moveEntitySilent(masterEntity, loc);
             return;
         }

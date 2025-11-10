@@ -195,7 +195,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
     public void stopSession(boolean save) {
         for (Playback playback : playbacks) {
             if (playback.getCharacterRuntime().getEntity() == null
-                    || !playback.getCharacterRuntime().getEntity().isAlive()) {
+                    || playback.getCharacterRuntime().getEntity().isRemoved()) {
                 playerSession.getCharacterRuntimes().remove(playback.getCharacterRuntime());
             }
             playback.stop(environment == Environment.DEVELOPMENT);
@@ -592,7 +592,6 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         this.totalTick = totalTick;
         return totalTick;
     }
-
 
     public boolean isPlaying() {
         return isPlaying;

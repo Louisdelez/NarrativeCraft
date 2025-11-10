@@ -152,7 +152,7 @@ public class PlayerSession {
         List<CharacterRuntime> characterRuntimes1 = new ArrayList<>();
         for (CharacterRuntime characterRuntime : characterRuntimes) {
             if (characterRuntime.getEntity() == null
-                    || !characterRuntime.getEntity().isAlive()) continue;
+                    || characterRuntime.getEntity().isRemoved()) continue;
             if (characterRuntime.getCharacterStory().getName().equalsIgnoreCase(characterStory.getName())) {
                 characterRuntimes1.add(characterRuntime);
             }
@@ -162,7 +162,7 @@ public class PlayerSession {
 
     public void clearKilledCharacters() {
         characterRuntimes.removeIf(characterRuntime -> characterRuntime.getEntity() == null
-                || !characterRuntime.getEntity().isAlive());
+                || characterRuntime.getEntity().isRemoved());
     }
 
     public void clearPlaybacksNotPlaying() {

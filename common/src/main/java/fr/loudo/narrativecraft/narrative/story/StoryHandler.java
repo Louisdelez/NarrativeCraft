@@ -160,7 +160,7 @@ public class StoryHandler {
         }
         for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
             if (characterRuntime.getEntity() == null
-                    || !characterRuntime.getEntity().isAlive()) continue;
+                    || characterRuntime.getEntity().isRemoved()) continue;
             characterRuntime.getEntity().remove(Entity.RemovalReason.KILLED);
         }
         AbstractController controller = playerSession.getController();
