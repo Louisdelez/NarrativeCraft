@@ -97,7 +97,7 @@ public class MainScreen extends Screen {
     private int showDevBtnCount;
     private Button devButton;
 
-    private final boolean finishedStory;
+    private boolean finishedStory;
     private final boolean pause;
     private boolean rendered;
 
@@ -392,8 +392,9 @@ public class MainScreen extends Screen {
                 .build();
 
         if (finishedStory) {
-            FinishedStoryScreen screen = new FinishedStoryScreen(playerSession);
+            FinishedStoryScreen screen = new FinishedStoryScreen(this);
             minecraft.setScreen(screen);
+            finishedStory = false;
         }
     }
 

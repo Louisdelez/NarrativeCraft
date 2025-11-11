@@ -53,7 +53,7 @@ public class OnPlayerServerConnection {
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
         if (NarrativeCraftMod.getInstance().getNarrativeWorldOption().showMainScreen) {
-            MainScreen mainScreen = new MainScreen(playerSession, false, false);
+            MainScreen mainScreen = new MainScreen(playerSession, true, false);
             Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(mainScreen));
         }
     }

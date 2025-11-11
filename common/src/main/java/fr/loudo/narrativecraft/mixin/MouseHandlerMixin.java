@@ -36,8 +36,30 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(MouseHandler.class)
 public class MouseHandlerMixin {
 
-    @Inject(method = "handleAccumulatedMovement", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "onMove", at = @At("HEAD"), cancellable = true)
     public void narrativecraft$onMouseMove(CallbackInfo ci) {
+        LocalPlayer player = Minecraft.getInstance().player;
+        PlayerSession playerSession =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
+        if (playerSession == null) return;
+        if (playerSession.getCurrentCamera() != null && Minecraft.getInstance().screen == null) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "handleAccumulatedMovement", at = @At("HEAD"), cancellable = true)
+    public void narrativecraft$handleAccumulatedMovement(CallbackInfo ci) {
+        LocalPlayer player = Minecraft.getInstance().player;
+        PlayerSession playerSession =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
+        if (playerSession == null) return;
+        if (playerSession.getCurrentCamera() != null && Minecraft.getInstance().screen == null) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "turnPlayer", at = @At("HEAD"), cancellable = true)
+    public void narrativecraft$turnPlayer(CallbackInfo ci) {
         LocalPlayer player = Minecraft.getInstance().player;
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
