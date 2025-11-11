@@ -264,6 +264,8 @@ public class StoryHandler {
                 return;
             }
             dialogText = story.Continue().replace("\n", "");
+            dialogText = dialogText.replace(
+                    "__username__", playerSession.getPlayer().getName().getString());
             if (story.hasError() || hasError) return;
             if (firstLoad) {
                 save(false);
@@ -415,6 +417,7 @@ public class StoryHandler {
             CrashScreen screen = new CrashScreen(playerSession, exception.getMessage());
             minecraft.execute(() -> minecraft.setScreen(screen));
         }
+        Util.sendCrashMessage(playerSession.getPlayer(), exception);
     }
 
     public boolean interactWith(Entity entity) {

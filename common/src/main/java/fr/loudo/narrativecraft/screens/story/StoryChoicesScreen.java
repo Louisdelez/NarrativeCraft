@@ -108,6 +108,8 @@ public class StoryChoicesScreen extends Screen {
         }
         choiceButtonWidgetList.clear();
         for (Choice choice : choiceList) {
+            choice.setText(choice.getText()
+                    .replace("__username__", playerSession.getPlayer().getName().getString()));
             choiceButtonWidgetList.add(new ChoiceButtonWidget(choice, index -> {
                 minecraft.setScreen(null);
                 NarrativeCraftMod.server.execute(() -> storyHandler.chooseChoiceAndNext(index));
@@ -186,7 +188,7 @@ public class StoryChoicesScreen extends Screen {
         }
         List<KeyMapping> choiceKeys = List.of(
                 ModKeys.SELECT_CHOICE_1, ModKeys.SELECT_CHOICE_2, ModKeys.SELECT_CHOICE_3, ModKeys.SELECT_CHOICE_4);
-        for (int i = 0; i < storyHandler.getStory().getCurrentChoices().size(); i++) {
+        for (int i = 0; i < choiceList.size(); i++) {
             if (event.key() == choiceKeys.get(i).getDefaultKey().getValue()) {
                 minecraft.setScreen(null);
                 try {

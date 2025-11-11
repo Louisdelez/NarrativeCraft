@@ -174,7 +174,8 @@ public class PlayerSession {
     }
 
     public boolean isOnGameplay() {
-        return !inkActions.stream()
+        List<InkAction> inkActions1 = new ArrayList<>(inkActions);
+        return !inkActions1.stream()
                 .filter(inkAction -> inkAction instanceof GameplayInkAction)
                 .toList()
                 .isEmpty();

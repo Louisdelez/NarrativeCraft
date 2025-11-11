@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.register;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionRegistry;
 import fr.loudo.narrativecraft.narrative.story.inkAction.*;
+import fr.loudo.narrativecraft.narrative.story.inkAction.sound.SoundInkAction;
 import fr.loudo.narrativecraft.narrative.story.inkAction.text.TextInkAction;
 
 public class InkActionRegister {

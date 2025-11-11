@@ -23,7 +23,6 @@
 
 package fr.loudo.narrativecraft.screens.components;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.gui.GuiGraphics;
@@ -40,7 +39,7 @@ import net.minecraft.util.FormattedCharSequence;
 public abstract class AbstractTextBoxScreen extends Screen {
 
     private static final ResourceLocation WINDOW_LOCATION =
-            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/gui/advancements/window.png");
+            ResourceLocation.withDefaultNamespace("textures/gui/advancements/window.png");
 
     protected final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
 

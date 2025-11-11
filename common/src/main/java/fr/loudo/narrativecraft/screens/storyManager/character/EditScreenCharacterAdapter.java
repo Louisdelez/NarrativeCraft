@@ -228,7 +228,7 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
             try {
                 newCharacter.setShowNametag(existing.showNametag());
                 if (scene == null) {
-                    newCharacter.setMainCharacterAttribute(attribute);
+                    newCharacter.setMainCharacterAttribute(existing.getMainCharacterAttribute());
                     NarrativeCraftFile.updateCharacterData(existing, newCharacter);
                 } else {
                     newCharacter.setMainCharacterAttribute(null);

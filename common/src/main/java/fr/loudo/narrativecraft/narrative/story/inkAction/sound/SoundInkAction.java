@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.story.inkAction;
+package fr.loudo.narrativecraft.narrative.story.inkAction.sound;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
@@ -30,7 +30,6 @@ import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.resources.ResourceLocation;
@@ -40,7 +39,7 @@ import net.minecraft.util.Mth;
 public class SoundInkAction extends InkAction {
 
     private SoundManager soundManager;
-    private SimpleSoundInstance simpleSoundInstance;
+    private SoundInstance simpleSoundInstance;
     private String identifier = "minecraft";
     private String name, action;
     private Type type;
@@ -69,13 +68,14 @@ public class SoundInkAction extends InkAction {
     public void partialTick(float partialTick) {
         if (!isRunning || totalTick == 0) return;
         double t = Mth.clamp((tick + partialTick) / totalTick, 0.0, 1.0);
+        float newVolume = 0;
         if (action.equals("start")) {
-            volume = (float) Mth.lerp(t, 0.0, 1.0);
+            newVolume = (float) Mth.lerp(t, 0.0, volume);
         } else if (action.equals("stop")) {
-            volume = (float) Mth.lerp(t, 1.0, 0.0);
+            newVolume = (float) Mth.lerp(t, volume, 0.0);
         }
-        soundManager.setVolume(simpleSoundInstance, volume);
-        if (volume == 0.0 && action.equals("stop")) {
+        soundManager.setVolume(simpleSoundInstance, newVolume);
+        if (newVolume == 0.0 && action.equals("stop")) {
             soundManager.stop(simpleSoundInstance);
         }
     }
@@ -150,7 +150,9 @@ public class SoundInkAction extends InkAction {
             }
             simpleSoundInstance = getSimpleSoundInstance();
             soundManager.play(simpleSoundInstance);
-            soundManager.setVolume(simpleSoundInstance, 0f);
+            if (fadeTime > 0) {
+                soundManager.setVolume(simpleSoundInstance, 0f);
+            }
         } else if (action.equals("stop") && arguments.size() > 3) {
             String fadeValue = arguments.get(3);
             if (!fadeValue.equals("fadeout")) return InkActionResult.ok();
@@ -192,6 +194,7 @@ public class SoundInkAction extends InkAction {
                     } else if (matchOne) {
                         if (fadeTime > 0) {
                             this.simpleSoundInstance = soundInkAction.simpleSoundInstance;
+                            this.volume = soundInkAction.volume;
                         } else {
                             isRunning = false;
                             soundInkAction.stop();
@@ -203,9 +206,9 @@ public class SoundInkAction extends InkAction {
         return InkActionResult.ok();
     }
 
-    private SimpleSoundInstance getSimpleSoundInstance() {
+    private SoundInstance getSimpleSoundInstance() {
         if (simpleSoundInstance == null) {
-            simpleSoundInstance = new SimpleSoundInstance(
+            simpleSoundInstance = new SoundInkInstance(
                     ResourceLocation.fromNamespaceAndPath(identifier, name),
                     SoundSource.MASTER,
                     volume,

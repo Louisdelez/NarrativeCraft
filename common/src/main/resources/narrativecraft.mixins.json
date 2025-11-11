@@ -35,6 +35,7 @@
     "MouseHandlerMixin",
     "OptionsMixin",
     "PlayerInfoMixin",
+    "SoundEngineMixin",
     "WinScreenMixin",
     "WorldSelectionListMixin",
     "accessor.StringSplitterAccessor",
