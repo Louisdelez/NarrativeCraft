@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -118,6 +119,7 @@ public class SoundInkAction extends InkAction {
                     "ink_action.validation.sound", type.name().toLowerCase(), name));
         }
         if (action.equals("start") && arguments.size() > 3) {
+            isLooping = InkUtil.getOptionalArgument(command, "loop");
             try {
                 volume = Float.parseFloat(arguments.get(3));
             } catch (NumberFormatException e) {
@@ -131,22 +133,16 @@ public class SoundInkAction extends InkAction {
             } catch (NumberFormatException e) {
                 return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(4)));
             }
-            if (arguments.size() < 6) return InkActionResult.ok();
-            try {
-                isLooping = Boolean.parseBoolean(arguments.get(5));
-            } catch (Exception e) {
-                return InkActionResult.error(Translation.message(NOT_VALID_BOOLEAN, arguments.get(5)));
-            }
-            if (arguments.size() < 7) return InkActionResult.ok();
-            String fadeValue = arguments.get(6);
+            if (arguments.size() == 5) return InkActionResult.ok();
+            String fadeValue = arguments.get(5);
             if (!fadeValue.equals("fadein")) return InkActionResult.ok();
-            if (arguments.size() == 7) {
+            if (arguments.size() == 6) {
                 return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "fade in value"));
             }
             try {
-                fadeTime = Double.parseDouble(arguments.get(7));
+                fadeTime = Double.parseDouble(arguments.get(6));
             } catch (NumberFormatException e) {
-                return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(7)));
+                return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(6)));
             }
             simpleSoundInstance = getSimpleSoundInstance();
             soundManager.play(simpleSoundInstance);

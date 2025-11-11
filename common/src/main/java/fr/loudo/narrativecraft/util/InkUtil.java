@@ -23,8 +23,21 @@
 
 package fr.loudo.narrativecraft.util;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class InkUtil {
     public static final Pattern SCENE_KNOT_PATTERN = Pattern.compile("chapter_\\d+_[a-zA-Z0-9_]+");
+    public static final Pattern OPTIONAL_ARGUMENT_PATTERN = Pattern.compile("--(\\S+)");
+
+    public static boolean getOptionalArgument(String command, String arg) {
+        Matcher matcher = OPTIONAL_ARGUMENT_PATTERN.matcher(command);
+        while (matcher.find()) {
+            String value = matcher.group(1);
+            if (arg.equalsIgnoreCase(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

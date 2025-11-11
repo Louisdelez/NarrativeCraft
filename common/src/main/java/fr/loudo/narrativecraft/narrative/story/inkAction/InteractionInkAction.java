@@ -65,7 +65,6 @@ public class InteractionInkAction extends InkAction {
 
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
-        isRunning = false;
         if (action.equals("summon")) {
             InteractionController controller =
                     new InteractionController(Environment.PRODUCTION, playerSession.getPlayer(), interaction);
@@ -82,6 +81,12 @@ public class InteractionInkAction extends InkAction {
                     .getInteractionControllers()
                     .removeIf(interactionController ->
                             interactionController.getInteraction().getName().equalsIgnoreCase(interaction.getName()));
+            for (InkAction inkAction : playerSession.getInkActions()) {
+                if (inkAction instanceof InteractionInkAction) {
+                    inkAction.setRunning(false);
+                }
+            }
+            isRunning = false;
         }
         return InkActionResult.ok();
     }
