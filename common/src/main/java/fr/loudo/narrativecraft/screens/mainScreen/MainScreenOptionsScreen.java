@@ -59,9 +59,6 @@ public class MainScreenOptionsScreen extends OptionsSubScreen {
         option.textSpeed = textSpeed;
         option.autoSkip = autoSkipCheck.selected();
         NarrativeCraftFile.updateUserOptions(option);
-        if (!lastScreen.isPauseScreen()) {
-            minecraft.setScreen(null);
-        }
         minecraft.setScreen(lastScreen);
     }
 

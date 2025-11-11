@@ -237,6 +237,7 @@ public class MainScreen extends Screen {
         if (!firstGame && !pause) {
             startY += buttonHeight + gap;
             Button startNewGame = Button.builder(Translation.message("screen.main_screen.new_game"), button -> {
+                        reset();
                         ConfirmScreen confirmScreen = new ConfirmScreen(
                                 b -> {
                                     if (b) {
@@ -269,7 +270,7 @@ public class MainScreen extends Screen {
             startY += buttonHeight + gap;
             Button selectSceneButton = Button.builder(
                             Translation.message("screen.main_screen.select_screen"), button -> {
-                                minecraft.getSoundManager().stop(musicInstance);
+                                reset();
                                 ChapterSelectorScreen screen = new ChapterSelectorScreen(playerSession, this);
                                 minecraft.setScreen(screen);
                             })
@@ -348,9 +349,9 @@ public class MainScreen extends Screen {
 
         startY += buttonHeight + gap;
         Button optionsButton = Button.builder(Translation.message("screen.main_screen.options"), button -> {
-                    minecraft.getSoundManager().stop(musicInstance);
-                    MainScreenOptionsScreen screen =
-                            new MainScreenOptionsScreen(playerSession, new MainScreen(playerSession, false, pause));
+                    reset();
+                    MainScreenOptionsScreen screen = new MainScreenOptionsScreen(playerSession, this);
+                    new MainScreenOptionsScreen(playerSession, this);
                     minecraft.setScreen(screen);
                 })
                 .bounds(initialX, startY, buttonWidth, buttonHeight)
@@ -396,6 +397,11 @@ public class MainScreen extends Screen {
             minecraft.setScreen(screen);
             finishedStory = false;
         }
+    }
+
+    private void reset() {
+        rendered = false;
+        minecraft.getSoundManager().stop(musicInstance);
     }
 
     @Override
