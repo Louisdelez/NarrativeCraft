@@ -57,6 +57,9 @@ public class MainScreenOptionsScreen extends OptionsSubScreen {
     @Override
     public void onClose() {
         option.textSpeed = textSpeed;
+        if (playerSession.getDialogRenderer() != null) {
+            playerSession.getDialogRenderer().getDialogScrollText().setTextSpeed(textSpeed);
+        }
         option.autoSkip = autoSkipCheck.selected();
         NarrativeCraftFile.updateUserOptions(option);
         minecraft.setScreen(lastScreen);
