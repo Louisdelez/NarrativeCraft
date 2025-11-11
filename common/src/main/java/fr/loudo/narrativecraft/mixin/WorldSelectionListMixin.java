@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.mixin;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.util.Translation;
@@ -79,7 +80,25 @@ public abstract class WorldSelectionListMixin {
                         }
                     },
                     Component.literal(""),
-                    Translation.message("screen.nc_incompatible"));
+                    Translation.message("screen.nc_mc_version_incompatible"));
+            minecraft.setScreen(confirmScreen);
+            ci.cancel();
+        }
+        if (!NarrativeCraftMod.VERSION.equals(worldOption.ncVersion)) {
+            ConfirmScreen confirmScreen = new ConfirmScreen(
+                    b -> {
+                        if (b) {
+                            File worldOptionFile = NarrativeCraftFile.getWorldOptionFile(this.summary.getLevelId());
+                            worldOption.ncVersion = NarrativeCraftMod.VERSION;
+                            NarrativeCraftFile.updateWorldOptions(worldOptionFile, worldOption);
+                            this.joinWorld();
+                        } else {
+                            minecraft.setScreen(this.screen);
+                        }
+                    },
+                    Component.literal(""),
+                    Translation.message(
+                            "screen.nc_version_incompatible", worldOption.ncVersion, NarrativeCraftMod.VERSION));
             minecraft.setScreen(confirmScreen);
             ci.cancel();
         }

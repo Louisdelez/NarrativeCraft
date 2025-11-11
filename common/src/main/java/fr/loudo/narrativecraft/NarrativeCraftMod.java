@@ -39,6 +39,7 @@ public class NarrativeCraftMod {
 
     public static final String MOD_ID = "narrativecraft";
     public static final String MOD_NAME = "NarrativeCraft";
+    public static final String VERSION = "1.0.0";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
 
     public static boolean firstTime = false;

@@ -64,7 +64,7 @@ public class CreditScreen extends WinScreen {
             } else {
                 mainScreen = new MainScreen(playerSession, false, false);
             }
-            Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(mainScreen));
+            Minecraft.getInstance().setScreen(mainScreen);
         });
     }
 
@@ -108,7 +108,7 @@ public class CreditScreen extends WinScreen {
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        if (event.key() == InputConstants.KEY_ESCAPE) {
+        if (event.key() == InputConstants.KEY_ESCAPE && event.isDown()) {
             minecraft.setScreen(null);
             onClose();
         }
