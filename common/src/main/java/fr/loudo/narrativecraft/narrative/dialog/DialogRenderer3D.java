@@ -84,20 +84,25 @@ public class DialogRenderer3D extends DialogRenderer {
         super.tick();
     }
 
-    private void updateDialogPosition() {
+    private void updateDialogPosition(float partialTick) {
         Entity serverEntity = characterRuntime.getEntity();
         if (serverEntity != null) {
             Entity entity =
                     minecraft.level.getEntity(characterRuntime.getEntity().getId());
             if (entity != null) {
-                dialogPosition = entity.position().add(0, entity.getEyeHeight(), 0);
+                if (dialogPosition != null) {
+                    dialogPosition = Mth.lerp(
+                            partialTick, dialogPosition, entity.position().add(0, entity.getEyeHeight(), 0));
+                } else {
+                    dialogPosition = entity.position().add(0, entity.getEyeHeight(), 0);
+                }
             }
         }
     }
 
     @Override
     public void render(PoseStack poseStack, float partialTick) {
-        updateDialogPosition();
+        updateDialogPosition(partialTick);
         if (dialogPosition == null) return;
 
         Vec3 position = dialogPosition;

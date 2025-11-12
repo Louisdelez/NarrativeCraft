@@ -348,6 +348,9 @@ public class TextInkAction extends InkAction {
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
         TextInkAction textInkAction = getTextInkFromId(attribute.getId(), playerSession.getInkActions());
+        if (textInkAction == null && action.equals("remove")) {
+            return InkActionResult.ignored();
+        }
 
         if (textInkAction == null && !action.equals("create")) {
             return InkActionResult.error(String.format("Text id '%s' not found!", attribute.getId()));
