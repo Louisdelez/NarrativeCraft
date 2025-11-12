@@ -97,7 +97,7 @@ public class CameraAngleControllerScreen extends Screen {
                     ChooseCharacterScreen screen = new ChooseCharacterScreen(
                             this,
                             Translation.message(
-                                            "controller.camera_angle.add_character",
+                                            "controller.add_character",
                                             cameraAngleController
                                                     .getCameraAngle()
                                                     .getName())

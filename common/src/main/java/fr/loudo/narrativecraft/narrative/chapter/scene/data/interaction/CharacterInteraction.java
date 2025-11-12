@@ -21,17 +21,20 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client;
+package fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction;
 
-import fr.loudo.narrativecraft.screens.storyManager.chapter.ChaptersScreen;
-import net.minecraft.client.Minecraft;
+import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 
-// STANDBY: only for testing
-public class ClientPacketHandlerCommon {
-    public static void openChaptersScreen() {
-        Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.player != null) {
-            minecraft.setScreen(new ChaptersScreen());
-        }
+public class CharacterInteraction extends StitchInteraction {
+
+    private final CharacterStoryData characterStoryData;
+
+    public CharacterInteraction(String stitch, CharacterStoryData characterStoryData) {
+        super(stitch);
+        this.characterStoryData = characterStoryData;
+    }
+
+    public CharacterStoryData getCharacterStoryData() {
+        return characterStoryData;
     }
 }

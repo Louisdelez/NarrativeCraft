@@ -40,6 +40,7 @@ import fr.loudo.narrativecraft.util.ImageFontConstants;
 import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.List;
+import java.util.stream.Collectors;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
@@ -79,12 +80,24 @@ public class CharactersScreen extends StoryElementScreen {
     @Override
     protected void addContents() {
         CharacterManager characterManager = NarrativeCraftMod.getInstance().getCharacterManager();
-        List<CharacterStory> characterStories =
-                scene == null ? characterManager.getCharacterStories() : scene.getNpcs();
+        List<CharacterStory> characterStories = scene == null
+                ? characterManager.getCharacterStories().stream()
+                        .filter(characterStory ->
+                                !characterStory.getMainCharacterAttribute().isMainCharacter())
+                        .collect(Collectors.toList())
+                : scene.getNpcs();
+        CharacterStory mainCharacter = characterManager.getMainCharacter();
+        if (mainCharacter != null && scene == null) {
+            characterStories.addFirst(mainCharacter);
+        }
 
         List<StoryElementList.StoryEntryData> entries = characterStories.stream()
                 .map(character -> {
-                    Button button = Button.builder(Component.literal(character.getName()), button1 -> {})
+                    String name = character.getName();
+                    if (character.getMainCharacterAttribute().isMainCharacter()) {
+                        name += " (" + Translation.message("global.main").getString() + ")";
+                    }
+                    Button button = Button.builder(Component.literal(name), button1 -> {})
                             .build();
                     button.active = false;
                     Button entityTypeButton = Button.builder(ImageFontConstants.ENTITY, button1 -> {
@@ -103,8 +116,24 @@ public class CharactersScreen extends StoryElementScreen {
                             },
                             () -> {
                                 if (scene == null) {
-                                    characterManager.removeCharacter(character);
-                                    NarrativeCraftFile.deleteCharacterFolder(character);
+                                    try {
+                                        if (character
+                                                .getMainCharacterAttribute()
+                                                .isMainCharacter()) {
+                                            CharacterStory newMainCharacter = characterManager
+                                                    .getCharacterStories()
+                                                    .get(0);
+                                            newMainCharacter
+                                                    .getMainCharacterAttribute()
+                                                    .setMainCharacter(true);
+                                            NarrativeCraftFile.updateCharacterData(newMainCharacter, newMainCharacter);
+                                        }
+                                        NarrativeCraftFile.deleteCharacterFolder(character);
+                                        characterManager.removeCharacter(character);
+                                    } catch (Exception e) {
+                                        Util.sendCrashMessage(minecraft.player, e);
+                                        minecraft.setScreen(null);
+                                    }
                                 } else {
                                     scene.removeNpc(character);
                                     NarrativeCraftFile.deleteCharacterFolder(character, scene);

@@ -73,6 +73,7 @@ public class MinecraftCommandInkAction extends InkAction {
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
         CommandSourceStack commandSourceStack = getCommandSourceStack(playerSession);
+        command = command.replace("@p", playerSession.getPlayer().getName().getString());
         try {
             playerSession
                     .getPlayer()
@@ -85,6 +86,7 @@ public class MinecraftCommandInkAction extends InkAction {
             return InkActionResult.error(
                     Translation.message(WRONG_ARGUMENT_TEXT, "Command can't be executed: " + e.getMessage()));
         }
+        isRunning = false;
         return InkActionResult.ok();
     }
 

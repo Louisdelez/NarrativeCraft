@@ -47,6 +47,7 @@ public abstract class InkAction {
     protected final CommandMatcher matcher;
     protected boolean isRunning;
     protected boolean canBeExecuted = false;
+    protected int tick, totalTick;
     protected String command;
     protected Runnable blockEndTask;
 

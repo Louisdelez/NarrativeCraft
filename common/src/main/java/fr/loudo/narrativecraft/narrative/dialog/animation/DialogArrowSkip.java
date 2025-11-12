@@ -80,7 +80,7 @@ public class DialogArrowSkip {
         double opacity;
         int originalColor = color;
         if (currentTick < totalTick) {
-            double t = Math.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
+            double t = Mth.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
             t = Easing.SMOOTH.interpolate(t);
             translateX = Mth.lerp(t, translateX + xTranslatePoint, translateX);
             opacity = Mth.lerp(t, 0.0, 0.8);
@@ -120,7 +120,7 @@ public class DialogArrowSkip {
         poseStack.pushMatrix();
 
         if (currentTick < totalTick) {
-            double t = Math.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
+            double t = Mth.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
             t = Easing.SMOOTH.interpolate(t);
             translateX = Mth.lerp(t, xTranslatePoint, translateX);
             opacity = Mth.lerp(t, 0.0, 1.0);

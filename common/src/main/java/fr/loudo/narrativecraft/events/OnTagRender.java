@@ -21,15 +21,29 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.handler;
+package fr.loudo.narrativecraft.events;
 
-import fr.loudo.narrativecraft.client.ClientPacketHandlerCommon;
-import fr.loudo.narrativecraft.network.OpenChaptersScreenPacket;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
 
-public class ClientPacketHandlerNeoForge {
-    public static void handleOpenChaptersScreen(
-            OpenChaptersScreenPacket openChaptersScreenPacket, IPayloadContext iPayloadContext) {
-        iPayloadContext.enqueueWork(ClientPacketHandlerCommon::openChaptersScreen);
+public class OnTagRender {
+
+    public static boolean cancelRendering(Component name) {
+        LocalPlayer player = Minecraft.getInstance().player;
+        PlayerSession playerSession =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
+        if (playerSession == null) return false;
+        if (playerSession.getStoryHandler() == null) return false;
+
+        for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+            if (characterRuntime.getEntity().getName().getString().equals(name.getString())) {
+                return !characterRuntime.getCharacterStory().showNametag();
+            }
+        }
+        return false;
     }
 }

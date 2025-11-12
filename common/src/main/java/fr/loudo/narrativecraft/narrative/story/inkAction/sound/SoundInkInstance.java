@@ -21,28 +21,42 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.narrative.story.inkAction.sound;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.handler.ClientPacketHandlerNeoForge;
-import fr.loudo.narrativecraft.network.OpenChaptersScreenPacket;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import net.minecraft.client.resources.sounds.AbstractSoundInstance;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 
-@Mod(NarrativeCraftMod.MOD_ID)
-public class RegisterPayloadEvent {
+public class SoundInkInstance extends AbstractSoundInstance {
 
-    public RegisterPayloadEvent(IEventBus modEventBus) {
-        modEventBus.addListener(RegisterPayloadEvent::register);
+    public SoundInkInstance(
+            ResourceLocation location,
+            SoundSource source,
+            float volume,
+            float pitch,
+            RandomSource random,
+            boolean looping,
+            int delay,
+            Attenuation attenuation,
+            double x,
+            double y,
+            double z,
+            boolean relative) {
+        super(location, source, random);
+        this.volume = volume;
+        this.pitch = pitch;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.looping = looping;
+        this.delay = delay;
+        this.attenuation = attenuation;
+        this.relative = relative;
     }
 
-    private static void register(RegisterPayloadHandlersEvent event) {
-        final PayloadRegistrar registrar = event.registrar("1");
-        registrar.playToClient(
-                OpenChaptersScreenPacket.TYPE,
-                OpenChaptersScreenPacket.STREAM_CODEC,
-                ClientPacketHandlerNeoForge::handleOpenChaptersScreen);
+    @Override
+    public float getVolume() {
+        return this.volume;
     }
 }

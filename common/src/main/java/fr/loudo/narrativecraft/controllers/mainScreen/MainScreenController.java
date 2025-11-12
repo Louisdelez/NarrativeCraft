@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.controllers.mainScreen;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionRegistry;
+import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.controllers.keyframe.AbstractKeyframesBase;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.Environment;
@@ -95,7 +96,10 @@ public class MainScreenController extends AbstractKeyframesBase<MainScreenKeyfra
                 for (String tag : tags) {
                     InkAction inkAction = InkActionRegistry.findByCommand(tag);
                     if (inkAction == null) continue;
-                    inkAction.validateAndExecute(tag, playerSession);
+                    InkActionResult result = inkAction.validateAndExecute(tag, playerSession);
+                    if (result.isOk()) {
+                        playerSession.addInkAction(inkAction);
+                    }
                 }
             }
             return;
@@ -144,6 +148,7 @@ public class MainScreenController extends AbstractKeyframesBase<MainScreenKeyfra
         if (!keyframeTriggers.isEmpty()) {
             keyframeTriggers.getFirst().hideKeyframe(playerSession.getPlayer());
         }
+        playerSession.getCharacterRuntimes().clear();
         if (save) {
             MainScreenKeyframe oldKeyframe = mainScreenData.getKeyframe();
             KeyframeTrigger oldKeyframeTrigger = mainScreenData.getKeyframeTrigger();

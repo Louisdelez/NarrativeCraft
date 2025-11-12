@@ -33,15 +33,14 @@ import fr.loudo.narrativecraft.screens.storyManager.animations.AnimationsScreen;
 import fr.loudo.narrativecraft.screens.storyManager.cameraAngle.CameraAngleScreen;
 import fr.loudo.narrativecraft.screens.storyManager.character.CharactersScreen;
 import fr.loudo.narrativecraft.screens.storyManager.cutscene.CutscenesScreen;
+import fr.loudo.narrativecraft.screens.storyManager.interaction.InteractionsScreen;
 import fr.loudo.narrativecraft.screens.storyManager.subscene.SubscenesScreen;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
 
 public class ScenesMenuScreen extends StoryElementScreen {
 
@@ -104,10 +103,10 @@ public class ScenesMenuScreen extends StoryElementScreen {
                             minecraft.setScreen(new CutscenesScreen(scene));
                         })
                         .build());
-        Button interactionBtn = Button.builder(Translation.message("global.interaction"), button -> {})
+        Button interactionBtn = Button.builder(Translation.message("global.interaction"), button -> {
+                    minecraft.setScreen(new InteractionsScreen(scene));
+                })
                 .build();
-        interactionBtn.active = false;
-        interactionBtn.setTooltip(Tooltip.create(Component.literal("Coming soon!")));
         StoryElementList.StoryEntryData interaction = new StoryElementList.StoryEntryData(interactionBtn);
         StoryElementList.StoryEntryData npc = new StoryElementList.StoryEntryData(Button.builder(
                         Translation.message("global.npc"), button -> minecraft.setScreen(new CharactersScreen(scene)))

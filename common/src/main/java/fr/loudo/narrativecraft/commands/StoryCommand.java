@@ -41,7 +41,6 @@ import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.List;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -53,7 +52,8 @@ public class StoryCommand {
         dispatcher.register(Commands.literal("nc")
                 .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
                 .then(Commands.literal("story")
-                        .then(Commands.literal("validate").executes(StoryCommand::validateStory))
+                        .then(Commands.literal("validate")
+                                .executes(commandContext -> validateStory(commandContext, true)))
                         .then(Commands.literal("play")
                                 .then(Commands.argument("chapter_index", IntegerArgumentType.integer())
                                         .suggests(NarrativeCraftMod.getInstance()
@@ -73,26 +73,27 @@ public class StoryCommand {
                         .then(Commands.literal("stop").executes(StoryCommand::stopStory))));
     }
 
-    private static int validateStory(CommandContext<CommandSourceStack> context) {
+    private static int validateStory(CommandContext<CommandSourceStack> context, boolean fullValidation) {
         ServerPlayer player = context.getSource().getPlayer();
-        player.sendSystemMessage(Component.empty());
-        player.sendSystemMessage(Translation.message("validation.validating").withStyle(ChatFormatting.YELLOW));
+        if (fullValidation) {
+            player.sendSystemMessage(Component.empty());
+            player.sendSystemMessage(
+                    Translation.message("validation.validating").withStyle(ChatFormatting.YELLOW));
+        }
         try {
             List<ErrorLine> results = StoryValidation.validate();
             List<ErrorLine> warnLines =
                     results.stream().filter(ErrorLine::isWarn).toList();
             List<ErrorLine> errorLines =
                     results.stream().filter(errorLine -> !errorLine.isWarn()).toList();
-            if (errorLines.isEmpty() && warnLines.isEmpty()) {
+            if (errorLines.isEmpty() && warnLines.isEmpty() && fullValidation) {
                 player.sendSystemMessage(
                         Translation.message("validation.validated").withStyle(ChatFormatting.GREEN));
                 player.sendSystemMessage(Component.empty());
                 return Command.SINGLE_SUCCESS;
             }
             for (ErrorLine errorLine : results) {
-                Minecraft.getInstance()
-                        .execute(() ->
-                                Minecraft.getInstance().player.displayClientMessage(errorLine.toMessage(), false));
+                player.sendSystemMessage(errorLine.toMessage());
             }
             if (!errorLines.isEmpty()) {
                 player.sendSystemMessage(Translation.message(
@@ -109,11 +110,13 @@ public class StoryCommand {
                                         .withStyle(ChatFormatting.GOLD))
                         .withStyle(ChatFormatting.YELLOW));
             }
-            return errorLines.isEmpty() ? 1 : 0;
+            return errorLines.isEmpty() ? Command.SINGLE_SUCCESS : 0;
         } catch (Exception e) {
             Util.sendCrashMessage(player, e);
         }
-        player.sendSystemMessage(Component.empty());
+        if (fullValidation) {
+            player.sendSystemMessage(Component.empty());
+        }
 
         return Command.SINGLE_SUCCESS;
     }
@@ -139,7 +142,7 @@ public class StoryCommand {
             context.getSource().sendFailure(Translation.message("scene.no_exists", sceneName, chapterIndex));
             return 0;
         }
-        if (validateStory(context) == 0) return 0;
+        if (validateStory(context, false) == 0) return 0;
         if (playerSession.getStoryHandler() != null) {
             playerSession.getStoryHandler().stop();
         }

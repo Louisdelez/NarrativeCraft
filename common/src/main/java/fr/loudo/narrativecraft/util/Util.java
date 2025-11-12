@@ -36,6 +36,8 @@ import fr.loudo.narrativecraft.platform.Services;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.imageio.ImageIO;
@@ -48,6 +50,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
@@ -56,6 +59,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
@@ -243,5 +247,36 @@ public class Util {
                 .getResourceManager()
                 .getResource(resourceLocation)
                 .isPresent();
+    }
+
+    public static List<String> splitText(String text, Font font, int width) {
+
+        List<String> finalString = new ArrayList<>();
+        List<FormattedCharSequence> charSequences = font.split(FormattedText.of(text), width);
+        for (FormattedCharSequence chara : charSequences) {
+            StringBuilder stringBuilder = new StringBuilder();
+            chara.accept((i, style, i1) -> {
+                stringBuilder.appendCodePoint(i1);
+                return true;
+            });
+            finalString.add(stringBuilder.toString());
+        }
+        return finalString;
+    }
+
+    public static String getLongerTextLine(List<String> lines, Minecraft minecraft) {
+        float longerSentenceWidth = 0;
+        String longerText = "";
+        for (String line : lines) {
+            float width = 0;
+            for (int i = 0; i < line.length(); i++) {
+                width += Util.getLetterWidth(line.codePointAt(i), minecraft);
+            }
+            if (width > longerSentenceWidth) {
+                longerSentenceWidth = width;
+                longerText = line;
+            }
+        }
+        return longerText;
     }
 }

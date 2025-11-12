@@ -25,15 +25,23 @@ package fr.loudo.narrativecraft.controllers;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.Environment;
+import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
+import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.util.Util;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.util.ARGB;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 
 public abstract class AbstractController {
+
+    protected final List<CharacterStoryData> characterStoryDataList = new ArrayList<>();
     protected final Environment environment;
     protected final PlayerSession playerSession;
     protected String hudMessage;
@@ -65,11 +73,38 @@ public abstract class AbstractController {
                 font, hudMessage, width / 2 - font.width(hudMessage) / 2, 10, ARGB.colorFromFloat(1, 1, 1, 1));
     }
 
+    public CharacterStoryData getCharacterStoryDataFromEntity(Entity entity) {
+        for (CharacterStoryData characterStoryData : characterStoryDataList) {
+            if (Util.isSameEntity(
+                    entity, characterStoryData.getCharacterRuntime().getEntity())) {
+                return characterStoryData;
+            }
+        }
+        return null;
+    }
+
+    public CharacterRuntime getCharacterFromEntity(Entity entity) {
+        for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+            if (Util.isSameEntity(entity, characterRuntime.getEntity())) {
+                return characterRuntime;
+            }
+        }
+        return null;
+    }
+
     public Environment getEnvironment() {
         return environment;
     }
 
     public PlayerSession getPlayerSession() {
         return playerSession;
+    }
+
+    public List<CharacterStoryData> getCharacterStoryDataList() {
+        return characterStoryDataList;
+    }
+
+    public void removeCharacterStoryData(CharacterStoryData characterStoryData) {
+        characterStoryDataList.remove(characterStoryData);
     }
 }

@@ -26,6 +26,8 @@ package fr.loudo.narrativecraft.register;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionRegistry;
 import fr.loudo.narrativecraft.narrative.story.inkAction.*;
+import fr.loudo.narrativecraft.narrative.story.inkAction.sound.SoundInkAction;
+import fr.loudo.narrativecraft.narrative.story.inkAction.text.TextInkAction;
 
 public class InkActionRegister {
     public static void register() {
@@ -109,5 +111,17 @@ public class InkActionRegister {
                 InkAction.Side.CLIENT,
                 "shake %strength% %decay_rate% %speed%",
                 command -> command.startsWith("shake")));
+        InkActionRegistry.register(() -> new InteractionInkAction(
+                "interaction",
+                InkAction.Side.SERVER,
+                "interaction <summon, remove> %interaction_name%",
+                command -> command.startsWith("interaction")));
+        InkActionRegistry.register(() -> new GameplayInkAction(
+                "gameplay", InkAction.Side.SERVER, "gameplay", command -> command.startsWith("gameplay")));
+        InkActionRegistry.register(() -> new TextInkAction(
+                "text",
+                InkAction.Side.CLIENT,
+                "text %id% <create|remove|edit|position|color|scale|spacing|width|fade|fadein|fadeout|type|font|sound> %...values%",
+                command -> command.startsWith("text")));
     }
 }

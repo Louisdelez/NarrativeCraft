@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.world.entity.Entity;
 
+// TODO: add string name of area triggers entered
 public class StorySave {
     private transient Chapter chapter;
     private transient Scene scene;

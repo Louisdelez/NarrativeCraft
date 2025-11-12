@@ -23,8 +23,6 @@
 
 package fr.loudo.narrativecraft.screens.components;
 
-import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.screens.mainScreen.MainScreen;
 import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -40,17 +38,16 @@ public class FinishedStoryScreen extends Screen {
     private static final ResourceLocation WINDOW_LOCATION =
             ResourceLocation.withDefaultNamespace("textures/gui/advancements/window.png");
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
-    private final PlayerSession playerSession;
+    private final Screen oldScreen;
 
-    public FinishedStoryScreen(PlayerSession playerSession) {
+    public FinishedStoryScreen(Screen oldScreen) {
         super(Component.literal("Finished Story Screen"));
-        this.playerSession = playerSession;
+        this.oldScreen = oldScreen;
     }
 
     @Override
     public void onClose() {
-        MainScreen mainScreen = new MainScreen(playerSession, false, false);
-        minecraft.setScreen(mainScreen);
+        minecraft.setScreen(oldScreen);
     }
 
     @Override

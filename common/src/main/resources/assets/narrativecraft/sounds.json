@@ -1,10 +1,10 @@
 {
   "sfx.dialog_sound": {
     "category": "master",
-    "sounds": ["sfx/dialog_sound"]
+    "sounds": ["narrativecraft:sfx/dialog_sound"]
   },
   "sfx.choice_appear": {
     "category": "master",
-    "sounds": ["sfx/choice_appear"]
+    "sounds": ["narrativecraft:sfx/choice_appear"]
   }
 }

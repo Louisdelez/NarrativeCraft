@@ -127,7 +127,7 @@ public class CutsceneKeyframeOptionScreen extends KeyframeOptionScreen<CutsceneK
                         BUTTON_HEIGHT)
                 .build();
         currentY += BUTTON_HEIGHT + gap - 10;
-        Component advancedTitle = Translation.message("screen.keyframe_option.advanced");
+        Component advancedTitle = Translation.message("global.advanced");
         Button advancedButton = Button.builder(advancedTitle, button -> {
                     CutsceneKeyframeAdvancedSettings screen = new CutsceneKeyframeAdvancedSettings(this, keyframe);
                     this.minecraft.setScreen(screen);

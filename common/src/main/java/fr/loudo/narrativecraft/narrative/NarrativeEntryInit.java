@@ -36,6 +36,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.CameraAngle;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.character.CharacterModel;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
@@ -110,6 +111,7 @@ public class NarrativeEntryInit {
             initSubscenes(scene);
             initCutscenes(scene);
             initCameraAngleGroups(scene);
+            initInteraction(scene);
             chapter.addScene(scene);
         }
     }
@@ -166,6 +168,19 @@ public class NarrativeEntryInit {
         scene.getCameraAngles().addAll(cameraAngleGroups);
     }
 
+    private static void initInteraction(Scene scene) throws IOException {
+        File interactionFile = NarrativeCraftFile.getInteractionFile(scene);
+        String content = Files.readString(interactionFile.toPath());
+        Type type = new TypeToken<List<Interaction>>() {}.getType();
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(CharacterStoryData.class, new CharacterStoryDataSerializer(scene))
+                .create();
+        List<Interaction> interactions = gson.fromJson(content, type);
+        if (interactions == null) return;
+        interactions.forEach(interaction -> interaction.setScene(scene));
+        scene.setInteractions(interactions);
+    }
+
     private static void initNpcs(Scene scene) throws Exception {
         File[] npcsFolder = NarrativeCraftFile.getNpcFolder(scene).listFiles();
         if (npcsFolder == null) return;
@@ -180,6 +195,7 @@ public class NarrativeEntryInit {
                 throw new Exception(String.format(
                         "NPC %s of scene %s couldn't be initialized", characterFolder.getName(), scene.getName()));
             }
+            characterStory.setCharacterType(CharacterType.NPC);
             scene.addNpc(characterStory);
         }
     }
@@ -198,18 +214,32 @@ public class NarrativeEntryInit {
             if (characterStory == null) {
                 throw new Exception(String.format("Character %s couldn't be initialized", characterFolder.getName()));
             }
+            characterStory.setCharacterType(CharacterType.MAIN);
             characterManager.addCharacter(characterStory);
+        }
+        if (characterManager.getMainCharacter() == null
+                && !characterManager.getCharacterStories().isEmpty()) {
+            CharacterStory characterStory =
+                    characterManager.getCharacterStories().get(0);
+            characterManager
+                    .getCharacterStories()
+                    .get(0)
+                    .getMainCharacterAttribute()
+                    .setMainCharacter(true);
+            NarrativeCraftFile.updateCharacterData(characterStory, characterStory);
         }
         if (NarrativeCraftMod.firstTime) {
             CharacterStory steve = new CharacterStory(
                     "Steve", "Steve from Minecraft.", "17", "05", "2009", CharacterModel.WIDE, CharacterType.MAIN);
             CharacterStory alex = new CharacterStory(
                     "Alex", "Alex from Minecraft.", "22", "08", "2014", CharacterModel.SLIM, CharacterType.MAIN);
+            steve.getMainCharacterAttribute().setMainCharacter(true);
             characterManager.addCharacter(steve);
             characterManager.addCharacter(alex);
             NarrativeCraftFile.createCharacterFolder(steve);
             NarrativeCraftFile.createCharacterFolder(alex);
             if (new Random().nextInt(0, 500) >= 445) {
+                steve.getMainCharacterAttribute().setMainCharacter(false);
                 CharacterStory herobrine = new CharacterStory(
                         "Herobrine",
                         "You can't escape me. §kYour story is now mine...",
@@ -218,6 +248,7 @@ public class NarrativeEntryInit {
                         "9999",
                         CharacterModel.WIDE,
                         CharacterType.MAIN);
+                herobrine.getMainCharacterAttribute().setMainCharacter(true);
                 characterManager.addCharacter(herobrine);
                 NarrativeCraftFile.createCharacterFolder(herobrine);
             }

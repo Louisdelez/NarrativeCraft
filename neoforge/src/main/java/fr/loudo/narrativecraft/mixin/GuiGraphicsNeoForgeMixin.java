@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.mixin;
 
+import fr.loudo.narrativecraft.gui.Fill2dGui;
 import fr.loudo.narrativecraft.gui.ICustomGuiRender;
 import fr.loudo.narrativecraft.gui.IGuiTextAccessor;
 import fr.loudo.narrativecraft.gui.SkipArrow2dGui;
@@ -34,6 +35,7 @@ import net.minecraft.client.gui.render.state.GuiRenderState;
 import net.minecraft.client.gui.render.state.GuiTextRenderState;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.locale.Language;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.ARGB;
 import org.joml.Matrix3x2f;
@@ -58,7 +60,6 @@ public abstract class GuiGraphicsNeoForgeMixin implements ICustomGuiRender {
 
     @Override
     public void narrativecraft$drawDialogSkip(float width, float height, int color) {
-
         this.guiRenderState.submitGuiElement(new SkipArrow2dGui(
                 RenderPipelines.GUI,
                 TextureSetup.noTexture(),
@@ -70,12 +71,46 @@ public abstract class GuiGraphicsNeoForgeMixin implements ICustomGuiRender {
     }
 
     @Override
+    public void narrativecraft$fill(float x1, float y1, float x2, float y2, int color) {
+        this.guiRenderState.submitGuiElement(new Fill2dGui(
+                RenderPipelines.GUI,
+                TextureSetup.noTexture(),
+                new Matrix3x2f(this.pose),
+                x1,
+                y1,
+                x2,
+                y2,
+                color,
+                this.peekScissorStack()));
+    }
+
+    @Override
     public void narrativecraft$drawStringFloat(
             String text, Font font, float x, float y, int color, boolean drawShadow) {
         if (ARGB.alpha(color) != 0) {
             GuiTextRenderState guiTextRenderState = new GuiTextRenderState(
                     font,
                     Language.getInstance().getVisualOrder(FormattedText.of(text)),
+                    new Matrix3x2f(this.pose),
+                    (int) x,
+                    (int) y,
+                    color,
+                    0,
+                    drawShadow,
+                    this.peekScissorStack());
+            ((IGuiTextAccessor) (Object) guiTextRenderState).narrativecraft$setFloatX(x);
+            ((IGuiTextAccessor) (Object) guiTextRenderState).narrativecraft$setFloatY(y);
+            this.guiRenderState.submitText(guiTextRenderState);
+        }
+    }
+
+    @Override
+    public void narrativecraft$drawStringFloat(
+            Component text, Font font, float x, float y, int color, boolean drawShadow) {
+        if (ARGB.alpha(color) != 0) {
+            GuiTextRenderState guiTextRenderState = new GuiTextRenderState(
+                    font,
+                    text.getVisualOrderText(),
                     new Matrix3x2f(this.pose),
                     (int) x,
                     (int) y,

@@ -33,6 +33,7 @@ import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Translation;
 import io.github.kosmx.emotes.api.events.server.ServerEmoteAPI;
 import io.github.kosmx.emotes.common.tools.UUIDMap;
@@ -57,6 +58,7 @@ public class EmoteInkAction extends InkAction {
     @Override
     protected InkActionResult doValidate(List<String> arguments, Scene scene) {
         if (!Services.PLATFORM.isModLoaded("emotecraft")) return InkActionResult.ignored();
+        forced = InkUtil.getOptionalArgument(command, "force");
         if (arguments.size() < 2) {
             return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Action, play or stop"));
         }
@@ -84,13 +86,6 @@ public class EmoteInkAction extends InkAction {
         if (characterStory == null) {
             return InkActionResult.error(Translation.message("character.no_exists", characterName));
         }
-        if (arguments.size() > 4) {
-            try {
-                forced = Boolean.parseBoolean(arguments.get(4));
-            } catch (Exception e) {
-                return InkActionResult.error(Translation.message(NOT_VALID_BOOLEAN, arguments.get(4)));
-            }
-        }
         return InkActionResult.ok();
     }
 
@@ -100,9 +95,12 @@ public class EmoteInkAction extends InkAction {
         if (!Services.PLATFORM.isModLoaded("emotecraft")) return InkActionResult.ignored();
         StoryHandler storyHandler = playerSession.getStoryHandler();
         if (storyHandler == null) return InkActionResult.ignored();
-        CharacterRuntime characterRuntime = storyHandler.getCharacterRuntimeFromCharacter(characterStory);
-        if (characterRuntime == null || characterRuntime.getEntity() == null) return InkActionResult.ignored();
-        ServerEmoteAPI.playEmote(characterRuntime.getEntity().getUUID(), emote, forced);
+        List<CharacterRuntime> characterRuntimes = storyHandler.getCharacterRuntimeFromCharacter(characterStory);
+        if (characterRuntimes.isEmpty()) return InkActionResult.ignored();
+        for (CharacterRuntime characterRuntime : characterRuntimes) {
+            if (characterRuntime == null || characterRuntime.getEntity() == null) continue;
+            ServerEmoteAPI.playEmote(characterRuntime.getEntity().getUUID(), emote, forced);
+        }
         return InkActionResult.ok();
     }
 

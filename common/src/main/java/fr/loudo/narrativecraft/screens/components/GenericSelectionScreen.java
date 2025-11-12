@@ -100,8 +100,8 @@ public class GenericSelectionScreen<T extends NarrativeEntry> extends Screen {
         if (entry == null) {
             consumer.accept(null);
         } else {
-            consumer.accept(entry.getItem());
             minecraft.setScreen(lastScreen);
+            consumer.accept(entry.getItem());
         }
     }
 

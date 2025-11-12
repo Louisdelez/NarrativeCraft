@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.screens.credits;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.mixin.invoker.WinScreenInvoker;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.screens.mainScreen.MainScreen;
@@ -43,11 +44,12 @@ import net.minecraft.util.ARGB;
 public class CreditScreen extends WinScreen {
 
     public static final ResourceLocation LOGO =
-            ResourceLocation.withDefaultNamespace("textures/narrativecraft_logo.png");
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/logo.png");
 
     private static final ResourceLocation BACKGROUND_IMAGE =
-            ResourceLocation.withDefaultNamespace("textures/narrativecraft_credits/background.png");
-    private static final ResourceLocation MUSIC = ResourceLocation.withDefaultNamespace("narrativecraft_credits.music");
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/credits/background.png");
+    private static final ResourceLocation MUSIC =
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "credits.music");
 
     public static final SimpleSoundInstance MUSIC_INSTANCE =
             SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(MUSIC), 1, 1);
@@ -62,7 +64,7 @@ public class CreditScreen extends WinScreen {
             } else {
                 mainScreen = new MainScreen(playerSession, false, false);
             }
-            Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(mainScreen));
+            Minecraft.getInstance().setScreen(mainScreen);
         });
     }
 
@@ -106,7 +108,7 @@ public class CreditScreen extends WinScreen {
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        if (event.key() == InputConstants.KEY_ESCAPE) {
+        if (event.key() == InputConstants.KEY_ESCAPE && event.isDown()) {
             minecraft.setScreen(null);
             onClose();
         }

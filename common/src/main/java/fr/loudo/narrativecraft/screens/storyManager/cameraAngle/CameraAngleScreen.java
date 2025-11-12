@@ -90,15 +90,14 @@ public class CameraAngleScreen extends StoryElementScreen {
                                         this, cameraAngle, new EditScreenCameraAngleAdapter(scene)));
                             },
                             () -> {
-                                minecraft.setScreen(new CameraAngleScreen(scene));
                                 try {
                                     scene.removeCameraAngleGroup(cameraAngle);
                                     NarrativeCraftFile.updateCameraAngles(scene);
-                                    minecraft.setScreen(new CameraAngleScreen(scene));
                                 } catch (Exception e) {
                                     scene.addCameraAngleGroup(cameraAngle);
                                     fr.loudo.narrativecraft.util.Util.sendCrashMessage(minecraft.player, e);
                                 }
+                                minecraft.setScreen(new CameraAngleScreen(scene));
                             });
                 })
                 .toList();

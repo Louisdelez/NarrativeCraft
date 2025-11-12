@@ -21,14 +21,21 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.platform;
+package fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction;
 
-import fr.loudo.narrativecraft.platform.services.IPacketSender;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.server.level.ServerPlayer;
+public class StitchInteraction {
 
-public class FabricPacketSender implements IPacketSender {
+    private String stitch;
 
-    @Override
-    public void sendToPlayer(ServerPlayer player, CustomPacketPayload payload) {}
+    public StitchInteraction(String stitch) {
+        this.stitch = stitch;
+    }
+
+    public String getStitch() {
+        return stitch;
+    }
+
+    public void setStitch(String stitch) {
+        this.stitch = stitch;
+    }
 }
