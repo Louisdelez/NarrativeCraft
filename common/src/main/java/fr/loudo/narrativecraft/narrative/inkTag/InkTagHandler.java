@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.api.inkAction.InkActionRegistry;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,8 +45,12 @@ public class InkTagHandler {
 
     public void execute() throws InkTagHandlerException {
         InkActionResult result = InkActionResult.ok();
+        StoryHandler storyHandler = playerSession.getStoryHandler();
         for (int i = 0; i < tagsToExecute.size(); i++) {
             String tag = tagsToExecute.get(i);
+            if (storyHandler != null) {
+                tag = InkUtil.parseVariables(storyHandler.getStory(), tag);
+            }
             InkAction inkAction = InkActionRegistry.findByCommand(tag);
             if (inkAction == null) continue;
             result = inkAction.validate(tag, playerSession.getScene());
@@ -81,7 +86,6 @@ public class InkTagHandler {
             }
         }
         tagsToExecute.clear();
-        StoryHandler storyHandler = playerSession.getStoryHandler();
         if (storyHandler != null && tagsToExecute.isEmpty() && result.isOk()) {
             if (storyHandler.isFinished() && storyHandler.getDialogText().isEmpty()) {
                 storyHandler.stopAndFinishScreen();

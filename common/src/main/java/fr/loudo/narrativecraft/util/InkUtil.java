@@ -23,12 +23,14 @@
 
 package fr.loudo.narrativecraft.util;
 
+import com.bladecoder.ink.runtime.Story;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class InkUtil {
     public static final Pattern SCENE_KNOT_PATTERN = Pattern.compile("chapter_\\d+_[a-zA-Z0-9_]+");
     public static final Pattern OPTIONAL_ARGUMENT_PATTERN = Pattern.compile("--(\\S+)");
+    public static final Pattern VARIABLE_NAME = Pattern.compile("%([A-Za-z0-9_]+)%");
 
     public static boolean getOptionalArgument(String command, String arg) {
         Matcher matcher = OPTIONAL_ARGUMENT_PATTERN.matcher(command);
@@ -39,5 +41,16 @@ public class InkUtil {
             }
         }
         return false;
+    }
+
+    public static String parseVariables(Story story, String tag) {
+        if (story == null) return tag;
+        Matcher matcher = InkUtil.VARIABLE_NAME.matcher(tag);
+        while (matcher.find()) {
+            Object variable = story.getVariablesState().get(matcher.group(1));
+            if (variable == null) continue;
+            tag = tag.replace("%" + matcher.group(1) + "%", variable.toString());
+        }
+        return tag;
     }
 }

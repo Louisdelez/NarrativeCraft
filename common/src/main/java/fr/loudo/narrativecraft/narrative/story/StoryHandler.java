@@ -266,6 +266,7 @@ public class StoryHandler {
             dialogText = story.Continue().replace("\n", "");
             dialogText = dialogText.replace(
                     "__username__", playerSession.getPlayer().getName().getString());
+            dialogText = InkUtil.parseVariables(story, dialogText);
             if (story.hasError() || hasError) return;
             if (firstLoad) {
                 save(false);
