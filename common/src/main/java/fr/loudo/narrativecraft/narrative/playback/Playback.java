@@ -91,6 +91,10 @@ public class Playback {
                 }
             }
         }
+        storyHandler.getPlayerSession().getCharacterRuntimes().removeIf(characterRuntime1 -> characterRuntime1
+                .getCharacterStory()
+                .getName()
+                .equals(this.characterRuntime.getCharacterStory().getName()));
         start();
     }
 
