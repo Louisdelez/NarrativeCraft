@@ -405,8 +405,8 @@ public class StoryHandler {
     }
 
     public void showCrash(Exception exception) {
+        NarrativeCraftMod.LOGGER.error("Error occurred on the story: ", exception);
         if (debugMode) {
-            NarrativeCraftMod.LOGGER.error("Error occurred on the story: ", exception);
             playerSession
                     .getPlayer()
                     .sendSystemMessage(
@@ -418,7 +418,6 @@ public class StoryHandler {
             CrashScreen screen = new CrashScreen(playerSession, exception.getMessage());
             minecraft.execute(() -> minecraft.setScreen(screen));
         }
-        Util.sendCrashMessage(playerSession.getPlayer(), exception);
     }
 
     public boolean interactWith(Entity entity) {

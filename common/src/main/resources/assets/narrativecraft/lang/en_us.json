@@ -15,6 +15,7 @@
 
   "narrativecraft.crash.global-message": "An unexpected error occurred on NarrativeCraft mod.",
   "narrativecraft.crash.narrative-data": "An unexpected error occurred while initializing narrative data from the world.",
+  "narrativecraft.crash.story-runtime": "Your story has crashed:",
 
   "narrativecraft.global.name": "Name",
   "narrativecraft.global.description": "Description",
