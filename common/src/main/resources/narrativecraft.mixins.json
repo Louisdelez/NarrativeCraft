@@ -8,6 +8,7 @@
     "AbstractBoatMixin",
     "AbstractContainerMenuMixin",
     "AbstractHorseMixin",
+    "AbstractContainerMenuMixin",
     "EntityMixin",
     "ItemStackMixin",
     "LivingEntityMixin",

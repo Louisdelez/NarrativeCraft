@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.dialog;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.narrative.dialog.animation.DialogArrowSkip;
 import fr.loudo.narrativecraft.util.Easing;
 import net.minecraft.client.gui.GuiGraphics;
