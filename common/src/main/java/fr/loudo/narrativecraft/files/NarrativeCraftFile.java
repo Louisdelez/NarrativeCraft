@@ -563,7 +563,9 @@ public class NarrativeCraftFile {
             for (Scene scene : chapter.getSortedSceneList()) {
                 File sceneFolder = new File(scenesFolder, Util.snakeCase(scene.getName()));
                 if (sceneFolder.exists()) {
-                    Files.move(sceneFolder.toPath(), new File(scenesFolder, scene.folderName()).toPath());
+                    File newSceneFolder = new File(scenesFolder, scene.folderName());
+                    deleteDirectory(newSceneFolder);
+                    Files.move(sceneFolder.toPath(), newSceneFolder.toPath());
                 }
                 String sceneInkFilePath = "chapters\\" + chapter.getIndex() + "\\" + "scenes\\" + scene.folderName()
                         + "\\" + Util.snakeCase(scene.getName()) + EXTENSION_SCRIPT_FILE;
