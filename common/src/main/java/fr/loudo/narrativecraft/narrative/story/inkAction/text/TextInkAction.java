@@ -29,6 +29,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.util.Easing;
 import fr.loudo.narrativecraft.util.FadeState;
+import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.HashMap;
 import java.util.List;
@@ -306,25 +307,19 @@ public class TextInkAction extends InkAction {
                 attribute.setCustomLetterSound(ResourceLocation.parse(arguments.get(3)));
             }
             case "type" -> {
+                dialogScrollTextInkAction.setBlock(InkUtil.getOptionalArgument(command, "block"));
                 if (arguments.size() > 3) {
                     try {
-                        dialogScrollTextInkAction.setBlock(Boolean.parseBoolean(arguments.get(3)));
-                    } catch (NumberFormatException e) {
-                        return InkActionResult.error(Translation.message(NOT_VALID_BOOLEAN, arguments.get(3)));
-                    }
-                }
-                if (arguments.size() > 4) {
-                    try {
-                        dialogScrollTextInkAction.setEndAt((int) (Double.parseDouble(arguments.get(4)) * 20.0));
+                        dialogScrollTextInkAction.setEndAt((int) (Double.parseDouble(arguments.get(3)) * 20.0));
                     } catch (NumberFormatException e) {
                         return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(3)));
                     }
                 }
-                if (arguments.size() > 5) {
+                if (arguments.size() > 4) {
                     try {
-                        dialogScrollTextInkAction.setTextSpeed((float) (Float.parseFloat(arguments.get(5)) * 20.0));
+                        dialogScrollTextInkAction.setTextSpeed((float) (Float.parseFloat(arguments.get(4)) * 20.0));
                     } catch (NumberFormatException e) {
-                        return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(5)));
+                        return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(4)));
                     }
                 }
             }
