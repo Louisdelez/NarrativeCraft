@@ -100,10 +100,12 @@ public class PlaybackData {
 
     public void killEntity() {
         if (entity == null) return;
-        entity.remove(Entity.RemovalReason.KILLED);
-        if (entity instanceof FakePlayer fakePlayer) {
-            Util.removeFakePlayerUUID(fakePlayer);
-        }
+        NarrativeCraftMod.server.execute(() -> {
+            entity.remove(Entity.RemovalReason.KILLED);
+            if (entity instanceof FakePlayer fakePlayer) {
+                Util.removeFakePlayerUUID(fakePlayer);
+            }
+        });
         entity = null;
     }
 
