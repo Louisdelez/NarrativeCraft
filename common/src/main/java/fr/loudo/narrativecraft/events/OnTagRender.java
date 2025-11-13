@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.events;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import java.util.ArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
@@ -39,7 +40,7 @@ public class OnTagRender {
         if (playerSession == null) return false;
         if (playerSession.getStoryHandler() == null) return false;
 
-        for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+        for (CharacterRuntime characterRuntime : new ArrayList<>(playerSession.getCharacterRuntimes())) {
             if (characterRuntime.getEntity().getName().getString().equals(name.getString())) {
                 return !characterRuntime.getCharacterStory().showNametag();
             }
