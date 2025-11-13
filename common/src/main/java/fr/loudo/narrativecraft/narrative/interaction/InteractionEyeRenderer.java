@@ -81,16 +81,16 @@ public class InteractionEyeRenderer {
         float scale = (float) (BASE_SCALE * t);
         int opacity = (int) (MAX_OPACITY * t);
 
-        poseStack.scale(scale, -scale, scale);
+        poseStack.scale(-scale, -scale, scale);
 
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
         VertexConsumer vc = bufferSource.getBuffer(NarrativeCraftMod.dialogBackgroundRenderType);
         Matrix4f mat = poseStack.last().pose();
 
-        vc.vertex(mat, -SIZE, SIZE, -1).color(0, 0, 0, opacity);
-        vc.vertex(mat, SIZE, SIZE, -1).color(0, 0, 0, opacity);
-        vc.vertex(mat, SIZE, -SIZE, -1).color(0, 0, 0, opacity);
-        vc.vertex(mat, -SIZE, -SIZE, -1).color(0, 0, 0, opacity);
+        vc.vertex(mat, -SIZE, SIZE, -1).color(0, 0, 0, opacity).endVertex();
+        vc.vertex(mat, SIZE, SIZE, -1).color(0, 0, 0, opacity).endVertex();
+        vc.vertex(mat, SIZE, -SIZE, -1).color(0, 0, 0, opacity).endVertex();
+        vc.vertex(mat, -SIZE, -SIZE, -1).color(0, 0, 0, opacity).endVertex();
 
         mc.font.drawInBatch(
                 ImageFontConstants.EYE_OPEN,

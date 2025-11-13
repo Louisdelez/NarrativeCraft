@@ -157,10 +157,12 @@ public class AreaTrigger extends SceneData {
             VertexConsumer vertex, Matrix4f matrix, Vec3 a, Vec3 b, float r, float g, float bcol, float alpha) {
         vertex.vertex(matrix, (float) a.x, (float) a.y, (float) a.z)
                 .color(r, g, bcol, alpha)
-                .normal(0, 1, 0);
+                .normal(0, 1, 0)
+                .endVertex();
         vertex.vertex(matrix, (float) b.x, (float) b.y, (float) b.z)
                 .color(r, g, bcol, alpha)
-                .normal(0, 1, 0);
+                .normal(0, 1, 0)
+                .endVertex();
     }
 
     public static boolean isInside(AreaTrigger areaTrigger, Vec3 pPosition) {
