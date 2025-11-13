@@ -40,7 +40,7 @@ public class RidingAction extends Action {
     public void execute(PlaybackData playbackData) {
         Entity vehicle = playbackData.getPlayback().getEntityByRecordId(entityRecordingId);
         if (vehicle != null) {
-            playbackData.getEntity().startRiding(vehicle, true);
+            playbackData.getEntity().startRiding(vehicle, true, true);
         }
     }
 

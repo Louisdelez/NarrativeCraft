@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.screens.credits;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.mixin.invoker.WinScreenInvoker;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.screens.mainScreen.MainScreen;
@@ -32,6 +33,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.WinScreen;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -59,7 +61,7 @@ public class CreditScreen extends WinScreen {
             } else {
                 mainScreen = new MainScreen(playerSession, false, false);
             }
-            Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(mainScreen));
+            Minecraft.getInstance().setScreen(mainScreen);
         });
     }
 

@@ -35,9 +35,11 @@ public class CharacterStory extends NarrativeEntry {
 
     private transient EntityType<?> entityType;
 
+    private MainCharacterAttribute mainCharacterAttribute = new MainCharacterAttribute();
     private String birthDate;
     private CharacterType characterType;
     private CharacterModel model;
+    private boolean showNametag;
     private int entityTypeId;
 
     public CharacterStory(
@@ -54,6 +56,7 @@ public class CharacterStory extends NarrativeEntry {
         this.model = model;
         this.entityType = EntityType.PLAYER;
         this.entityTypeId = BuiltInRegistries.ENTITY_TYPE.getId(entityType);
+        showNametag = characterType == CharacterType.MAIN;
     }
 
     public void updateEntityType(EntityType<?> entityType) {
@@ -103,10 +106,29 @@ public class CharacterStory extends NarrativeEntry {
         return entityTypeId;
     }
 
+    public boolean showNametag() {
+        return showNametag;
+    }
+
+    public void setShowNametag(boolean showNametag) {
+        this.showNametag = showNametag;
+    }
+
     public EntityType<?> getEntityType() {
         if (entityType == null) {
             entityType = EntityType.PLAYER;
         }
         return entityType;
+    }
+
+    public MainCharacterAttribute getMainCharacterAttribute() {
+        if (mainCharacterAttribute == null) {
+            mainCharacterAttribute = new MainCharacterAttribute();
+        }
+        return mainCharacterAttribute;
+    }
+
+    public void setMainCharacterAttribute(MainCharacterAttribute mainCharacterAttribute) {
+        this.mainCharacterAttribute = mainCharacterAttribute;
     }
 }

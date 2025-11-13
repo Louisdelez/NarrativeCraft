@@ -27,11 +27,15 @@ import com.bladecoder.ink.runtime.Story;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.controllers.AbstractController;
+import fr.loudo.narrativecraft.controllers.interaction.InteractionController;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.hud.StoryDebugHud;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.CharacterInteraction;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.EntityInteraction;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.StitchInteraction;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
@@ -39,18 +43,22 @@ import fr.loudo.narrativecraft.narrative.dialog.*;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandlerException;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.story.inkAction.GameplayInkAction;
 import fr.loudo.narrativecraft.options.NarrativeClientOption;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.screens.components.CrashScreen;
 import fr.loudo.narrativecraft.screens.credits.CreditScreen;
 import fr.loudo.narrativecraft.screens.story.StoryChoicesScreen;
 import fr.loudo.narrativecraft.util.InkUtil;
+import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 
 public class StoryHandler {
@@ -98,14 +106,21 @@ public class StoryHandler {
     }
 
     public boolean isFinished() {
-        return !story.canContinue() && story.getCurrentChoices().isEmpty() && !story.hasError() && !hasError;
+        return !story.canContinue()
+                && story.getCurrentChoices().isEmpty()
+                && !story.hasError()
+                && !hasError
+                && !playerSession.isOnGameplay();
     }
 
     public void start() {
         if (playerSession.getController() != null) {
             playerSession.getController().stopSession(false);
         }
+        playerSession.getAreaTriggersEntered().clear();
+        playerSession.setLastAreaTriggerEntered(null);
         playerSession.setStoryHandler(this);
+        minecraft.options.hideGui = false;
         firstLoad = true;
         try {
             story = new Story(NarrativeCraftFile.storyContent());
@@ -136,13 +151,16 @@ public class StoryHandler {
         for (InkAction inkAction : playerSession.getInkActions()) {
             inkAction.stop();
         }
+        for (InteractionController interactionController : playerSession.getInteractionControllers()) {
+            interactionController.stopSession(false);
+        }
         playerSession.getInkActions().clear();
         for (Playback playback : playerSession.getPlaybackManager().getPlaybacks()) {
             playback.stop(true);
         }
         for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
             if (characterRuntime.getEntity() == null
-                    || !characterRuntime.getEntity().isAlive()) continue;
+                    || characterRuntime.getEntity().isRemoved()) continue;
             characterRuntime.getEntity().remove(Entity.RemovalReason.KILLED);
         }
         AbstractController controller = playerSession.getController();
@@ -150,9 +168,12 @@ public class StoryHandler {
             controller.stopSession(false);
         }
         playerSession.setCurrentCamera(null);
-        playerSession.getCharacterRuntimes().clear();
         playerSession.setDialogRenderer(null);
         playerSession.setStoryHandler(null);
+        playerSession.getCharacterRuntimes().clear();
+        playerSession.getAreaTriggersEntered().clear();
+        playerSession.setLastAreaTriggerEntered(null);
+        playerSession.getInteractionControllers().clear();
         playerSession.getInkTagHandler().getTagsToExecute().clear();
     }
 
@@ -166,6 +187,19 @@ public class StoryHandler {
         }
     }
 
+    public void playStitch(String stitch) {
+        try {
+            story.choosePathString(playerSession.getScene().knotName() + "." + stitch);
+            next();
+            if (playerSession.getCurrentCamera() != null) {
+                playerSession.getInkActions().removeIf(inkAction -> inkAction instanceof GameplayInkAction);
+            }
+        } catch (Exception e) {
+            stop();
+            showCrash(e);
+        }
+    }
+
     public boolean characterInStory(CharacterStory characterStory) {
         for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
             if (characterRuntime.getCharacterStory().getName().equals(characterStory.getName())) {
@@ -175,13 +209,14 @@ public class StoryHandler {
         return false;
     }
 
-    public CharacterRuntime getCharacterRuntimeFromCharacter(CharacterStory characterStory) {
+    public List<CharacterRuntime> getCharacterRuntimeFromCharacter(CharacterStory characterStory) {
+        List<CharacterRuntime> characterRuntimes = new ArrayList<>();
         for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
             if (characterRuntime.getCharacterStory().getName().equals(characterStory.getName())) {
-                return characterRuntime;
+                characterRuntimes.add(characterRuntime);
             }
         }
-        return null;
+        return characterRuntimes;
     }
 
     public void killCharacter(CharacterStory characterStory) {
@@ -201,7 +236,7 @@ public class StoryHandler {
             story.chooseChoiceIndex(choiceIndex);
             playerSession.setDialogRenderer(null);
             next();
-            if (dialogText.isEmpty() && !isFinished()) {
+            if (dialogText.isEmpty() && !isFinished() && story.getCurrentTags().isEmpty()) {
                 throw new Exception("Empty dialog after a choice cannot be rendered!");
             }
         } catch (Exception e) {
@@ -229,6 +264,9 @@ public class StoryHandler {
                 return;
             }
             dialogText = story.Continue().replace("\n", "");
+            dialogText = dialogText.replace(
+                    "__username__", playerSession.getPlayer().getName().getString());
+            dialogText = InkUtil.parseVariables(story, dialogText);
             if (story.hasError() || hasError) return;
             if (firstLoad) {
                 save(false);
@@ -261,7 +299,9 @@ public class StoryHandler {
             }
             // Handles dialog stopping animation, to executes tags AFTER the animation disappeared.
             // And for that, it checks if the new dialog character is the same as the old dialog (dialog renderer)
-            if (dialogRenderer == null || sameCharacterTalking(dialogText)) {
+            if (dialogRenderer == null
+                    || (sameCharacterTalking(dialogText)
+                            && story.getCurrentTags().isEmpty())) {
                 playerSession.getInkTagHandler().execute();
             } else {
                 dialogRenderer.stop();
@@ -276,12 +316,14 @@ public class StoryHandler {
     }
 
     public void showCurrentDialog() {
-        try {
-            showDialog(dialogText);
-        } catch (Exception e) {
-            stop();
-            showCrash(e);
-        }
+        minecraft.execute(() -> {
+            try {
+                showDialog(dialogText);
+            } catch (Exception e) {
+                stop();
+                showCrash(e);
+            }
+        });
     }
 
     public Matcher getDialogMatcher(String dialog) {
@@ -363,13 +405,52 @@ public class StoryHandler {
     }
 
     public void showCrash(Exception exception) {
+        NarrativeCraftMod.LOGGER.error("Error occurred on the story: ", exception);
         if (debugMode) {
-            NarrativeCraftMod.LOGGER.error("Error occurred on the story: ", exception);
-            Util.sendCrashMessage(playerSession.getPlayer(), exception);
+            playerSession
+                    .getPlayer()
+                    .sendSystemMessage(
+                            Translation.message("crash.story-runtime").withStyle(ChatFormatting.RED));
+            playerSession
+                    .getPlayer()
+                    .sendSystemMessage(Component.literal(exception.getMessage()).withStyle(ChatFormatting.RED));
         } else {
             CrashScreen screen = new CrashScreen(playerSession, exception.getMessage());
             minecraft.execute(() -> minecraft.setScreen(screen));
         }
+    }
+
+    public boolean interactWith(Entity entity) {
+        for (InteractionController interactionController : playerSession.getInteractionControllers()) {
+            StitchInteraction stitchInteraction = null;
+            CharacterRuntime characterRuntime = interactionController.getCharacterFromEntity(entity);
+            if (characterRuntime != null) {
+                CharacterInteraction characterInteraction = interactionController.getCharacterInteractionFromCharacter(
+                        interactionController.getCharacterStoryDataFromEntity(characterRuntime.getEntity()));
+                if (characterInteraction != null) {
+                    stitchInteraction = characterInteraction;
+                }
+            }
+            EntityInteraction entityInteraction = interactionController.getEntityInteraction(entity);
+            if (entityInteraction != null) {
+                stitchInteraction = entityInteraction;
+            }
+            if (stitchInteraction != null) {
+                if (stitchInteraction.getStitch().isEmpty()) {
+                    return false;
+                }
+                boolean sameInteraction = (playerSession.getLastInteraction() != null
+                        && playerSession.getLastInteraction().getStitch().equals(stitchInteraction.getStitch()));
+                if (playerSession.getDialogRenderer() != null) {
+                    if (sameInteraction) return true;
+                    playerSession.setDialogRenderer(null);
+                }
+                playerSession.setLastInteraction(stitchInteraction);
+                playStitch(stitchInteraction.getStitch());
+                return true;
+            }
+        }
+        return false;
     }
 
     public void save(boolean showLogo) {
@@ -464,11 +545,15 @@ public class StoryHandler {
                 .equalsIgnoreCase(characterName);
     }
 
-    private DialogRenderer getDialogRenderer(String dialog, CharacterStory characterStory) {
+    private DialogRenderer getDialogRenderer(String dialog, CharacterStory characterStory) throws Exception {
         DialogRenderer dialogRenderer;
         if (characterStory != null) {
-            CharacterRuntime characterRuntime = playerSession.getCharacterRuntimeByCharacter(characterStory);
-            dialogRenderer = new DialogRenderer3D(dialog, characterStory.getName(), dialogData, characterRuntime);
+            List<CharacterRuntime> characterRuntimes = playerSession.getCharacterRuntimesByCharacter(characterStory);
+            if (characterRuntimes.isEmpty())
+                throw new Exception("Dialog cannot be instantiated as " + characterStory.getName()
+                        + " is not present in the world!");
+            dialogRenderer =
+                    new DialogRenderer3D(dialog, characterStory.getName(), dialogData, characterRuntimes.getFirst());
             DialogRenderer3D dialogRenderer3D = (DialogRenderer3D) dialogRenderer;
             dialogRenderer3D.setDialogEntityBobbing(new DialogEntityBobbing(
                     dialogRenderer3D, dialogData.getNoiseShakeSpeed(), dialogData.getNoiseShakeStrength()));

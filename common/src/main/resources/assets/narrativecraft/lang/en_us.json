@@ -1,11 +1,11 @@
 {
   "key.screen.story.open": "Open Story Manager",
-  "key.categories.narrativecraft": "NarrativeCraft",
+  "key.category.narrativecraft.main": "NarrativeCraft",
   "key.animation.record.start": "Start Animation Recording",
   "key.animation.record.stop": "Stop Animation Recording",
   "key.cutscene.keyframes.create_group": "Create Keyframe Group",
   "key.cutscene.keyframes.add_keyframe": "Add Keyframe",
-  "key.screen.keyframe_controller": "Keyframe Controller Screen Toggle",
+  "key.screen.keyframe_controller": "Controller Screen Toggle",
   "key.dialog.next": "Next Dialog",
   "key.choice.1": "Select Choice 1",
   "key.choice.2": "Select Choice 2",
@@ -15,6 +15,7 @@
 
   "narrativecraft.crash.global-message": "An unexpected error occurred on NarrativeCraft mod.",
   "narrativecraft.crash.narrative-data": "An unexpected error occurred while initializing narrative data from the world.",
+  "narrativecraft.crash.story-runtime": "Your story has crashed:",
 
   "narrativecraft.global.name": "Name",
   "narrativecraft.global.description": "Description",
@@ -35,9 +36,12 @@
   "narrativecraft.global.interaction": "Interaction",
   "narrativecraft.global.dev_env": "Welcome in the development environment! Have fun creating :p",
   "narrativecraft.global.line": "Line",
+  "narrativecraft.global.advanced": "Advanced",
+  "narrativecraft.global.main": "Main",
+  "narrativecraft.global.stitch": "Stitch",
 
   "narrativecraft.file.main_ink_warning": "Main ink file, do not write here! If you need to write variables or functions, they have their own separated files.",
-  "narrativecraft.file.vars_placeholder": "Write your variables here.",
+  "narrativecraft.file.vars_placeholder": "Write your global variables here.",
   "narrativecraft.file.funcs_placeholder": "Write your functions here.",
 
   "narrativecraft.story.stopped": "Story stopped.",
@@ -76,6 +80,7 @@
 
   "narrativecraft.scene.rank": "Rank",
   "narrativecraft.scene.already_exists": "Scene %s already exists in this chapter.",
+  "narrativecraft.scene.no_exists": "Scene %s does not exists in this chapter.",
   "narrativecraft.scene.rank_above_scenes_size": "Your rank value is above the size of scenes.",
   "narrativecraft.scene.rank_no_under_one": "Rank value cannot be under 1.",
 
@@ -96,6 +101,10 @@
   "narrativecraft.camera_angle.keyframe_no_exists": "Camera angle keyframe %s does not exists in %s.",
   "narrativecraft.camera_angle.name_no_empty": "The name cannot be empty.",
 
+  "narrativecraft.interaction.already_exists": "Interaction %s already exists in %s.",
+  "narrativecraft.interaction.no_exists": "Interaction %s does not exists in %s.",
+  "narrativecraft.interaction.area_trigger.already_exists": "Area trigger %s already exists in %s.",
+
   "narrativecraft.character.already_exists": "Character %s already exists in the story.",
   "narrativecraft.character.no_exists": "Character %s does not exists.",
   "narrativecraft.character.must_link_character": "You must choose a character.",
@@ -104,6 +113,7 @@
 
   "narrativecraft.controller.confirm_leaving": "Are you sure you want to leave without saving?",
   "narrativecraft.controller.saved": "Successfully saved!",
+  "narrativecraft.controller.add_character": "Add character to %s",
 
   "narrativecraft.controller.cutscene.hud_tick": "Cutscene controller scene %s. Tick %s/%s",
   "narrativecraft.controller.cutscene.hud_no_calculated_tick": "Cutscene controller scene %s. Tick %s",
@@ -120,8 +130,15 @@
   "narrativecraft.controller.cutscene.settings.group_selected": "Keyframe Group #%d selected.",
 
   "narrativecraft.controller.camera_angle.hud": "Camera angle controller scene %s",
-  "narrativecraft.controller.camera_angle.add_character": "Add character to %s",
   "narrativecraft.controller.camera_angle.template_character": "Add template character to %s",
+
+  "narrativecraft.controller.interaction.hud": "Interaction controller scene %s",
+  "narrativecraft.controller.interaction.change_stitch": "Change stitch",
+  "narrativecraft.controller.interaction.add_entity_interaction": "Add entity interaction",
+  "narrativecraft.controller.interaction.area_trigger_list": "Area triggers",
+
+  "narrativecraft.controller.area_trigger.pos_1_set": "Position 1 set",
+  "narrativecraft.controller.area_trigger.pos_2_set": "Position 2 set",
 
   "narrativecraft.controller.main_screen.hud": "Main Screen controller",
   "narrativecraft.controller.main_screen.only_one_keyframe": "Only one keyframe authorized",
@@ -136,6 +153,9 @@
   "narrativecraft.tooltip.cutscene_settings": "Cutscene settings",
   "narrativecraft.tooltip.save": "Save",
   "narrativecraft.tooltip.leave_without_saving": "Leave without saving",
+  "narrativecraft.tooltip.area_trigger.loc_1": "Location 1",
+  "narrativecraft.tooltip.area_trigger.loc_2": "Location 2",
+  "narrativecraft.tooltip.area_trigger.is_unique_explanation": "Trigger the stitch only the first time the player enters the area.",
 
   "narrativecraft.screen.story_manager.chapter_list": "Chapters",
   "narrativecraft.screen.story_manager.scene_list": "Scenes of chapter %s",
@@ -144,12 +164,14 @@
   "narrativecraft.screen.story_manager.subscene_list": "Subscenes of scene %s",
   "narrativecraft.screen.story_manager.cutscene_list": "Cutscenes of scene %s",
   "narrativecraft.screen.story_manager.camera_angle_list": "Camera angles of scene %s",
+  "narrativecraft.screen.story_manager.interaction_list": "Interactions of scene %s",
   "narrativecraft.screen.story_manager.characters": "Characters",
   "narrativecraft.screen.story_manager.npcs": "Npcs of scene %s",
   "narrativecraft.screen.story_manager.link_animation_character": "Link animation to character",
   "narrativecraft.screen.story_manager.subscene_cutscene_link": "Link subscene to cutscene",
   "narrativecraft.screen.story_manager.animation_cutscene_link": "Link animation to cutscene",
   "narrativecraft.screen.story_manager.subscene_animation_link": "Link animation to subscene",
+  "narrativecraft.screen.story_manager.area_trigger.is_unique": "Is unique?",
   "narrativecraft.screen.edit_info.name_must": "You must have a name!",
   "narrativecraft.screen.pick.subscene.title": "%s selector for subscene %s",
   "narrativecraft.screen.pick.cutscene.title": "%s selector for cutscene %s",
@@ -162,7 +184,6 @@
   "narrativecraft.screen.keyframe_option.rotation": "Rotation: %d",
   "narrativecraft.screen.keyframe_option.fov": "Zoom: %.2f",
   "narrativecraft.screen.keyframe_option.update": "Update",
-  "narrativecraft.screen.keyframe_option.advanced": "Advanced",
   "narrativecraft.screen.keyframe_option.play_from_here": "Play here",
   "narrativecraft.screen.keyframe_option.start_delay": "Start delay:",
   "narrativecraft.screen.keyframe_option.path_time": "Path time:",
@@ -191,6 +212,12 @@
   "narrativecraft.screen.main_screen.options.dialog_speed": "Text speed: %s",
   "narrativecraft.screen.main_screen.options.auto_skip": "Auto-skip",
 
+  "narrativecraft.screen.character_advanced.main_character": "Is this the main character?",
+  "narrativecraft.screen.character_advanced.same_skin_as_player": "Same skin as player",
+  "narrativecraft.screen.character_advanced.player_same_skin_as_their": "Player wear their skin",
+  "narrativecraft.screen.character_advanced.skin_from_folder": "Skin from folder",
+  "narrativecraft.screen.character_advanced.show_nametag": "Show nametag?",
+
   "narrativecraft.screen.chapter_manager.title": "Chapters List",
   "narrativecraft.screen.scene_manager.title": "Scene list of chapter %d",
 
@@ -212,7 +239,8 @@
 
   "narrativecraft.screen.change_skin_link.title": "Change skin of character %s",
 
-  "narrativecraft.screen.nc_incompatible": "NarrativeCraft world version differs from Minecraft's. Continuing may cause issues but will update NarrativeCraft world version.",
+  "narrativecraft.screen.nc_mc_version_incompatible": "NarrativeCraft world version differs from Minecraft's. Continuing may cause issues but will update NarrativeCraft world version.",
+  "narrativecraft.screen.nc_version_incompatible": "This world use NarrativeCraft %s, your version is %s. Continuing may cause issues but will update NarrativeCraft version.",
 
   "narrativecraft.ink_action.no_exists": "This tag could not be recognized.",
   "narrativecraft.ink_action.not_authorized": "Tag %s is not authorized.",

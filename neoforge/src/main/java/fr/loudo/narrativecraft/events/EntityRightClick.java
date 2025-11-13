@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import net.minecraft.world.InteractionHand;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
@@ -37,8 +38,9 @@ public class EntityRightClick {
     }
 
     public static void onEntityRightClick(PlayerInteractEvent.EntityInteractSpecific event) {
-        if (event.getLevel().isClientSide) {
-            OnEntityRightClick.entityRightClick(event.getEntity(), event.getTarget());
+        if (event.getLevel().isClientSide() && event.getHand() == InteractionHand.MAIN_HAND) {
+            NarrativeCraftMod.server.execute(
+                    () -> OnEntityRightClick.entityRightClick(event.getEntity(), event.getTarget()));
         }
     }
 }

@@ -37,6 +37,7 @@ public class HurtAction extends Action {
     public void execute(PlaybackData playbackData) {
         playbackData
                 .getEntity()
+                .level()
                 .getServer()
                 .getPlayerList()
                 .broadcastAll(new ClientboundHurtAnimationPacket(

@@ -31,6 +31,7 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.managers.RecordingManager;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
+import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.recording.Recording;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.screens.components.ChooseCharacterScreen;
@@ -140,6 +141,11 @@ public class RecordCommand {
             }
             recording.setSubscenesPlaying(subsceneToPlay);
             recording.start();
+            for (Subscene subscene : subsceneToPlay) {
+                for (Playback playback : subscene.getPlaybacks()) {
+                    playerSession.getCharacterRuntimes().add(playback.getCharacterRuntime());
+                }
+            }
             recordingManager.addRecording(recording);
             context.getSource()
                     .sendSuccess(
@@ -169,6 +175,7 @@ public class RecordCommand {
 
         Recording recording = recordingManager.getRecording(player);
         recording.stop();
+        playerSession.getCharacterRuntimes().clear();
 
         context.getSource().sendSuccess(() -> Translation.message("record.stop.success"), false);
 

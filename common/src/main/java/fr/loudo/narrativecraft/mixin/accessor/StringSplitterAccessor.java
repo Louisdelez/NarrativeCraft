@@ -21,20 +21,15 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.mixin.accessor;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.minecraft.client.StringSplitter;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-public class RenderWorldEvent {
+@Mixin(StringSplitter.class)
+public interface StringSplitterAccessor {
 
-    public static void renderWorld(WorldRenderContext worldRenderContext) {
-        RenderSystem.depthMask(false);
-        RenderSystem.disableDepthTest();
-        OnRenderWorld.renderWorld(
-                new PoseStack(), worldRenderContext.tickCounter().getGameTimeDeltaPartialTick(true));
-        RenderSystem.depthMask(true);
-        RenderSystem.enableDepthTest();
-    }
+    @Accessor
+    StringSplitter.WidthProvider getWidthProvider();
 }

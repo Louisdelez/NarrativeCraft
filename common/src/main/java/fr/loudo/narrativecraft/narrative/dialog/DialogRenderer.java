@@ -25,8 +25,7 @@ package fr.loudo.narrativecraft.narrative.dialog;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.narrative.dialog.animation.DialogArrowSkip;
-import fr.loudo.narrativecraft.narrative.dialog.animation.DialogScrollText;
-import fr.loudo.narrativecraft.narrative.story.text.ParsedDialog;
+import fr.loudo.narrativecraft.narrative.dialog.animation.DialogScrollTextDialog;
 import fr.loudo.narrativecraft.util.Easing;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -37,7 +36,7 @@ public class DialogRenderer {
     protected final Minecraft minecraft;
     protected double dialogTransitionTime = 0.5;
     protected double dialogAppearTime = 0.2;
-    protected final DialogScrollText dialogScrollText;
+    protected final DialogScrollTextDialog dialogScrollTextDialog;
     protected DialogArrowSkip dialogArrowSkip;
     protected String text;
     protected float width,
@@ -78,10 +77,10 @@ public class DialogRenderer {
         this.backgroundColor = backgroundColor;
         this.textColor = textColor;
         minecraft = Minecraft.getInstance();
-        dialogScrollText = new DialogScrollText(this, minecraft);
+        dialogScrollTextDialog = new DialogScrollTextDialog(this, minecraft);
         dialogArrowSkip = new DialogArrowSkip(this, 2.5F, 2.5F, -5f, -10f, -1);
         initMeasures();
-        dialogScrollText.reset();
+        dialogScrollTextDialog.reset();
     }
 
     public DialogRenderer(String text, DialogData dialogData) {
@@ -98,10 +97,10 @@ public class DialogRenderer {
     }
 
     private void initMeasures() {
-        height = minecraft.font.lineHeight * dialogScrollText.getLines().size();
-        totalHeight = height + (dialogScrollText.getLines().size() - 1) * gap + 2 * paddingY;
-        float widthLongestLine = (minecraft.font.width(dialogScrollText.getLongerTextLine())
-                + (dialogScrollText.getLongerTextLine().length() - 1) * letterSpacing);
+        height = minecraft.font.lineHeight * dialogScrollTextDialog.getLines().size();
+        totalHeight = height + (dialogScrollTextDialog.getLines().size() - 1) * gap + 2 * paddingY;
+        float widthLongestLine = (minecraft.font.width(dialogScrollTextDialog.getLongerTextLine())
+                + (dialogScrollTextDialog.getLongerTextLine().length() - 1) * letterSpacing);
         totalWidth = (widthLongestLine / 2) + 2 * paddingX;
     }
 
@@ -116,7 +115,7 @@ public class DialogRenderer {
         } else if (dialogAutoSkip && dialogAutoSkipping && currentTick >= totalTickAutoSkip) {
             runDialogAutoSkipped.run();
         }
-        dialogScrollText.tick();
+        dialogScrollTextDialog.tick();
         dialogArrowSkip.tick();
     }
 
@@ -170,8 +169,8 @@ public class DialogRenderer {
         return currentTick < totalTick;
     }
 
-    public DialogScrollText getDialogScrollText() {
-        return dialogScrollText;
+    public DialogScrollTextDialog getDialogScrollText() {
+        return dialogScrollTextDialog;
     }
 
     public float getInterpolatedWidth(float partialTick) {
@@ -183,7 +182,7 @@ public class DialogRenderer {
     }
 
     protected double t(float partialTick) {
-        return Math.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
+        return Mth.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
     }
 
     public double getDialogTransitionTime() {
@@ -196,10 +195,9 @@ public class DialogRenderer {
 
     public void setText(String text) {
         this.text = text;
-        ParsedDialog parsedDialog = ParsedDialog.parse(text);
-        dialogScrollText.setText(parsedDialog.cleanedText());
+        dialogScrollTextDialog.setText(text);
         initMeasures();
-        dialogScrollText.reset();
+        dialogScrollTextDialog.reset();
     }
 
     public float getWidth() {
@@ -208,10 +206,9 @@ public class DialogRenderer {
 
     public void setWidth(float width) {
         this.width = width;
-        ParsedDialog parsedDialog = ParsedDialog.parse(text);
-        dialogScrollText.setText(parsedDialog.cleanedText());
+        dialogScrollTextDialog.setText(text);
         initMeasures();
-        dialogScrollText.reset();
+        dialogScrollTextDialog.reset();
     }
 
     public float getHeight() {

@@ -77,9 +77,10 @@ public class EntryBoxScreen extends Screen {
         this.addRenderableWidget(labelBox.getStringWidget());
         this.addRenderableWidget(labelBox.getEditBox());
 
-        Button doneButton = Button.builder(
-                        CommonComponents.GUI_DONE,
-                        button -> consumer.accept(labelBox.getEditBox().getValue()))
+        Button doneButton = Button.builder(CommonComponents.GUI_DONE, button -> {
+                    consumer.accept(labelBox.getEditBox().getValue());
+                    onClose();
+                })
                 .bounds(
                         (width - globalWidth) / 2,
                         labelBox.getEditBox().getY() + labelBox.getEditBox().getHeight() + globalGap,

@@ -25,8 +25,6 @@ package fr.loudo.narrativecraft.controllers.keyframe;
 
 import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.narrative.Environment;
-import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
-import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.keyframes.keyframeTrigger.KeyframeTrigger;
@@ -40,8 +38,8 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.GameType;
 
 /**
  * Base controller providing common functionality for keyframes,
@@ -53,9 +51,7 @@ public abstract class AbstractKeyframeController<T extends Keyframe> extends Abs
         implements KeyframeControllerInterface<T> {
 
     protected final List<KeyframeTrigger> keyframeTriggers = new ArrayList<>();
-    protected final List<CharacterStoryData> characterStoryDataList = new ArrayList<>();
     protected final AtomicInteger keyframesCounter = new AtomicInteger();
-    protected GameType lastGameType;
 
     public AbstractKeyframeController(Environment environment, Player player) {
         super(environment, player);
@@ -73,20 +69,15 @@ public abstract class AbstractKeyframeController<T extends Keyframe> extends Abs
         minecraft.options.setCameraType(CameraType.FIRST_PERSON);
         if (playerSession.getCurrentCamera() != null && keyframe == null) {
             playerSession.setCurrentCamera(null);
-            playerSession.getPlayer().setGameMode(lastGameType);
             minecraft.options.hideGui = false;
             showKeyframes(playerSession.getPlayer());
             Vec3 pos = playerSession.getPlayer().position();
             playerSession
                     .getPlayer()
-                    .teleportTo(pos.x, pos.y - 5.0 - playerSession.getPlayer().getEyeHeight(), pos.z);
+                    .teleportTo(pos.x, pos.y - playerSession.getPlayer().getEyeHeight(), pos.z);
             return;
         }
         if (keyframe == null) return;
-        if (playerSession.getCurrentCamera() == null) {
-            lastGameType = playerSession.getPlayer().gameMode.getGameModeForPlayer();
-        }
-        playerSession.getPlayer().setGameMode(GameType.SPECTATOR);
         playerSession.setCurrentCamera(keyframe.getKeyframeLocation());
         hideKeyframes(playerSession.getPlayer());
         minecraft.options.hideGui = true;
@@ -122,28 +113,5 @@ public abstract class AbstractKeyframeController<T extends Keyframe> extends Abs
 
     public List<KeyframeTrigger> getKeyframeTriggers() {
         return keyframeTriggers;
-    }
-
-    public CharacterRuntime getCharacterFromEntity(Entity entity) {
-        for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
-            if (Util.isSameEntity(entity, characterRuntime.getEntity())) {
-                return characterRuntime;
-            }
-        }
-        return null;
-    }
-
-    public CharacterStoryData getCharacterStoryDataFromEntity(Entity entity) {
-        for (CharacterStoryData characterStoryData : characterStoryDataList) {
-            if (Util.isSameEntity(
-                    entity, characterStoryData.getCharacterRuntime().getEntity())) {
-                return characterStoryData;
-            }
-        }
-        return null;
-    }
-
-    public List<CharacterStoryData> getCharacterStoryDataList() {
-        return characterStoryDataList;
     }
 }

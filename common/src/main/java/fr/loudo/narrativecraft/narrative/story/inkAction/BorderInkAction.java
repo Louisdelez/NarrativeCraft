@@ -27,19 +27,36 @@ import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.util.Easing;
 import fr.loudo.narrativecraft.util.Translation;
+import java.util.Arrays;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.FastColor;
+import net.minecraft.util.Mth;
 
 public class BorderInkAction extends InkAction {
 
-    private int up, right, down, left, color;
+    private float up, right, down, left;
+    private float upInterpolated, rightInterpolated, downInterpolated, leftInterpolated;
+    private int color;
     private double opacity;
+    private Easing easing;
+    private String fadeAction;
 
     public BorderInkAction(String id, Side side, String syntax, CommandMatcher matcher) {
         super(id, side, syntax, matcher);
+    }
+
+    @Override
+    public void tick() {
+        if (tick == totalTick && fadeAction.equals("out")) {
+            isRunning = false;
+        }
+        if (tick < totalTick) {
+            tick++;
+        }
     }
 
     @Override
@@ -52,6 +69,39 @@ public class BorderInkAction extends InkAction {
         if (minecraft.options.guiScale().get() == 0) {
             guiScale = 3;
         }
+
+        float up = this.up;
+        float right = this.right;
+        float down = this.down;
+        float left = this.left;
+
+        if (fadeAction.equals("out") && tick == totalTick) {
+            up = 0;
+            right = 0;
+            down = 0;
+            left = 0;
+        }
+
+        if (tick < totalTick) {
+            double t = Mth.clamp((tick + partialTick) / totalTick, 0.0, 1.0);
+            t = easing.interpolate(t);
+            if (fadeAction.equals("in")) {
+                up = (float) Mth.lerp(t, 0, this.up);
+                right = (float) Mth.lerp(t, 0, this.right);
+                down = (float) Mth.lerp(t, 0, this.down);
+                left = (float) Mth.lerp(t, 0, this.left);
+            } else if (fadeAction.equals("out")) {
+                up = (float) Mth.lerp(t, this.up, 0);
+                right = (float) Mth.lerp(t, this.right, 0);
+                down = (float) Mth.lerp(t, this.down, 0);
+                left = (float) Mth.lerp(t, this.left, 0);
+            }
+            upInterpolated = up;
+            rightInterpolated = right;
+            downInterpolated = down;
+            leftInterpolated = left;
+        }
+
         // UP
         guiGraphics.fill(0, 0, widthScreen, up / guiScale, color);
 
@@ -67,50 +117,75 @@ public class BorderInkAction extends InkAction {
 
     @Override
     protected InkActionResult doValidate(List<String> arguments, Scene scene) {
-        if (arguments.size() < 2) {
+        fadeAction = "";
+        easing = Easing.SMOOTH;
+        if (arguments.size() == 1) {
             return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Up value missing"));
         }
-        if (arguments.size() < 3) {
-            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Right value missing"));
+        if (arguments.get(1).equals("clear")) {
+            return InkActionResult.ok();
         }
-        if (arguments.size() < 4) {
-            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Down value missing"));
-        }
-        if (arguments.size() < 5) {
-            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Left value missing"));
-        }
-        if (arguments.size() < 6) {
-            try {
-                up = Integer.parseInt(arguments.get(1)) * 2;
-            } catch (NumberFormatException e) {
-                return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(1)));
+        if (arguments.get(1).equals("out")) {
+            fadeAction = "out";
+            if (arguments.size() == 2) {
+                return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Fade time value"));
             }
             try {
-                right = Integer.parseInt(arguments.get(2)) * 2;
+                totalTick = (int) (Double.parseDouble(arguments.get(2)) * 20.0);
             } catch (NumberFormatException e) {
                 return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(2)));
             }
-            try {
-                down = Integer.parseInt(arguments.get(3)) * 2;
-            } catch (NumberFormatException e) {
-                return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(3)));
+            easing = Easing.SMOOTH;
+            if (arguments.size() > 3) {
+                try {
+                    easing = Easing.valueOf(arguments.get(3).toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    return InkActionResult.error(
+                            Translation.message(WRONG_EASING_VALUE, Arrays.toString(Easing.values())));
+                }
             }
+            return InkActionResult.ok();
+        }
+        if (arguments.size() == 2) {
+            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Right value missing"));
+        }
+        if (arguments.size() == 3) {
+            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Down value missing"));
+        }
+        if (arguments.size() == 4) {
+            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Left value missing"));
+        }
+        try {
+            up = Integer.parseInt(arguments.get(1)) * 2;
+        } catch (NumberFormatException e) {
+            return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(1)));
+        }
+        try {
+            right = Integer.parseInt(arguments.get(2)) * 2;
+        } catch (NumberFormatException e) {
+            return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(2)));
+        }
+        try {
+            down = Integer.parseInt(arguments.get(3)) * 2;
+        } catch (NumberFormatException e) {
+            return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(3)));
+        }
+        try {
+            left = Integer.parseInt(arguments.get(4)) * 2;
+        } catch (NumberFormatException e) {
+            return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(4)));
+        }
+        if (arguments.size() > 5) {
             try {
-                left = Integer.parseInt(arguments.get(4)) * 2;
+                color = Integer.parseInt(arguments.get(5), 16);
             } catch (NumberFormatException e) {
-                return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(4)));
-            }
-        } else {
-            try {
-                color = Integer.parseInt(arguments.get(6), 16);
-            } catch (NumberFormatException e) {
-                return InkActionResult.error(Translation.message(NOT_VALID_COLOR, arguments.get(6)));
+                return InkActionResult.error(Translation.message(NOT_VALID_COLOR, arguments.get(5)));
             }
         }
         opacity = 1.0;
         if (arguments.size() > 6) {
             try {
-                opacity = Integer.parseInt(arguments.get(6));
+                opacity = Double.parseDouble(arguments.get(6));
                 if (opacity > 1) {
                     return InkActionResult.error(
                             Translation.message(WRONG_ARGUMENT_TEXT, "The opacity value is greater than 1"));
@@ -123,11 +198,47 @@ public class BorderInkAction extends InkAction {
             }
         }
         color = FastColor.ARGB32.color((int) (opacity * 255), color);
+        if (arguments.size() < 7) return InkActionResult.ok();
+        fadeAction = arguments.get(7);
+        if (!fadeAction.equals("in")) {
+            return InkActionResult.error(Translation.message(WRONG_ARGUMENT_TEXT, "Action must be \"in\""));
+        }
+        if (arguments.size() == 8)
+            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Fade time value"));
+        try {
+            totalTick = (int) (Double.parseDouble(arguments.get(8)) * 20.0);
+        } catch (NumberFormatException e) {
+            return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(8)));
+        }
+        if (arguments.size() == 9) return InkActionResult.ok();
+        try {
+            easing = Easing.valueOf(arguments.get(9).toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return InkActionResult.error(Translation.message(WRONG_EASING_VALUE, Arrays.toString(Easing.values())));
+        }
         return InkActionResult.ok();
     }
 
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
+        if (fadeAction.equals("out")) {
+            for (InkAction inkAction : playerSession.getClientSideInkActions()) {
+                if (inkAction instanceof BorderInkAction borderInkAction) {
+                    borderInkAction.isRunning = false;
+                    this.up = borderInkAction.upInterpolated;
+                    this.right = borderInkAction.rightInterpolated;
+                    this.down = borderInkAction.downInterpolated;
+                    this.left = borderInkAction.leftInterpolated;
+                    this.opacity = borderInkAction.opacity;
+                    this.color = borderInkAction.color;
+                    this.easing = borderInkAction.easing;
+                }
+            }
+        }
+        if (up == 0 && right == 0 && down == 0 && left == 0) {
+            playerSession.getInkActions().removeIf(inkAction -> inkAction instanceof BorderInkAction);
+            isRunning = false;
+        }
         return InkActionResult.ok();
     }
 

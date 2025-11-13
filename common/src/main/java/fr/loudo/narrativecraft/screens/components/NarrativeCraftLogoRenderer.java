@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.screens.components;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.util.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
@@ -30,7 +31,7 @@ import net.minecraft.resources.ResourceLocation;
 public class NarrativeCraftLogoRenderer {
 
     public static final ResourceLocation LOGO =
-            ResourceLocation.withDefaultNamespace("textures/narrativecraft_logo.png");
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/logo.png");
 
     private final ResourceLocation resourceLocation;
     private int[] logoRes;

@@ -64,9 +64,9 @@ import net.minecraft.util.FastColor;
 public class MainScreen extends Screen {
 
     public static final ResourceLocation BACKGROUND_IMAGE =
-            ResourceLocation.withDefaultNamespace("textures/narrativecraft_mainscreen/background.png");
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/main_screen/background.png");
     public static final ResourceLocation MUSIC =
-            ResourceLocation.withDefaultNamespace("narrativecraft_mainscreen.music");
+            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main_screen.music");
 
     public static SimpleSoundInstance musicInstance = new SimpleSoundInstance(
             MainScreen.MUSIC,
@@ -95,7 +95,7 @@ public class MainScreen extends Screen {
     private int showDevBtnCount;
     private Button devButton;
 
-    private final boolean finishedStory;
+    private boolean finishedStory;
     private final boolean pause;
     private boolean rendered;
 
@@ -171,7 +171,9 @@ public class MainScreen extends Screen {
     @Override
     protected void init() {
         boolean storyFinished = NarrativeCraftMod.getInstance().getNarrativeWorldOption().finishedStory;
-        minecraft.options.hideGui = true;
+        if (playerSession.getCurrentCamera() != null) {
+            minecraft.options.hideGui = true;
+        }
         showDevBtnCount = 0;
         StorySave save = null;
         try {
@@ -233,6 +235,7 @@ public class MainScreen extends Screen {
         if (!firstGame && !pause) {
             startY += buttonHeight + gap;
             Button startNewGame = Button.builder(Translation.message("screen.main_screen.new_game"), button -> {
+                        reset();
                         ConfirmScreen confirmScreen = new ConfirmScreen(
                                 b -> {
                                     if (b) {
@@ -265,7 +268,7 @@ public class MainScreen extends Screen {
             startY += buttonHeight + gap;
             Button selectSceneButton = Button.builder(
                             Translation.message("screen.main_screen.select_screen"), button -> {
-                                minecraft.getSoundManager().stop(musicInstance);
+                                reset();
                                 ChapterSelectorScreen screen = new ChapterSelectorScreen(playerSession, this);
                                 minecraft.setScreen(screen);
                             })
@@ -293,8 +296,9 @@ public class MainScreen extends Screen {
                                 }
                                 try {
                                     List<ErrorLine> results = StoryValidation.validate();
-                                    List<ErrorLine> errorLines =
-                                            results.stream().filter(errorLine -> !errorLine.isWarn()).toList();
+                                    List<ErrorLine> errorLines = results.stream()
+                                            .filter(errorLine -> !errorLine.isWarn())
+                                            .toList();
                                     if (errorLines.isEmpty()) {
                                         NarrativeCraftMod.server.execute(() -> {
                                             playerSession.getStoryHandler().stop();
@@ -343,9 +347,9 @@ public class MainScreen extends Screen {
 
         startY += buttonHeight + gap;
         Button optionsButton = Button.builder(Translation.message("screen.main_screen.options"), button -> {
-                    minecraft.getSoundManager().stop(musicInstance);
-                    MainScreenOptionsScreen screen =
-                            new MainScreenOptionsScreen(playerSession, new MainScreen(playerSession, false, pause));
+                    reset();
+                    MainScreenOptionsScreen screen = new MainScreenOptionsScreen(playerSession, this);
+                    new MainScreenOptionsScreen(playerSession, this);
                     minecraft.setScreen(screen);
                 })
                 .bounds(initialX, startY, buttonWidth, buttonHeight)
@@ -372,7 +376,7 @@ public class MainScreen extends Screen {
         } else {
             startY += buttonHeight + gap;
             Button quitButton = Button.builder(Translation.message("screen.main_screen.quit"), button -> {
-                        Util.disconnectPlayer();
+                        Util.disconnectPlayer(minecraft);
                     })
                     .bounds(initialX, startY, buttonWidth, buttonHeight)
                     .build();
@@ -387,9 +391,15 @@ public class MainScreen extends Screen {
                 .build();
 
         if (finishedStory) {
-            FinishedStoryScreen screen = new FinishedStoryScreen(playerSession);
+            FinishedStoryScreen screen = new FinishedStoryScreen(this);
             minecraft.setScreen(screen);
+            finishedStory = false;
         }
+    }
+
+    private void reset() {
+        rendered = false;
+        minecraft.getSoundManager().stop(musicInstance);
     }
 
     @Override

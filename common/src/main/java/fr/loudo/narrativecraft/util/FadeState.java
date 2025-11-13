@@ -21,30 +21,10 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.util;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
-
-public record OpenChaptersScreenPacket(String name, int age) implements CustomPacketPayload {
-
-    public static final CustomPacketPayload.Type<OpenChaptersScreenPacket> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "open_chapters_screen"));
-
-    public static final StreamCodec<ByteBuf, OpenChaptersScreenPacket> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            OpenChaptersScreenPacket::name,
-            ByteBufCodecs.VAR_INT,
-            OpenChaptersScreenPacket::age,
-            OpenChaptersScreenPacket::new);
-
-    @Override
-    public @NotNull Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
+public enum FadeState {
+    FADE_IN,
+    STAY,
+    FADE_OUT
 }

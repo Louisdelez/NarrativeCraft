@@ -69,11 +69,38 @@ public abstract class AbstractController {
                 FastColor.ARGB32.colorFromFloat(1, 1, 1, 1));
     }
 
+    public CharacterStoryData getCharacterStoryDataFromEntity(Entity entity) {
+        for (CharacterStoryData characterStoryData : characterStoryDataList) {
+            if (Util.isSameEntity(
+                    entity, characterStoryData.getCharacterRuntime().getEntity())) {
+                return characterStoryData;
+            }
+        }
+        return null;
+    }
+
+    public CharacterRuntime getCharacterFromEntity(Entity entity) {
+        for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+            if (Util.isSameEntity(entity, characterRuntime.getEntity())) {
+                return characterRuntime;
+            }
+        }
+        return null;
+    }
+
     public Environment getEnvironment() {
         return environment;
     }
 
     public PlayerSession getPlayerSession() {
         return playerSession;
+    }
+
+    public List<CharacterStoryData> getCharacterStoryDataList() {
+        return characterStoryDataList;
+    }
+
+    public void removeCharacterStoryData(CharacterStoryData characterStoryData) {
+        characterStoryDataList.remove(characterStoryData);
     }
 }

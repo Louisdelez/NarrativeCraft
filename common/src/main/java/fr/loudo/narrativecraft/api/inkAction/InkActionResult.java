@@ -25,8 +25,7 @@ package fr.loudo.narrativecraft.api.inkAction;
 
 import net.minecraft.network.chat.Component;
 
-public record InkActionResult(
-        fr.loudo.narrativecraft.api.inkAction.InkActionResult.Status status, String errorMessage) {
+public record InkActionResult(Status status, String errorMessage) {
     public enum Status {
         OK,
         IGNORED,

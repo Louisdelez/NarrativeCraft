@@ -84,20 +84,25 @@ public class DialogRenderer3D extends DialogRenderer {
         super.tick();
     }
 
-    private void updateDialogPosition() {
+    private void updateDialogPosition(float partialTick) {
         Entity serverEntity = characterRuntime.getEntity();
         if (serverEntity != null) {
             Entity entity =
                     minecraft.level.getEntity(characterRuntime.getEntity().getId());
             if (entity != null) {
-                dialogPosition = entity.position().add(0, entity.getEyeHeight(), 0);
+                if (dialogPosition != null) {
+                    dialogPosition = Mth.lerp(
+                            partialTick, dialogPosition, entity.position().add(0, entity.getEyeHeight(), 0));
+                } else {
+                    dialogPosition = entity.position().add(0, entity.getEyeHeight(), 0);
+                }
             }
         }
     }
 
     @Override
     public void render(PoseStack poseStack, float partialTick) {
-        updateDialogPosition();
+        updateDialogPosition(partialTick);
         if (dialogPosition == null) return;
 
         Vec3 position = dialogPosition;
@@ -127,7 +132,7 @@ public class DialogRenderer3D extends DialogRenderer {
             if (dialogStarting && !dialogStopping) dialogStarting = false;
         }
         poseStack.translate(position.x, position.y, position.z);
-        poseStack.mulPose(minecraft.getEntityRenderDispatcher().cameraOrientation());
+        poseStack.mulPose(minecraft.getEntityRenderDispatcher().camera.rotation());
         poseStack.scale(originalScale * 0.025F, -originalScale * 0.025F, originalScale * 0.025F);
 
         renderDialogBackground(poseStack, partialTick);
@@ -176,8 +181,8 @@ public class DialogRenderer3D extends DialogRenderer {
 
         if (!dialogStopping) {
             dialogEntityBobbing.partialTick(partialTick);
-            dialogScrollText.render(poseStack, minecraft.renderBuffers().bufferSource(), partialTick);
-            if (dialogScrollText.isFinished()) {
+            dialogScrollTextDialog.render(poseStack, minecraft.renderBuffers().bufferSource(), partialTick);
+            if (dialogScrollTextDialog.isFinished()) {
                 if (!dialogAutoSkipping) {
                     dialogAutoSkipping = true;
                     currentTick = 0;

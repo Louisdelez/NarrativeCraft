@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.api.inkAction.InkActionRegistry;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,28 +45,37 @@ public class InkTagHandler {
 
     public void execute() throws InkTagHandlerException {
         InkActionResult result = InkActionResult.ok();
+        StoryHandler storyHandler = playerSession.getStoryHandler();
         for (int i = 0; i < tagsToExecute.size(); i++) {
             String tag = tagsToExecute.get(i);
+            if (storyHandler != null) {
+                tag = InkUtil.parseVariables(storyHandler.getStory(), tag);
+            }
             InkAction inkAction = InkActionRegistry.findByCommand(tag);
             if (inkAction == null) continue;
-            inkAction.setBlockEndTask(() -> {
-                inkAction.setRunning(false);
-                try {
-                    execute();
-                } catch (InkTagHandlerException e) {
-                    if (playerSession.getStoryHandler() == null) {
-                        Util.sendCrashMessage(playerSession.getPlayer(), e);
-                    } else {
-                        playerSession.getStoryHandler().showCrash(e);
-                        playerSession.getStoryHandler().stop();
-                    }
-                }
-            });
             result = inkAction.validate(tag, playerSession.getScene());
             if (result.isError()) {
                 throw new InkTagHandlerException(inkAction.getClass(), result.errorMessage());
             }
             result = inkAction.execute(playerSession);
+            if (result.isError()) {
+                throw new InkTagHandlerException(inkAction.getClass(), result.errorMessage());
+            }
+            if (result.isBlock()) {
+                inkAction.setBlockEndTask(() -> {
+                    inkAction.setRunning(false);
+                    try {
+                        execute();
+                    } catch (InkTagHandlerException e) {
+                        if (playerSession.getStoryHandler() == null) {
+                            Util.sendCrashMessage(playerSession.getPlayer(), e);
+                        } else {
+                            playerSession.getStoryHandler().showCrash(e);
+                            playerSession.getStoryHandler().stop();
+                        }
+                    }
+                });
+            }
             if (result.isIgnore()) {
                 inkAction.setRunning(false);
             }
@@ -76,12 +86,19 @@ public class InkTagHandler {
             }
         }
         tagsToExecute.clear();
-        StoryHandler storyHandler = playerSession.getStoryHandler();
         if (storyHandler != null && tagsToExecute.isEmpty() && result.isOk()) {
             if (storyHandler.isFinished() && storyHandler.getDialogText().isEmpty()) {
                 storyHandler.stopAndFinishScreen();
+            } else if (storyHandler.getDialogText().isEmpty()
+                    && storyHandler
+                            .getStory()
+                            .canContinue()) { // Handle conditional block (for some reason it returns empty dialog when
+                // going in a condition, have to next twice to get it)
+                storyHandler.next();
             } else if (!storyHandler.isFinished()
-                    && storyHandler.getDialogText().isEmpty() && storyHandler.getStory().getCurrentChoices().isEmpty()) {
+                    && storyHandler.getDialogText().isEmpty()
+                    && storyHandler.getStory().getCurrentChoices().isEmpty()
+                    && !playerSession.isOnGameplay()) {
                 storyHandler.next();
                 run = null;
             } else {

@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import net.minecraft.network.protocol.game.ClientboundGameEventPacket;
@@ -51,13 +52,7 @@ public class WeatherInkAction extends InkAction {
         if (!weather.equals("clear") && !weather.equals("rain") && !weather.equals("thunder")) {
             return InkActionResult.error(Translation.message(WRONG_ARGUMENT_TEXT, "Only clear, rain or thunder"));
         }
-        if (arguments.size() > 2) {
-            try {
-                instantly = Boolean.parseBoolean(arguments.get(2));
-            } catch (Exception e) {
-                return InkActionResult.error(Translation.message(NOT_VALID_BOOLEAN, arguments.get(2)));
-            }
-        }
+        instantly = InkUtil.getOptionalArgument(command, "instant");
         return InkActionResult.ok();
     }
 

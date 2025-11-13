@@ -27,7 +27,7 @@ import fr.loudo.narrativecraft.util.Position2D;
 
 public class DialogData {
     public static DialogData globalDialogData =
-            new DialogData(new Position2D(0, 0.8F), 90, 5, 5, 0.8F, 0, 0, 0, -1, 2.9F, 2.15F, false, false, 0.0);
+            new DialogData(new Position2D(0, 0.4F), 90, 5, 5, 0.8F, 0, 0, 0, -1, 2.9F, 2.15F, false, false, 0.0);
 
     private Position2D offset;
     private float width, paddingX, paddingY, scale, letterSpacing, gap, noiseShakeSpeed, noiseShakeStrength;

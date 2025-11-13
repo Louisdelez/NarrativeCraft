@@ -36,6 +36,7 @@ import java.util.List;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -60,7 +61,8 @@ public class StoryChoicesScreen extends Screen {
         super(Component.literal("Choice screen"));
         this.playerSession = playerSession;
         storyHandler = playerSession.getStoryHandler();
-        this.choiceList = playerSession.getStoryHandler().getStory().getCurrentChoices();
+        List<Choice> choices = playerSession.getStoryHandler().getStory().getCurrentChoices();
+        this.choiceList = choices.subList(0, Math.min(choices.size(), 4));
         this.animatedChoices = new ArrayList<>();
         initiated = !animate;
         totalTick = (int) (APPEAR_TIME * 20.0);
@@ -68,7 +70,7 @@ public class StoryChoicesScreen extends Screen {
 
     public StoryChoicesScreen(List<Choice> choiceList, boolean animate) {
         super(Component.literal("Choice screen"));
-        this.choiceList = choiceList;
+        this.choiceList = choiceList.subList(0, Math.min(choiceList.size(), 4));
         this.animatedChoices = new ArrayList<>();
         initiated = !animate;
         totalTick = (int) (APPEAR_TIME * 20.0);
@@ -99,12 +101,15 @@ public class StoryChoicesScreen extends Screen {
     @Override
     protected void init() {
         if (!initiated) {
-            ResourceLocation soundRes = ResourceLocation.withDefaultNamespace("sfx.choice_appear");
+            ResourceLocation soundRes =
+                    ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sfx.choice_appear");
             SoundEvent sound = SoundEvent.createVariableRangeEvent(soundRes);
             this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(sound, 1.0f, 1.0f));
         }
         choiceButtonWidgetList.clear();
         for (Choice choice : choiceList) {
+            choice.setText(choice.getText()
+                    .replace("__username__", playerSession.getPlayer().getName().getString()));
             choiceButtonWidgetList.add(new ChoiceButtonWidget(choice, index -> {
                 minecraft.setScreen(null);
                 NarrativeCraftMod.server.execute(() -> storyHandler.chooseChoiceAndNext(index));
@@ -175,16 +180,16 @@ public class StoryChoicesScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == InputConstants.KEY_ESCAPE) return false;
+    public boolean keyPressed(KeyEvent event) {
+        if (event.key() == InputConstants.KEY_ESCAPE) return false;
         if (storyHandler == null) {
             minecraft.setScreen(null);
-            return super.keyPressed(keyCode, scanCode, modifiers);
+            return super.keyPressed(event);
         }
         List<KeyMapping> choiceKeys = List.of(
                 ModKeys.SELECT_CHOICE_1, ModKeys.SELECT_CHOICE_2, ModKeys.SELECT_CHOICE_3, ModKeys.SELECT_CHOICE_4);
-        for (int i = 0; i < storyHandler.getStory().getCurrentChoices().size(); i++) {
-            if (keyCode == choiceKeys.get(i).getDefaultKey().getValue()) {
+        for (int i = 0; i < choiceList.size(); i++) {
+            if (event.key() == choiceKeys.get(i).getDefaultKey().getValue()) {
                 minecraft.setScreen(null);
                 try {
                     int finalI = i;
@@ -195,12 +200,12 @@ public class StoryChoicesScreen extends Screen {
                 }
             }
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(event);
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        t = Math.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
+        t = Mth.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
         for (AnimatedChoice ac : animatedChoices) {
             int newOpacity = (int) Mth.lerp(t, 5, 255);
             guiGraphics.pose().pushPose();

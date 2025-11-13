@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.narrative.story.text;
 
 import fr.loudo.narrativecraft.narrative.dialog.DialogAnimationType;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +38,13 @@ public record ParsedDialog(String cleanedText, List<TextEffect> effects) {
         List<TextEffect> effects = new ArrayList<>();
         StringBuilder cleanText = new StringBuilder();
 
-        Pattern pattern = Pattern.compile("\\[(\\w+)((?:\\s+\\w+=[^\\]\\s]+)*?)\\](.*?)\\[/\\1\\]");
+        Pattern patternDialog = Pattern.compile(StoryHandler.DIALOG_REGEX);
+        Matcher dialogMatcher = patternDialog.matcher(dialogContent);
+        if (dialogMatcher.matches()) {
+            dialogContent = dialogMatcher.group(2).trim();
+        }
+
+        Pattern pattern = Pattern.compile("\\[(\\w+)((?:\\s+\\w+=[^\\]\\s]+)*?)\\](?:(.*?)\\[/\\1\\]|([^\\[]*))");
         Matcher matcher = pattern.matcher(dialogContent);
 
         int currentIndex = 0;
@@ -48,6 +55,9 @@ public record ParsedDialog(String cleanedText, List<TextEffect> effects) {
             String effectName = matcher.group(1);
             String paramString = matcher.group(2).trim();
             String innerText = matcher.group(3);
+            if (innerText == null) {
+                innerText = matcher.group(4);
+            }
 
             DialogAnimationType type;
             try {

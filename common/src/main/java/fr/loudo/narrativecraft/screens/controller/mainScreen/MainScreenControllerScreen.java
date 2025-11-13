@@ -95,7 +95,7 @@ public class MainScreenControllerScreen extends Screen {
         Button addCharacter = Button.builder(ImageFontConstants.CHARACTER_ADD, button -> {
                     ChooseCharacterScreen screen = new ChooseCharacterScreen(
                             this,
-                            Translation.message("controller.camera_angle.add_character", "Main Screen character list")
+                            Translation.message("controller.add_character", "Main Screen character list")
                                     .getString(),
                             null,
                             null,

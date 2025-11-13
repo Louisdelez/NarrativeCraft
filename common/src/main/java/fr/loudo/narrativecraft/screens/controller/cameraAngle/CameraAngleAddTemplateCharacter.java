@@ -30,6 +30,8 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.CharacterInteraction;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframe;
 import fr.loudo.narrativecraft.narrative.playback.PlaybackData;
@@ -48,6 +50,7 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
 
     private final CameraAngleController cameraAngleController;
     private List<Button> buttons = new ArrayList<>();
+    private boolean defaultScreen = true;
 
     public CameraAngleAddTemplateCharacter(Screen lastScreen, CameraAngleController cameraAngleController) {
         super(
@@ -63,6 +66,7 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
         super(lastScreen, title);
         this.cameraAngleController = cameraAngleController;
         this.buttons = buttons;
+        defaultScreen = false;
     }
 
     @Override
@@ -75,6 +79,7 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
             }
             return;
         }
+        if (!defaultScreen) return;
         List<Button> animationsButton = new ArrayList<>();
         Button animationButton = Button.builder(Translation.message("global.animations"), button -> {
                     for (Animation animation : scene.getAnimations()) {
@@ -87,6 +92,7 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                                                             .getLocations()
                                                             .size()
                                                     - 1));
+                                    minecraft.setScreen(null);
                                 })
                                 .build();
                         animationsButton.add(button1);
@@ -111,6 +117,7 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                                                                 .size()
                                                         - 1);
                                     }
+                                    minecraft.setScreen(null);
                                 })
                                 .build();
                         subscenesButton.add(button1);
@@ -136,6 +143,22 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                                             (lastKeyframe.getTick() + 2 + lastKeyframe.getTransitionDelayTick());
                                     for (Subscene subscene : cutscene.getSubscenes()) {
                                         for (Animation animation : subscene.getAnimations()) {
+                                            NarrativeCraftMod.server.execute(() -> {
+                                                spawnEntity(
+                                                        animation,
+                                                        Math.min(
+                                                                lastLocIndex,
+                                                                animation
+                                                                                .getActionsData()
+                                                                                .getFirst()
+                                                                                .getLocations()
+                                                                                .size()
+                                                                        - 1));
+                                            });
+                                        }
+                                    }
+                                    for (Animation animation : cutscene.getAnimations()) {
+                                        NarrativeCraftMod.server.execute(() -> {
                                             spawnEntity(
                                                     animation,
                                                     Math.min(
@@ -146,20 +169,9 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                                                                             .getLocations()
                                                                             .size()
                                                                     - 1));
-                                        }
+                                        });
                                     }
-                                    for (Animation animation : cutscene.getAnimations()) {
-                                        spawnEntity(
-                                                animation,
-                                                Math.min(
-                                                        lastLocIndex,
-                                                        animation
-                                                                        .getActionsData()
-                                                                        .getFirst()
-                                                                        .getLocations()
-                                                                        .size()
-                                                                - 1));
-                                    }
+                                    minecraft.setScreen(null);
                                 })
                                 .build();
                         cutscenesButton.add(button1);
@@ -169,6 +181,45 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                 })
                 .build();
         objectListScreen.addButton(cutsceneButton);
+
+        List<Button> interactionButtons = new ArrayList<>();
+        Button interactionButton = Button.builder(Translation.message("global.interaction"), button -> {
+                    for (Interaction interaction : scene.getInteractions()) {
+                        Button button1 = Button.builder(Component.literal(interaction.getName()), button2 -> {
+                                    for (CharacterInteraction characterInteraction :
+                                            interaction.getCharacterInteractions()) {
+                                        NarrativeCraftMod.server.execute(() -> {
+                                            CharacterStoryData characterStoryData =
+                                                    characterInteraction.getCharacterStoryData();
+                                            characterStoryData.spawn(
+                                                    cameraAngleController
+                                                            .getPlayerSession()
+                                                            .getPlayer()
+                                                            .level(),
+                                                    Environment.DEVELOPMENT);
+                                            characterStoryData.applyItems(minecraft.player.registryAccess());
+                                            characterStoryData.applyBytes(characterStoryData
+                                                    .getCharacterRuntime()
+                                                    .getEntity());
+                                            cameraAngleController
+                                                    .getCharacterStoryDataList()
+                                                    .add(characterStoryData);
+                                            cameraAngleController
+                                                    .getPlayerSession()
+                                                    .getCharacterRuntimes()
+                                                    .add(characterStoryData.getCharacterRuntime());
+                                        });
+                                    }
+                                    minecraft.setScreen(null);
+                                })
+                                .build();
+                        interactionButtons.add(button1);
+                    }
+                    minecraft.setScreen(new CameraAngleAddTemplateCharacter(
+                            this, Translation.message("global.subscenes"), cameraAngleController, interactionButtons));
+                })
+                .build();
+        objectListScreen.addButton(interactionButton);
     }
 
     protected void addFooter() {
@@ -207,6 +258,5 @@ public class CameraAngleAddTemplateCharacter extends ButtonListScreen {
                     .getCharacterRuntimes()
                     .add(characterStoryData.getCharacterRuntime());
         });
-        minecraft.setScreen(null);
     }
 }

@@ -32,23 +32,28 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.character.CharacterModel;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
+import fr.loudo.narrativecraft.narrative.character.MainCharacterAttribute;
+import fr.loudo.narrativecraft.screens.characters.CharacterAdvancedScreen;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.storyManager.EditScreenAdapter;
 import fr.loudo.narrativecraft.util.ScreenUtils;
 import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
 public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterStory> {
 
     private final Scene scene;
+    private MainCharacterAttribute attribute;
 
     public EditScreenCharacterAdapter(Scene scene) {
         this.scene = scene;
@@ -90,6 +95,14 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
                 .width(70)
                 .build();
         screen.extraFields.put("modelBtn", modelButton);
+
+        if (attribute == null && scene == null) {
+            if (entry == null) {
+                attribute = new MainCharacterAttribute();
+            } else {
+                attribute = new MainCharacterAttribute(entry.getMainCharacterAttribute());
+            }
+        }
 
         if (entry != null) {
             if (scene == null) {
@@ -142,18 +155,33 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
         StringWidget modelText = ScreenUtils.text(
                 label, screen.getFont(), x, y + modelButton.getHeight() / 2 - screen.getFont().lineHeight / 2);
         screen.addRenderableWidget(modelText);
-        modelButton.setPosition(x + modelText.getWidth() + 5, y);
         screen.addRenderableWidget(modelButton);
+        modelButton.setPosition(x + modelText.getWidth() + 5, y);
+        if (entry != null) {
+            Button advancedBtn = Button.builder(Translation.message("global.advanced"), button -> {
+                        screen.setName(screen.getNameBox().getEditBox().getValue());
+                        screen.setDescription(
+                                screen.getDescriptionBox().getMultiLineEditBox().getValue());
+                        CharacterAdvancedScreen screen1 = new CharacterAdvancedScreen(screen, entry);
+                        minecraft.setScreen(screen1);
+                    })
+                    .width(83)
+                    .build();
+            advancedBtn.setPosition(modelButton.getX() + modelButton.getWidth() + 5, y);
+            screen.addRenderableWidget(advancedBtn);
+        }
     }
 
     @Override
     public void buildFromScreen(
+            Screen screen,
             Map<String, Object> extraFields,
             Minecraft minecraft,
             @Nullable CharacterStory existing,
             String name,
             String description) {
         CharacterManager characterManager = NarrativeCraftMod.getInstance().getCharacterManager();
+        CharacterStory currentMainCharacter = characterManager.getMainCharacter();
         CharacterStory newCharacter;
         CharacterModel model = CharacterModel.valueOf(
                 ((Button) extraFields.get("modelBtn")).getMessage().getString());
@@ -178,12 +206,17 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
             }
             try {
                 if (scene == null) {
+                    if (characterManager.getCharacterStories().isEmpty()) {
+                        newCharacter.getMainCharacterAttribute().setMainCharacter(true);
+                    }
                     NarrativeCraftFile.createCharacterFolder(newCharacter);
                     characterManager.addCharacter(newCharacter);
                 } else {
                     NarrativeCraftFile.createCharacterFolder(newCharacter, scene);
                     scene.addNpc(newCharacter);
                 }
+                newCharacter.setMainCharacterAttribute(attribute);
+                updateMainCharacter(currentMainCharacter, newCharacter);
                 minecraft.setScreen(new CharactersScreen(scene));
             } catch (Exception e) {
                 Util.sendCrashMessage(minecraft.player, e);
@@ -193,13 +226,18 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
             List<Chapter> chapters =
                     NarrativeCraftMod.getInstance().getChapterManager().getChapters();
             try {
+                newCharacter.setShowNametag(existing.showNametag());
                 if (scene == null) {
+                    newCharacter.setMainCharacterAttribute(existing.getMainCharacterAttribute());
                     NarrativeCraftFile.updateCharacterData(existing, newCharacter);
                 } else {
+                    newCharacter.setMainCharacterAttribute(null);
                     NarrativeCraftFile.updateCharacterData(existing, newCharacter, scene);
                 }
                 existing.setName(newCharacter.getName());
                 existing.setDescription(newCharacter.getDescription());
+                existing.setMainCharacterAttribute(newCharacter.getMainCharacterAttribute());
+                existing.setShowNametag(newCharacter.showNametag());
                 if (scene == null) {
                     existing.setBirthDate(newCharacter.getBirthDate());
                 }
@@ -212,11 +250,23 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
                         NarrativeCraftFile.updateCameraAngles(scene);
                     }
                 }
+                updateMainCharacter(currentMainCharacter, newCharacter);
                 minecraft.setScreen(new CharactersScreen(scene));
             } catch (Exception e) {
                 Util.sendCrashMessage(minecraft.player, e);
                 minecraft.setScreen(null);
             }
+        }
+    }
+
+    private void updateMainCharacter(CharacterStory currentMainCharacter, CharacterStory newCharacter)
+            throws IOException {
+        if (attribute == null) return;
+        if (currentMainCharacter != null
+                && attribute.isMainCharacter()
+                && !currentMainCharacter.getName().equalsIgnoreCase(newCharacter.getName())) {
+            currentMainCharacter.getMainCharacterAttribute().setMainCharacter(false);
+            NarrativeCraftFile.updateCharacterData(currentMainCharacter, currentMainCharacter);
         }
     }
 }

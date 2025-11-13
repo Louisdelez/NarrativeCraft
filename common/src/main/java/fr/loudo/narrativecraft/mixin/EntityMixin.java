@@ -28,20 +28,26 @@ import fr.loudo.narrativecraft.narrative.recording.Recording;
 import fr.loudo.narrativecraft.narrative.recording.actions.ActionsData;
 import fr.loudo.narrativecraft.narrative.recording.actions.HurtAction;
 import fr.loudo.narrativecraft.narrative.recording.actions.StopRidingAction;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin {
     @Shadow
     @Nullable
     public abstract Entity getVehicle();
+
+    @Shadow
+    public double yo;
 
     @Inject(method = "markHurt", at = @At("HEAD"))
     private void narrativecraft$mark(CallbackInfo ci) {
@@ -66,6 +72,16 @@ public abstract class EntityMixin {
             StopRidingAction stopRidingAction =
                     new StopRidingAction(recording.getTick(), vehicleActionsData.getEntityIdRecording());
             recording.getActionDataFromEntity(player).addAction(stopRidingAction);
+        }
+    }
+
+    @Inject(method = "isInvisibleTo", at = @At("HEAD"), cancellable = true)
+    private void narrativecraft$isInvisibleTo(Player player, CallbackInfoReturnable<Boolean> cir) {
+        PlayerSession playerSession =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
+        if (playerSession == null) return;
+        if (playerSession.getCurrentCamera() != null) {
+            cir.setReturnValue(true);
         }
     }
 }

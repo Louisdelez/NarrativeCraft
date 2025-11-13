@@ -21,16 +21,21 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.mixin.invoker;
+package fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction;
 
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.font.FontSet;
-import net.minecraft.resources.ResourceLocation;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Invoker;
+public class StitchInteraction {
 
-@Mixin(Font.class)
-public interface FontInvoker {
-    @Invoker
-    FontSet callGetFontSet(ResourceLocation fontLocation);
+    private String stitch;
+
+    public StitchInteraction(String stitch) {
+        this.stitch = stitch;
+    }
+
+    public String getStitch() {
+        return stitch;
+    }
+
+    public void setStitch(String stitch) {
+        this.stitch = stitch;
+    }
 }

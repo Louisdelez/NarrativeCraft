@@ -31,6 +31,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 
@@ -74,28 +75,12 @@ public class SubsceneInkAction extends InkAction {
             return InkActionResult.error(Translation.message(
                     WRONG_ARGUMENT_TEXT, Translation.message("subscene.no_exists", subsceneName, scene.getName())));
         }
+        isLooping = InkUtil.getOptionalArgument(command, "loop");
+        isUnique = InkUtil.getOptionalArgument(command, "unique");
+        isBlock = InkUtil.getOptionalArgument(command, "block");
         if (arguments.size() < 4 || action.equals("stop")) {
             canBeExecuted = true;
             return InkActionResult.ok();
-        }
-        try {
-            isLooping = Boolean.parseBoolean(arguments.get(3));
-        } catch (Exception e) {
-            return InkActionResult.error(Translation.message(NOT_VALID_BOOLEAN, arguments.get(3)));
-        }
-        if (arguments.size() > 4) {
-            try {
-                isUnique = Boolean.parseBoolean(arguments.get(4));
-            } catch (Exception e) {
-                return InkActionResult.error(Translation.message(NOT_VALID_BOOLEAN, arguments.get(4)));
-            }
-        }
-        if (arguments.size() > 5) {
-            try {
-                isBlock = Boolean.parseBoolean(arguments.get(5));
-            } catch (Exception e) {
-                return InkActionResult.error(Translation.message(NOT_VALID_BOOLEAN, arguments.get(5)));
-            }
         }
         return InkActionResult.ok();
     }

@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.util;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.font.GlyphInfo;
+import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.DynamicOps;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
@@ -32,12 +33,10 @@ import fr.loudo.narrativecraft.mixin.accessor.FontAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.PlayerAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.PlayerListAccessor;
 import fr.loudo.narrativecraft.mixin.invoker.FontInvoker;
-import fr.loudo.narrativecraft.mixin.invoker.PauseScreenInvoker;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.platform.Services;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Optional;
 import java.util.UUID;
 import javax.imageio.ImageIO;
@@ -45,6 +44,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.font.FontSet;
 import net.minecraft.client.gui.screens.PauseScreen;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -58,15 +58,15 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.ValueInput;
 
 public class Util {
 
@@ -253,5 +253,36 @@ public class Util {
                 .getResourceManager()
                 .getResource(resourceLocation)
                 .isPresent();
+    }
+
+    public static List<String> splitText(String text, Font font, int width) {
+
+        List<String> finalString = new ArrayList<>();
+        List<FormattedCharSequence> charSequences = font.split(FormattedText.of(text), width);
+        for (FormattedCharSequence chara : charSequences) {
+            StringBuilder stringBuilder = new StringBuilder();
+            chara.accept((i, style, i1) -> {
+                stringBuilder.appendCodePoint(i1);
+                return true;
+            });
+            finalString.add(stringBuilder.toString());
+        }
+        return finalString;
+    }
+
+    public static String getLongerTextLine(List<String> lines, Minecraft minecraft) {
+        float longerSentenceWidth = 0;
+        String longerText = "";
+        for (String line : lines) {
+            float width = 0;
+            for (int i = 0; i < line.length(); i++) {
+                width += Util.getLetterWidth(line.codePointAt(i), minecraft);
+            }
+            if (width > longerSentenceWidth) {
+                longerSentenceWidth = width;
+                longerText = line;
+            }
+        }
+        return longerText;
     }
 }
