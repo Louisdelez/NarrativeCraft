@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.world.entity.Entity;
 
-// TODO: add string name of area triggers entered
 public class StorySave {
     private transient Chapter chapter;
     private transient Scene scene;
@@ -46,9 +45,15 @@ public class StorySave {
     private final DialogData dialogData;
     private final List<String> tagsRunning;
     private final List<CharacterStoryData> characterStoryDataList = new ArrayList<>();
+    private final List<String> areaTriggersEnteredName = new ArrayList<>();
 
     public StorySave(PlayerSession playerSession) throws Exception {
         StoryHandler storyHandler = playerSession.getStoryHandler();
+        playerSession.getAreaTriggersEntered().forEach(areaTrigger -> {
+            if (!areaTriggersEnteredName.contains(areaTrigger.getName())) {
+                areaTriggersEnteredName.add(areaTrigger.getName());
+            }
+        });
         chapter = playerSession.getChapter();
         scene = playerSession.getScene();
         saveData = storyHandler.getStory().getState().toJson();
@@ -126,5 +131,9 @@ public class StorySave {
 
     public List<CharacterStoryData> getCharacterStoryDataList() {
         return characterStoryDataList;
+    }
+
+    public List<String> getAreaTriggersEnteredName() {
+        return areaTriggersEnteredName;
     }
 }
