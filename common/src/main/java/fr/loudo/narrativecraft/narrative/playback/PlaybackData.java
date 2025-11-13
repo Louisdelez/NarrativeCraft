@@ -105,8 +105,8 @@ public class PlaybackData {
             if (entity instanceof FakePlayer fakePlayer) {
                 Util.removeFakePlayerUUID(fakePlayer);
             }
+            entity = null;
         });
-        entity = null;
     }
 
     public void spawnEntity(Location location) {
