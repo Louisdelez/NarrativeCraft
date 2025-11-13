@@ -218,6 +218,8 @@
   "narrativecraft.screen.character_advanced.skin_from_folder": "Skin from folder",
   "narrativecraft.screen.character_advanced.show_nametag": "Show nametag?",
 
+  "narrativecraft.screen.character.change_entity_type": "Change Character Entity Type",
+
   "narrativecraft.screen.chapter_manager.title": "Chapters List",
   "narrativecraft.screen.scene_manager.title": "Scene list of chapter %d",
 

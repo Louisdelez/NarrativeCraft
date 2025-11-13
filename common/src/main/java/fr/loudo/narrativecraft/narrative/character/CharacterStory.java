@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.narrative.character;
 
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
+import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.util.Util;
 import java.io.IOException;
 import net.minecraft.client.Minecraft;
@@ -59,13 +60,17 @@ public class CharacterStory extends NarrativeEntry {
         showNametag = characterType == CharacterType.MAIN;
     }
 
-    public void updateEntityType(EntityType<?> entityType) {
+    public void updateEntityType(EntityType<?> entityType, Scene scene) {
         EntityType<?> oldEntityType = this.entityType;
         int oldEntityTypeId = entityTypeId;
         try {
             this.entityType = entityType;
             entityTypeId = BuiltInRegistries.ENTITY_TYPE.getId(entityType);
-            NarrativeCraftFile.updateCharacterData(this, this);
+            if (scene != null) {
+                NarrativeCraftFile.updateCharacterData(this, this, scene);
+            } else {
+                NarrativeCraftFile.updateCharacterData(this, this);
+            }
         } catch (IOException e) {
             this.entityType = oldEntityType;
             entityTypeId = oldEntityTypeId;
