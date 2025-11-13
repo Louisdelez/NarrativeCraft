@@ -158,6 +158,9 @@ public class TextInkAction extends InkAction {
         action = arguments.get(2);
         switch (action) {
             case "create" -> {
+                if (InkUtil.getOptionalArgument(command, "no-drop-shadow")) {
+                    attribute.setDropShadow(false);
+                }
                 if (arguments.size() == 3) {
                     return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Text"));
                 }
@@ -174,12 +177,6 @@ public class TextInkAction extends InkAction {
                     attribute.setColor(Integer.parseInt(arguments.get(4), 16));
                 } catch (NumberFormatException e) {
                     return InkActionResult.error(Translation.message(NOT_VALID_COLOR, arguments.get(4)));
-                }
-                if (arguments.size() == 5) return InkActionResult.ok();
-                try {
-                    attribute.setDropShadow(Boolean.parseBoolean(arguments.get(5)));
-                } catch (Exception e) {
-                    return InkActionResult.error(Translation.message(NOT_VALID_BOOLEAN, arguments.get(5)));
                 }
             }
             case "remove" -> {
