@@ -189,6 +189,9 @@ public class Util {
             entity.getEntityData().set(AvatarAccessor.getDATA_PLAYER_MODE_CUSTOMISATION(), (byte) 0b01111111);
         } else {
             entity = (LivingEntity) characterStory.getEntityType().create(level, EntitySpawnReason.MOB_SUMMONED);
+            if (entity != null) {
+                entity.setInvulnerable(true);
+            }
             if (entity instanceof Mob mob) mob.setNoAi(true);
         }
 
