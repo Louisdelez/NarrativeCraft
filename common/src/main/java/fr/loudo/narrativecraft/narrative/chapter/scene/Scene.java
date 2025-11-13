@@ -25,10 +25,7 @@ package fr.loudo.narrativecraft.narrative.chapter.scene;
 
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.CameraAngle;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.*;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.util.Util;
@@ -220,6 +217,17 @@ public class Scene extends NarrativeEntry {
             interactions = new ArrayList<>();
         }
         return interactions;
+    }
+
+    public AreaTrigger getAreaTriggerByName(String name) {
+        for (Interaction interaction : interactions) {
+            for (AreaTrigger areaTrigger : interaction.getAreaTriggers()) {
+                if (areaTrigger.getName().equalsIgnoreCase(name)) {
+                    return areaTrigger;
+                }
+            }
+        }
+        return null;
     }
 
     public void setInteractions(List<Interaction> interactions) {

@@ -88,6 +88,7 @@ public class OnEnterInkAction extends InkAction {
         playerSession.getCharacterRuntimes().clear();
         storyHandler.setDialogData(DialogData.globalDialogData);
         storyHandler.save(true);
+        playerSession.setLastAreaTriggerEntered(null);
         return InkActionResult.ok();
     }
 
