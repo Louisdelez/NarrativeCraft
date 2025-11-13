@@ -49,7 +49,7 @@ public class ObjectListScreen extends ContainerObjectSelectionList<ObjectListScr
     }
 
     public void clear() {
-        this.clearEntries();
+        children().clear();
     }
 
     protected static class Entry extends ContainerObjectSelectionList.Entry<Entry> {
@@ -61,10 +61,22 @@ public class ObjectListScreen extends ContainerObjectSelectionList<ObjectListScr
             this.screen = screen;
         }
 
-        @Override
-        public void renderContent(GuiGraphics guiGraphics, int i, int i1, boolean b, float v) {
-            children.setPosition(this.screen.width / 2 - (children.getWidth() / 2), this.getContentY());
-            children.render(guiGraphics, i, i1, v);
+        // GuiGraphics guiGraphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean
+        // isHovered, int partialTick
+        public void render(
+                GuiGraphics p_281311_,
+                int p_94497_,
+                int p_94498_,
+                int p_94499_,
+                int p_94500_,
+                int p_94501_,
+                int p_94502_,
+                int p_94503_,
+                boolean p_94504_,
+                float p_94505_) {
+
+            children.setPosition(this.screen.width / 2 - (children.getWidth() / 2), p_94498_);
+            children.render(p_281311_, p_94502_, p_94503_, p_94505_);
         }
 
         @Override

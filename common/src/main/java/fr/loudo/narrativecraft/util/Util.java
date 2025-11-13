@@ -25,7 +25,6 @@ package fr.loudo.narrativecraft.util;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.font.GlyphInfo;
-import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.DynamicOps;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
@@ -33,23 +32,27 @@ import fr.loudo.narrativecraft.mixin.accessor.FontAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.PlayerAccessor;
 import fr.loudo.narrativecraft.mixin.accessor.PlayerListAccessor;
 import fr.loudo.narrativecraft.mixin.invoker.FontInvoker;
+import fr.loudo.narrativecraft.mixin.invoker.PauseScreenInvoker;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.platform.Services;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.imageio.ImageIO;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.font.FontSet;
 import net.minecraft.client.gui.screens.PauseScreen;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
@@ -58,15 +61,14 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.ProblemReporter;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.TagValueInput;
-import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.phys.Vec3;
 
 public class Util {
 
@@ -284,5 +286,30 @@ public class Util {
             }
         }
         return longerText;
+    }
+
+    // Code Owned by mojang
+    public static boolean isLookingAtMe(
+            LivingEntity entity1,
+            LivingEntity entity2,
+            double tolerance,
+            boolean scaleByDistance,
+            boolean visual,
+            double... yValues) {
+        Vec3 vec3 = entity1.getViewVector(1.0F).normalize();
+
+        for (double d0 : yValues) {
+            Vec3 vec31 =
+                    new Vec3(entity2.getX() - entity1.getX(), d0 - entity2.getEyeY(), entity2.getZ() - entity1.getZ());
+            double d1 = vec31.length();
+            vec31 = vec31.normalize();
+            double d2 = vec3.dot(vec31);
+            if (d2 > (double) 1.0F - tolerance / (scaleByDistance ? d1 : (double) 1.0F)
+                    && entity2.hasLineOfSight(entity2)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

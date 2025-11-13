@@ -150,6 +150,7 @@ public class MainScreen extends Screen {
             }
             NarrativeCraftMod.LOGGER.error(" ");
         } catch (Exception e) {
+            NarrativeCraftMod.LOGGER.error("Story can't due to crash: ", e);
             CrashScreen crashScreen = new CrashScreen(playerSession, e.getMessage());
             minecraft.setScreen(crashScreen);
         }
@@ -376,7 +377,7 @@ public class MainScreen extends Screen {
         } else {
             startY += buttonHeight + gap;
             Button quitButton = Button.builder(Translation.message("screen.main_screen.quit"), button -> {
-                        Util.disconnectPlayer(minecraft);
+                        Util.disconnectPlayer();
                     })
                     .bounds(initialX, startY, buttonWidth, buttonHeight)
                     .build();

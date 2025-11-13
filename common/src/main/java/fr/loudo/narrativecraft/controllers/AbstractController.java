@@ -25,15 +25,23 @@ package fr.loudo.narrativecraft.controllers;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.Environment;
+import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
+import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.util.Util;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.util.FastColor;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 
 public abstract class AbstractController {
+
+    protected final List<CharacterStoryData> characterStoryDataList = new ArrayList<>();
     protected final Environment environment;
     protected final PlayerSession playerSession;
     protected String hudMessage;

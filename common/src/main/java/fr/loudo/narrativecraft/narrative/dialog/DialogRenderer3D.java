@@ -91,8 +91,11 @@ public class DialogRenderer3D extends DialogRenderer {
                     minecraft.level.getEntity(characterRuntime.getEntity().getId());
             if (entity != null) {
                 if (dialogPosition != null) {
-                    dialogPosition = Mth.lerp(
-                            partialTick, dialogPosition, entity.position().add(0, entity.getEyeHeight(), 0));
+                    Vec3 newPos = entity.position().add(0, entity.getEyeHeight(), 0);
+                    double x = Mth.lerp(partialTick, dialogPosition.x, newPos.x);
+                    double y = Mth.lerp(partialTick, dialogPosition.y, newPos.y);
+                    double z = Mth.lerp(partialTick, dialogPosition.z, newPos.z);
+                    dialogPosition = new Vec3(x, y, z);
                 } else {
                     dialogPosition = entity.position().add(0, entity.getEyeHeight(), 0);
                 }

@@ -44,7 +44,6 @@ import java.util.List;
 import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
@@ -201,26 +200,24 @@ public class CutscenesScreen extends StoryElementScreen {
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
-        if (event.key() == InputConstants.KEY_LSHIFT) {
-            settingsButtons.forEach(settingsButton -> {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == InputConstants.KEY_LSHIFT) {
+            for (Button settingsButton : settingsButtons) {
                 settingsButton.setTooltip(
                         Tooltip.create(Translation.message("screen.story_manager.animation_cutscene_link")));
-            });
+            }
         }
-        shiftPressed = event.hasShiftDown();
-        return super.keyPressed(event);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public boolean keyReleased(KeyEvent event) {
-        if (event.key() == InputConstants.KEY_LSHIFT) {
-            settingsButtons.forEach(settingsButton -> {
+    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == InputConstants.KEY_LSHIFT) {
+            for (Button settingsButton : settingsButtons) {
                 settingsButton.setTooltip(
                         Tooltip.create(Translation.message("screen.story_manager.subscene_cutscene_link")));
-            });
+            }
         }
-        shiftPressed = event.hasShiftDown();
-        return super.keyReleased(event);
+        return super.keyReleased(keyCode, scanCode, modifiers);
     }
 }

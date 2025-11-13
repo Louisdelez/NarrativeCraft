@@ -30,15 +30,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.resources.ResourceLocation;
 
 public class ModKeys {
 
     private static final Map<KeyMapping, Boolean> previousStatesKeyMapping = new HashMap<>();
     private static final Map<Integer, Boolean> previousStatesKeyCode = new HashMap<>();
     private static final List<KeyMapping> ALL_KEYS = new ArrayList<>();
-    private static final KeyMapping.Category CATEGORY =
-            new KeyMapping.Category(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main"));
 
     public static final KeyMapping OPEN_STORY_MANAGER = registerKey("key.screen.story.open", InputConstants.KEY_N);
     public static final KeyMapping START_ANIMATION_RECORDING =
@@ -55,7 +52,8 @@ public class ModKeys {
     public static final KeyMapping STORY_DEBUG = registerKey("key.story_debug", InputConstants.KEY_F9);
 
     private static KeyMapping registerKey(String translationKey, int code) {
-        KeyMapping key = new KeyMapping(translationKey, InputConstants.Type.KEYSYM, code, CATEGORY);
+        KeyMapping key = new KeyMapping(
+                translationKey, InputConstants.Type.KEYSYM, code, "key.categories." + NarrativeCraftMod.MOD_ID);
         ALL_KEYS.add(key);
         return key;
     }

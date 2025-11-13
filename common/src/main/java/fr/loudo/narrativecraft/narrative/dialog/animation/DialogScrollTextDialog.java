@@ -25,7 +25,6 @@ package fr.loudo.narrativecraft.narrative.dialog.animation;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.gui.ICustomGuiRender;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer2D;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer3D;
@@ -38,7 +37,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 import org.joml.Vector2f;
 
 public class DialogScrollTextDialog extends AbstractDialogScrollText {
@@ -101,7 +100,7 @@ public class DialogScrollTextDialog extends AbstractDialogScrollText {
                     String.valueOf(letter.letter()),
                     x,
                     y,
-                    ARGB.color(255, textColor),
+                    FastColor.ARGB32.color(255, textColor),
                     false,
                     poseStack.last().pose(),
                     minecraft.renderBuffers().bufferSource(),
@@ -113,6 +112,7 @@ public class DialogScrollTextDialog extends AbstractDialogScrollText {
     }
 
     public void render(GuiGraphics guiGraphics, float partialTick) {
+        PoseStack poseStack = guiGraphics.pose();
         Map<Integer, Vector2f> offsets = getTextEffectOffsets(partialTick);
         for (int i = 0; i < lettersRenderer.size(); i++) {
             LetterLocation letter = lettersRenderer.get(i);
@@ -128,9 +128,17 @@ public class DialogScrollTextDialog extends AbstractDialogScrollText {
                 x += offsets.get(i).x;
                 y += offsets.get(i).y;
             }
-            ((ICustomGuiRender) guiGraphics)
-                    .narrativecraft$drawStringFloat(
-                            String.valueOf(letter.letter()), minecraft.font, x, y, ARGB.color(255, textColor), false);
+            minecraft.font.drawInBatch(
+                    String.valueOf(letter.letter()),
+                    x,
+                    y,
+                    FastColor.ARGB32.color(255, textColor),
+                    false,
+                    poseStack.last().pose(),
+                    minecraft.renderBuffers().bufferSource(),
+                    Font.DisplayMode.SEE_THROUGH,
+                    0,
+                    LightTexture.FULL_BRIGHT);
         }
     }
 }

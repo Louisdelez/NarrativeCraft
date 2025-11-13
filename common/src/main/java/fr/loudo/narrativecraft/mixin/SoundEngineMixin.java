@@ -33,7 +33,6 @@ import net.minecraft.client.sounds.SoundEngine;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
@@ -45,8 +44,6 @@ public abstract class SoundEngineMixin implements VolumeAudio {
     @Shadow
     @Final
     private Map<SoundInstance, ChannelAccess.ChannelHandle> instanceToChannel;
-
-    public abstract void setVolume(SoundInstance soundInstance, float volume);
 
     @Shadow
     protected abstract float calculateVolume(SoundInstance sound);
@@ -68,12 +65,10 @@ public abstract class SoundEngineMixin implements VolumeAudio {
     */
     @Redirect(
             method = "updateCategoryVolume",
-            at = @At(value = "INVOKE", target = "Ljava/util/Map;forEach(Ljava/util/function/BiConsumer;)V")
-    )
+            at = @At(value = "INVOKE", target = "Ljava/util/Map;forEach(Ljava/util/function/BiConsumer;)V"))
     private void narrativecraft$updateCategoryVolume(
             Map<SoundInstance, ChannelAccess.ChannelHandle> instance,
-            BiConsumer<? super SoundInstance, ? super ChannelAccess.ChannelHandle> v
-    ) {
+            BiConsumer<? super SoundInstance, ? super ChannelAccess.ChannelHandle> v) {
         instance.forEach((soundInstance, channelHandle) -> {
             if (soundInstance instanceof SoundInkInstance) return;
             float f = this.calculateVolume(soundInstance);
@@ -81,4 +76,3 @@ public abstract class SoundEngineMixin implements VolumeAudio {
         });
     }
 }
-

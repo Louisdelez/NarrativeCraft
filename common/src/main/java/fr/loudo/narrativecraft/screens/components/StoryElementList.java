@@ -125,15 +125,25 @@ public class StoryElementList extends ContainerObjectSelectionList<StoryElementL
         }
 
         @Override
-        public void renderContent(GuiGraphics guiGraphics, int i, int i1, boolean b, float v) {
+        public void render(
+                GuiGraphics graphics,
+                int index,
+                int top,
+                int left,
+                int width,
+                int height,
+                int mouseX,
+                int mouseY,
+                boolean hovered,
+                float partial) {
             int totalWidth = buttons.stream().mapToInt(Button::getWidth).sum() + (buttons.size() - 1) * gap;
             int x = (screen.width / 2 - totalWidth / 2);
             if (buttons.size() > 1) {
                 x -= gap;
             }
             for (Button button : buttons) {
-                button.setPosition(x, this.getContentY());
-                button.render(guiGraphics, i, i1, v);
+                button.setPosition(x, top);
+                button.render(graphics, mouseX, mouseY, partial);
                 x += button.getWidth() + gap;
             }
         }

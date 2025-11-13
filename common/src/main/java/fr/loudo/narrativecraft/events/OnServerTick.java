@@ -32,6 +32,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.EntityIn
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.util.Util;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
@@ -113,8 +114,9 @@ public class OnServerTick {
                                     .getEntity()
                             instanceof LivingEntity livingEntity) {
                         if (pPosition.distanceTo(livingEntity.position()) <= 5.0
-                                && livingEntity.isLookingAtMe(
+                                && Util.isLookingAtMe(
                                         player,
+                                        livingEntity,
                                         0.2,
                                         true,
                                         false,
@@ -131,18 +133,14 @@ public class OnServerTick {
                         continue;
                     }
                     if (pPosition.distanceTo(entityInteraction.getArmorStand().position()) <= 5.0
-                            && entityInteraction
-                                    .getArmorStand()
-                                    .isLookingAtMe(
-                                            player,
-                                            0.05,
-                                            true,
-                                            false,
-                                            entityInteraction.getArmorStand().getY()
-                                                    + entityInteraction
-                                                                    .getArmorStand()
-                                                                    .getBbHeight()
-                                                            / 2)) {
+                            && Util.isLookingAtMe(
+                                    player,
+                                    entityInteraction.getArmorStand(),
+                                    0.2,
+                                    true,
+                                    false,
+                                    entityInteraction.getArmorStand().getY()
+                                            + entityInteraction.getArmorStand().getBbHeight() / 2)) {
                         playerSession.setLookingAtEntityId(
                                 entityInteraction.getArmorStand().getId());
                     }

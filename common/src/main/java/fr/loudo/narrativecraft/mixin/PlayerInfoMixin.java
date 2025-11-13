@@ -34,10 +34,8 @@ import java.io.File;
 import java.util.ArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
-import net.minecraft.core.ClientAsset;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.PlayerModelType;
-import net.minecraft.world.entity.player.PlayerSkin;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -54,10 +52,10 @@ public class PlayerInfoMixin {
 
     @Inject(method = "getProfile", at = @At("RETURN"), cancellable = true)
     private void narrativecraft$getProfile(CallbackInfoReturnable<GameProfile> callbackInfo) {
-        if (!"_username_".equals(this.profile.name())) return;
+        if (!"_username_".equals(this.profile.getName())) return;
         GameProfile originalProfile = callbackInfo.getReturnValue();
         String playerName = Minecraft.getInstance().player.getName().getString();
-        callbackInfo.setReturnValue(new GameProfile(originalProfile.id(), playerName));
+        callbackInfo.setReturnValue(new GameProfile(originalProfile.getId(), playerName));
     }
 
     @Inject(method = "getSkin", at = @At("RETURN"), cancellable = true)
@@ -72,19 +70,15 @@ public class PlayerInfoMixin {
             if (mainCharacter != null
                     && mainCharacter.getMainCharacterAttribute().isSameSkinAsTheir()) {
                 ResourceLocation mainCharacterSkin = NarrativeCraftFile.getMainCharacterSkin();
-                PlayerModelType playerModelType;
+                PlayerSkin.Model playerModelType;
                 if (mainCharacterSkin != null) {
                     try {
-                        playerModelType =
-                                PlayerModelType.valueOf(mainCharacter.getModel().name());
+                        playerModelType = PlayerSkin.Model.valueOf(
+                                mainCharacter.getModel().name());
                     } catch (IllegalArgumentException exception) {
-                        playerModelType = PlayerModelType.WIDE;
+                        playerModelType = PlayerSkin.Model.WIDE;
                     }
-                    PlayerSkin playerSkin = PlayerSkin.insecure(
-                            new ClientAsset.ResourceTexture(mainCharacterSkin, mainCharacterSkin),
-                            null,
-                            null,
-                            playerModelType);
+                    PlayerSkin playerSkin = new PlayerSkin(mainCharacterSkin, null, null, null, playerModelType, true);
                     callbackInfo.setReturnValue(playerSkin);
                     return;
                 }
@@ -97,12 +91,12 @@ public class PlayerInfoMixin {
             CharacterStory characterStory = characterRuntime.getCharacterStory();
             var mainCharacterAttribute = characterStory.getMainCharacterAttribute();
 
-            PlayerModelType playerModelType;
+            PlayerSkin.Model playerModelType;
             try {
                 playerModelType =
-                        PlayerModelType.valueOf(characterStory.getModel().name());
+                        PlayerSkin.Model.valueOf(characterStory.getModel().name());
             } catch (IllegalArgumentException exception) {
-                playerModelType = PlayerModelType.WIDE;
+                playerModelType = PlayerSkin.Model.WIDE;
             }
 
             File currentSkinFile = characterRuntime.getCharacterSkinController().getCurrentSkin();
@@ -113,10 +107,9 @@ public class PlayerInfoMixin {
                     "character/" + Util.snakeCase(characterStory.getName()) + "/"
                             + Util.snakeCase(currentSkinFile.getName()));
 
-            PlayerSkin playerSkin = PlayerSkin.insecure(
-                    new ClientAsset.ResourceTexture(skinLocation, skinLocation), null, null, playerModelType);
+            PlayerSkin playerSkin = new PlayerSkin(skinLocation, null, null, null, playerModelType, true);
 
-            if (this.profile.name().equals(characterStory.getName())) {
+            if (this.profile.getName().equals(characterStory.getName())) {
                 if (mainCharacterAttribute.isMainCharacter() && mainCharacterAttribute.isSameSkinAsPlayer()) {
                     callbackInfo.setReturnValue(minecraft.player.getSkin());
                     return;

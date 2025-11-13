@@ -31,7 +31,7 @@ import java.io.File;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.ConfirmScreen;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldSelectionList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.storage.LevelSummary;
@@ -58,7 +58,7 @@ public abstract class WorldSelectionListMixin {
 
     @Shadow
     @Final
-    private Screen screen;
+    private SelectWorldScreen screen;
 
     @Inject(method = "joinWorld", at = @At("HEAD"), cancellable = true)
     private void narrativecraft$joinWorld(CallbackInfo ci) {

@@ -282,8 +282,8 @@ public class PlayerSession {
             }
             return;
         }
-        if (player.gameMode() != GameType.SPECTATOR) {
-            this.lastGameType = player.gameMode();
+        if (player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR) {
+            this.lastGameType = player.gameMode.getGameModeForPlayer();
         }
         player.setGameMode(GameType.SPECTATOR);
     }

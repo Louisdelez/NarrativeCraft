@@ -42,8 +42,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class ServerPlayerCommonMixin {
 
     @Inject(method = "startRiding", at = @At(value = "HEAD"))
-    private void narrativecraft$rideEntity(
-            Entity vehicle, boolean force, boolean sendGameEvent, CallbackInfoReturnable<Boolean> cir) {
+    private void narrativecraft$rideEntity(Entity vehicle, boolean force, CallbackInfoReturnable<Boolean> cir) {
         ServerPlayer player = (ServerPlayer) (Object) this;
         Recording recording =
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);

@@ -52,7 +52,7 @@ public class EntityInteraction extends StitchInteraction {
         armorStand.setGlowingTag(environment == Environment.DEVELOPMENT);
         armorStand.setNoGravity(true);
         armorStand.setNoBasePlate(true);
-        armorStand.snapTo(new Vec3(x, y, z));
+        armorStand.moveTo(new Vec3(x, y, z));
         player.connection.send(new ClientboundAddEntityPacket(
                 armorStand.getId(),
                 armorStand.getUUID(),

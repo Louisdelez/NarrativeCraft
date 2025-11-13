@@ -23,6 +23,8 @@
 
 package fr.loudo.narrativecraft.narrative.story.inkAction;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
@@ -33,8 +35,10 @@ import java.util.Arrays;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
+import org.joml.Matrix4f;
 
 public class BorderInkAction extends InkAction {
 
@@ -102,17 +106,37 @@ public class BorderInkAction extends InkAction {
             leftInterpolated = left;
         }
 
+        PoseStack poseStack = guiGraphics.pose();
+        Matrix4f matrix4f = poseStack.last().pose();
+        VertexConsumer vertexConsumer = minecraft.renderBuffers().bufferSource().getBuffer(RenderType.gui());
+
         // UP
-        guiGraphics.fill(0, 0, widthScreen, up / guiScale, color);
+        vertexConsumer.addVertex(matrix4f, 0, 0, 0).setColor(color);
+        vertexConsumer.addVertex(matrix4f, 0, up / guiScale, 0).setColor(color);
+        vertexConsumer.addVertex(matrix4f, widthScreen, up / guiScale, 0).setColor(color);
+        vertexConsumer.addVertex(matrix4f, widthScreen, 0, 0).setColor(color);
 
         // RIGHT
-        guiGraphics.fill(widthScreen - right / guiScale, 0, widthScreen, heightScreen, color);
+        vertexConsumer.addVertex(matrix4f, widthScreen - right / guiScale, 0, 0).setColor(color);
+        vertexConsumer
+                .addVertex(matrix4f, widthScreen - right / guiScale, heightScreen, 0)
+                .setColor(color);
+        vertexConsumer.addVertex(matrix4f, widthScreen, heightScreen, 0).setColor(color);
+        vertexConsumer.addVertex(matrix4f, widthScreen, 0, 0).setColor(color);
 
         // DOWN
-        guiGraphics.fill(0, heightScreen - down / guiScale, widthScreen, heightScreen, color);
+        vertexConsumer.addVertex(matrix4f, 0, heightScreen - down / guiScale, 0).setColor(color);
+        vertexConsumer.addVertex(matrix4f, 0, heightScreen, 0).setColor(color);
+        vertexConsumer.addVertex(matrix4f, widthScreen, heightScreen, 0).setColor(color);
+        vertexConsumer
+                .addVertex(matrix4f, widthScreen, heightScreen - down / guiScale, 0)
+                .setColor(color);
 
         // LEFT
-        guiGraphics.fill(0, 0, left / guiScale, heightScreen, color);
+        vertexConsumer.addVertex(matrix4f, 0, 0, 0).setColor(color);
+        vertexConsumer.addVertex(matrix4f, 0, heightScreen, 0).setColor(color);
+        vertexConsumer.addVertex(matrix4f, left / guiScale, heightScreen, 0).setColor(color);
+        vertexConsumer.addVertex(matrix4f, left / guiScale, 0, 0).setColor(color);
     }
 
     @Override

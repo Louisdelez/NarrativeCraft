@@ -36,7 +36,6 @@ import java.util.List;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -180,16 +179,16 @@ public class StoryChoicesScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
-        if (event.key() == InputConstants.KEY_ESCAPE) return false;
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == InputConstants.KEY_ESCAPE) return false;
         if (storyHandler == null) {
             minecraft.setScreen(null);
-            return super.keyPressed(event);
+            return super.keyPressed(keyCode, scanCode, modifiers);
         }
         List<KeyMapping> choiceKeys = List.of(
                 ModKeys.SELECT_CHOICE_1, ModKeys.SELECT_CHOICE_2, ModKeys.SELECT_CHOICE_3, ModKeys.SELECT_CHOICE_4);
         for (int i = 0; i < choiceList.size(); i++) {
-            if (event.key() == choiceKeys.get(i).getDefaultKey().getValue()) {
+            if (keyCode == choiceKeys.get(i).getDefaultKey().getValue()) {
                 minecraft.setScreen(null);
                 try {
                     int finalI = i;
@@ -200,7 +199,7 @@ public class StoryChoicesScreen extends Screen {
                 }
             }
         }
-        return super.keyPressed(event);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override

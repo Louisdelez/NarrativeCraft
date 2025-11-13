@@ -31,10 +31,9 @@ import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.OptionsSubScreen;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
 public class ChangeSkinLinkScreen extends OptionsSubScreen {
@@ -115,31 +114,38 @@ public class ChangeSkinLinkScreen extends OptionsSubScreen {
                 this.skin = skin;
             }
 
-            @Override
-            public void renderContent(GuiGraphics guiGraphics, int i, int i1, boolean b, float v) {
-                guiGraphics.drawCenteredString(
+            public void render(
+                    GuiGraphics p_345300_,
+                    int p_345469_,
+                    int p_345328_,
+                    int p_345700_,
+                    int p_345311_,
+                    int p_345185_,
+                    int p_344805_,
+                    int p_345963_,
+                    boolean p_345912_,
+                    float p_346091_) {
+                p_345300_.drawCenteredString(
                         ChangeSkinLinkScreen.this.font,
                         this.skin.getName().split("\\.")[0],
                         SkinList.this.width / 2,
-                        this.getContentYMiddle() - 9 / 2,
+                        p_345328_ + p_345185_ / 2 - 4,
                         -1);
             }
 
-            @Override
-            public boolean keyPressed(KeyEvent event) {
-                if (event.isConfirmation()) {
+            public boolean keyPressed(int p_346403_, int p_345881_, int p_345858_) {
+                if (CommonInputs.selected(p_346403_)) {
                     this.select();
                     ChangeSkinLinkScreen.this.onClose();
                     return true;
                 } else {
-                    return super.keyPressed(event);
+                    return super.keyPressed(p_346403_, p_345881_, p_345858_);
                 }
             }
 
-            @Override
-            public boolean mouseClicked(MouseButtonEvent p_446815_, boolean p_432750_) {
+            public boolean mouseClicked(double p_344965_, double p_345385_, int p_345080_) {
                 this.select();
-                return super.mouseClicked(p_446815_, p_432750_);
+                return super.mouseClicked(p_344965_, p_345385_, p_345080_);
             }
 
             private void select() {

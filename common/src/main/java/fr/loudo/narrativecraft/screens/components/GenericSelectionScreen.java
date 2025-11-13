@@ -33,9 +33,8 @@ import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
+import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
@@ -100,8 +99,8 @@ public class GenericSelectionScreen<T extends NarrativeEntry> extends Screen {
         if (entry == null) {
             consumer.accept(null);
         } else {
-            minecraft.setScreen(lastScreen);
             consumer.accept(entry.getItem());
+            minecraft.setScreen(lastScreen);
         }
     }
 
@@ -156,31 +155,34 @@ public class GenericSelectionScreen<T extends NarrativeEntry> extends Screen {
             }
 
             @Override
-            public void renderContent(GuiGraphics guiGraphics, int i, int i1, boolean b, float v) {
+            public void render(
+                    GuiGraphics guiGraphics,
+                    int x,
+                    int y,
+                    int width,
+                    int height,
+                    int mouseX,
+                    int mouseY,
+                    int i6,
+                    boolean isSelected,
+                    float partialTick) {
                 String displayName = this.item.getName();
-                guiGraphics.drawCenteredString(
-                        parentScreen.font,
-                        displayName,
-                        SelectionList.this.width / 2,
-                        this.getContentYMiddle() - 9 / 2,
-                        -1);
+                guiGraphics.drawCenteredString(parentScreen.font, displayName, SelectionList.this.width / 2, y + 3, -1);
             }
 
-            @Override
-            public boolean keyPressed(KeyEvent event) {
-                if (event.isConfirmation()) {
+            public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+                if (CommonInputs.selected(keyCode)) {
                     this.select();
                     parentScreen.onClose();
                     return true;
                 } else {
-                    return super.keyPressed(event);
+                    return super.keyPressed(keyCode, scanCode, modifiers);
                 }
             }
 
-            @Override
-            public boolean mouseClicked(MouseButtonEvent p_446815_, boolean p_432750_) {
+            public boolean mouseClicked(double mouseX, double mouseY, int button) {
                 this.select();
-                return super.mouseClicked(p_446815_, p_432750_);
+                return super.mouseClicked(mouseX, mouseY, button);
             }
 
             private void select() {

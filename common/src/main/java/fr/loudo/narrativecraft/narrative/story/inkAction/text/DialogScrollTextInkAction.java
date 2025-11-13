@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.story.inkAction.text;
 
-import fr.loudo.narrativecraft.gui.ICustomGuiRender;
+import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.narrative.dialog.animation.AbstractDialogScrollText;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.List;
@@ -31,10 +31,11 @@ import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FontDescription;
-import net.minecraft.util.ARGB;
-import org.joml.Matrix3x2fStack;
+import net.minecraft.util.FastColor;
+import org.joml.Matrix4f;
 import org.joml.Vector2f;
 
 public class DialogScrollTextInkAction extends AbstractDialogScrollText {
@@ -81,13 +82,13 @@ public class DialogScrollTextInkAction extends AbstractDialogScrollText {
         Attribute attribute = textInkAction.getAttribute();
         if (!attribute.isRender()) return;
 
-        Matrix3x2fStack poseStack = guiGraphics.pose();
+        PoseStack poseStack = guiGraphics.pose();
         Font font = attribute.getFont();
         Position position = attribute.getPosition();
 
         Component longerText = Component.literal(getLongerTextLine()).withStyle(style -> {
             if (attribute.getCustomFont() == null) return style;
-            return style.withFont(new FontDescription.Resource(attribute.getCustomFont()));
+            return style.withFont(attribute.getCustomFont());
         });
 
         int textWidth = font.width(longerText.getVisualOrderText());
@@ -165,10 +166,10 @@ public class DialogScrollTextInkAction extends AbstractDialogScrollText {
             spacing = new float[] {0, 0};
         }
 
-        poseStack.pushMatrix();
-        poseStack.translate(anchorX + spacing[0], anchorY + spacing[1]);
-        poseStack.scale(attribute.getScale(), attribute.getScale());
-        poseStack.translate(textOffsetX, textOffsetY);
+        poseStack.pushPose();
+        poseStack.translate(anchorX + spacing[0], anchorY + spacing[1], 0);
+        poseStack.scale(attribute.getScale(), attribute.getScale(), attribute.getScale());
+        poseStack.translate(textOffsetX, textOffsetY, 0);
 
         Map<Integer, Vector2f> offsets = getTextEffectOffsets(partialTick);
 
@@ -184,19 +185,25 @@ public class DialogScrollTextInkAction extends AbstractDialogScrollText {
                 y += offsets.get(i).y;
             }
 
-            ((ICustomGuiRender) guiGraphics)
-                    .narrativecraft$drawStringFloat(
-                            String.valueOf(letter.letter()),
-                            font,
-                            x,
-                            y,
-                            ARGB.color(
-                                    (int) (opacity * 255.0),
-                                    textInkAction.getAttribute().getColor()),
-                            attribute.isDropShadow());
+            MultiBufferSource.BufferSource bufferSource =
+                    minecraft.renderBuffers().bufferSource();
+            Matrix4f matrix4f = poseStack.last().pose();
+            font.drawInBatch(
+                    String.valueOf(letter.letter()),
+                    x,
+                    y,
+                    FastColor.ARGB32.color(
+                            (int) (opacity * 255.0),
+                            textInkAction.getAttribute().getColor()),
+                    attribute.isDropShadow(),
+                    matrix4f,
+                    bufferSource,
+                    Font.DisplayMode.SEE_THROUGH,
+                    0,
+                    LightTexture.FULL_BRIGHT);
         }
 
-        poseStack.popMatrix();
+        poseStack.popPose();
     }
 
     public boolean isBlock() {

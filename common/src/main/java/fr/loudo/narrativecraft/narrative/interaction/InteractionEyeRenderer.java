@@ -32,7 +32,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.util.ARGB;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
@@ -96,7 +96,7 @@ public class InteractionEyeRenderer {
                 ImageFontConstants.EYE_OPEN,
                 -mc.font.width(ImageFontConstants.EYE_OPEN) / 2f,
                 -mc.font.lineHeight / 2f,
-                ARGB.color(opacity, 0xFFFFFF),
+                FastColor.ARGB32.color(opacity, 0xFFFFFF),
                 false,
                 mat,
                 bufferSource,

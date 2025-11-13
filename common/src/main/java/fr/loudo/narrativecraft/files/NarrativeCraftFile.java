@@ -50,9 +50,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.DefaultPlayerSkin;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.entity.player.PlayerSkin;
 import net.minecraft.world.level.storage.LevelResource;
 
 public class NarrativeCraftFile {
@@ -443,9 +443,8 @@ public class NarrativeCraftFile {
         File dataFile = getDataFile(characterFolder);
         File mainSkinFile = createFile(skinsFolder, "main.png");
         PlayerSkin defaultPlayerSkin = DefaultPlayerSkin.get(UUID.randomUUID());
-        try (InputStream inputStream = Minecraft.getInstance()
-                .getResourceManager()
-                .open(defaultPlayerSkin.body().texturePath())) {
+        try (InputStream inputStream =
+                Minecraft.getInstance().getResourceManager().open(defaultPlayerSkin.texture())) {
             Files.copy(inputStream, mainSkinFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException ignored) {
         }
@@ -465,9 +464,8 @@ public class NarrativeCraftFile {
         File mainSkinFile = createFile(characterFolder, "main.png");
         File dataFile = createFile(characterFolder, DATA_FILE_NAME);
         PlayerSkin defaultPlayerSkin = DefaultPlayerSkin.get(UUID.randomUUID());
-        try (InputStream inputStream = Minecraft.getInstance()
-                .getResourceManager()
-                .open(defaultPlayerSkin.body().texturePath())) {
+        try (InputStream inputStream =
+                Minecraft.getInstance().getResourceManager().open(defaultPlayerSkin.texture())) {
             Files.copy(inputStream, mainSkinFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException ignored) {
         }
