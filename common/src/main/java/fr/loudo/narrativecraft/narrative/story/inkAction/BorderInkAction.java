@@ -110,6 +110,8 @@ public class BorderInkAction extends InkAction {
         Matrix4f matrix4f = poseStack.last().pose();
         VertexConsumer vertexConsumer = minecraft.renderBuffers().bufferSource().getBuffer(RenderType.gui());
 
+        poseStack.pushPose();
+
         // UP
         vertexConsumer.addVertex(matrix4f, 0, 0, 0).setColor(color);
         vertexConsumer.addVertex(matrix4f, 0, up / guiScale, 0).setColor(color);
@@ -137,6 +139,8 @@ public class BorderInkAction extends InkAction {
         vertexConsumer.addVertex(matrix4f, 0, heightScreen, 0).setColor(color);
         vertexConsumer.addVertex(matrix4f, left / guiScale, heightScreen, 0).setColor(color);
         vertexConsumer.addVertex(matrix4f, left / guiScale, 0, 0).setColor(color);
+
+        poseStack.popPose();
     }
 
     @Override
