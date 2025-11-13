@@ -33,6 +33,7 @@ import fr.loudo.narrativecraft.hud.StoryDebugHud;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.AreaTrigger;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.CharacterInteraction;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.EntityInteraction;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.StitchInteraction;
@@ -148,6 +149,7 @@ public class StoryHandler {
 
     public void stop() {
         playerSession.getInkTagHandler().stopAll();
+        playerSession.setLastAreaTriggerEntered(null);
         for (InkAction inkAction : playerSession.getInkActions()) {
             inkAction.stop();
         }
@@ -367,6 +369,11 @@ public class StoryHandler {
         }
         dialogData = save.getDialogData();
         dialogText = story.getCurrentText().replace("\n", "");
+        for (String areaTriggerName : save.getAreaTriggersEnteredName()) {
+            AreaTrigger areaTrigger = save.getScene().getAreaTriggerByName(areaTriggerName);
+            if (areaTrigger == null) continue;
+            playerSession.getAreaTriggersEntered().add(areaTrigger);
+        }
         playerSession.getInkTagHandler().execute();
         if (!story.getCurrentChoices().isEmpty()) {
             handleChoices();
