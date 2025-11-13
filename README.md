@@ -13,9 +13,18 @@
   </a>
 </p>
 
+## Tutorial video
+<a href="https://youtu.be/QUZUdqEoVRU">
+   <img width="1400" height="789" src="https://github.com/user-attachments/assets/33024ef3-eeef-4bee-aa94-a108a45c0866" />
+</a>
+
 
 ## Concept
-Do you want to create your own Life is Strange game, or Until Then game, or any narrative game you can think of? NarrativeCraft is a tool that makes this possible with a plot twist: you don't need to know how to code, all thanks to the Ink narrative scripting system.
+NarrativeCraft is a Minecraft mod that turns Minecraft into a sort of game-engine where you can create narrative stories with choices and patterns based on choices.
+
+It's mostly for creating a game in a game and is highly inspired from games I love like Life Is Strange and Until Then.
+
+It's all-in-one (recording, cutscene, rendering dialogs, story management) and is designed to be easy to use.
 
 Create your own unique stories with endearing characters, let your imagination take form in a 3D sandbox, with shaders, music, and cutscenes.
 
@@ -48,19 +57,9 @@ By events, I mean custom lines you can write to trigger in-game actions. For exa
 ## What does it look like in-game?
 
 I'm glad you asked! I made a small showcase to demonstrate what this mod is capable of:  
-
 <a href="https://youtu.be/4VunlM_XCms">
 <img src="https://github.com/user-attachments/assets/a1c5a664-dbf4-4782-aa4e-d18ca1462579"/>
 </a>
-
-
-## I want to start making stories
-Here's a tutorial video that teach you the basics!
-
-<a href="https://youtu.be/QUZUdqEoVRU">
-   <img width="1920" height="1080" src="https://github.com/user-attachments/assets/33024ef3-eeef-4bee-aa94-a108a45c0866" />
-</a>
-
 
 ## Contribution
 
