@@ -27,8 +27,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
-import fr.loudo.narrativecraft.api.inkAction.InkActionRegistry;
-import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.controllers.keyframe.AbstractKeyframeGroupsBase;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.managers.PlaybackManager;
@@ -67,7 +65,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
 
     private boolean isPlaying;
     private int currentTick, skipTickCount;
-    private int totalTick;
+    private int totalTick, lastTick;
     private CutsceneKeyframeGroup selectedGroup;
 
     public CutsceneController(Environment environment, Player player, Cutscene cutscene) {
@@ -97,25 +95,13 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
                     .getString();
         }
         if (!isPlaying) return;
-        List<KeyframeTrigger> keyframeTriggersToExecute = keyframeTriggers.stream()
-                .filter(trigger -> trigger.getTick() == currentTick)
-                .toList();
-        for (KeyframeTrigger keyframeTrigger : keyframeTriggersToExecute) {
-            for (String command : keyframeTrigger.getCommandsToList()) {
-                InkAction inkAction = InkActionRegistry.findByCommand(command);
-                if (inkAction == null) continue;
-                InkActionResult result = inkAction.validateAndExecute(command, playerSession);
-                if (!result.isOk()) continue;
-                playerSession.addInkAction(inkAction);
-            }
-        }
         currentTick++;
         if (currentTick >= totalTick && environment == Environment.DEVELOPMENT) {
             pause();
             if (Minecraft.getInstance().screen instanceof CutsceneControllerScreen screen) {
                 screen.getControllerButton().setMessage(screen.getPlayText());
             }
-        } else if (currentTick >= totalTick && environment == Environment.PRODUCTION) {
+        } else if (currentTick >= lastTick && environment == Environment.PRODUCTION) {
             if (onEnd != null) {
                 onEnd.run();
             }
@@ -156,6 +142,10 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
             playbacks.add(playback);
         }
         totalTick = calculateTotalTick();
+        CutsceneKeyframe lastKeyframe = getLastKeyframeLastGroup();
+        if (lastKeyframe != null) {
+            lastTick = lastKeyframe.getTick() + lastKeyframe.getTransitionDelayTick();
+        }
         for (Playback playback : playbacks) {
             playerSession.getCharacterRuntimes().add(playback.getCharacterRuntime());
         }
@@ -195,7 +185,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
     public void stopSession(boolean save) {
         for (Playback playback : playbacks) {
             if (playback.getCharacterRuntime().getEntity() == null
-                    || !playback.getCharacterRuntime().getEntity().isAlive()) {
+                    || playback.getCharacterRuntime().getEntity().isRemoved()) {
                 playerSession.getCharacterRuntimes().remove(playback.getCharacterRuntime());
             }
             playback.stop(environment == Environment.DEVELOPMENT);
@@ -220,6 +210,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         }
         playerSession.getPlaybackManager().getPlaybacks().removeAll(playbacks);
         if (environment != Environment.DEVELOPMENT) return;
+        playerSession.getCharacterRuntimes().clear();
         for (CutsceneKeyframeGroup keyframeGroup : keyframeGroups) {
             keyframeGroup.hideKeyframes(playerSession.getPlayer());
         }
@@ -533,6 +524,10 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         return currentTick >= totalTick;
     }
 
+    public boolean finishedCutscene() {
+        return currentTick >= lastTick;
+    }
+
     public void nextSecondSkip() {
         if (playbacks.isEmpty()) {
             currentTick += skipTickCount;
@@ -566,30 +561,39 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
     }
 
     private int calculateTotalTick() {
+        int totalTick = 0;
+
         if (!playbacks.isEmpty()) {
-            int total = 0;
-            int count = 0;
+            int maxPlaybackTick = 0;
 
             for (Subscene subscene : cutscene.getSubscenes()) {
-                for (Playback playback : subscene.getPlaybacks()) {
-                    total += playback.getMaxTick();
-                    count++;
+                for (Playback p : subscene.getPlaybacks()) {
+                    maxPlaybackTick = Math.max(maxPlaybackTick, p.getMaxTick());
                 }
             }
 
-            for (Playback playback : playbacks) {
-                total += playback.getMaxTick();
-                count++;
+            for (Playback p : playbacks) {
+                maxPlaybackTick = Math.max(maxPlaybackTick, p.getMaxTick());
             }
 
-            if (count == 0) return 0;
-            totalTick = total / count;
+            int additionalTick = 0;
+            for (CutsceneKeyframeGroup group : keyframeGroups) {
+                for (CutsceneKeyframe kf : group.getKeyframes()) {
+                    if (kf.getTick() >= maxPlaybackTick) {
+                        additionalTick += kf.getPathTick() + kf.getTransitionDelayTick();
+                    }
+                }
+            }
+
+            totalTick = maxPlaybackTick + additionalTick;
         } else {
             CutsceneKeyframe keyframe = getLastKeyframeLastGroup();
             if (keyframe != null) {
                 totalTick = keyframe.getTick();
             }
         }
+
+        this.totalTick = totalTick;
         return totalTick;
     }
 

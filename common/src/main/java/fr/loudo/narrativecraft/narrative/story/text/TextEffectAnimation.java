@@ -39,8 +39,7 @@ public class TextEffectAnimation {
     private final Map<Integer, Vector2f> oldLetterOffsets = new HashMap<>();
     private int tickCounter;
 
-    public TextEffectAnimation(String text) {
-        ParsedDialog parsedDialog = ParsedDialog.parse(text);
+    public TextEffectAnimation(ParsedDialog parsedDialog) {
         dialogLetterEffectList = TextEffect.apply(parsedDialog.effects());
     }
 
@@ -50,7 +49,9 @@ public class TextEffectAnimation {
         oldLetterOffsets.clear();
         oldLetterOffsets.putAll(letterOffsets);
 
-        for (DialogLetterEffect dialogLetterEffect : dialogLetterEffectList) {
+        for (DialogLetterEffect dialogLetterEffect : dialogLetterEffectList.stream()
+                .filter(dialogLetterEffect -> dialogLetterEffect.getAnimation() != DialogAnimationType.WAIT)
+                .toList()) {
             dialogLetterEffect.tick();
             if (dialogLetterEffect.getAnimation() == DialogAnimationType.SHAKE) {
 
@@ -71,10 +72,6 @@ public class TextEffectAnimation {
                     oldLetterOffsets.put(j, new Vector2f(offsetX, offsetY));
                 }
 
-                if (dialogLetterEffect.canApplyEffect()) {
-                    dialogLetterEffect.reset();
-                }
-
             } else if (dialogLetterEffect.getAnimation() == DialogAnimationType.WAVE) {
                 float waveSpacing = 0.2f;
                 double waveSpeed = (double) tickCounter / dialogLetterEffect.getTotalTick();
@@ -85,6 +82,17 @@ public class TextEffectAnimation {
                 }
             }
         }
+    }
+
+    public boolean canTick(int currentCharIndex) {
+        for (DialogLetterEffect dialogLetterEffect : dialogLetterEffectList.stream()
+                .filter(dialogLetterEffect -> dialogLetterEffect.getAnimation() == DialogAnimationType.WAIT)
+                .toList()) {
+            if (currentCharIndex < dialogLetterEffect.getStartIndex() - 1) continue;
+            dialogLetterEffect.tick();
+            return dialogLetterEffect.getCooldownTick() == 0;
+        }
+        return true;
     }
 
     public Map<Integer, Vector2f> getOffsets(float partialTick) {

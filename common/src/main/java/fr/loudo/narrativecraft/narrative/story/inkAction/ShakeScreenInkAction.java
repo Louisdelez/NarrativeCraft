@@ -69,7 +69,8 @@ public class ShakeScreenInkAction extends InkAction {
 
         noiseI += (1.0f / 20.0f) * noiseShakeSpeed;
 
-        shakeStrength = Mth.lerp(shakeDecayRate * (1.0f / 20.0f), shakeStrength, 0.0f);
+        float decayFactor = Mth.clamp(shakeDecayRate * (1.0f / 20.0f), 0.0f, 1.0f);
+        shakeStrength = Mth.lerp(decayFactor, shakeStrength, 0.0f);
 
         lastOffsetX = currentOffsetX;
         lastOffsetY = currentOffsetY;
@@ -77,7 +78,7 @@ public class ShakeScreenInkAction extends InkAction {
         currentOffsetX = (float) noise.getValue(1, noiseI) * shakeStrength;
         currentOffsetY = (float) noise.getValue(100, noiseI) * shakeStrength;
 
-        if (Math.abs(shakeStrength) <= 0) {
+        if (Math.abs(shakeStrength) < 0.001f) {
             isRunning = false;
             currentOffsetX = currentOffsetY = lastOffsetX = lastOffsetY = 0;
         }

@@ -27,6 +27,8 @@ import com.mojang.blaze3d.vertex.*;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
+import fr.loudo.narrativecraft.controllers.interaction.InteractionController;
+import fr.loudo.narrativecraft.narrative.interaction.InteractionEyeRenderer;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -38,15 +40,31 @@ public class OnRenderWorld {
                 .getSessionByPlayer(Minecraft.getInstance().player);
         if (playerSession == null) return;
         if (playerSession.getController() instanceof CutsceneController controller) {
+            poseStack.pushPose();
             controller.drawLinesBetweenKeyframes(poseStack);
+            poseStack.popPose();
+        }
+        if (playerSession.getController() instanceof InteractionController controller) {
+            poseStack.pushPose();
+            controller.showAreaTriggers(poseStack);
+            poseStack.popPose();
         }
         if (playerSession.getDialogRenderer() != null) {
+            poseStack.pushPose();
             playerSession.getDialogRenderer().render(poseStack, partialTick);
+            poseStack.popPose();
         }
         List<InkAction> inkActionsClient = playerSession.getClientSideInkActions();
         for (InkAction inkAction : inkActionsClient) {
             inkAction.partialTick(partialTick);
+            poseStack.pushPose();
             inkAction.render(poseStack, partialTick);
+            poseStack.popPose();
+        }
+        if (playerSession.getCurrentCamera() == null && playerSession.isOnGameplay()) {
+            poseStack.pushPose();
+            InteractionEyeRenderer.render(poseStack, partialTick, playerSession.getLookingAtEntityId());
+            poseStack.popPose();
         }
     }
 }

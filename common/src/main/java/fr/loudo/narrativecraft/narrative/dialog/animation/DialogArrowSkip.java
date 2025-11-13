@@ -27,7 +27,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.util.Easing;
-import fr.loudo.narrativecraft.util.MathHelper;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.FastColor;
@@ -77,7 +76,7 @@ public class DialogArrowSkip {
         double opacity;
         int originalColor = color;
         if (currentTick < totalTick) {
-            double t = MathHelper.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
+            double t = Mth.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
             t = Easing.SMOOTH.interpolate(t);
             translateX = Mth.lerp(t, translateX + xTranslatePoint, translateX);
             opacity = Mth.lerp(t, 0.0, 0.8);
@@ -107,7 +106,7 @@ public class DialogArrowSkip {
         poseStack.pushPose();
 
         if (currentTick < totalTick) {
-            double t = MathHelper.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
+            double t = Mth.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
             t = Easing.SMOOTH.interpolate(t);
             translateX = Mth.lerp(t, xTranslatePoint, translateX);
             opacity = Mth.lerp(t, 0.0, 1.0);

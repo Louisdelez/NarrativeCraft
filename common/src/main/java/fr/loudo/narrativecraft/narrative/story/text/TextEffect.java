@@ -53,6 +53,7 @@ public record TextEffect(DialogAnimationType type, int startIndex, int endIndex,
                     time = time == -1 ? 0.05 : time;
                     force = force == -1 ? 0.35f : force;
                 }
+                case WAIT -> time = time == -1 ? 0 : time;
             }
 
             dialogLetterEffectList.add(

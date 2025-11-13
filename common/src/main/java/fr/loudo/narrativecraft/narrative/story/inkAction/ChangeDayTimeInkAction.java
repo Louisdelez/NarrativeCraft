@@ -29,7 +29,6 @@ import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.util.Easing;
-import fr.loudo.narrativecraft.util.MathHelper;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +37,7 @@ import net.minecraft.util.Mth;
 public class ChangeDayTimeInkAction extends InkAction {
 
     private String action;
-    private long fromTick, toTick, segmentTick, currentTick, lastTick;
+    private long fromTick, toTick, segmentTick, tick;
     private double forSeconds;
     private Easing easing;
 
@@ -56,8 +55,8 @@ public class ChangeDayTimeInkAction extends InkAction {
     public void partialTick(float partialTick) {
         if (!canBeExecuted || !isRunning || easing == null) return;
         double durationTicks = forSeconds * 20.0;
-        double t = MathHelper.clamp((segmentTick + partialTick) / durationTicks, 0.0, 1.0);
-        currentTick = (long) Mth.lerp(t, fromTick, toTick);
+        double t = Mth.clamp((segmentTick + partialTick) / durationTicks, 0.0, 1.0);
+        tick = (long) Mth.lerp(t, fromTick, toTick);
     }
 
     @Override
@@ -73,7 +72,7 @@ public class ChangeDayTimeInkAction extends InkAction {
             return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Time day tick"));
         }
         fromTick = getTickFromString(arguments.get(2));
-        currentTick = fromTick;
+        tick = fromTick;
         if (fromTick == -1) {
             return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(2)));
         }
@@ -118,7 +117,7 @@ public class ChangeDayTimeInkAction extends InkAction {
     protected InkActionResult doExecute(PlayerSession playerSession) {
         for (InkAction inkAction : playerSession.getInkActions()) {
             if (inkAction instanceof ChangeDayTimeInkAction changeDayTimeInkAction && this.action.equals("add")) {
-                currentTick += changeDayTimeInkAction.getCurrentTick();
+                tick += changeDayTimeInkAction.getTick();
                 changeDayTimeInkAction.setRunning(false);
             }
         }
@@ -149,8 +148,8 @@ public class ChangeDayTimeInkAction extends InkAction {
         }
     }
 
-    public long getCurrentTick() {
-        return currentTick;
+    public long getTick() {
+        return tick;
     }
 
     @Override

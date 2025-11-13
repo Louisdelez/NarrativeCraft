@@ -21,6 +21,20 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.handler;
+package fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction;
 
-public class ClientPacketHandlerForge {}
+import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
+
+public class CharacterInteraction extends StitchInteraction {
+
+    private final CharacterStoryData characterStoryData;
+
+    public CharacterInteraction(String stitch, CharacterStoryData characterStoryData) {
+        super(stitch);
+        this.characterStoryData = characterStoryData;
+    }
+
+    public CharacterStoryData getCharacterStoryData() {
+        return characterStoryData;
+    }
+}

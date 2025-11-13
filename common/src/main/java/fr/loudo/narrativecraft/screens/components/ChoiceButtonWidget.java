@@ -72,7 +72,8 @@ public class ChoiceButtonWidget extends AbstractButton {
         int width = font.width(parsedDialog.cleanedText());
         int height = font.lineHeight;
         this.setWidth(width + paddingX * 2);
-        textEffectAnimation = new TextEffectAnimation(choiceString);
+        this.height = (height + paddingY * 2);
+        textEffectAnimation = new TextEffectAnimation(parsedDialog);
     }
 
     public void tick() {

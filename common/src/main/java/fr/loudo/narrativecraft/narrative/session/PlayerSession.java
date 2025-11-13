@@ -25,10 +25,13 @@ package fr.loudo.narrativecraft.narrative.session;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.controllers.AbstractController;
+import fr.loudo.narrativecraft.controllers.interaction.InteractionController;
 import fr.loudo.narrativecraft.gui.StorySaveIconGui;
 import fr.loudo.narrativecraft.managers.PlaybackManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.AreaTrigger;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.StitchInteraction;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
@@ -36,10 +39,12 @@ import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandler;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.recording.Location;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.narrative.story.inkAction.GameplayInkAction;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.GameType;
 
 public class PlayerSession {
 
@@ -49,13 +54,19 @@ public class PlayerSession {
     private final List<CharacterRuntime> characterRuntimes = new ArrayList<>();
     private final InkTagHandler inkTagHandler;
     private final StorySaveIconGui storySaveIconGui = new StorySaveIconGui(0.2, 0.9, 0.2);
+    private final List<InteractionController> interactionControllers = new ArrayList<>();
+    private final List<AreaTrigger> areaTriggersEntered = new ArrayList<>();
     private AbstractController controller;
     private DialogRenderer dialogRenderer;
     private KeyframeLocation currentCamera;
     private StoryHandler storyHandler;
+    private AreaTrigger lastAreaTriggerEntered;
+    private StitchInteraction lastInteraction;
     private Chapter chapter;
     private Scene scene;
     private String stitch;
+    private GameType lastGameType;
+    private int lookingAtEntityId;
     private boolean showDebugHud;
 
     public PlayerSession(ServerPlayer player) {
@@ -136,30 +147,67 @@ public class PlayerSession {
         return inkTagHandler;
     }
 
-    public CharacterRuntime getCharacterRuntimeByCharacter(CharacterStory characterStory) {
+    public List<CharacterRuntime> getCharacterRuntimesByCharacter(CharacterStory characterStory) {
         clearKilledCharacters();
+        List<CharacterRuntime> characterRuntimes1 = new ArrayList<>();
         for (CharacterRuntime characterRuntime : characterRuntimes) {
             if (characterRuntime.getEntity() == null
-                    || !characterRuntime.getEntity().isAlive()) continue;
+                    || characterRuntime.getEntity().isRemoved()) continue;
             if (characterRuntime.getCharacterStory().getName().equalsIgnoreCase(characterStory.getName())) {
-                return characterRuntime;
+                characterRuntimes1.add(characterRuntime);
             }
         }
-        return null;
+        return characterRuntimes1;
     }
 
     public void clearKilledCharacters() {
         characterRuntimes.removeIf(characterRuntime -> characterRuntime.getEntity() == null
-                || !characterRuntime.getEntity().isAlive());
+                || characterRuntime.getEntity().isRemoved());
     }
 
     public void clearPlaybacksNotPlaying() {
         playbackManager
                 .getPlaybacks()
-                .removeIf(playback -> !playback.isPlaying()
-                        || playback.hasEnded()
+                .removeIf(playback -> playback.hasEnded()
                         || playback.getCharacterRuntime().getEntity() == null
-                        || !playback.getCharacterRuntime().getEntity().isAlive());
+                        || playback.getCharacterRuntime().getEntity().isRemoved());
+    }
+
+    public boolean isOnGameplay() {
+        List<InkAction> inkActions1 = new ArrayList<>(inkActions);
+        return !inkActions1.stream()
+                .filter(inkAction -> inkAction instanceof GameplayInkAction)
+                .toList()
+                .isEmpty();
+    }
+
+    public List<AreaTrigger> getAreaTriggersEntered() {
+        return areaTriggersEntered;
+    }
+
+    public void addAreaTriggerEntered(AreaTrigger areaTrigger) {
+        if (areaTriggersEntered.contains(areaTrigger)) return;
+        areaTriggersEntered.add(areaTrigger);
+    }
+
+    public void removeAreaTriggerEntered(AreaTrigger areaTrigger) {
+        areaTriggersEntered.remove(areaTrigger);
+    }
+
+    public AreaTrigger getLastAreaTriggerEntered() {
+        return lastAreaTriggerEntered;
+    }
+
+    public StitchInteraction getLastInteraction() {
+        return lastInteraction;
+    }
+
+    public void setLastInteraction(StitchInteraction lastInteraction) {
+        this.lastInteraction = lastInteraction;
+    }
+
+    public void setLastAreaTriggerEntered(AreaTrigger lastAreaTriggerEntered) {
+        this.lastAreaTriggerEntered = lastAreaTriggerEntered;
     }
 
     public List<CharacterRuntime> getCharacterRuntimes() {
@@ -198,6 +246,14 @@ public class PlayerSession {
         this.stitch = stitch;
     }
 
+    public int getLookingAtEntityId() {
+        return lookingAtEntityId;
+    }
+
+    public void setLookingAtEntityId(int lookingAtEntityId) {
+        this.lookingAtEntityId = lookingAtEntityId;
+    }
+
     public AbstractController getController() {
         return controller;
     }
@@ -220,6 +276,16 @@ public class PlayerSession {
 
     public void setCurrentCamera(KeyframeLocation currentCamera) {
         this.currentCamera = currentCamera;
+        if (currentCamera == null) {
+            if (lastGameType != null) {
+                player.setGameMode(lastGameType);
+            }
+            return;
+        }
+        if (player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR) {
+            this.lastGameType = player.gameMode.getGameModeForPlayer();
+        }
+        player.setGameMode(GameType.SPECTATOR);
     }
 
     public StorySaveIconGui getStorySaveIconGui() {
@@ -232,5 +298,9 @@ public class PlayerSession {
 
     public void setShowDebugHud(boolean showDebugHud) {
         this.showDebugHud = showDebugHud;
+    }
+
+    public List<InteractionController> getInteractionControllers() {
+        return interactionControllers;
     }
 }

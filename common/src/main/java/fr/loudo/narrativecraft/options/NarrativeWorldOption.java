@@ -28,4 +28,5 @@ public class NarrativeWorldOption {
     public boolean showMainScreen = false;
     public boolean showCreditsScreen = true;
     public String stringMcVersion = "";
+    public String ncVersion = "1.0.0";
 }

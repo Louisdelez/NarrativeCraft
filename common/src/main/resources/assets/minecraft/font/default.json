@@ -2,137 +2,146 @@
   "providers": [
     {
       "type": "bitmap",
-      "file": "minecraft:font/keyframe_group.png",
+      "file": "narrativecraft:font/keyframe_group.png",
       "ascent": 11,
       "height": 14,
       "chars": [
-        "\uE000"
+        "\uE100"
       ]
     },
     {
       "type": "bitmap",
-      "file": "minecraft:font/keyframe.png",
+      "file": "narrativecraft:font/keyframe.png",
       "ascent": 10,
       "height": 12,
       "chars": [
-        "\uE001"
+        "\uE101"
       ]
     },
     {
       "type": "bitmap",
-      "file": "minecraft:font/keyframe_trigger.png",
+      "file": "narrativecraft:font/keyframe_trigger.png",
       "ascent": 10,
       "height": 12,
       "chars": [
-        "\uE002"
+        "\uE102"
       ]
     },
     {
       "type": "bitmap",
-      "file": "minecraft:font/settings.png",
+      "file": "narrativecraft:font/settings.png",
       "ascent": 10,
       "height": 12,
       "chars": [
-        "\uE003"
+        "\uE103"
       ]
     },
     {
       "type": "bitmap",
-      "file": "minecraft:font/add.png",
+      "file": "narrativecraft:font/add.png",
       "ascent": 10,
       "height": 12,
       "chars": [
-        "\uE004"
+        "\uE104"
       ]
     },
     {
       "type": "bitmap",
-      "file": "minecraft:font/edit.png",
+      "file": "narrativecraft:font/edit.png",
       "ascent": 8,
       "height": 10,
       "chars": [
-        "\uE005"
+        "\uE105"
       ]
     },
     {
       "type": "bitmap",
-      "file": "minecraft:font/remove.png",
+      "file": "narrativecraft:font/remove.png",
       "ascent": 10,
       "height": 14,
       "chars": [
-        "\uE006"
+        "\uE106"
       ]
     },
     {
       "type": "bitmap",
-      "file": "minecraft:font/character_add.png",
+      "file": "narrativecraft:font/character_add.png",
       "ascent": 10,
       "height": 14,
       "chars": [
-        "\uE007"
+        "\uE107"
       ]
     },
     {
       "type": "bitmap",
-      "file": "minecraft:font/save.png",
+      "file": "narrativecraft:font/save.png",
       "ascent": 10,
       "height": 14,
       "chars": [
-        "\uE008"
+        "\uE108"
       ]
     },
     {
       "type": "bitmap",
-      "file": "minecraft:font/character.png",
+      "file": "narrativecraft:font/character.png",
       "ascent": 10,
       "height": 14,
       "chars": [
-        "\uE009"
+        "\uE109"
       ]
     },
     {
       "type": "bitmap",
-      "file": "minecraft:font/dialog.png",
+      "file": "narrativecraft:font/dialog.png",
       "ascent": 10,
       "height": 14,
       "chars": [
-        "\uE010"
+        "\uE110"
       ]
     },
     {
       "type": "bitmap",
-      "file": "minecraft:font/entity.png",
+      "file": "narrativecraft:font/entity.png",
       "ascent": 10,
       "height": 14,
       "chars": [
-        "\uE011"
+        "\uE111"
       ]
     },
     {
       "type": "bitmap",
-      "file": "minecraft:font/eye_open.png",
+      "file": "narrativecraft:font/eye_open.png",
       "ascent": 10,
       "height": 14,
       "chars": [
-        "\uE012"
+        "\uE112"
       ]
     },
     {
       "type": "bitmap",
-      "file": "minecraft:font/eye_close.png",
+      "file": "narrativecraft:font/eye_close.png",
       "ascent": 10,
       "height": 14,
       "chars": [
-        "\uE013"
+        "\uE113"
       ]
     },
     {
       "type": "bitmap",
-      "file": "minecraft:font/folder.png",
+      "file": "narrativecraft:font/folder.png",
       "ascent": 10,
       "height": 14,
       "chars": [
-        "\uE014"
+        "\uE114"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "narrativecraft:font/box.png",
+      "ascent": 10,
+      "height": 14,
+      "chars": [
+        "\uE115"
       ]
     }
   ]

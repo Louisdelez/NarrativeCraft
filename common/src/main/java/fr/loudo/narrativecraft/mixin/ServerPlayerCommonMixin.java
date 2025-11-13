@@ -28,6 +28,7 @@ import fr.loudo.narrativecraft.narrative.recording.Recording;
 import fr.loudo.narrativecraft.narrative.recording.actions.ActionsData;
 import fr.loudo.narrativecraft.narrative.recording.actions.ItemPickUpAction;
 import fr.loudo.narrativecraft.narrative.recording.actions.RidingAction;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -41,12 +42,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class ServerPlayerCommonMixin {
 
     @Inject(method = "startRiding", at = @At(value = "HEAD"))
-    private void narrativecraft$rideEntity(Entity entity, boolean force, CallbackInfoReturnable<Boolean> cir) {
+    private void narrativecraft$rideEntity(Entity vehicle, boolean force, CallbackInfoReturnable<Boolean> cir) {
         ServerPlayer player = (ServerPlayer) (Object) this;
         Recording recording =
                 NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
         if (recording == null || !recording.isRecording()) return;
-        ActionsData vehicleActionsData = recording.getActionDataFromEntity(entity);
+        ActionsData vehicleActionsData = recording.getActionDataFromEntity(vehicle);
         RidingAction ridingAction = new RidingAction(recording.getTick(), vehicleActionsData.getEntityIdRecording());
         recording.getActionDataFromEntity(player).getActions().add(ridingAction);
     }
@@ -61,5 +62,14 @@ public class ServerPlayerCommonMixin {
                 recording.getTick(),
                 recording.getActionDataFromEntity(itemEntity).getEntityIdRecording());
         recording.getActionDataFromEntity(player).addAction(action);
+    }
+
+    @Inject(method = "setCamera", at = @At(value = "HEAD"), cancellable = true)
+    private void narrativecraft$setCamera(Entity entityToSpectate, CallbackInfo ci) {
+        ServerPlayer player = (ServerPlayer) (Object) this;
+        PlayerSession playerSession =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
+        if (playerSession == null) return;
+        if (playerSession.getCurrentCamera() != null) ci.cancel();
     }
 }

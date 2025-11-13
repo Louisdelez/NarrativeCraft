@@ -54,6 +54,7 @@ public class Playback {
     private final Level level;
     private final Environment environment;
     private final List<PlaybackData> entityPlaybacks = new ArrayList<>();
+    private Runnable onStop;
 
     private LivingEntity masterEntity;
     private boolean isPlaying, hasEnded, isUnique;
@@ -77,19 +78,24 @@ public class Playback {
             start();
             return;
         }
-        CharacterRuntime characterRuntime = storyHandler.getCharacterRuntimeFromCharacter(this.getCharacter());
-        if (characterRuntime == null || characterRuntime.getEntity() == null) {
-            start();
-            return;
+        List<CharacterRuntime> characterRuntimes = storyHandler.getCharacterRuntimeFromCharacter(this.getCharacter());
+        for (CharacterRuntime characterRuntime1 : characterRuntimes) {
+            if (characterRuntime1.getEntity() != null
+                    && !characterRuntime1.getEntity().isRemoved()) {
+                if (needToRespawn(
+                        characterRuntime1.getEntity().position(),
+                        animation.getFirstLocation().asVec3())) {
+                    storyHandler.killCharacter(animation.getCharacter());
+                } else {
+                    masterEntity = characterRuntime1.getEntity();
+                    characterRuntime.setEntity(masterEntity);
+                }
+            }
         }
-        if (needToRespawn(
-                characterRuntime.getEntity().position(),
-                animation.getFirstLocation().asVec3())) {
-            storyHandler.killCharacter(animation.getCharacter());
-        } else {
-            masterEntity = characterRuntime.getEntity();
-            characterRuntime.setEntity(masterEntity);
-        }
+        storyHandler.getPlayerSession().getCharacterRuntimes().removeIf(characterRuntime1 -> characterRuntime1
+                .getCharacterStory()
+                .getName()
+                .equals(this.characterRuntime.getCharacterStory().getName()));
         start();
     }
 
@@ -293,7 +299,7 @@ public class Playback {
     }
 
     private void spawnMasterEntity(Location loc) {
-        if (masterEntity != null && masterEntity.isAlive()) {
+        if (masterEntity != null && !masterEntity.isRemoved()) {
             moveEntitySilent(masterEntity, loc);
             return;
         }
@@ -325,6 +331,7 @@ public class Playback {
                 playbackData.killEntity();
             }
         }
+        if (onStop != null) onStop.run();
     }
 
     private void moveEntitySilent(Entity entity, Location location) {
@@ -410,7 +417,7 @@ public class Playback {
         return id;
     }
 
-    public Environment getEnvironnement() {
+    public Environment getEnvironment() {
         return environment;
     }
 
@@ -428,5 +435,13 @@ public class Playback {
 
     public void setUnique(boolean unique) {
         isUnique = unique;
+    }
+
+    public Runnable getOnStop() {
+        return onStop;
+    }
+
+    public void setOnStop(Runnable onStop) {
+        this.onStop = onStop;
     }
 }

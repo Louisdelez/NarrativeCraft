@@ -44,15 +44,15 @@ import java.util.List;
 import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
 public class CutscenesScreen extends StoryElementScreen {
 
     private final Scene scene;
+    private final List<Button> settingsButtons = new ArrayList<>();
 
-    private Button settingsButton;
+    private boolean shiftPressed;
 
     public CutscenesScreen(Scene scene) {
         super(Translation.message("screen.story_manager.cutscene_list", scene.getName()));
@@ -91,11 +91,10 @@ public class CutscenesScreen extends StoryElementScreen {
                                 minecraft.setScreen(null);
                             })
                             .build();
-                    settingsButton = createSettingsButton(cutscene);
-                    settingsButton.setTooltip(Tooltip.create(
-                            hasShiftDown()
-                                    ? Translation.message("screen.story_manager.animation_cutscene_link")
-                                    : Translation.message("screen.story_manager.subscene_cutscene_link")));
+                    Button settingsButton = createSettingsButton(cutscene);
+                    settingsButton.setTooltip(
+                            Tooltip.create(Translation.message("screen.story_manager.subscene_cutscene_link")));
+                    settingsButtons.add(settingsButton);
                     return new StoryElementList.StoryEntryData(
                             button,
                             List.of(settingsButton),
@@ -132,7 +131,7 @@ public class CutscenesScreen extends StoryElementScreen {
                 .toList();
         return Button.builder(ImageFontConstants.SETTINGS, button -> {
                     PickElementScreen screen;
-                    if (Screen.hasShiftDown()) {
+                    if (shiftPressed) {
                         screen = new PickElementScreen(
                                 this,
                                 Translation.message(
@@ -203,8 +202,10 @@ public class CutscenesScreen extends StoryElementScreen {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == InputConstants.KEY_LSHIFT) {
-            settingsButton.setTooltip(
-                    Tooltip.create(Translation.message("screen.story_manager.animation_cutscene_link")));
+            for (Button settingsButton : settingsButtons) {
+                settingsButton.setTooltip(
+                        Tooltip.create(Translation.message("screen.story_manager.animation_cutscene_link")));
+            }
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
@@ -212,8 +213,10 @@ public class CutscenesScreen extends StoryElementScreen {
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
         if (keyCode == InputConstants.KEY_LSHIFT) {
-            settingsButton.setTooltip(
-                    Tooltip.create(Translation.message("screen.story_manager.subscene_cutscene_link")));
+            for (Button settingsButton : settingsButtons) {
+                settingsButton.setTooltip(
+                        Tooltip.create(Translation.message("screen.story_manager.subscene_cutscene_link")));
+            }
         }
         return super.keyReleased(keyCode, scanCode, modifiers);
     }

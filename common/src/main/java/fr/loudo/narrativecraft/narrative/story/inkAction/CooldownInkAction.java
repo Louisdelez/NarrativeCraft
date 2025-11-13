@@ -34,7 +34,6 @@ import java.util.List;
 public class CooldownInkAction extends InkAction {
 
     private double totalTick;
-    private double currentTick;
 
     public CooldownInkAction(String id, Side side, String syntax, CommandMatcher matcher) {
         super(id, side, syntax, matcher);
@@ -43,8 +42,8 @@ public class CooldownInkAction extends InkAction {
     @Override
     public void tick() {
         if (!isRunning) return;
-        currentTick++;
-        if (currentTick >= totalTick) {
+        tick++;
+        if (tick >= totalTick) {
             isRunning = false;
             blockEndTask.run();
         }

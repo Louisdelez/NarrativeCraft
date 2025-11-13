@@ -28,6 +28,7 @@ import com.mojang.math.Axis;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.events.OnHudRender;
+import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.inkAction.ShakeScreenInkAction;
 import java.util.List;
@@ -51,8 +52,9 @@ public class GameRendererMixin {
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
         if (playerSession == null) return;
-        if (playerSession.getCurrentCamera() == null) return;
-        callbackInfo.setReturnValue((double) playerSession.getCurrentCamera().getFov());
+        KeyframeLocation keyframeLocation = playerSession.getCurrentCamera();
+        if (keyframeLocation == null) return;
+        callbackInfo.setReturnValue((double) keyframeLocation.getFov());
     }
 
     @Inject(method = "bobHurt", at = @At("RETURN"))

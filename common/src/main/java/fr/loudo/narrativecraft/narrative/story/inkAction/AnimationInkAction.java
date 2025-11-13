@@ -32,6 +32,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 
@@ -77,29 +78,9 @@ public class AnimationInkAction extends InkAction {
             return InkActionResult.error(Translation.message(
                     WRONG_ARGUMENT_TEXT, Translation.message("animation.no_exists", animationName, scene.getName())));
         }
-        if (arguments.size() < 4 || action.equals("stop")) {
-            canBeExecuted = true;
-            return InkActionResult.ok();
-        }
-        try {
-            isLooping = Boolean.parseBoolean(arguments.get(3));
-        } catch (Exception e) {
-            return InkActionResult.error(Translation.message(NOT_VALID_BOOLEAN, arguments.get(3)));
-        }
-        if (arguments.size() > 4) {
-            try {
-                isUnique = Boolean.parseBoolean(arguments.get(4));
-            } catch (Exception e) {
-                return InkActionResult.error(Translation.message(NOT_VALID_BOOLEAN, arguments.get(4)));
-            }
-        }
-        if (arguments.size() > 5) {
-            try {
-                isBlock = Boolean.parseBoolean(arguments.get(5));
-            } catch (Exception e) {
-                return InkActionResult.error(Translation.message(NOT_VALID_BOOLEAN, arguments.get(5)));
-            }
-        }
+        isLooping = InkUtil.getOptionalArgument(command, "loop");
+        isLooping = InkUtil.getOptionalArgument(command, "unique");
+        isLooping = InkUtil.getOptionalArgument(command, "loop");
         canBeExecuted = true;
         return InkActionResult.ok();
     }

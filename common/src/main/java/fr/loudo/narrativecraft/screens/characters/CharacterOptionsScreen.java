@@ -24,11 +24,10 @@
 package fr.loudo.narrativecraft.screens.characters;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.controllers.keyframe.AbstractKeyframeController;
+import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
-import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
 import fr.loudo.narrativecraft.screens.components.ButtonListScreen;
 import fr.loudo.narrativecraft.screens.components.ChangeSkinLinkScreen;
 import fr.loudo.narrativecraft.util.Translation;
@@ -40,14 +39,11 @@ import net.minecraft.network.chat.Component;
 
 public class CharacterOptionsScreen extends ButtonListScreen {
 
-    private final AbstractKeyframeController<? extends Keyframe> controller;
-    private final CharacterRuntime characterRuntime;
-    private final CharacterStoryData characterStoryData;
+    protected final AbstractController controller;
+    protected final CharacterRuntime characterRuntime;
+    protected final CharacterStoryData characterStoryData;
 
-    public CharacterOptionsScreen(
-            Screen lastScreen,
-            AbstractKeyframeController<? extends Keyframe> controller,
-            CharacterRuntime characterRuntime) {
+    public CharacterOptionsScreen(Screen lastScreen, AbstractController controller, CharacterRuntime characterRuntime) {
         super(lastScreen, Component.literal("Character options screen"));
         this.controller = controller;
         this.characterRuntime = characterRuntime;
@@ -84,9 +80,7 @@ public class CharacterOptionsScreen extends ButtonListScreen {
                                     if (b) {
                                         NarrativeCraftMod.server.execute(() -> {
                                             characterStoryData.kill();
-                                            controller
-                                                    .getCharacterStoryDataList()
-                                                    .remove(characterStoryData);
+                                            controller.removeCharacterStoryData(characterStoryData);
                                         });
                                     }
                                     minecraft.setScreen(null);

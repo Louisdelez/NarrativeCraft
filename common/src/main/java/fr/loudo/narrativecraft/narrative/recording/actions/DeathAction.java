@@ -68,7 +68,7 @@ public class DeathAction extends Action {
                     playback.getPlaybackDataByRecordId(entityRecordingId).getActionsData();
             Location posToSpawn = actionsData.getLocations().get(playback.getTick() - 1);
             if (posToSpawn == null) return;
-            if (playbackData.getEntity() == null || !playbackData.getEntity().isAlive()) {
+            if (playbackData.getEntity() == null || playbackData.getEntity().isRemoved()) {
                 playbackData.spawnEntity(posToSpawn);
             }
         }

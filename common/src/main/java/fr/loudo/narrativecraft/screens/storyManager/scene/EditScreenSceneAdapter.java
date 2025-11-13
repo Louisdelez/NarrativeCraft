@@ -34,6 +34,7 @@ import fr.loudo.narrativecraft.util.Util;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.Screen;
 import org.jetbrains.annotations.Nullable;
 
 public class EditScreenSceneAdapter implements EditScreenAdapter<Scene> {
@@ -72,6 +73,7 @@ public class EditScreenSceneAdapter implements EditScreenAdapter<Scene> {
 
     @Override
     public void buildFromScreen(
+            Screen screen,
             Map<String, Object> extraFields,
             Minecraft minecraft,
             @Nullable Scene existing,
@@ -98,6 +100,7 @@ public class EditScreenSceneAdapter implements EditScreenAdapter<Scene> {
             }
         } else {
             Scene newScene = new Scene(name, description, chapter);
+            newScene.setRank(existing.getRank());
             Scene oldScene = new Scene(existing.getName(), existing.getDescription(), chapter);
             oldScene.setRank(existing.getRank());
             try {
@@ -116,11 +119,15 @@ public class EditScreenSceneAdapter implements EditScreenAdapter<Scene> {
                             Translation.message("global.error"), Translation.message("scene.rank_no_under_one"));
                     return;
                 }
-                newScene.setRank(rank); // Only setRank to correctly update data on json file.
                 NarrativeCraftFile.updateSceneData(oldScene, newScene);
                 existing.setName(name);
                 existing.setDescription(description);
-                chapter.setSceneRank(existing, rank);
+                NarrativeCraftFile.updateSceneNameScript(oldScene, newScene);
+                if (existing.getRank() != rank) {
+                    chapter.setSceneRank(existing, rank);
+                    NarrativeCraftFile.updateSceneRankData(chapter);
+                }
+                NarrativeCraftFile.updateMasterSceneKnot(existing);
                 NarrativeCraftFile.updateInkIncludes();
                 minecraft.setScreen(new ScenesScreen(chapter));
             } catch (Exception e) {

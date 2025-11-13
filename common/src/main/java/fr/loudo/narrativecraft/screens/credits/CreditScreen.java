@@ -58,7 +58,7 @@ public class CreditScreen extends WinScreen {
             } else {
                 mainScreen = new MainScreen(playerSession, false, false);
             }
-            Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(mainScreen));
+            Minecraft.getInstance().setScreen(mainScreen);
         });
     }
 

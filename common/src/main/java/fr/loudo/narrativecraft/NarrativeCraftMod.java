@@ -40,6 +40,7 @@ public class NarrativeCraftMod {
     public static final String MOD_ID = "narrativecraft";
     public static final String MOD_NAME = "NarrativeCraft";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
+    public static final String VERSION = "1.0.0";
 
     public static boolean firstTime = false;
     public static MinecraftServer server;
@@ -51,7 +52,7 @@ public class NarrativeCraftMod {
     private final RecordingManager recordingManager = new RecordingManager();
     private final PlaybackManager playbackManager = new PlaybackManager();
     private final NarrativeCraftLogoRenderer narrativeCraftLogoRenderer =
-            new NarrativeCraftLogoRenderer(new ResourceLocation("textures/narrativecraft_logo.png"));
+            new NarrativeCraftLogoRenderer(new ResourceLocation(NarrativeCraftMod.MOD_ID, "textures/logo.png"));
     private NarrativeClientOption narrativeClientOptions = new NarrativeClientOption();
     private NarrativeWorldOption narrativeWorldOption = new NarrativeWorldOption();
 

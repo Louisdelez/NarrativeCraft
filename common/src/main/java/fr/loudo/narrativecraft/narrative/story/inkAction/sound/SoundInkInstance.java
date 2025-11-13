@@ -21,14 +21,42 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.mixin.accessor;
+package fr.loudo.narrativecraft.narrative.story.inkAction.sound;
 
-import net.minecraft.client.gui.screens.WinScreen;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
+import net.minecraft.client.resources.sounds.AbstractSoundInstance;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 
-@Mixin(WinScreen.class)
-public interface WinScreenAccessor {
-    @Accessor
-    float getUnmodifiedScrollSpeed();
+public class SoundInkInstance extends AbstractSoundInstance {
+
+    public SoundInkInstance(
+            ResourceLocation location,
+            SoundSource source,
+            float volume,
+            float pitch,
+            RandomSource random,
+            boolean looping,
+            int delay,
+            Attenuation attenuation,
+            double x,
+            double y,
+            double z,
+            boolean relative) {
+        super(location, source, random);
+        this.volume = volume;
+        this.pitch = pitch;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.looping = looping;
+        this.delay = delay;
+        this.attenuation = attenuation;
+        this.relative = relative;
+    }
+
+    @Override
+    public float getVolume() {
+        return this.volume;
+    }
 }

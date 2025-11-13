@@ -37,6 +37,7 @@ public class DialogLetterEffect {
         this.endIndex = endIndex;
         this.time = time;
         totalTick = (int) (time * 20.0);
+        cooldownTick = totalTick;
     }
 
     public void reset() {

@@ -24,13 +24,17 @@
 package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.audio.VolumeAudio;
+import fr.loudo.narrativecraft.narrative.story.inkAction.sound.SoundInkInstance;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.ChannelAccess;
 import net.minecraft.client.sounds.SoundEngine;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(SoundEngine.class)
 public abstract class SoundEngineMixin implements VolumeAudio {
@@ -53,5 +57,22 @@ public abstract class SoundEngineMixin implements VolumeAudio {
                 channelHandle.execute((channel) -> channel.setVolume(volume * this.calculateVolume(soundInstance)));
             }
         }
+    }
+
+    /*
+        Don't override volume of a sound ink action when changing volume in client settings
+        Otherwise, sounds from sound ink are at max volume and broken
+    */
+    @Redirect(
+            method = "updateCategoryVolume",
+            at = @At(value = "INVOKE", target = "Ljava/util/Map;forEach(Ljava/util/function/BiConsumer;)V"))
+    private void narrativecraft$updateCategoryVolume(
+            Map<SoundInstance, ChannelAccess.ChannelHandle> instance,
+            BiConsumer<? super SoundInstance, ? super ChannelAccess.ChannelHandle> v) {
+        instance.forEach((soundInstance, channelHandle) -> {
+            if (soundInstance instanceof SoundInkInstance) return;
+            float f = this.calculateVolume(soundInstance);
+            channelHandle.execute((channel) -> channel.setVolume(f));
+        });
     }
 }

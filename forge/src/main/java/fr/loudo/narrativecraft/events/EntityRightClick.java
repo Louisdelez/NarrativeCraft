@@ -33,7 +33,8 @@ public class EntityRightClick {
     @SubscribeEvent
     public static void onEntityRightClick(PlayerInteractEvent.EntityInteractSpecific event) {
         if (event.getLevel().isClientSide) {
-            OnEntityRightClick.entityRightClick(event.getEntity(), event.getTarget());
+            NarrativeCraftMod.server.execute(
+                    () -> OnEntityRightClick.entityRightClick(event.getEntity(), event.getTarget()));
         }
     }
 }

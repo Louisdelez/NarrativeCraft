@@ -34,6 +34,7 @@ import fr.loudo.narrativecraft.util.Util;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import org.jetbrains.annotations.Nullable;
 
 public class EditScreenAnimationAdapter implements EditScreenAdapter<Animation> {
@@ -52,6 +53,7 @@ public class EditScreenAnimationAdapter implements EditScreenAdapter<Animation> 
 
     @Override
     public void buildFromScreen(
+            Screen screen,
             Map<String, Object> extraFields,
             Minecraft minecraft,
             @Nullable Animation existing,

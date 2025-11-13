@@ -42,7 +42,7 @@ public class ItemStackMixin {
     @Inject(method = "use", at = @At("HEAD"))
     private void narrativecraft$useItem(
             Level level, Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             Recording recording =
                     NarrativeCraftMod.getInstance().getRecordingManager().getRecording(player);
             if (recording == null || !recording.isRecording()) return;

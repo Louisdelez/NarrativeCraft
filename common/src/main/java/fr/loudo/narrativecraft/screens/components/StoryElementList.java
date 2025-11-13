@@ -136,9 +136,7 @@ public class StoryElementList extends ObjectSelectionList<StoryElementList.Entry
                 boolean hovered,
                 float partial) {
             int totalWidth = buttons.stream().mapToInt(Button::getWidth).sum() + (buttons.size() - 1) * gap;
-            int x = (screen.width / 2
-                    - totalWidth / 2); //  this line is wrong but sorry my head hurts okay, those mouseX coord shit is
-            // driving me crazy
+            int x = (screen.width / 2 - totalWidth / 2);
             if (buttons.size() > 1) {
                 x -= gap;
             }

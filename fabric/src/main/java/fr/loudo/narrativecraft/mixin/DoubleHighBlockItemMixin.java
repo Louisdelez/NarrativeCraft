@@ -39,7 +39,7 @@ public class DoubleHighBlockItemMixin {
 
     @Inject(method = "placeBlock", at = @At(value = "HEAD"))
     private void atPlaceBlock(BlockPlaceContext context, BlockState state, CallbackInfoReturnable<Boolean> cir) {
-        if (!context.getLevel().isClientSide && NarrativeCraftMod.server != null) {
+        if (!context.getLevel().isClientSide() && NarrativeCraftMod.server != null) {
             ServerPlayer serverPlayer = NarrativeCraftMod.server
                     .getPlayerList()
                     .getPlayer(context.getPlayer().getUUID());

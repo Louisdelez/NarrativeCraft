@@ -21,17 +21,29 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.client;
+package fr.loudo.narrativecraft.events;
 
-import fr.loudo.narrativecraft.screens.storyManager.chapter.ChaptersScreen;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
+import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
 
-// STANDBY: only for testing
-public class ClientPacketHandlerCommon {
-    public static void openChaptersScreen() {
-        Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.player != null) {
-            minecraft.setScreen(new ChaptersScreen());
+public class OnTagRender {
+
+    public static boolean cancelRendering(Component name) {
+        LocalPlayer player = Minecraft.getInstance().player;
+        PlayerSession playerSession =
+                NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
+        if (playerSession == null) return false;
+        if (playerSession.getStoryHandler() == null) return false;
+
+        for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+            if (characterRuntime.getEntity().getName().getString().equals(name.getString())) {
+                return !characterRuntime.getCharacterStory().showNametag();
+            }
         }
+        return false;
     }
 }

@@ -21,18 +21,17 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.story.inkAction;
+package fr.loudo.narrativecraft.narrative.story.inkAction.sound;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.audio.VolumeAudio;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.util.MathHelper;
+import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.resources.ResourceLocation;
@@ -42,7 +41,7 @@ import net.minecraft.util.Mth;
 public class SoundInkAction extends InkAction {
 
     private SoundManager soundManager;
-    private SimpleSoundInstance simpleSoundInstance;
+    private SoundInstance simpleSoundInstance;
     private String identifier = "minecraft";
     private String name, action;
     private Type type;
@@ -57,9 +56,12 @@ public class SoundInkAction extends InkAction {
 
     @Override
     public void tick() {
+        if (!soundManager.isActive(simpleSoundInstance)) {
+            isRunning = false;
+        }
         if (!isRunning || totalTick == 0) return;
-        currentTick++;
-        isRunning = currentTick <= totalTick || action.equals("start") || soundManager.isActive(simpleSoundInstance);
+        tick++;
+        isRunning = tick <= totalTick || action.equals("start");
         if (!isRunning) {
             soundManager.stop(simpleSoundInstance);
         }
@@ -68,14 +70,15 @@ public class SoundInkAction extends InkAction {
     @Override
     public void partialTick(float partialTick) {
         if (!isRunning || totalTick == 0) return;
-        double t = MathHelper.clamp((currentTick + partialTick) / totalTick, 0.0, 1.0);
+        double t = Mth.clamp((tick + partialTick) / totalTick, 0.0, 1.0);
+        float newVolume = 0;
         if (action.equals("start")) {
-            volume = (float) Mth.lerp(t, 0.0, 1.0);
+            newVolume = (float) Mth.lerp(t, 0.0, volume);
         } else if (action.equals("stop")) {
-            volume = (float) Mth.lerp(t, 1.0, 0.0);
+            newVolume = (float) Mth.lerp(t, volume, 0.0);
         }
-        ((VolumeAudio) soundManager).narrativecraft$setVolume(simpleSoundInstance, volume);
-        if (volume == 0.0 && action.equals("stop")) {
+        ((VolumeAudio) soundManager).narrativecraft$setVolume(simpleSoundInstance, newVolume);
+        if (newVolume == 0.0 && action.equals("stop")) {
             soundManager.stop(simpleSoundInstance);
         }
     }
@@ -118,6 +121,7 @@ public class SoundInkAction extends InkAction {
                     "ink_action.validation.sound", type.name().toLowerCase(), name));
         }
         if (action.equals("start") && arguments.size() > 3) {
+            isLooping = InkUtil.getOptionalArgument(command, "loop");
             try {
                 volume = Float.parseFloat(arguments.get(3));
             } catch (NumberFormatException e) {
@@ -131,26 +135,22 @@ public class SoundInkAction extends InkAction {
             } catch (NumberFormatException e) {
                 return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(4)));
             }
-            if (arguments.size() < 6) return InkActionResult.ok();
-            try {
-                isLooping = Boolean.parseBoolean(arguments.get(5));
-            } catch (Exception e) {
-                return InkActionResult.error(Translation.message(NOT_VALID_BOOLEAN, arguments.get(5)));
-            }
-            if (arguments.size() < 7) return InkActionResult.ok();
-            String fadeValue = arguments.get(6);
+            if (arguments.size() == 5) return InkActionResult.ok();
+            String fadeValue = arguments.get(5);
             if (!fadeValue.equals("fadein")) return InkActionResult.ok();
-            if (arguments.size() == 7) {
+            if (arguments.size() == 6) {
                 return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "fade in value"));
             }
             try {
-                fadeTime = Double.parseDouble(arguments.get(7));
+                fadeTime = Double.parseDouble(arguments.get(6));
             } catch (NumberFormatException e) {
-                return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(7)));
+                return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(6)));
             }
             simpleSoundInstance = getSimpleSoundInstance();
             soundManager.play(simpleSoundInstance);
-            ((VolumeAudio) soundManager).narrativecraft$setVolume(simpleSoundInstance, 0f);
+            if (fadeTime > 0) {
+                ((VolumeAudio) soundManager).narrativecraft$setVolume(simpleSoundInstance, 0f);
+            }
         } else if (action.equals("stop") && arguments.size() > 3) {
             String fadeValue = arguments.get(3);
             if (!fadeValue.equals("fadeout")) return InkActionResult.ok();
@@ -192,6 +192,7 @@ public class SoundInkAction extends InkAction {
                     } else if (matchOne) {
                         if (fadeTime > 0) {
                             this.simpleSoundInstance = soundInkAction.simpleSoundInstance;
+                            this.volume = soundInkAction.volume;
                         } else {
                             isRunning = false;
                             soundInkAction.stop();
@@ -203,9 +204,9 @@ public class SoundInkAction extends InkAction {
         return InkActionResult.ok();
     }
 
-    private SimpleSoundInstance getSimpleSoundInstance() {
+    private SoundInstance getSimpleSoundInstance() {
         if (simpleSoundInstance == null) {
-            simpleSoundInstance = new SimpleSoundInstance(
+            simpleSoundInstance = new SoundInkInstance(
                     new ResourceLocation(identifier, name),
                     SoundSource.MASTER,
                     volume,

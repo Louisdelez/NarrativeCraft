@@ -75,6 +75,10 @@ public class OpenScreenCommand {
             playerSession.getPlayer().sendSystemMessage(Translation.message("session.controller_set"));
             return 0;
         }
+        if (NarrativeCraftMod.getInstance().getRecordingManager().isRecording(playerSession.getPlayer())) {
+            playerSession.getPlayer().sendSystemMessage(Translation.message("record.cant_access"));
+            return 0;
+        }
         if (playerSession.getStoryHandler() != null) return 0;
         if (NarrativeCraftMod.getInstance().getRecordingManager().isRecording(playerSession.getPlayer())) {
             playerSession.getPlayer().sendSystemMessage(Translation.message("record.cant_access"));

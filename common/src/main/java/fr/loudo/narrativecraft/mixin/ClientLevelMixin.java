@@ -46,7 +46,7 @@ public class ClientLevelMixin {
         List<InkAction> inkActionsClient = playerSession.getClientSideInkActions();
         for (InkAction inkAction : inkActionsClient) {
             if (inkAction instanceof ChangeDayTimeInkAction changeDayTimeInkAction) {
-                cir.setReturnValue(changeDayTimeInkAction.getCurrentTick());
+                cir.setReturnValue(changeDayTimeInkAction.getTick());
             }
         }
     }

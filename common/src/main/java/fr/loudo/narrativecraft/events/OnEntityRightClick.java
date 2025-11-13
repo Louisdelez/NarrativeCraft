@@ -24,12 +24,20 @@
 package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.controllers.AbstractController;
+import fr.loudo.narrativecraft.controllers.interaction.InteractionController;
 import fr.loudo.narrativecraft.controllers.keyframe.AbstractKeyframeController;
+import fr.loudo.narrativecraft.narrative.Environment;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.CharacterInteraction;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.EntityInteraction;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.keyframeTrigger.KeyframeTrigger;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.screens.characters.CharacterOptionsScreen;
+import fr.loudo.narrativecraft.screens.components.CharacterInteractionOptionsScreen;
+import fr.loudo.narrativecraft.screens.components.InteractionOptionScreen;
 import fr.loudo.narrativecraft.screens.keyframe.KeyframeTriggerScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
@@ -42,19 +50,47 @@ public class OnEntityRightClick {
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
         if (playerSession == null) return;
 
-        if (playerSession.getController() instanceof AbstractKeyframeController<?> controller) {
-            CharacterRuntime characterRuntime = controller.getCharacterFromEntity(entity);
-            if (characterRuntime != null) {
-                CharacterOptionsScreen screen = new CharacterOptionsScreen(null, controller, characterRuntime);
-                Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
-            }
-            Keyframe keyframe = controller.getKeyframeByEntity(entity);
-            controller.setCamera(keyframe);
-            KeyframeTrigger keyframeTrigger = controller.getKeyframeTriggerByEntity(entity);
+        StoryHandler storyHandler = playerSession.getStoryHandler();
+        if (storyHandler != null) {
+            storyHandler.interactWith(entity);
+        }
+
+        AbstractController controller = playerSession.getController();
+        if (controller == null) return;
+
+        if (controller.getEnvironment() != Environment.DEVELOPMENT) return;
+        CharacterRuntime characterRuntime = controller.getCharacterFromEntity(entity);
+        if (controller instanceof AbstractKeyframeController<?> keyframeController) {
+            Keyframe keyframe = keyframeController.getKeyframeByEntity(entity);
+            keyframeController.setCamera(keyframe);
+            KeyframeTrigger keyframeTrigger = keyframeController.getKeyframeTriggerByEntity(entity);
             if (keyframeTrigger != null) {
-                KeyframeTriggerScreen screen = new KeyframeTriggerScreen(controller, keyframeTrigger);
+                KeyframeTriggerScreen screen = new KeyframeTriggerScreen(keyframeController, keyframeTrigger);
                 Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
             }
+        }
+        if (controller instanceof InteractionController interactionController) {
+            if (characterRuntime != null) {
+                CharacterInteraction characterInteraction = interactionController.getCharacterInteractionFromCharacter(
+                        interactionController.getCharacterStoryDataFromEntity(characterRuntime.getEntity()));
+                if (characterInteraction != null) {
+                    CharacterInteractionOptionsScreen screen = new CharacterInteractionOptionsScreen(
+                            null, controller, characterRuntime, characterInteraction);
+                    Minecraft.getInstance()
+                            .execute(() -> Minecraft.getInstance().setScreen(screen));
+                    return;
+                }
+            }
+            EntityInteraction entityInteraction = interactionController.getEntityInteraction(entity);
+            if (entityInteraction != null) {
+                InteractionOptionScreen screen =
+                        new InteractionOptionScreen(null, entityInteraction, interactionController);
+                Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
+            }
+        }
+        if (characterRuntime != null) {
+            CharacterOptionsScreen screen = new CharacterOptionsScreen(null, controller, characterRuntime);
+            Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
         }
     }
 }

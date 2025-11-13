@@ -65,6 +65,15 @@ public class Chapter extends NarrativeEntry {
         return null;
     }
 
+    public Scene getSceneByRank(int rank) {
+        for (Scene scene : scenes) {
+            if (scene.getRank() == rank) {
+                return scene;
+            }
+        }
+        return null;
+    }
+
     public boolean sceneExists(String name) {
         for (Scene scene : scenes) {
             if (scene.getName().equalsIgnoreCase(name)) {

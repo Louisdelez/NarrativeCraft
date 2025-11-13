@@ -84,7 +84,8 @@ public class ItemChangeAction extends Action {
             CompoundTag tag = Util.tagFromIdAndComponents(item, data);
             itemStack.setTag(tag);
         }
-        entity.getServer()
+        entity.level()
+                .getServer()
                 .getPlayerList()
                 .broadcastAll(new ClientboundSetEquipmentPacket(
                         entity.getId(), List.of(new Pair<>(EquipmentSlot.valueOf(equipmentSlot), itemStack))));

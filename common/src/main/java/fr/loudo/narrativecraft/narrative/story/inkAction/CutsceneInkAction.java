@@ -47,7 +47,7 @@ public class CutsceneInkAction extends InkAction {
     @Override
     public void tick() {
         if (!isRunning) return;
-        if (controller.atMaxTick()) {
+        if (controller.finishedCutscene()) {
             blockEndTask.run();
         }
     }
