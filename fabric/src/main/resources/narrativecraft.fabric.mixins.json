@@ -13,6 +13,7 @@
   ],
   "client": [
     "GuiMixin",
+    "LevelRendererFabricMixin",
     "MinecraftFabricMixin"
   ],
   "server": [],

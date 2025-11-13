@@ -196,6 +196,10 @@ public class Util {
             if (entity instanceof Mob mob) mob.setNoAi(true);
         }
 
+        return entity;
+    }
+
+    public static void spawnEntity(Entity entity, Level level) {
         if (entity instanceof FakePlayer fakePlayer) {
             ((PlayerListAccessor) level.getServer().getPlayerList())
                     .getPlayersByUUID()
@@ -211,7 +215,6 @@ public class Util {
         } else {
             level.addFreshEntity(entity);
         }
-        return entity;
     }
 
     public static void disconnectPlayer() {

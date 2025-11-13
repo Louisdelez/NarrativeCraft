@@ -107,6 +107,7 @@ public class AnimationInkAction extends InkAction {
         } else if (action.equals("stop")) {
             Playback playback = playerSession.getPlaybackManager().getPlayback(animation.getName());
             if (playback == null) return InkActionResult.ignored();
+            playerSession.getCharacterRuntimes().remove(playback.getCharacterRuntime());
             playback.stop(true);
         }
         return isBlock ? InkActionResult.block() : InkActionResult.ok();

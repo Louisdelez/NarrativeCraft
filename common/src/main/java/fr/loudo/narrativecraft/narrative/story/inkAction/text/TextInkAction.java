@@ -138,8 +138,9 @@ public class TextInkAction extends InkAction {
         double t = Mth.clamp((tick + partialTick) / totalTick, 0.0, 1.0);
 
         return switch (fadeState) {
-            case FADE_IN -> Mth.lerp(t, 0.0, originalOpacity);
-            case FADE_OUT -> Mth.lerp(t, originalOpacity, 0.0);
+            case FADE_IN -> Mth.lerp(t, 0.1, originalOpacity);
+            case FADE_OUT ->
+                Mth.lerp(t, originalOpacity, 0.1); // Why 0.1 ? I don't know, 0.0 leave the text visible, wtf
             default -> originalOpacity;
         };
     }

@@ -21,19 +21,43 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import fr.loudo.narrativecraft.events.OnRenderWorld;
+import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.LightTexture;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-public class RenderWorldEvent {
-
-    public static void renderWorld(WorldRenderContext worldRenderContext) {
+@Mixin(LevelRenderer.class)
+public class LevelRendererFabricMixin {
+    @Inject(method = "renderLevel", at = @At("RETURN"))
+    private void narrativecraft$renderLevel(
+            DeltaTracker deltaTracker,
+            boolean renderBlockOutline,
+            Camera camera,
+            GameRenderer gameRenderer,
+            LightTexture lightTexture,
+            Matrix4f frustumMatrix,
+            Matrix4f projectionMatrix,
+            CallbackInfo ci) {
+        Matrix4fStack matrix4fstack = RenderSystem.getModelViewStack();
+        matrix4fstack.pushMatrix();
+        matrix4fstack.mul(frustumMatrix);
+        RenderSystem.applyModelViewMatrix();
         RenderSystem.depthMask(false);
         RenderSystem.disableDepthTest();
-        OnRenderWorld.renderWorld(
-                new PoseStack(), worldRenderContext.tickCounter().getGameTimeDeltaPartialTick(true));
+        OnRenderWorld.renderWorld(new PoseStack(), deltaTracker.getGameTimeDeltaPartialTick(true));
+        matrix4fstack.popMatrix();
         RenderSystem.depthMask(true);
         RenderSystem.enableDepthTest();
     }

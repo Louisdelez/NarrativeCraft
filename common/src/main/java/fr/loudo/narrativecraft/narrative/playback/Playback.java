@@ -305,6 +305,7 @@ public class Playback {
         masterEntity = Util.createEntityFromCharacter(characterRuntime.getCharacterStory(), level);
         characterRuntime.setEntity(masterEntity);
         moveEntitySilent(masterEntity, loc);
+        Util.spawnEntity(masterEntity, level);
 
         entityPlaybacks.getFirst().setEntity(masterEntity);
     }
@@ -339,6 +340,7 @@ public class Playback {
         entity.setYHeadRot(location.yaw());
         entity.setOnGround(location.onGround());
         entity.teleportTo(location.x(), location.y(), location.z());
+        entity.moveTo(location.x(), location.y(), location.z());
     }
 
     public boolean entityInPlayback(Entity entity) {
