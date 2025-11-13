@@ -195,7 +195,6 @@ public class Util {
         }
     }
 
-
     public static void disconnectPlayer() {
         PauseScreen pauseScreen = new PauseScreen(false);
         Minecraft.getInstance().setScreen(pauseScreen);
