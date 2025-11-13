@@ -70,6 +70,7 @@ public class EntityInteraction extends StitchInteraction {
     }
 
     public void kill(ServerPlayer player) {
+        if (armorStand == null) return;
         player.connection.send(new ClientboundRemoveEntitiesPacket(armorStand.getId()));
     }
 
