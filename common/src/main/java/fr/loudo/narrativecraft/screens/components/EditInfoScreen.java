@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Random;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
@@ -220,6 +221,12 @@ public class EditInfoScreen<T extends NarrativeEntry> extends Screen {
     @Override
     public void onClose() {
         this.minecraft.setScreen(lastScreen);
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        this.renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     @Override
