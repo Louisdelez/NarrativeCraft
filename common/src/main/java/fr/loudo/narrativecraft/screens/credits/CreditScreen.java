@@ -23,7 +23,6 @@
 
 package fr.loudo.narrativecraft.screens.credits;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import fr.loudo.narrativecraft.mixin.invoker.WinScreenInvoker;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.screens.mainScreen.MainScreen;
@@ -101,15 +100,6 @@ public class CreditScreen extends WinScreen {
                                 .withStyle(ChatFormatting.WHITE),
                         false);
         ((WinScreenInvoker) this).callAddCreditsLine(Component.literal("           "), false);
-    }
-
-    @Override
-    public boolean keyPressed(int p_169469_, int p_169470_, int p_169471_) {
-        if (p_169469_ == InputConstants.KEY_ESCAPE) {
-            minecraft.setScreen(null);
-            onClose();
-        }
-        return super.keyPressed(p_169469_, p_169470_, p_169471_);
     }
 
     @Override

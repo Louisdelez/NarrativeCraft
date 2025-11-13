@@ -55,8 +55,13 @@ public class EditScreenAreaTriggerAdapter implements EditScreenAdapter<AreaTrigg
                 Translation.message("global.stitch"), minecraft.font, 110, 20, 0, 0, ScreenUtils.Align.HORIZONTAL);
         screen.extraFields.put("stitchBox", stitch.getEditBox());
         screen.extraFields.put("stitch", stitch);
-        Checkbox isUniqueBox = new Checkbox(0, 0, 20, 20,
-                        Translation.message("screen.story_manager.area_trigger.is_unique"), entry != null && entry.isUnique());
+        Checkbox isUniqueBox = new Checkbox(
+                0,
+                0,
+                20,
+                20,
+                Translation.message("screen.story_manager.area_trigger.is_unique"),
+                entry != null && entry.isUnique());
         isUniqueBox.setTooltip(Tooltip.create(Translation.message("tooltip.area_trigger.is_unique_explanation")));
         screen.extraFields.put("uniqueBox", isUniqueBox);
     }
