@@ -101,7 +101,7 @@ public class CharactersScreen extends StoryElementScreen {
                             .build();
                     button.active = false;
                     Button entityTypeButton = Button.builder(ImageFontConstants.ENTITY, button1 -> {
-                                CharacterEntityTypeScreen screen = new CharacterEntityTypeScreen(this, character);
+                                CharacterEntityTypeScreen screen = new CharacterEntityTypeScreen(this, character, scene);
                                 minecraft.setScreen(screen);
                             })
                             .build();

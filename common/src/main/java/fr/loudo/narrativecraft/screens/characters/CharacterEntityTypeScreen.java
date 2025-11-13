@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.screens.characters;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -43,11 +44,13 @@ public class CharacterEntityTypeScreen extends OptionsSubScreen {
     private EntityTypeList entityTypeList;
     private final List<EntityType<?>> entityTypes;
     private final CharacterStory characterStory;
+    private final Scene scene;
 
-    public CharacterEntityTypeScreen(Screen lastScreen, CharacterStory characterStory) {
+    public CharacterEntityTypeScreen(Screen lastScreen, CharacterStory characterStory, Scene scene) {
         super(lastScreen, Minecraft.getInstance().options, Component.literal("Change Character Entity Type"));
         this.entityTypes = NarrativeCraftMod.getInstance().getCharacterManager().getAvailableEntityTypes();
         this.characterStory = characterStory;
+        this.scene = scene;
     }
 
     @Override
@@ -77,7 +80,7 @@ public class CharacterEntityTypeScreen extends OptionsSubScreen {
         }
         EntityType<?> entityType = entry.entityType;
         minecraft.setScreen(lastScreen);
-        characterStory.updateEntityType(entityType);
+        characterStory.updateEntityType(entityType, scene);
     }
 
     @Override
