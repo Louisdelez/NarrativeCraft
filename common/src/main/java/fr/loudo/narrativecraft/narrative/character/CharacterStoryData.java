@@ -73,6 +73,7 @@ public class CharacterStoryData {
         characterRuntime.getEntity().setYRot(location.yaw());
         characterRuntime.getEntity().setYHeadRot(location.yaw());
         characterRuntime.getEntity().setOnGround(location.onGround());
+        Util.spawnEntity(characterRuntime.getEntity(), level);
         try {
             characterRuntime.getEntity().setPose(Pose.valueOf(poseName));
         } catch (Exception ignored) {

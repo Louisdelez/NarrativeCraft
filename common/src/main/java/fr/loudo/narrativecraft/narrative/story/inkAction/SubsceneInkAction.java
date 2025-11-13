@@ -101,11 +101,11 @@ public class SubsceneInkAction extends InkAction {
             playerSession.clearKilledCharacters();
             playerSession.getPlaybackManager().getPlaybacks().addAll(subscene.getPlaybacks());
         } else if (action.equals("stop")) {
-            subscene.stop(true);
             for (Playback playback : subscene.getPlaybacks()) {
                 playerSession.getCharacterRuntimes().remove(playback.getCharacterRuntime());
             }
             playerSession.getPlaybackManager().getPlaybacks().removeAll(subscene.getPlaybacks());
+            subscene.stop(true);
         }
         return isBlock ? InkActionResult.block() : InkActionResult.ok();
     }

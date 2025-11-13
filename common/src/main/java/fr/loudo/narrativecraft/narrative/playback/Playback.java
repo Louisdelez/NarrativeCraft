@@ -311,6 +311,7 @@ public class Playback {
         masterEntity = Util.createEntityFromCharacter(characterRuntime.getCharacterStory(), level);
         characterRuntime.setEntity(masterEntity);
         moveEntitySilent(masterEntity, loc);
+        Util.spawnEntity(masterEntity, level);
 
         entityPlaybacks.getFirst().setEntity(masterEntity);
     }
