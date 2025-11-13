@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.playback;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.mixin.accessor.PlayerListAccessor;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
@@ -76,6 +77,11 @@ public class Playback {
     public void startFromStory(StoryHandler storyHandler) {
         if (storyHandler == null) {
             start();
+            return;
+        }
+        if (this.getCharacter() == null) {
+            NarrativeCraftMod.LOGGER.error(
+                    "Animation {} does not have any character assigned, can't start.", animation.getName());
             return;
         }
         List<CharacterRuntime> characterRuntimes = storyHandler.getCharacterRuntimeFromCharacter(this.getCharacter());

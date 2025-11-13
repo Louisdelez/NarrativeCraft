@@ -168,6 +168,9 @@ public class Util {
             entity.getEntityData().set(PlayerAccessor.getDATA_PLAYER_MODE_CUSTOMISATION(), (byte) 0b01111111);
         } else {
             entity = (LivingEntity) createEntityFromKey(characterStory.getEntityType(), (ServerLevel) level);
+            if (entity != null) {
+                entity.setInvulnerable(true);
+            }
             if (entity instanceof Mob mob) mob.setNoAi(true);
         }
 
