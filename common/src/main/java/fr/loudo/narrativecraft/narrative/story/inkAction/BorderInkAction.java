@@ -109,34 +109,39 @@ public class BorderInkAction extends InkAction {
         PoseStack poseStack = guiGraphics.pose();
         Matrix4f matrix4f = poseStack.last().pose();
         VertexConsumer vertexConsumer = minecraft.renderBuffers().bufferSource().getBuffer(RenderType.gui());
+        poseStack.pushPose();
 
         // UP
-        vertexConsumer.vertex(matrix4f, 0, 0, 0).color(color);
-        vertexConsumer.vertex(matrix4f, 0, up / guiScale, 0).color(color);
-        vertexConsumer.vertex(matrix4f, widthScreen, up / guiScale, 0).color(color);
-        vertexConsumer.vertex(matrix4f, widthScreen, 0, 0).color(color);
+        vertexConsumer.vertex(matrix4f, 0, 0, 0).color(color).endVertex();
+        vertexConsumer.vertex(matrix4f, 0, up / guiScale, 0).color(color).endVertex();
+        vertexConsumer.vertex(matrix4f, widthScreen, up / guiScale, 0).color(color).endVertex();
+        vertexConsumer.vertex(matrix4f, widthScreen, 0, 0).color(color).endVertex();
 
         // RIGHT
-        vertexConsumer.vertex(matrix4f, widthScreen - right / guiScale, 0, 0).color(color);
+        vertexConsumer.vertex(matrix4f, widthScreen - right / guiScale, 0, 0).color(color).endVertex();
         vertexConsumer
                 .vertex(matrix4f, widthScreen - right / guiScale, heightScreen, 0)
-                .color(color);
-        vertexConsumer.vertex(matrix4f, widthScreen, heightScreen, 0).color(color);
-        vertexConsumer.vertex(matrix4f, widthScreen, 0, 0).color(color);
+                .color(color)
+                .endVertex();
+        vertexConsumer.vertex(matrix4f, widthScreen, heightScreen, 0).color(color).endVertex();
+        vertexConsumer.vertex(matrix4f, widthScreen, 0, 0).color(color).endVertex();
 
         // DOWN
-        vertexConsumer.vertex(matrix4f, 0, heightScreen - down / guiScale, 0).color(color);
-        vertexConsumer.vertex(matrix4f, 0, heightScreen, 0).color(color);
-        vertexConsumer.vertex(matrix4f, widthScreen, heightScreen, 0).color(color);
+        vertexConsumer.vertex(matrix4f, 0, heightScreen - down / guiScale, 0).color(color).endVertex();
+        vertexConsumer.vertex(matrix4f, 0, heightScreen, 0).color(color).endVertex();
+        vertexConsumer.vertex(matrix4f, widthScreen, heightScreen, 0).color(color).endVertex();
         vertexConsumer
                 .vertex(matrix4f, widthScreen, heightScreen - down / guiScale, 0)
-                .color(color);
+                .color(color)
+                .endVertex();
 
         // LEFT
-        vertexConsumer.vertex(matrix4f, 0, 0, 0).color(color);
-        vertexConsumer.vertex(matrix4f, 0, heightScreen, 0).color(color);
-        vertexConsumer.vertex(matrix4f, left / guiScale, heightScreen, 0).color(color);
-        vertexConsumer.vertex(matrix4f, left / guiScale, 0, 0).color(color);
+        vertexConsumer.vertex(matrix4f, 0, 0, 0).color(color).endVertex();
+        vertexConsumer.vertex(matrix4f, 0, heightScreen, 0).color(color).endVertex();
+        vertexConsumer.vertex(matrix4f, left / guiScale, heightScreen, 0).color(color).endVertex();
+        vertexConsumer.vertex(matrix4f, left / guiScale, 0, 0).color(color).endVertex();
+
+        poseStack.popPose();
     }
 
     @Override
