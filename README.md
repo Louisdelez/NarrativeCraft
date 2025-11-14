@@ -20,7 +20,7 @@
 
 
 ## Concept
-NarrativeCraft is a Minecraft mod that turns Minecraft into a sort of game-engine where you can create narrative stories with choices and patterns based on choices.
+NarrativeCraft is a Minecraft mod that turns the game into a space for building interactive stories, with choices and branching narratives that react to the player’s decisions.
 
 It's mostly for creating a game in a game and is highly inspired from games I love like Life Is Strange and Until Then.
 
