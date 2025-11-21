@@ -27,6 +27,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
@@ -39,7 +40,6 @@ import fr.loudo.narrativecraft.narrative.story.StorySave;
 import fr.loudo.narrativecraft.options.NarrativeClientOption;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.serialization.*;
-import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
 import java.io.*;
@@ -310,7 +310,7 @@ public class NarrativeCraftFile {
         File chapterInkFile = getInkFile(scene.getChapter());
         String originalContent = Files.readString(chapterInkFile.toPath());
 
-        Matcher matcher = InkUtil.SCENE_KNOT_PATTERN.matcher(originalContent);
+        Matcher matcher = InkActionUtil.SCENE_KNOT_PATTERN.matcher(originalContent);
 
         String updatedContent;
         if (matcher.find()) {

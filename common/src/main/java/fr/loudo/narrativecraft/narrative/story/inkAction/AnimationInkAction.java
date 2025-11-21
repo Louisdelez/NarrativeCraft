@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.narrative.story.inkAction;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
+import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
 import fr.loudo.narrativecraft.managers.PlaybackManager;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
@@ -32,7 +33,6 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 
@@ -78,9 +78,9 @@ public class AnimationInkAction extends InkAction {
             return InkActionResult.error(Translation.message(
                     WRONG_ARGUMENT_TEXT, Translation.message("animation.no_exists", animationName, scene.getName())));
         }
-        isLooping = InkUtil.getOptionalArgument(command, "loop");
-        isLooping = InkUtil.getOptionalArgument(command, "unique");
-        isLooping = InkUtil.getOptionalArgument(command, "loop");
+        isLooping = InkActionUtil.getOptionalArgument(command, "loop");
+        isLooping = InkActionUtil.getOptionalArgument(command, "unique");
+        isLooping = InkActionUtil.getOptionalArgument(command, "loop");
         canBeExecuted = true;
         return InkActionResult.ok();
     }
