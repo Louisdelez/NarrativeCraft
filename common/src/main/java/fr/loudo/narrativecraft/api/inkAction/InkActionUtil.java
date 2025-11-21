@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.api.inkAction;
 
+import com.bladecoder.ink.runtime.Story;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -30,12 +31,22 @@ import java.util.regex.Pattern;
 
 public class InkActionUtil {
 
+    public static final Pattern SCENE_KNOT_PATTERN = Pattern.compile("chapter_\\d+_[a-zA-Z0-9_]+");
+    public static final Pattern OPTIONAL_ARGUMENT_PATTERN = Pattern.compile("--(\\S+)");
+    public static final Pattern VARIABLE_NAME = Pattern.compile("%([A-Za-z0-9_]+)%");
     public static final Pattern NAME_PATTERN = Pattern.compile("\"([^\"]+)\"|(\\S+)");
 
     public static List<String> getArguments(String command) {
         Matcher matcher = NAME_PATTERN.matcher(command);
         List<String> arguments = new ArrayList<>();
         while (matcher.find()) {
+            String matchString = matcher.group(1) != null ? matcher.group(1) : matcher.group(2);
+            Matcher argumentMatcher = OPTIONAL_ARGUMENT_PATTERN.matcher(matchString);
+            if (argumentMatcher.matches()) continue;
+            if (matchString.equals("\"\"")) {
+                arguments.add("");
+                continue;
+            }
             arguments.add(matcher.group(1) != null ? matcher.group(1) : matcher.group(2));
         }
         return arguments;
@@ -53,5 +64,27 @@ public class InkActionUtil {
             seconds = -1;
         }
         return seconds;
+    }
+
+    public static boolean getOptionalArgument(String command, String arg) {
+        Matcher matcher = OPTIONAL_ARGUMENT_PATTERN.matcher(command);
+        while (matcher.find()) {
+            String value = matcher.group(1);
+            if (arg.equalsIgnoreCase(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static String parseVariables(Story story, String tag) {
+        if (story == null) return tag;
+        Matcher matcher = VARIABLE_NAME.matcher(tag);
+        while (matcher.find()) {
+            Object variable = story.getVariablesState().get(matcher.group(1));
+            if (variable == null) continue;
+            tag = tag.replace("%" + matcher.group(1) + "%", variable.toString());
+        }
+        return tag;
     }
 }

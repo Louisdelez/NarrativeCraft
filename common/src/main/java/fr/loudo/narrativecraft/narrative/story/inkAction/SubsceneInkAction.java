@@ -25,13 +25,13 @@ package fr.loudo.narrativecraft.narrative.story.inkAction;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
+import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 
@@ -75,9 +75,9 @@ public class SubsceneInkAction extends InkAction {
             return InkActionResult.error(Translation.message(
                     WRONG_ARGUMENT_TEXT, Translation.message("subscene.no_exists", subsceneName, scene.getName())));
         }
-        isLooping = InkUtil.getOptionalArgument(command, "loop");
-        isUnique = InkUtil.getOptionalArgument(command, "unique");
-        isBlock = InkUtil.getOptionalArgument(command, "block");
+        isLooping = InkActionUtil.getOptionalArgument(command, "loop");
+        isUnique = InkActionUtil.getOptionalArgument(command, "unique");
+        isBlock = InkActionUtil.getOptionalArgument(command, "block");
         if (arguments.size() < 4 || action.equals("stop")) {
             canBeExecuted = true;
             return InkActionResult.ok();

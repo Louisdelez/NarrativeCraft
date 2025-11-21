@@ -25,11 +25,11 @@ package fr.loudo.narrativecraft.narrative.story.inkAction.text;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
+import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.util.Easing;
 import fr.loudo.narrativecraft.util.FadeState;
-import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.HashMap;
 import java.util.List;
@@ -95,9 +95,11 @@ public class TextInkAction extends InkAction {
                 break;
 
             case FADE_OUT:
-                isRunning = false;
-                if (dialogScrollTextInkAction.isBlock()) {
-                    blockEndTask.run();
+                if (!attribute.noRemove()) {
+                    isRunning = false;
+                    if (dialogScrollTextInkAction.isBlock()) {
+                        blockEndTask.run();
+                    }
                 }
                 break;
         }
@@ -154,10 +156,11 @@ public class TextInkAction extends InkAction {
         if (arguments.size() == 2) {
             return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Attribute (create, font...)"));
         }
+        attribute.setNoRemove(InkActionUtil.getOptionalArgument(command, "no-remove"));
         action = arguments.get(2);
         switch (action) {
             case "create" -> {
-                if (InkUtil.getOptionalArgument(command, "no-drop-shadow")) {
+                if (InkActionUtil.getOptionalArgument(command, "no-drop-shadow")) {
                     attribute.setDropShadow(false);
                 }
                 if (arguments.size() == 3) {
@@ -238,6 +241,16 @@ public class TextInkAction extends InkAction {
                     return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(3)));
                 }
             }
+            case "opacity" -> {
+                if (arguments.size() == 3) {
+                    return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Opacity value"));
+                }
+                try {
+                    attribute.setOpacity(Double.parseDouble(arguments.get(3)));
+                } catch (NumberFormatException e) {
+                    return InkActionResult.error(Translation.message(NOT_VALID_NUMBER, arguments.get(3)));
+                }
+            }
             case "fade" -> {
                 if (arguments.size() == 3) {
                     return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Fade in value"));
@@ -304,7 +317,7 @@ public class TextInkAction extends InkAction {
                 attribute.setCustomLetterSound(ResourceLocation.parse(arguments.get(3)));
             }
             case "type" -> {
-                dialogScrollTextInkAction.setBlock(InkUtil.getOptionalArgument(command, "block"));
+                dialogScrollTextInkAction.setBlock(InkActionUtil.getOptionalArgument(command, "block"));
                 if (arguments.size() > 3) {
                     try {
                         dialogScrollTextInkAction.setEndAt((int) (Double.parseDouble(arguments.get(3)) * 20.0));
@@ -500,7 +513,7 @@ class Attribute {
     private float scale = 1.0f;
     private double in, stay, out;
     private boolean dropShadow = true;
-    private boolean render, noTyping;
+    private boolean render, noTyping, noRemove;
     private Animation animation;
 
     public Attribute(String id, String text) {
@@ -637,6 +650,14 @@ class Attribute {
 
     public void setNoTyping(boolean noTyping) {
         this.noTyping = noTyping;
+    }
+
+    public boolean noRemove() {
+        return noRemove;
+    }
+
+    public void setNoRemove(boolean noRemove) {
+        this.noRemove = noRemove;
     }
 
     public void setRender(boolean render) {

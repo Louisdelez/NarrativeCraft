@@ -26,9 +26,9 @@ package fr.loudo.narrativecraft.narrative.inkTag;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionRegistry;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
+import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,7 @@ public class InkTagHandler {
         for (int i = 0; i < tagsToExecute.size(); i++) {
             String tag = tagsToExecute.get(i);
             if (storyHandler != null) {
-                tag = InkUtil.parseVariables(storyHandler.getStory(), tag);
+                tag = InkActionUtil.parseVariables(storyHandler.getStory(), tag);
             }
             InkAction inkAction = InkActionRegistry.findByCommand(tag);
             if (inkAction == null) continue;
