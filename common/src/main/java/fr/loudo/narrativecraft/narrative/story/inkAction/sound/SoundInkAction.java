@@ -25,10 +25,10 @@ package fr.loudo.narrativecraft.narrative.story.inkAction.sound;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
+import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
 import fr.loudo.narrativecraft.audio.VolumeAudio;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -121,7 +121,7 @@ public class SoundInkAction extends InkAction {
                     "ink_action.validation.sound", type.name().toLowerCase(), name));
         }
         if (action.equals("start") && arguments.size() > 3) {
-            isLooping = InkUtil.getOptionalArgument(command, "loop");
+            isLooping = InkActionUtil.getOptionalArgument(command, "loop");
             try {
                 volume = Float.parseFloat(arguments.get(3));
             } catch (NumberFormatException e) {

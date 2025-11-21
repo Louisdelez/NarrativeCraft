@@ -81,12 +81,14 @@ public abstract class AbstractDialogScrollText {
     }
 
     public void forceFinish() {
+        if (lines.isEmpty()) return;
         while (!isFinished()) {
             addLetter();
         }
     }
 
     public void tick() {
+        if (lines.isEmpty()) return;
         if (textEffectAnimation != null) {
             textEffectAnimation.tick();
             if (!textEffectAnimation.canTick(index)) return;

@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.narrative.story.inkAction;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
+import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
@@ -33,7 +34,6 @@ import fr.loudo.narrativecraft.narrative.dialog.DialogData;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.util.InkUtil;
 import java.util.Arrays;
 import java.util.List;
 import net.minecraft.world.entity.Entity;
@@ -57,7 +57,7 @@ public class OnEnterInkAction extends InkAction {
         if (currentKnot == null
                 || currentKnot.equalsIgnoreCase(playerSession.getScene().knotName())) return InkActionResult.ignored();
 
-        if (!currentKnot.matches(InkUtil.SCENE_KNOT_PATTERN.pattern())) return InkActionResult.ignored();
+        if (!currentKnot.matches(InkActionUtil.SCENE_KNOT_PATTERN.pattern())) return InkActionResult.ignored();
         String[] splitKnot = currentKnot.split("_");
         if (splitKnot.length < 2) return InkActionResult.ignored();
         int chapterIndex = Integer.parseInt(splitKnot[1]);

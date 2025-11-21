@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.narrative.story;
 import com.bladecoder.ink.runtime.Story;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
+import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
 import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.controllers.interaction.InteractionController;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
@@ -50,7 +51,6 @@ import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.screens.components.CrashScreen;
 import fr.loudo.narrativecraft.screens.credits.CreditScreen;
 import fr.loudo.narrativecraft.screens.story.StoryChoicesScreen;
-import fr.loudo.narrativecraft.util.InkUtil;
 import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.ArrayList;
@@ -268,7 +268,7 @@ public class StoryHandler {
             dialogText = story.Continue().replace("\n", "");
             dialogText = dialogText.replace(
                     "__username__", playerSession.getPlayer().getName().getString());
-            dialogText = InkUtil.parseVariables(story, dialogText);
+            dialogText = InkActionUtil.parseVariables(story, dialogText);
             if (story.hasError() || hasError) return;
             if (firstLoad) {
                 save(false);
@@ -589,7 +589,7 @@ public class StoryHandler {
         return !story.getState()
                         .getCurrentKnot()
                         .equals(playerSession.getScene().knotName())
-                && story.getState().getCurrentKnot().matches(InkUtil.SCENE_KNOT_PATTERN.pattern());
+                && story.getState().getCurrentKnot().matches(InkActionUtil.SCENE_KNOT_PATTERN.pattern());
     }
 
     public DialogData getDialogData() {
