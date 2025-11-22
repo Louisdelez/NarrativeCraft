@@ -75,7 +75,7 @@ public class SoundInkAction extends InkAction {
         } else if (action.equals("stop")) {
             newVolume = (float) Mth.lerp(t, volume, 0.0);
         }
-        ((VolumeAudio) soundManager).narrativecraft$setVolume(simpleSoundInstance, newVolume);
+        soundManager.setVolume(simpleSoundInstance, newVolume);
         if (newVolume == 0.0 && action.equals("stop")) {
             soundManager.stop(simpleSoundInstance);
         }
