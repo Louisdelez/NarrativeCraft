@@ -84,12 +84,12 @@ public abstract class WorldSelectionListMixin {
             minecraft.setScreen(confirmScreen);
             ci.cancel();
         }
-        if (!NarrativeCraftMod.VERSION.equals(worldOption.ncVersion)) {
+        if (!NarrativeCraftMod.MAJOR_VERSION.equals(worldOption.ncVersion)) {
             ConfirmScreen confirmScreen = new ConfirmScreen(
                     b -> {
                         if (b) {
                             File worldOptionFile = NarrativeCraftFile.getWorldOptionFile(this.summary.getLevelId());
-                            worldOption.ncVersion = NarrativeCraftMod.VERSION;
+                            worldOption.ncVersion = NarrativeCraftMod.MAJOR_VERSION;
                             NarrativeCraftFile.updateWorldOptions(worldOptionFile, worldOption);
                             this.joinWorld();
                         } else {
@@ -98,7 +98,7 @@ public abstract class WorldSelectionListMixin {
                     },
                     Component.literal(""),
                     Translation.message(
-                            "screen.nc_version_incompatible", worldOption.ncVersion, NarrativeCraftMod.VERSION));
+                            "screen.nc_version_incompatible", worldOption.ncVersion, NarrativeCraftMod.MAJOR_VERSION));
             minecraft.setScreen(confirmScreen);
             ci.cancel();
         }
