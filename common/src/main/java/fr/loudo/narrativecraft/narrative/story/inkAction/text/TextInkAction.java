@@ -95,11 +95,12 @@ public class TextInkAction extends InkAction {
                 break;
 
             case FADE_OUT:
+                attribute.setFadeState(null);
                 if (!attribute.noRemove()) {
                     isRunning = false;
-                    if (dialogScrollTextInkAction.isBlock()) {
-                        blockEndTask.run();
-                    }
+                }
+                if (dialogScrollTextInkAction.isBlock()) {
+                    blockEndTask.run();
                 }
                 break;
         }
