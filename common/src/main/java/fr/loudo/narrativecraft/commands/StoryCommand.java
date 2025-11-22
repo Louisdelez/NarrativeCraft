@@ -92,6 +92,7 @@ public class StoryCommand {
                 player.sendSystemMessage(Component.empty());
                 return Command.SINGLE_SUCCESS;
             }
+            if (!fullValidation && errorLines.isEmpty()) return Command.SINGLE_SUCCESS;
             for (ErrorLine errorLine : results) {
                 player.sendSystemMessage(errorLine.toMessage());
             }
