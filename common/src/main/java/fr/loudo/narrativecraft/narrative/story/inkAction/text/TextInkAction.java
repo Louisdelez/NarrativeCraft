@@ -95,7 +95,7 @@ public class TextInkAction extends InkAction {
                 break;
 
             case FADE_OUT:
-                fadeState = null;
+                attribute.setFadeState(null);
                 if (!attribute.noRemove()) {
                     isRunning = false;
                 }
