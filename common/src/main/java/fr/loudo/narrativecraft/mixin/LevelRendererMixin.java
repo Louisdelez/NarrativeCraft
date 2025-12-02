@@ -57,11 +57,7 @@ public class LevelRendererMixin {
             Matrix4f projectionMatrix,
             CallbackInfo ci) {
         poseStack.pushPose();
-        RenderSystem.disableDepthTest();
-        RenderSystem.depthMask(false);
         OnRenderWorld.renderWorld(poseStack, partialTick);
-        RenderSystem.enableDepthTest();
-        RenderSystem.depthMask(true);
         poseStack.popPose();
     }
 }

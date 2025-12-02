@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.dialog;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
@@ -144,6 +145,9 @@ public class DialogRenderer3D extends DialogRenderer {
         poseStack.mulPose(minecraft.getEntityRenderDispatcher().cameraOrientation());
         poseStack.scale(-(originalScale * 0.025F), -(originalScale * 0.025F), originalScale * 0.025F);
 
+        RenderSystem.disableDepthTest();
+        RenderSystem.depthMask(false);
+
         renderDialogBackground(poseStack, partialTick);
 
         Side side = dialogOffsetSide();
@@ -184,9 +188,13 @@ public class DialogRenderer3D extends DialogRenderer {
             poseStack.translate(0, totalHeight, 0);
         }
 
+        minecraft.renderBuffers().bufferSource().endBatch(NarrativeCraftMod.dialogBackgroundRenderType);
+
         if (!dialogStopping) {
             dialogEntityBobbing.partialTick(partialTick);
             dialogScrollTextDialog.render(poseStack, minecraft.renderBuffers().bufferSource(), partialTick);
+            minecraft.renderBuffers().bufferSource().endBatch();
+
             if (dialogScrollTextDialog.isFinished()) {
                 if (!dialogAutoSkipping) {
                     dialogAutoSkipping = true;
@@ -194,6 +202,7 @@ public class DialogRenderer3D extends DialogRenderer {
                 }
                 dialogArrowSkip.start();
             }
+
             if (!noSkip) {
                 VertexConsumer consumer1 = minecraft
                         .renderBuffers()
@@ -203,6 +212,10 @@ public class DialogRenderer3D extends DialogRenderer {
                 minecraft.renderBuffers().bufferSource().endBatch(NarrativeCraftMod.dialogBackgroundRenderType);
             }
         }
+
+        RenderSystem.enableDepthTest();
+        RenderSystem.depthMask(true);
+
 
         poseStack.popPose();
         minecraft.renderBuffers().bufferSource().endBatch(NarrativeCraftMod.dialogBackgroundRenderType);
