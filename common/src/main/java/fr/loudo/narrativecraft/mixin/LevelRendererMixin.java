@@ -23,7 +23,6 @@
 
 package fr.loudo.narrativecraft.mixin;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.events.OnRenderWorld;
 import net.minecraft.client.Camera;

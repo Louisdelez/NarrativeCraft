@@ -216,7 +216,6 @@ public class DialogRenderer3D extends DialogRenderer {
         RenderSystem.enableDepthTest();
         RenderSystem.depthMask(true);
 
-
         poseStack.popPose();
         minecraft.renderBuffers().bufferSource().endBatch(NarrativeCraftMod.dialogBackgroundRenderType);
     }
