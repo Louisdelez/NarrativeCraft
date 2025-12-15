@@ -32,6 +32,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.EntityIn
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -43,16 +44,13 @@ public class OnServerTick {
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             PlayerSession playerSession =
                     NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
-            List<InkAction> inkActions = playerSession.getInkActions();
-            for (int i = inkActions.size() - 1; i >= 0; i--) {
-                InkAction inkAction = inkActions.get(i);
-                if (inkAction.getSide() != InkAction.Side.SERVER) continue;
-                if (!inkAction.isRunning()) {
-                    inkActions.remove(i);
-                    continue;
-                }
+            List<InkAction> toRemove = new ArrayList<>();
+            List<InkAction> inkActionsServer = playerSession.getServerSideInkActions();
+            for (InkAction inkAction : inkActionsServer) {
+                if (!inkAction.isRunning()) toRemove.add(inkAction);
                 inkAction.tick();
             }
+            playerSession.getInkActions().removeAll(toRemove);
             StoryHandler storyHandler = playerSession.getStoryHandler();
 
             KeyframeLocation location = playerSession.getCurrentCamera();

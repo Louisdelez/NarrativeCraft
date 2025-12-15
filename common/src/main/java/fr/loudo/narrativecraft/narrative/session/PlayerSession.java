@@ -297,7 +297,13 @@ public class PlayerSession {
 
     public void markCameraSynced(KeyframeLocation camera) {
         lastSyncedCamera = new KeyframeLocation(
-                camera.getX(), camera.getY(), camera.getZ(), camera.getPitch(), camera.getYaw(), camera.getRoll(), camera.getFov());
+                camera.getX(),
+                camera.getY(),
+                camera.getZ(),
+                camera.getPitch(),
+                camera.getYaw(),
+                camera.getRoll(),
+                camera.getFov());
     }
 
     private boolean sameCameraPose(KeyframeLocation a, KeyframeLocation b) {
