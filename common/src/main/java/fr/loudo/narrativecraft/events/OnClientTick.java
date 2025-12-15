@@ -28,7 +28,6 @@ import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionEyeRenderer;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 
@@ -45,13 +44,16 @@ public class OnClientTick {
         if (playerSession.getDialogRenderer() != null) {
             playerSession.getDialogRenderer().tick();
         }
-        List<InkAction> toRemove = new ArrayList<>();
-        List<InkAction> inkActionsClient = playerSession.getClientSideInkActions();
-        for (InkAction inkAction : inkActionsClient) {
-            if (!inkAction.isRunning()) toRemove.add(inkAction);
+        List<InkAction> inkActions = playerSession.getInkActions();
+        for (int i = inkActions.size() - 1; i >= 0; i--) {
+            InkAction inkAction = inkActions.get(i);
+            if (inkAction.getSide() != InkAction.Side.CLIENT) continue;
+            if (!inkAction.isRunning()) {
+                inkActions.remove(i);
+                continue;
+            }
             inkAction.tick();
         }
-        playerSession.getInkActions().removeAll(toRemove);
 
         // Renderer
         playerSession.getStorySaveIconGui().tick();

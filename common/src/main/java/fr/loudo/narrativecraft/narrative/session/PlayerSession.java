@@ -59,6 +59,7 @@ public class PlayerSession {
     private AbstractController controller;
     private DialogRenderer dialogRenderer;
     private KeyframeLocation currentCamera;
+    private KeyframeLocation lastSyncedCamera;
     private StoryHandler storyHandler;
     private AreaTrigger lastAreaTriggerEntered;
     private StitchInteraction lastInteraction;
@@ -174,11 +175,12 @@ public class PlayerSession {
     }
 
     public boolean isOnGameplay() {
-        List<InkAction> inkActions1 = new ArrayList<>(inkActions);
-        return !inkActions1.stream()
-                .filter(inkAction -> inkAction instanceof GameplayInkAction)
-                .toList()
-                .isEmpty();
+        for (InkAction inkAction : inkActions) {
+            if (inkAction instanceof GameplayInkAction) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<AreaTrigger> getAreaTriggersEntered() {
@@ -277,6 +279,7 @@ public class PlayerSession {
     public void setCurrentCamera(KeyframeLocation currentCamera) {
         this.currentCamera = currentCamera;
         if (currentCamera == null) {
+            lastSyncedCamera = null;
             if (lastGameType != null) {
                 player.setGameMode(lastGameType);
             }
@@ -286,6 +289,25 @@ public class PlayerSession {
             this.lastGameType = player.gameMode();
         }
         player.setGameMode(GameType.SPECTATOR);
+    }
+
+    public boolean shouldSyncCamera(KeyframeLocation camera) {
+        return lastSyncedCamera == null || !sameCameraPose(camera, lastSyncedCamera);
+    }
+
+    public void markCameraSynced(KeyframeLocation camera) {
+        lastSyncedCamera = new KeyframeLocation(
+                camera.getX(), camera.getY(), camera.getZ(), camera.getPitch(), camera.getYaw(), camera.getRoll(), camera.getFov());
+    }
+
+    private boolean sameCameraPose(KeyframeLocation a, KeyframeLocation b) {
+        final double posEpsilon = 1.0E-4;
+        final float rotEpsilon = 1.0E-3F;
+        return Math.abs(a.getX() - b.getX()) < posEpsilon
+                && Math.abs(a.getY() - b.getY()) < posEpsilon
+                && Math.abs(a.getZ() - b.getZ()) < posEpsilon
+                && Math.abs(a.getYaw() - b.getYaw()) < rotEpsilon
+                && Math.abs(a.getPitch() - b.getPitch()) < rotEpsilon;
     }
 
     public StorySaveIconGui getStorySaveIconGui() {
