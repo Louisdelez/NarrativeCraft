@@ -120,10 +120,13 @@ public class PlaybackData {
         if (entity instanceof Mob mob) mob.setNoAi(true);
         moveEntity(location, location, true);
         if (entity instanceof ItemEntity itemEntity) { // Drop Item
-            List<Action> actions = playback.getMasterEntityData().getActions().stream()
-                    .filter(action -> action instanceof BreakBlockAction && action.getTick() == playback.getTick() - 1)
-                    .toList();
-            boolean randomizeMotion = !actions.isEmpty();
+            boolean randomizeMotion = false;
+            for (Action action : playback.getMasterEntityData().getActions()) {
+                if (action instanceof BreakBlockAction && action.getTick() == playback.getTick() - 1) {
+                    randomizeMotion = true;
+                    break;
+                }
+            }
             entity = ((LivingEntityInvoker) playback.getMasterEntity())
                     .callCreateItemStackToDrop(itemEntity.getItem(), randomizeMotion, false);
         }

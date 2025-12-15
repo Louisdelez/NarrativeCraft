@@ -54,7 +54,7 @@ public class OnServerTick {
             StoryHandler storyHandler = playerSession.getStoryHandler();
 
             KeyframeLocation location = playerSession.getCurrentCamera();
-            if (location != null) {
+            if (location != null && playerSession.shouldSyncCamera(location)) {
                 playerSession
                         .getPlayer()
                         .connection
@@ -64,6 +64,7 @@ public class OnServerTick {
                                 location.getZ(),
                                 location.getYaw(),
                                 location.getPitch());
+                playerSession.markCameraSynced(location);
             }
 
             if (storyHandler == null) continue;

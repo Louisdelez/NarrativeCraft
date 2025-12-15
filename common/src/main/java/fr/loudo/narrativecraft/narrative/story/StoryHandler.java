@@ -74,6 +74,7 @@ public class StoryHandler {
     private final PlayerSession playerSession;
     private final StoryDebugHud storyDebugHud;
     private DialogData dialogData = new DialogData(DialogData.globalDialogData);
+    private static final Pattern DIALOG_PATTERN = Pattern.compile(DIALOG_REGEX);
     private Story story;
     private String dialogText;
     private boolean loadScene, debugMode, firstLoad, hasError;
@@ -329,8 +330,7 @@ public class StoryHandler {
     }
 
     public Matcher getDialogMatcher(String dialog) {
-        Pattern pattern = Pattern.compile(DIALOG_REGEX);
-        return pattern.matcher(dialog);
+        return DIALOG_PATTERN.matcher(dialog);
     }
 
     private void loadSave() throws Exception {

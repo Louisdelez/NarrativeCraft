@@ -268,30 +268,32 @@ public class Playback {
 
     public void actionListener(PlaybackData playbackData) {
         if (playbackData.getEntity() == null) return;
-        List<Action> actionToBePlayed = playbackData.getActionsData().getActions().stream()
-                .filter(action -> globalTick == action.getTick())
-                .toList();
-        for (Action action : actionToBePlayed) {
+        List<Action> actions = playbackData.getActionsData().getActions();
+        for (Action action : actions) {
+            if (globalTick != action.getTick()) continue;
             if (action instanceof EmoteAction && !Services.PLATFORM.isModLoaded("emotecraft")) continue;
             action.execute(playbackData);
         }
     }
 
     public void actionListenerRewind(PlaybackData playbackData) {
-        List<Action> actionToBePlayed = playbackData.getActionsData().getActions().stream()
-                .filter(action -> globalTick == action.getTick())
-                .toList();
-        actionToBePlayed = actionToBePlayed.reversed();
-        for (Action action : actionToBePlayed) {
+        List<Action> actions = playbackData.getActionsData().getActions();
+        for (int i = actions.size() - 1; i >= 0; i--) {
+            Action action = actions.get(i);
+            if (globalTick != action.getTick()) continue;
             if (action instanceof EmoteAction && !Services.PLATFORM.isModLoaded("emotecraft")) continue;
             if (!(action instanceof DeathAction) && playbackData.getEntity() == null) continue;
             if (action instanceof PoseAction poseAction) {
                 poseAction.rewind(playbackData);
                 if (poseAction.getPreviousPose() == Pose.SLEEPING) {
-                    SleepAction previousSleepAction = (SleepAction) playbackData.getActionsData().getActions().stream()
-                            .filter(action1 -> globalTick <= action.getTick() && action1 instanceof SleepAction)
-                            .toList()
-                            .getLast();
+                    SleepAction previousSleepAction = null;
+                    for (int j = actions.size() - 1; j >= 0; j--) {
+                        Action candidate = actions.get(j);
+                        if (candidate instanceof SleepAction sleepAction && sleepAction.getTick() <= action.getTick()) {
+                            previousSleepAction = sleepAction;
+                            break;
+                        }
+                    }
                     if (previousSleepAction != null) {
                         previousSleepAction.execute(playbackData);
                     }
