@@ -29,7 +29,7 @@ import fr.loudo.narrativecraft.narrative.story.text.TextEffectAnimation;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import org.joml.Vector2f;
 
@@ -44,8 +44,8 @@ public abstract class AbstractDialogScrollText {
     protected float currentX;
     protected float currentY;
     protected float tickAccumulator = 0.0f;
-    protected ResourceLocation letterSound =
-            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sfx.dialog_sound");
+    protected Identifier letterSound =
+            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sfx.dialog_sound");
 
     protected int textColor = 0xFFFFFF;
     protected float textSpeed = 1.0f;
@@ -214,11 +214,11 @@ public abstract class AbstractDialogScrollText {
         this.muteSound = muteSound;
     }
 
-    public ResourceLocation getLetterSound() {
+    public Identifier getLetterSound() {
         return letterSound;
     }
 
-    public void setLetterSound(ResourceLocation letterSound) {
+    public void setLetterSound(Identifier letterSound) {
         this.letterSound = letterSound;
     }
 

@@ -59,7 +59,7 @@ public class InteractionEyeRenderer {
     public static void render(PoseStack poseStack, float partialTick, int entityId) {
         Minecraft mc = Minecraft.getInstance();
         Entity entity = mc.level.getEntity(entityId);
-        Vec3 camPos = mc.gameRenderer.getMainCamera().getPosition();
+        Vec3 camPos = mc.gameRenderer.getMainCamera().position();
 
         isWatching = entity != null;
 
@@ -87,10 +87,10 @@ public class InteractionEyeRenderer {
         VertexConsumer vc = bufferSource.getBuffer(NarrativeCraftMod.dialogBackgroundRenderType);
         Matrix4f mat = poseStack.last().pose();
 
-        vc.addVertex(mat, -SIZE, SIZE, -1).setColor(0, 0, 0, opacity);
-        vc.addVertex(mat, SIZE, SIZE, -1).setColor(0, 0, 0, opacity);
-        vc.addVertex(mat, SIZE, -SIZE, -1).setColor(0, 0, 0, opacity);
-        vc.addVertex(mat, -SIZE, -SIZE, -1).setColor(0, 0, 0, opacity);
+        vc.addVertex(mat, -SIZE, SIZE, -1).setColor(0, 0, 0, opacity).setLight(LightTexture.FULL_BRIGHT);
+        vc.addVertex(mat, SIZE, SIZE, -1).setColor(0, 0, 0, opacity).setLight(LightTexture.FULL_BRIGHT);
+        vc.addVertex(mat, SIZE, -SIZE, -1).setColor(0, 0, 0, opacity).setLight(LightTexture.FULL_BRIGHT);
+        vc.addVertex(mat, -SIZE, -SIZE, -1).setColor(0, 0, 0, opacity).setLight(LightTexture.FULL_BRIGHT);
 
         mc.font.drawInBatch(
                 ImageFontConstants.EYE_OPEN,

@@ -36,6 +36,7 @@ import java.util.List;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.PermissionSet;
 
 public class MinecraftCommandInkAction extends InkAction {
 
@@ -54,7 +55,7 @@ public class MinecraftCommandInkAction extends InkAction {
         command = command.replace("\\{", "{");
         command = command.replace("\\}", "}");
         CommandSourceStack commandSourceStack =
-                new CommandSourceStack(null, null, null, null, 4, null, null, NarrativeCraftMod.server, null);
+                new CommandSourceStack(null, null, null, null, PermissionSet.ALL_PERMISSIONS, null, null, NarrativeCraftMod.server, null);
         ParseResults<CommandSourceStack> parse = NarrativeCraftMod.server
                 .getCommands()
                 .getDispatcher()
@@ -98,7 +99,7 @@ public class MinecraftCommandInkAction extends InkAction {
                 player.position(),
                 player.getRotationVector(),
                 player.level(),
-                4,
+                PermissionSet.ALL_PERMISSIONS,
                 player.getName().getString(),
                 player.getDisplayName(),
                 player.level().getServer(),

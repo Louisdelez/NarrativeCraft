@@ -83,7 +83,7 @@ public class ChoiceButtonWidget extends AbstractButton {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         int left = this.getX();
         int top = this.getY();
         int right = left + this.getWidth();

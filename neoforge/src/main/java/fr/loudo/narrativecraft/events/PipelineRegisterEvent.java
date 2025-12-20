@@ -41,24 +41,24 @@ public class PipelineRegisterEvent {
 
     @SubscribeEvent
     private static void onPipelineRegister(RegisterRenderPipelinesEvent event) {
-        RenderPipeline pipeline = RenderPipeline.builder(RenderPipelines.TEXT_SNIPPET)
-                .withLocation("pipeline/narrativecraft_dialog_background")
-                .withVertexShader("core/rendertype_text_background_see_through")
-                .withFragmentShader("core/rendertype_text_background_see_through")
-                .withDepthWrite(false)
-                .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-                .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
-                .build();
-        event.registerPipeline(pipeline);
-        NarrativeCraftMod.dialogBackgroundRenderType = RenderType.create(
-                "narrativecraft_dialog_background",
-                1536,
-                false,
-                true,
-                pipeline,
-                RenderType.CompositeState.builder()
-                        .setTextureState(RenderStateShard.NO_TEXTURE)
-                        .setLightmapState(RenderStateShard.LIGHTMAP)
-                        .createCompositeState(false));
+//        RenderPipeline pipeline = RenderPipeline.builder(RenderPipelines.TEXT_SNIPPET)
+//                .withLocation("pipeline/narrativecraft_dialog_background")
+//                .withVertexShader("core/rendertype_text_background_see_through")
+//                .withFragmentShader("core/rendertype_text_background_see_through")
+//                .withDepthWrite(false)
+//                .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+//                .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
+//                .build();
+//        event.registerPipeline(pipeline);
+//        NarrativeCraftMod.dialogBackgroundRenderType = RenderTypes.create(
+//                "narrativecraft_dialog_background",
+//                1536,
+//                false,
+//                true,
+//                pipeline,
+//                RenderTypes.CompositeState.builder()
+//                        .setTextureState(RenderStateShard.NO_TEXTURE)
+//                        .setLightmapState(RenderStateShard.LIGHTMAP)
+//                        .createCompositeState(false));
     }
 }

@@ -36,12 +36,13 @@ import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.server.permissions.Permissions;
 
 public class OpenScreenCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("nc")
-                .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
+                .requires(commandSourceStack -> commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
                 .then(Commands.literal("open")
                         .then(Commands.literal("story_manager").executes(OpenScreenCommand::openStoryManager))
                         .then(Commands.literal("character_manager").executes(OpenScreenCommand::openCharacterManager))

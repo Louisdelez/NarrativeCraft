@@ -23,32 +23,49 @@
 
 package fr.loudo.narrativecraft.mixin;
 
+import fr.loudo.narrativecraft.audio.VolumeAudio;
 import fr.loudo.narrativecraft.narrative.story.inkAction.sound.SoundInkInstance;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.ChannelAccess;
 import net.minecraft.client.sounds.SoundEngine;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-/*
-    Don't override volume of a sound ink action when changing volume in client settings
-    Otherwise, sounds from sound ink are at max volume and broken
-*/
 @Mixin(SoundEngine.class)
-public abstract class SoundEngineMixin {
+public abstract class SoundEngineMixin implements VolumeAudio {
 
     @Shadow
     protected abstract float calculateVolume(SoundInstance sound);
 
     @Shadow
-    public abstract void setVolume(SoundInstance soundInstance, float volume);
+    @Final
+    private Map<SoundInstance, ChannelAccess.ChannelHandle> instanceToChannel;
 
+    @Shadow
+    private boolean loaded;
+
+    // Code owned by Mojang. Removed from 1.21.10
+    @Override
+    public void narrativecraft$setVolume(SoundInstance soundInstance, float volume) {
+        if (this.loaded) {
+            ChannelAccess.ChannelHandle channelHandle = this.instanceToChannel.get(soundInstance);
+            if (channelHandle != null) {
+                channelHandle.execute((channel) -> channel.setVolume(volume * this.calculateVolume(soundInstance)));
+            }
+        }
+    }
+
+    /*
+        Don't override volume of a sound ink action when changing volume in client settings
+        Otherwise, sounds from sound ink are at max volume and broken
+    */
     @Redirect(
-            method = "updateCategoryVolume",
+            method = "refreshCategoryVolume",
             at = @At(value = "INVOKE", target = "Ljava/util/Map;forEach(Ljava/util/function/BiConsumer;)V"))
     private void narrativecraft$updateCategoryVolume(
             Map<SoundInstance, ChannelAccess.ChannelHandle> instance,

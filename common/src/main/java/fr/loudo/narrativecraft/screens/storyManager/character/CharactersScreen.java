@@ -180,9 +180,9 @@ public class CharactersScreen extends StoryElementScreen {
     @Override
     protected void openFolder() {
         if (scene == null) {
-            net.minecraft.Util.getPlatform().openPath(NarrativeCraftFile.characterDirectory.toPath());
+            net.minecraft.util.Util.getPlatform().openPath(NarrativeCraftFile.characterDirectory.toPath());
         } else {
-            net.minecraft.Util.getPlatform()
+            net.minecraft.util.Util.getPlatform()
                     .openPath(NarrativeCraftFile.getNpcFolder(scene).toPath());
         }
     }

@@ -24,14 +24,14 @@
 package fr.loudo.narrativecraft.narrative.story.inkAction.sound;
 
 import net.minecraft.client.resources.sounds.AbstractSoundInstance;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 
 public class SoundInkInstance extends AbstractSoundInstance {
 
     public SoundInkInstance(
-            ResourceLocation location,
+            Identifier location,
             SoundSource source,
             float volume,
             float pitch,

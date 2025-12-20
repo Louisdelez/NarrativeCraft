@@ -27,19 +27,19 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.util.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 
 public class NarrativeCraftLogoRenderer {
 
-    public static final ResourceLocation LOGO =
-            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/logo.png");
+    public static final Identifier LOGO =
+            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/logo.png");
 
-    private final ResourceLocation resourceLocation;
+    private final Identifier resourceLocation;
     private int[] logoRes;
     private int imageHeight;
 
-    public NarrativeCraftLogoRenderer(ResourceLocation resourceLocation) {
+    public NarrativeCraftLogoRenderer(Identifier resourceLocation) {
         this.resourceLocation = resourceLocation;
     }
 

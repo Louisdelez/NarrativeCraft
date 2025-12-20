@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.narrative.story.inkAction.sound;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
+import fr.loudo.narrativecraft.audio.VolumeAudio;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.util.Translation;
@@ -33,7 +34,7 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundManager;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 
@@ -75,7 +76,7 @@ public class SoundInkAction extends InkAction {
         } else if (action.equals("stop")) {
             newVolume = (float) Mth.lerp(t, volume, 0.0);
         }
-        soundManager.setVolume(simpleSoundInstance, newVolume);
+        ((VolumeAudio)soundManager).narrativecraft$setVolume(simpleSoundInstance, newVolume);
         if (newVolume == 0.0 && action.equals("stop")) {
             soundManager.stop(simpleSoundInstance);
         }
@@ -113,7 +114,7 @@ public class SoundInkAction extends InkAction {
             identifier = splitName[0];
             name = splitName[1];
         }
-        ResourceLocation location = ResourceLocation.fromNamespaceAndPath(identifier, name);
+        Identifier location = Identifier.fromNamespaceAndPath(identifier, name);
         if (soundManager.getSoundEvent(location) == null) {
             return InkActionResult.warn(Translation.message(
                     "ink_action.validation.sound", type.name().toLowerCase(), name));
@@ -147,7 +148,7 @@ public class SoundInkAction extends InkAction {
             simpleSoundInstance = getSimpleSoundInstance();
             soundManager.play(simpleSoundInstance);
             if (fadeTime > 0) {
-                soundManager.setVolume(simpleSoundInstance, 0f);
+                ((VolumeAudio)soundManager).narrativecraft$setVolume(simpleSoundInstance, 0f);
             }
         } else if (action.equals("stop") && arguments.size() > 3) {
             String fadeValue = arguments.get(3);
@@ -171,7 +172,7 @@ public class SoundInkAction extends InkAction {
             simpleSoundInstance = getSimpleSoundInstance();
             soundManager.play(simpleSoundInstance);
             if (fadeTime > 0) {
-                soundManager.setVolume(simpleSoundInstance, 0);
+                ((VolumeAudio)soundManager).narrativecraft$setVolume(simpleSoundInstance, 0);
             }
         } else if (action.equals("stop")) {
             for (InkAction inkAction : playerSession.getInkActions()) {
@@ -205,7 +206,7 @@ public class SoundInkAction extends InkAction {
     private SoundInstance getSimpleSoundInstance() {
         if (simpleSoundInstance == null) {
             simpleSoundInstance = new SoundInkInstance(
-                    ResourceLocation.fromNamespaceAndPath(identifier, name),
+                    Identifier.fromNamespaceAndPath(identifier, name),
                     SoundSource.MASTER,
                     volume,
                     pitch,

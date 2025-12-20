@@ -27,7 +27,7 @@ import fr.loudo.narrativecraft.mixin.accessor.AbstractBoatAccessor;
 import fr.loudo.narrativecraft.narrative.playback.PlaybackData;
 import fr.loudo.narrativecraft.narrative.recording.actions.manager.ActionType;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.vehicle.AbstractBoat;
+import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
 
 public class AbstractBoatBubbleAction extends Action {
 

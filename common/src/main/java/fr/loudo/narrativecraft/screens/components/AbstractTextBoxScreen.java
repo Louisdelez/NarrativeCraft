@@ -33,13 +33,13 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 
 public abstract class AbstractTextBoxScreen extends Screen {
 
-    private static final ResourceLocation WINDOW_LOCATION =
-            ResourceLocation.withDefaultNamespace("textures/gui/advancements/window.png");
+    private static final Identifier WINDOW_LOCATION =
+            Identifier.withDefaultNamespace("textures/gui/advancements/window.png");
 
     protected final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
 

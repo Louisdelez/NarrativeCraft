@@ -38,6 +38,7 @@ import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permissions;
 
 public class OnPlayerServerConnection {
 
@@ -46,7 +47,7 @@ public class OnPlayerServerConnection {
         initSession(player);
         NarrativeCraftMod.getInstance().setNarrativeWorldOption(NarrativeCraftFile.loadWorldOptions());
         NarrativeCraftMod.getInstance().setNarrativeClientOptions(NarrativeCraftFile.loadUserOptions());
-        if (player.hasPermissions(2) && NarrativeEntryInit.hasError) {
+        if (player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR) && NarrativeEntryInit.hasError) {
             player.sendSystemMessage(Translation.message("crash.narrative-data").withStyle(ChatFormatting.RED));
         }
         CutsceneEditItems.init(player.registryAccess());

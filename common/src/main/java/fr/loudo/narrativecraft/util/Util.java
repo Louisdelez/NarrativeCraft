@@ -54,7 +54,7 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.Resource;
@@ -225,7 +225,7 @@ public class Util {
         return ((StringSplitterAccessor) splitter).getWidthProvider().getWidth(letterCode, Style.EMPTY);
     }
 
-    public static int[] getImageResolution(ResourceLocation resourceLocation) {
+    public static int[] getImageResolution(Identifier resourceLocation) {
         ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
 
         Optional<Resource> resource = resourceManager.getResource(resourceLocation);
@@ -247,7 +247,7 @@ public class Util {
         return Math.round(ratio * newWidth);
     }
 
-    public static boolean resourceExists(ResourceLocation resourceLocation) {
+    public static boolean resourceExists(Identifier resourceLocation) {
         return Minecraft.getInstance()
                 .getResourceManager()
                 .getResource(resourceLocation)

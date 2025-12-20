@@ -31,12 +31,12 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class FinishedStoryScreen extends Screen {
 
-    private static final ResourceLocation WINDOW_LOCATION =
-            ResourceLocation.withDefaultNamespace("textures/gui/advancements/window.png");
+    private static final Identifier WINDOW_LOCATION =
+            Identifier.withDefaultNamespace("textures/gui/advancements/window.png");
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     private final Screen oldScreen;
 

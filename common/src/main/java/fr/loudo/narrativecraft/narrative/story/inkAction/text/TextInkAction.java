@@ -38,7 +38,7 @@ import java.util.function.BiConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 
 public class TextInkAction extends InkAction {
@@ -309,13 +309,13 @@ public class TextInkAction extends InkAction {
                 if (arguments.size() == 3) {
                     return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Font value"));
                 }
-                attribute.setCustomFont(ResourceLocation.parse(arguments.get(3)));
+                attribute.setCustomFont(Identifier.parse(arguments.get(3)));
             }
             case "sound" -> {
                 if (arguments.size() == 3) {
                     return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Sound value"));
                 }
-                attribute.setCustomLetterSound(ResourceLocation.parse(arguments.get(3)));
+                attribute.setCustomLetterSound(Identifier.parse(arguments.get(3)));
             }
             case "type" -> {
                 dialogScrollTextInkAction.setBlock(InkActionUtil.getOptionalArgument(command, "block"));
@@ -504,7 +504,7 @@ class Attribute {
     private final String id;
     private final Font font = Minecraft.getInstance().font;
     private String text;
-    private ResourceLocation customFont, customLetterSound;
+    private Identifier customFont, customLetterSound;
     private Position position = Position.MIDDLE;
     private FadeState fadeState;
     private float[] spacing;
@@ -537,19 +537,19 @@ class Attribute {
         return font;
     }
 
-    public ResourceLocation getCustomFont() {
+    public Identifier getCustomFont() {
         return customFont;
     }
 
-    public ResourceLocation getCustomLetterSound() {
+    public Identifier getCustomLetterSound() {
         return customLetterSound;
     }
 
-    public void setCustomLetterSound(ResourceLocation customLetterSound) {
+    public void setCustomLetterSound(Identifier customLetterSound) {
         this.customLetterSound = customLetterSound;
     }
 
-    public void setCustomFont(ResourceLocation customFont) {
+    public void setCustomFont(Identifier customFont) {
         this.customFont = customFont;
     }
 

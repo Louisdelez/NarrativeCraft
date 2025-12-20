@@ -30,7 +30,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.SceneData;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
@@ -103,11 +103,11 @@ public class AreaTrigger extends SceneData {
     public void drawSquareLine(PoseStack poseStack) {
         Minecraft minecraft = Minecraft.getInstance();
         Camera camera = minecraft.gameRenderer.getMainCamera();
-        Vec3 camPos = camera.getPosition();
+        Vec3 camPos = camera.entity().position();
 
         PoseStack.Pose matrix4f = poseStack.last();
         MultiBufferSource.BufferSource bufferSource = minecraft.renderBuffers().bufferSource();
-        VertexConsumer vertex = bufferSource.getBuffer(RenderType.lines());
+        VertexConsumer vertex = bufferSource.getBuffer(RenderTypes.lines());
 
         double minX = Math.min(x1, x2);
         double minY = Math.min(y1, y2);
@@ -150,7 +150,7 @@ public class AreaTrigger extends SceneData {
         drawEdge(vertex, matrix, p101, p111, r, g, b, a);
         drawEdge(vertex, matrix, p001, p011, r, g, b, a);
 
-        bufferSource.endBatch(RenderType.lines());
+        bufferSource.endBatch(RenderTypes.lines());
     }
 
     private void drawEdge(

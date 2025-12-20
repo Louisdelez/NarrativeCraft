@@ -34,12 +34,13 @@ import fr.loudo.narrativecraft.screens.storyManager.scene.ScenesMenuScreen;
 import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.server.permissions.Permissions;
 
 public class PressKeyListener {
 
     public static void onPressKey(Minecraft minecraft) {
         ModKeys.handleKeyPress(ModKeys.OPEN_STORY_MANAGER, () -> {
-            if (!minecraft.player.hasPermissions(2)) return;
+            if (!minecraft.player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return;
             PlayerSession playerSession =
                     NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
             if (playerSession == null) return;

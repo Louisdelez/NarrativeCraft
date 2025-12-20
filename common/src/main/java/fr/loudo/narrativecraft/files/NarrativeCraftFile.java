@@ -50,7 +50,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.DefaultPlayerSkin;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.PlayerSkin;
 import net.minecraft.world.level.storage.LevelResource;
@@ -823,7 +823,7 @@ public class NarrativeCraftFile {
         }
     }
 
-    public static ResourceLocation getMainCharacterSkin() {
+    public static Identifier getMainCharacterSkin() {
         CharacterStory characterStory =
                 NarrativeCraftMod.getInstance().getCharacterManager().getMainCharacter();
         if (characterStory == null) return null;
@@ -831,7 +831,7 @@ public class NarrativeCraftFile {
         CharacterSkinController characterSkinController = new CharacterSkinController(characterRuntime, null, null);
         File mainSkinFile = characterSkinController.getMainSkinFile();
         if (mainSkinFile == null) return null;
-        return ResourceLocation.fromNamespaceAndPath(
+        return Identifier.fromNamespaceAndPath(
                 NarrativeCraftMod.MOD_ID,
                 "character/" + Util.snakeCase(characterStory.getName()) + "/" + Util.snakeCase(mainSkinFile.getName()));
     }

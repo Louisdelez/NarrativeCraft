@@ -45,12 +45,13 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permissions;
 
 public class StoryCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("nc")
-                .requires(commandSourceStack -> commandSourceStack.hasPermission(2))
+                .requires(commandSourceStack -> commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
                 .then(Commands.literal("story")
                         .then(Commands.literal("validate")
                                 .executes(commandContext -> validateStory(commandContext, true)))
@@ -155,7 +156,7 @@ public class StoryCommand {
     }
 
     private static int stopStory(CommandContext<CommandSourceStack> context) {
-        if (!context.getSource().hasPermission(2)) return 0;
+        if (!context.getSource().permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) return 0;
 
         PlayerSession playerSession = NarrativeCraftMod.getInstance()
                 .getPlayerSessionManager()

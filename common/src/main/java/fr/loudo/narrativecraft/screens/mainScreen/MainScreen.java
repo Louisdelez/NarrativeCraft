@@ -59,16 +59,16 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.ARGB;
 
 public class MainScreen extends Screen {
 
-    public static final ResourceLocation BACKGROUND_IMAGE =
-            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/main_screen/background.png");
-    public static final ResourceLocation MUSIC =
-            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main_screen.music");
+    public static final Identifier BACKGROUND_IMAGE =
+            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/main_screen/background.png");
+    public static final Identifier MUSIC =
+            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main_screen.music");
 
     public static SimpleSoundInstance musicInstance = new SimpleSoundInstance(
             MainScreen.MUSIC,

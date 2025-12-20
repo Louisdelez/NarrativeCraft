@@ -29,7 +29,7 @@ import fr.loudo.narrativecraft.narrative.recording.RecordingData;
 import fr.loudo.narrativecraft.narrative.recording.actions.manager.ActionDifferenceListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

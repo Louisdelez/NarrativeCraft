@@ -51,7 +51,7 @@ import java.util.List;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
@@ -414,12 +414,12 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
         if (playerSession.getCurrentCamera() != null || environment != Environment.DEVELOPMENT) return;
         Minecraft client = Minecraft.getInstance();
         Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
-        Vec3 cameraPos = camera.getPosition();
+        Vec3 cameraPos = camera.position();
         PoseStack.Pose matrix4f = poseStack.last();
 
         for (CutsceneKeyframeGroup keyframeGroup : keyframeGroups) {
             VertexConsumer vertexConsumer =
-                    client.renderBuffers().bufferSource().getBuffer(RenderType.debugLineStrip(1.0F));
+                    client.renderBuffers().bufferSource().getBuffer(RenderTypes.lines());
             for (int i = 0; i < keyframeGroup.getKeyframes().size() - 1; i++) {
                 CutsceneKeyframe firstKeyFrame = keyframeGroup.getKeyframes().get(i);
                 CutsceneKeyframe secondKeyFrame = keyframeGroup.getKeyframes().get(i + 1);
@@ -436,10 +436,12 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
                 vertexConsumer
                         .addVertex(matrix4f, new Vector3f((float) x1, (float) y1, (float) z1))
                         .setColor(1.0F, 1.0F, 0.0F, 1.0F)
+                        .setLineWidth(1.0F)
                         .setNormal(0, 1, 0);
                 vertexConsumer
                         .addVertex(matrix4f, new Vector3f((float) x2, (float) y2, (float) z2))
                         .setColor(1.0F, 1.0F, 0.0F, 1.0F)
+                        .setLineWidth(1.0F)
                         .setNormal(0, 1, 0);
             }
             client.renderBuffers().bufferSource().endBatch();

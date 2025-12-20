@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.core.ClientAsset;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.entity.player.PlayerSkin;
 import org.spongepowered.asm.mixin.Final;
@@ -71,7 +71,7 @@ public class PlayerInfoMixin {
                     NarrativeCraftMod.getInstance().getCharacterManager().getMainCharacter();
             if (mainCharacter != null
                     && mainCharacter.getMainCharacterAttribute().isSameSkinAsTheir()) {
-                ResourceLocation mainCharacterSkin = NarrativeCraftFile.getMainCharacterSkin();
+                Identifier mainCharacterSkin = NarrativeCraftFile.getMainCharacterSkin();
                 PlayerModelType playerModelType;
                 if (mainCharacterSkin != null) {
                     try {
@@ -108,7 +108,7 @@ public class PlayerInfoMixin {
             File currentSkinFile = characterRuntime.getCharacterSkinController().getCurrentSkin();
             if (currentSkinFile == null) continue;
 
-            ResourceLocation skinLocation = ResourceLocation.fromNamespaceAndPath(
+            Identifier skinLocation = Identifier.fromNamespaceAndPath(
                     NarrativeCraftMod.MOD_ID,
                     "character/" + Util.snakeCase(characterStory.getName()) + "/"
                             + Util.snakeCase(currentSkinFile.getName()));

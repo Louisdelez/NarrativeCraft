@@ -37,19 +37,19 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.ARGB;
 
 public class CreditScreen extends WinScreen {
 
-    public static final ResourceLocation LOGO =
-            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/logo.png");
+    public static final Identifier LOGO =
+            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/logo.png");
 
-    private static final ResourceLocation BACKGROUND_IMAGE =
-            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/credits/background.png");
-    private static final ResourceLocation MUSIC =
-            ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "credits.music");
+    private static final Identifier BACKGROUND_IMAGE =
+            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/credits/background.png");
+    private static final Identifier MUSIC =
+            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "credits.music");
 
     public static final SimpleSoundInstance MUSIC_INSTANCE =
             SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(MUSIC), 1, 1);

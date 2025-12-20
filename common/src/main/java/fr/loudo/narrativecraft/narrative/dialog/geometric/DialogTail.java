@@ -110,8 +110,8 @@ public class DialogTail {
         Vec3 dialogPos = dialog.translateToRelativeApplyOffset(dialog.getDialogPosition());
         Vec3 toDialog = dialogPos.subtract(entityPos);
 
-        Vec3 camRight = new Vec3(camera.getLeftVector()).scale(-1);
-        Vec3 camUp = new Vec3(camera.getUpVector());
+        Vec3 camRight = new Vec3(camera.leftVector()).scale(-1);
+        Vec3 camUp = new Vec3(camera.upVector());
 
         float scale = dialog.getScale() * 0.025F;
 

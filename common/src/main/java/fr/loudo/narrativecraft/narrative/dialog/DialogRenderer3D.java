@@ -424,7 +424,7 @@ public class DialogRenderer3D extends DialogRenderer {
     }
 
     public Vec3 translateToRelative(Vec3 worldPos) {
-        Vec3 camPos = minecraft.gameRenderer.getMainCamera().getPosition();
+        Vec3 camPos = minecraft.gameRenderer.getMainCamera().position();
         return new Vec3(worldPos.x - camPos.x, worldPos.y - camPos.y, worldPos.z - camPos.z);
     }
 

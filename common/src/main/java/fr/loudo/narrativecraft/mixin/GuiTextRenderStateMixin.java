@@ -37,25 +37,15 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class GuiTextRenderStateMixin implements IGuiTextAccessor {
     private float xFloat;
     private float yFloat;
-
+    
     @Redirect(
             method = "ensurePrepared",
-            at =
-                    @At(
-                            value = "INVOKE",
-                            target =
-                                    "Lnet/minecraft/client/gui/Font;prepareText(Lnet/minecraft/util/FormattedCharSequence;FFIZI)Lnet/minecraft/client/gui/Font$PreparedText;"))
-    private Font.PreparedText narrativecraft$ensurePrepared(
-            Font instance,
-            FormattedCharSequence text,
-            float x,
-            float y,
-            int color,
-            boolean dropShadow,
-            int backgroundColor) {
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font;prepareText(Lnet/minecraft/util/FormattedCharSequence;FFIZZI)Lnet/minecraft/client/gui/Font$PreparedText;")
+    )
+    private Font.PreparedText narrativecraft$ensurePrepared(Font instance, FormattedCharSequence text, float x, float y, int color, boolean dropShadow, boolean backgroundColor, int j) {
         float finalX = (xFloat != 0) ? xFloat : x;
         float finalY = (yFloat != 0) ? yFloat : y;
-        return instance.prepareText(text, finalX, finalY, color, dropShadow, backgroundColor);
+        return instance.prepareText(text, finalX, finalY, color, dropShadow, backgroundColor, j);
     }
 
     @Override

@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class CharacterSkinController {
 
@@ -88,7 +88,7 @@ public class CharacterSkinController {
                             nativeImage);
                     minecraft
                             .getTextureManager()
-                            .register(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, path), texture);
+                            .register(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, path), texture);
                 } catch (IOException ignored) {
                 }
             });
@@ -103,7 +103,7 @@ public class CharacterSkinController {
             minecraft.execute(() -> {
                 minecraft
                         .getTextureManager()
-                        .release(ResourceLocation.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, path));
+                        .release(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, path));
             });
         }
         cachedSkins.clear();

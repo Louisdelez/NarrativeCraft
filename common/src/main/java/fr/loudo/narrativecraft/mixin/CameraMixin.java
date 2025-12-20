@@ -32,6 +32,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -55,12 +56,7 @@ public abstract class CameraMixin {
 
     @Inject(method = "setup", at = @At("RETURN"))
     private void narrativecraft$cameraSetup(
-            BlockGetter level,
-            Entity entity,
-            boolean detached,
-            boolean thirdPersonReverse,
-            float partialTick,
-            CallbackInfo ci) {
+            Level p_454891_, Entity p_90577_, boolean p_90578_, boolean p_90579_, float partialTick, CallbackInfo ci) {
         LocalPlayer player = Minecraft.getInstance().player;
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
