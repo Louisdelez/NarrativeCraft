@@ -33,8 +33,8 @@ public class CommandsRegister {
             PlayerSessionCommand.register(commandDispatcher);
             RecordCommand.register(commandDispatcher);
             PlaybackCommand.register(commandDispatcher);
-            StoryCommand.register(commandDispatcher);
-            OpenScreenCommand.register(commandDispatcher);
+            //            StoryCommand.register(commandDispatcher);
+            //            OpenScreenCommand.register(commandDispatcher);
             LinkCommand.register(commandDispatcher);
         });
     }

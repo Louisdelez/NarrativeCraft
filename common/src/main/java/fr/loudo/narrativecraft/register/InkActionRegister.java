@@ -25,9 +25,8 @@ package fr.loudo.narrativecraft.register;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionRegistry;
-import fr.loudo.narrativecraft.narrative.story.inkAction.*;
-import fr.loudo.narrativecraft.narrative.story.inkAction.sound.SoundInkAction;
-import fr.loudo.narrativecraft.narrative.story.inkAction.text.TextInkAction;
+import fr.loudo.narrativecraft.narrative.story.inkAction.client.*;
+import fr.loudo.narrativecraft.narrative.story.inkAction.server.*;
 
 public class InkActionRegister {
     public static void register() {
@@ -36,18 +35,8 @@ public class InkActionRegister {
                 InkAction.Side.SERVER,
                 "animation start %animation_name% [loop=true/false] [unique=true/false] [block=true/false]",
                 command -> command.startsWith("animation start") || command.startsWith("animation stop")));
-        InkActionRegistry.register(() -> new BorderInkAction(
-                "border",
-                InkAction.Side.CLIENT,
-                "border %up% %right% %down% %left% [%color%] [%opacity%]",
-                command -> command.startsWith("border")));
         InkActionRegistry.register(() -> new CameraAngleInkAction(
-                "camera", InkAction.Side.CLIENT, "camera %parent% %child%", command -> command.startsWith("camera")));
-        InkActionRegistry.register(() -> new ChangeDayTimeInkAction(
-                "change_day_time",
-                InkAction.Side.CLIENT,
-                "time <set,add> <day,midnight,night,noon,%tick%> [to <day,midnight,night,noon,%tick%> for %time% <second(s), minute(s), hour(s)> [%easing%]]",
-                command -> command.startsWith("time set") || command.startsWith("time add")));
+                "camera", InkAction.Side.SERVER, "camera %parent% %child%", command -> command.startsWith("camera")));
         InkActionRegistry.register(() -> new CutsceneInkAction(
                 "cutscene",
                 InkAction.Side.SERVER,
@@ -58,11 +47,6 @@ public class InkActionRegister {
                 InkAction.Side.SERVER,
                 "wait %time% <second(s), minute(s), hour(s)>",
                 command -> command.startsWith("wait")));
-        InkActionRegistry.register(() -> new DialogParametersInkAction(
-                "dialog",
-                InkAction.Side.CLIENT,
-                "dialog <offset, scale, padding, width, textColor, backgroundColor, gap, letterSpacing, unSkippable, autoSkip, bobbing> [%value1%] [%value2%]",
-                command -> command.startsWith("dialog")));
         InkActionRegistry.register(() -> new MinecraftCommandInkAction(
                 "minecraft_command",
                 InkAction.Side.SERVER,
@@ -73,11 +57,6 @@ public class InkActionRegister {
                 InkAction.Side.SERVER,
                 "emote <play,stop> %emote_name% %character_name% %isForced%",
                 command -> command.startsWith("emote play") || command.startsWith("emote stop")));
-        InkActionRegistry.register(() -> new FadeInkAction(
-                "fade",
-                InkAction.Side.CLIENT,
-                "fade %fadeInValue% %stayValue% %fadeOutValue% %color%",
-                command -> command.startsWith("fade")));
         InkActionRegistry.register(() -> new KillCharacterInkAction(
                 "kill_character",
                 InkAction.Side.SERVER,
@@ -86,16 +65,7 @@ public class InkActionRegister {
         InkActionRegistry.register(() -> new OnEnterInkAction(
                 "enter", InkAction.Side.SERVER, "on enter", command -> command.equals("on enter")));
         InkActionRegistry.register(
-                () -> new SaveInkAction("save", InkAction.Side.CLIENT, "save", command -> command.equals("save")));
-        InkActionRegistry.register(() -> new SoundInkAction(
-                "sound",
-                InkAction.Side.CLIENT,
-                "<song|sfx> <start|stop> %namespace:category.name% [%volume> %pitch% [loop=<true|false>] [<fadein|fadeout> %time%]]",
-                command -> command.startsWith("song start")
-                        || command.startsWith("sfx start")
-                        || command.startsWith("song stop")
-                        || command.startsWith("sfx stop")
-                        || command.equals("sound stop all")));
+                () -> new SaveInkAction("save", InkAction.Side.SERVER, "save", command -> command.equals("save")));
         InkActionRegistry.register(() -> new SubsceneInkAction(
                 "subscene",
                 InkAction.Side.SERVER,
@@ -106,11 +76,6 @@ public class InkActionRegister {
                 InkAction.Side.SERVER,
                 "weather <clear, rain, thunder>",
                 command -> command.startsWith("weather")));
-        InkActionRegistry.register(() -> new ShakeScreenInkAction(
-                "shake_screen",
-                InkAction.Side.CLIENT,
-                "shake %strength% %decay_rate% %speed%",
-                command -> command.startsWith("shake")));
         InkActionRegistry.register(() -> new InteractionInkAction(
                 "interaction",
                 InkAction.Side.SERVER,
@@ -118,10 +83,5 @@ public class InkActionRegister {
                 command -> command.startsWith("interaction")));
         InkActionRegistry.register(() -> new GameplayInkAction(
                 "gameplay", InkAction.Side.SERVER, "gameplay", command -> command.startsWith("gameplay")));
-        InkActionRegistry.register(() -> new TextInkAction(
-                "text",
-                InkAction.Side.CLIENT,
-                "text %id% <create|remove|edit|position|color|scale|spacing|width|fade|fadein|fadeout|type|font|sound> %...values%",
-                command -> command.startsWith("text")));
     }
 }

@@ -26,7 +26,6 @@ package fr.loudo.narrativecraft.narrative.session;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.controllers.interaction.InteractionController;
-import fr.loudo.narrativecraft.gui.StorySaveIconGui;
 import fr.loudo.narrativecraft.managers.PlaybackManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
@@ -39,21 +38,20 @@ import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandler;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.recording.Location;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import fr.loudo.narrativecraft.narrative.story.inkAction.GameplayInkAction;
+import fr.loudo.narrativecraft.narrative.story.inkAction.server.GameplayInkAction;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 
-public class PlayerSession {
+public class PlayerSession extends AbstractPlayerSession {
 
     private final ServerPlayer player;
     private final PlaybackManager playbackManager = new PlaybackManager();
     private final List<InkAction> inkActions = new ArrayList<>();
     private final List<CharacterRuntime> characterRuntimes = new ArrayList<>();
     private final InkTagHandler inkTagHandler;
-    private final StorySaveIconGui storySaveIconGui = new StorySaveIconGui(0.2, 0.9, 0.2);
     private final List<InteractionController> interactionControllers = new ArrayList<>();
     private final List<AreaTrigger> areaTriggersEntered = new ArrayList<>();
     private AbstractController controller;
@@ -63,9 +61,6 @@ public class PlayerSession {
     private StoryHandler storyHandler;
     private AreaTrigger lastAreaTriggerEntered;
     private StitchInteraction lastInteraction;
-    private Chapter chapter;
-    private Scene scene;
-    private String stitch;
     private GameType lastGameType;
     private int lookingAtEntityId;
     private boolean showDebugHud;
@@ -224,30 +219,6 @@ public class PlayerSession {
         this.dialogRenderer = dialogRenderer;
     }
 
-    public Chapter getChapter() {
-        return chapter;
-    }
-
-    public void setChapter(Chapter chapter) {
-        this.chapter = chapter;
-    }
-
-    public Scene getScene() {
-        return scene;
-    }
-
-    public void setScene(Scene scene) {
-        this.scene = scene;
-    }
-
-    public String getStitch() {
-        return stitch;
-    }
-
-    public void setStitch(String stitch) {
-        this.stitch = stitch;
-    }
-
     public int getLookingAtEntityId() {
         return lookingAtEntityId;
     }
@@ -314,10 +285,6 @@ public class PlayerSession {
                 && Math.abs(a.getZ() - b.getZ()) < posEpsilon
                 && Math.abs(a.getYaw() - b.getYaw()) < rotEpsilon
                 && Math.abs(a.getPitch() - b.getPitch()) < rotEpsilon;
-    }
-
-    public StorySaveIconGui getStorySaveIconGui() {
-        return storySaveIconGui;
     }
 
     public boolean isShowDebugHud() {

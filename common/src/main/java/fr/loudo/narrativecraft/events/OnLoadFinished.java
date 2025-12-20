@@ -23,11 +23,11 @@
 
 package fr.loudo.narrativecraft.events;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.NarrativeCraftModClient;
 
 public class OnLoadFinished {
 
     public static void loadFinished() {
-        NarrativeCraftMod.getInstance().getNarrativeCraftLogoRenderer().init();
+        NarrativeCraftModClient.getInstance().getNarrativeCraftLogoRenderer().init();
     }
 }

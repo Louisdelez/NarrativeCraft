@@ -25,7 +25,7 @@ package fr.loudo.narrativecraft.narrative.dialog.animation;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.NarrativeCraftModClient;
 import fr.loudo.narrativecraft.gui.ICustomGuiRender;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.util.Easing;
@@ -91,7 +91,8 @@ public class DialogArrowSkip {
     }
 
     private void draw(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, int color) {
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(NarrativeCraftMod.dialogBackgroundRenderType);
+        VertexConsumer vertexConsumer =
+                bufferSource.getBuffer(NarrativeCraftModClient.getInstance().dialogBackgroundRenderType());
         Matrix4f matrix4f = poseStack.last().pose();
 
         float xStart = dialogRenderer.getTotalWidth() - width - offset;

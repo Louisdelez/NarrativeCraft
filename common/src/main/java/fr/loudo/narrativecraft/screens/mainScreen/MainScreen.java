@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.screens.mainScreen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.NarrativeCraftModClient;
 import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
 import fr.loudo.narrativecraft.controllers.cutscene.CutscenePlayback;
@@ -37,7 +38,7 @@ import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.narrative.story.StorySave;
 import fr.loudo.narrativecraft.narrative.story.StoryValidation;
-import fr.loudo.narrativecraft.narrative.story.inkAction.FadeInkAction;
+import fr.loudo.narrativecraft.narrative.story.inkAction.client.FadeInkAction;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.screens.components.ChapterSelectorScreen;
 import fr.loudo.narrativecraft.screens.components.CrashScreen;
@@ -85,7 +86,7 @@ public class MainScreen extends Screen {
             true);
 
     private final NarrativeCraftLogoRenderer narrativeCraftLogo =
-            NarrativeCraftMod.getInstance().getNarrativeCraftLogoRenderer();
+            NarrativeCraftModClient.getInstance().getNarrativeCraftLogoRenderer();
     private final PlayerSession playerSession;
     private final int buttonWidth = 100;
     private final int buttonHeight = 20;

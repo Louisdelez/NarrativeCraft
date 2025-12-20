@@ -36,9 +36,9 @@ import fr.loudo.narrativecraft.util.Translation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.util.Util;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.layouts.LinearLayout;
+import net.minecraft.util.Util;
 
 public class StoryOptionsScreen extends StoryElementScreen {
 

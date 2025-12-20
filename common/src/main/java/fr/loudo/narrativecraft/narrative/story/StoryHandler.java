@@ -27,6 +27,7 @@ import com.bladecoder.ink.runtime.Story;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
+import fr.loudo.narrativecraft.client.NarrativeCraftModClient;
 import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.controllers.interaction.InteractionController;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
@@ -45,7 +46,7 @@ import fr.loudo.narrativecraft.narrative.dialog.*;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandlerException;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.narrative.story.inkAction.GameplayInkAction;
+import fr.loudo.narrativecraft.narrative.story.inkAction.server.GameplayInkAction;
 import fr.loudo.narrativecraft.options.NarrativeClientOption;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.screens.components.CrashScreen;
@@ -67,7 +68,7 @@ public class StoryHandler {
     private final NarrativeWorldOption worldOption =
             NarrativeCraftMod.getInstance().getNarrativeWorldOption();
     private final NarrativeClientOption clientOption =
-            NarrativeCraftMod.getInstance().getNarrativeClientOptions();
+            NarrativeCraftModClient.getInstance().getNarrativeClientOptions();
     private final Minecraft minecraft = Minecraft.getInstance();
     public static final String DIALOG_REGEX = "^(\\w+)\\s*:\\s*(.+?)\\s*$";
 
@@ -467,7 +468,10 @@ public class StoryHandler {
                 NarrativeCraftFile.writeSave(save);
             }
             if (showLogo) {
-                playerSession.getStorySaveIconGui().showSave(debugMode);
+                NarrativeCraftModClient.getInstance()
+                        .getPlayerSessionClient()
+                        .getStorySaveIconGui()
+                        .showSave(debugMode);
             }
         } catch (Exception e) {
             stop();

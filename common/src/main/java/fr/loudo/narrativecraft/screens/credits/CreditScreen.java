@@ -48,8 +48,7 @@ public class CreditScreen extends WinScreen {
 
     private static final Identifier BACKGROUND_IMAGE =
             Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/credits/background.png");
-    private static final Identifier MUSIC =
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "credits.music");
+    private static final Identifier MUSIC = Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "credits.music");
 
     public static final SimpleSoundInstance MUSIC_INSTANCE =
             SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(MUSIC), 1, 1);

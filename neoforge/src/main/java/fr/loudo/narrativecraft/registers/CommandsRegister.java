@@ -39,9 +39,9 @@ public class CommandsRegister {
 
     public static void register(RegisterCommandsEvent event) {
         PlayerSessionCommand.register(event.getDispatcher());
-        RecordCommand.register(event.getDispatcher());
+        //        RecordCommand.register(event.getDispatcher());
         PlaybackCommand.register(event.getDispatcher());
-        OpenScreenCommand.register(event.getDispatcher());
+        // OpenScreenCommand.register(event.getDispatcher());
         StoryCommand.register(event.getDispatcher());
         LinkCommand.register(event.getDispatcher());
     }

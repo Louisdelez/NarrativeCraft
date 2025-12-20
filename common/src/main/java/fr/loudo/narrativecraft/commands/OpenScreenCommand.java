@@ -42,7 +42,8 @@ public class OpenScreenCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("nc")
-                .requires(commandSourceStack -> commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                .requires(commandSourceStack ->
+                        commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
                 .then(Commands.literal("open")
                         .then(Commands.literal("story_manager").executes(OpenScreenCommand::openStoryManager))
                         .then(Commands.literal("character_manager").executes(OpenScreenCommand::openCharacterManager))

@@ -25,7 +25,7 @@ package fr.loudo.narrativecraft.narrative.interaction;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.NarrativeCraftModClient;
 import fr.loudo.narrativecraft.util.Easing;
 import fr.loudo.narrativecraft.util.ImageFontConstants;
 import net.minecraft.client.Minecraft;
@@ -84,7 +84,8 @@ public class InteractionEyeRenderer {
         poseStack.scale(scale, -scale, scale);
 
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
-        VertexConsumer vc = bufferSource.getBuffer(NarrativeCraftMod.dialogBackgroundRenderType);
+        VertexConsumer vc =
+                bufferSource.getBuffer(NarrativeCraftModClient.getInstance().dialogBackgroundRenderType());
         Matrix4f mat = poseStack.last().pose();
 
         vc.addVertex(mat, -SIZE, SIZE, -1).setColor(0, 0, 0, opacity).setLight(LightTexture.FULL_BRIGHT);

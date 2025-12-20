@@ -21,28 +21,15 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.mixin;
+package fr.loudo.narrativecraft.client;
 
-import net.minecraft.network.Utf8String;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import fr.loudo.narrativecraft.client.files.NarrativeCraftFileClient;
+import fr.loudo.narrativecraft.client.register.InkActionRegisterClient;
 
-// Bypass Minecraft 16 characters name limit
-@Mixin(Utf8String.class)
-public abstract class Utf8StringMixin {
+public class CommonClientInit {
 
-    @ModifyVariable(method = "write", at = @At("HEAD"), ordinal = 0, argsOnly = true)
-    private static int modifyWriteMaxLength(int maxLength) {
-        return narrativecraft$getMaxTagNameLength(maxLength);
-    }
-
-    @ModifyVariable(method = "read", at = @At("HEAD"), ordinal = 0, argsOnly = true)
-    private static int modifyReadMaxLength(int maxLength) {
-        return narrativecraft$getMaxTagNameLength(maxLength);
-    }
-
-    private static int narrativecraft$getMaxTagNameLength(int maxLength) {
-        return maxLength == 16 ? 64 : maxLength;
+    public static void init() {
+        InkActionRegisterClient.register();
+        NarrativeCraftFileClient.init();
     }
 }

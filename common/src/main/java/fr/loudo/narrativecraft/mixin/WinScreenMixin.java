@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.mixin;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.NarrativeCraftModClient;
 import fr.loudo.narrativecraft.screens.components.NarrativeCraftLogoRenderer;
 import fr.loudo.narrativecraft.screens.credits.CreditScreen;
 import fr.loudo.narrativecraft.util.Util;
@@ -74,7 +74,7 @@ public class WinScreenMixin {
         if (winScreen instanceof CreditScreen creditsScreen) {
             if (Util.resourceExists(CreditScreen.LOGO)) {
                 NarrativeCraftLogoRenderer narrativeCraftLogoRenderer =
-                        NarrativeCraftMod.getInstance().getNarrativeCraftLogoRenderer();
+                        NarrativeCraftModClient.getInstance().getNarrativeCraftLogoRenderer();
                 guiGraphics.blit(
                         RenderPipelines.GUI_TEXTURED,
                         CreditScreen.LOGO,

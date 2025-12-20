@@ -32,7 +32,6 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 
 public class ChapterManager {
@@ -68,7 +67,7 @@ public class ChapterManager {
         return (context, builder) -> {
             PlayerSession playerSession = NarrativeCraftMod.getInstance()
                     .getPlayerSessionManager()
-                    .getSessionByPlayer(Minecraft.getInstance().player);
+                    .getSessionByPlayer(context.getSource().getPlayer());
             if (playerSession == null) return builder.buildFuture();
             if (!playerSession.isSessionSet()) return builder.buildFuture();
             for (Subscene subscene : playerSession.getScene().getSubscenes()) {

@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.narrative.dialog.animation;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.NarrativeCraftModClient;
 import fr.loudo.narrativecraft.gui.ICustomGuiRender;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer2D;
@@ -48,7 +48,8 @@ public class DialogScrollTextDialog extends AbstractDialogScrollText {
         super(minecraft);
         this.dialogRenderer = dialogRenderer;
         setText(dialogRenderer.getText());
-        NarrativeClientOption clientOption = NarrativeCraftMod.getInstance().getNarrativeClientOptions();
+        NarrativeClientOption clientOption =
+                NarrativeCraftModClient.getInstance().getNarrativeClientOptions();
         this.textSpeed = clientOption.textSpeed;
         this.letterSpacing = dialogRenderer.getLetterSpacing();
         this.gap = dialogRenderer.getGap();

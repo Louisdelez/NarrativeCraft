@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.narrative.dialog.animation;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.NarrativeCraftModClient;
 import fr.loudo.narrativecraft.narrative.story.text.ParsedDialog;
 import fr.loudo.narrativecraft.narrative.story.text.TextEffectAnimation;
 import fr.loudo.narrativecraft.util.Util;
@@ -44,8 +45,7 @@ public abstract class AbstractDialogScrollText {
     protected float currentX;
     protected float currentY;
     protected float tickAccumulator = 0.0f;
-    protected Identifier letterSound =
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sfx.dialog_sound");
+    protected Identifier letterSound = Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sfx.dialog_sound");
 
     protected int textColor = 0xFFFFFF;
     protected float textSpeed = 1.0f;
@@ -55,7 +55,7 @@ public abstract class AbstractDialogScrollText {
 
     public AbstractDialogScrollText(Minecraft minecraft) {
         this.minecraft = minecraft;
-        textSpeed = NarrativeCraftMod.getInstance().getNarrativeClientOptions().textSpeed;
+        textSpeed = NarrativeCraftModClient.getInstance().getNarrativeClientOptions().textSpeed;
     }
 
     public void setText(String text) {

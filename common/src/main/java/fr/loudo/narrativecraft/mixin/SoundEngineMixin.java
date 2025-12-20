@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.audio.VolumeAudio;
-import fr.loudo.narrativecraft.narrative.story.inkAction.sound.SoundInkInstance;
+import fr.loudo.narrativecraft.narrative.story.inkAction.client.sound.SoundInkInstance;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import net.minecraft.client.resources.sounds.SoundInstance;

@@ -26,7 +26,7 @@ package fr.loudo.narrativecraft.mixin;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.narrative.story.inkAction.ChangeDayTimeInkAction;
+import fr.loudo.narrativecraft.narrative.story.inkAction.client.ChangeDayTimeInkAction;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;

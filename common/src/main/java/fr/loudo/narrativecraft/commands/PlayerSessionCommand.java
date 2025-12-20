@@ -42,7 +42,8 @@ public class PlayerSessionCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("nc")
-                .requires(commandSourceStack -> commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                .requires(commandSourceStack ->
+                        commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
                 .then(Commands.literal("session")
                         .then(Commands.literal("clear").executes(PlayerSessionCommand::clearSession))
                         .then(Commands.literal("set")

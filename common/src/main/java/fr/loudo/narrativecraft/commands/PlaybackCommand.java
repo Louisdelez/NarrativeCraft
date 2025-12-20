@@ -49,7 +49,8 @@ import net.minecraft.server.permissions.Permissions;
 public class PlaybackCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("nc")
-                .requires(commandSourceStack -> commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                .requires(commandSourceStack ->
+                        commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
                 .then(Commands.literal("playback")
                         .then(Commands.literal("play")
                                 .then(Commands.literal("animation")

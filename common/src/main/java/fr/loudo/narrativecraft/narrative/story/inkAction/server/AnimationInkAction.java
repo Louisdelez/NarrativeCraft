@@ -21,32 +21,35 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.story.inkAction;
+package fr.loudo.narrativecraft.narrative.story.inkAction.server;
 
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
+import fr.loudo.narrativecraft.managers.PlaybackManager;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 
-public class SubsceneInkAction extends InkAction {
-    private Subscene subscene;
+public class AnimationInkAction extends InkAction {
+
+    private Animation animation;
+    private Playback playback;
     private String action;
     private boolean isLooping, isBlock, isUnique;
 
-    public SubsceneInkAction(String id, Side side, String syntax, CommandMatcher matcher) {
+    public AnimationInkAction(String id, Side side, String syntax, CommandMatcher matcher) {
         super(id, side, syntax, matcher);
     }
 
     @Override
     public void tick() {
-        if (subscene == null) {
+        if (playback == null) {
             isRunning = false;
             return;
         }
@@ -54,7 +57,7 @@ public class SubsceneInkAction extends InkAction {
             blockEndTask.run();
             return;
         }
-        isRunning = !subscene.hasEnded();
+        isRunning = !playback.hasEnded();
     }
 
     @Override
@@ -67,45 +70,44 @@ public class SubsceneInkAction extends InkAction {
             return InkActionResult.error(Translation.message(WRONG_ARGUMENT_TEXT, "Only start or stop as action"));
         }
         if (arguments.size() < 3) {
-            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Subscene name"));
+            return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Animation name"));
         }
-        String subsceneName = arguments.get(2);
-        subscene = scene.getSubsceneByName(subsceneName);
-        if (subscene == null) {
+        String animationName = arguments.get(2);
+        animation = scene.getAnimationByName(animationName);
+        if (animation == null) {
             return InkActionResult.error(Translation.message(
-                    WRONG_ARGUMENT_TEXT, Translation.message("subscene.no_exists", subsceneName, scene.getName())));
+                    WRONG_ARGUMENT_TEXT, Translation.message("animation.no_exists", animationName, scene.getName())));
         }
         isLooping = InkActionUtil.getOptionalArgument(command, "loop");
-        isUnique = InkActionUtil.getOptionalArgument(command, "unique");
-        isBlock = InkActionUtil.getOptionalArgument(command, "block");
-        if (arguments.size() < 4 || action.equals("stop")) {
-            canBeExecuted = true;
-            return InkActionResult.ok();
-        }
+        isLooping = InkActionUtil.getOptionalArgument(command, "unique");
+        isLooping = InkActionUtil.getOptionalArgument(command, "loop");
+        canBeExecuted = true;
         return InkActionResult.ok();
     }
 
     @Override
     protected InkActionResult doExecute(PlayerSession playerSession) {
         if (action.equals("start")) {
+            playback = new Playback(
+                    PlaybackManager.ID_INCREMENTER.incrementAndGet(),
+                    animation,
+                    playerSession.getPlayer().level(),
+                    Environment.PRODUCTION,
+                    isLooping);
             StoryHandler storyHandler = playerSession.getStoryHandler();
             if (storyHandler != null) {
-                subscene.start(playerSession.getPlayer().level(), Environment.PRODUCTION, isLooping, storyHandler);
+                playback.startFromStory(storyHandler);
             } else {
-                subscene.start(playerSession.getPlayer().level(), Environment.PRODUCTION, isLooping);
+                playback.start();
             }
-            for (Playback playback : subscene.getPlaybacks()) {
-                playerSession.getCharacterRuntimes().add(playback.getCharacterRuntime());
-                playback.setUnique(isUnique);
-            }
+            playback.setUnique(isUnique);
+            playerSession.getPlaybackManager().addPlayback(playback);
+            playerSession.getCharacterRuntimes().add(playback.getCharacterRuntime());
             playerSession.clearKilledCharacters();
-            playerSession.getPlaybackManager().getPlaybacks().addAll(subscene.getPlaybacks());
         } else if (action.equals("stop")) {
-            for (Playback playback : subscene.getPlaybacks()) {
-                playerSession.getCharacterRuntimes().remove(playback.getCharacterRuntime());
-            }
-            playerSession.getPlaybackManager().getPlaybacks().removeAll(subscene.getPlaybacks());
-            subscene.stop(true);
+            Playback playback = playerSession.getPlaybackManager().getPlayback(animation.getName());
+            if (playback == null) return InkActionResult.ignored();
+            playback.stop(true);
         }
         return isBlock ? InkActionResult.block() : InkActionResult.ok();
     }

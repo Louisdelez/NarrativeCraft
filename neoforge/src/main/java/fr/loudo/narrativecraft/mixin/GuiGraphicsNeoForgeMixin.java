@@ -97,6 +97,7 @@ public abstract class GuiGraphicsNeoForgeMixin implements ICustomGuiRender {
                     color,
                     0,
                     drawShadow,
+                    false,
                     this.peekScissorStack());
             ((IGuiTextAccessor) (Object) guiTextRenderState).narrativecraft$setFloatX(x);
             ((IGuiTextAccessor) (Object) guiTextRenderState).narrativecraft$setFloatY(y);
@@ -117,6 +118,7 @@ public abstract class GuiGraphicsNeoForgeMixin implements ICustomGuiRender {
                     color,
                     0,
                     drawShadow,
+                    false,
                     this.peekScissorStack());
             ((IGuiTextAccessor) (Object) guiTextRenderState).narrativecraft$setFloatX(x);
             ((IGuiTextAccessor) (Object) guiTextRenderState).narrativecraft$setFloatY(y);

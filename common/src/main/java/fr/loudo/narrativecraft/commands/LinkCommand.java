@@ -27,17 +27,17 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import fr.loudo.narrativecraft.util.ConstantsLink;
 import java.net.URI;
-
-import net.minecraft.server.permissions.Permissions;
-import net.minecraft.util.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.server.permissions.Permissions;
+import net.minecraft.util.Util;
 
 public class LinkCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("nc")
-                .requires(commandSourceStack -> commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                .requires(commandSourceStack ->
+                        commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
                 .then(Commands.literal("link")
                         .then(Commands.literal("discord").executes(commandContext -> openLink(ConstantsLink.DISCORD)))
                         .then(Commands.literal("docs").executes(commandContext -> openLink(ConstantsLink.DOCS)))

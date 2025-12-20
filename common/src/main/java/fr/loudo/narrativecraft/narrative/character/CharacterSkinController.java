@@ -101,9 +101,7 @@ public class CharacterSkinController {
         Minecraft minecraft = Minecraft.getInstance();
         for (String path : cachedSkins) {
             minecraft.execute(() -> {
-                minecraft
-                        .getTextureManager()
-                        .release(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, path));
+                minecraft.getTextureManager().release(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, path));
             });
         }
         cachedSkins.clear();

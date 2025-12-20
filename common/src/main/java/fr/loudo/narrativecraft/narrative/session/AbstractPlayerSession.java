@@ -21,28 +21,37 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.mixin;
+package fr.loudo.narrativecraft.narrative.session;
 
-import net.minecraft.network.Utf8String;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 
-// Bypass Minecraft 16 characters name limit
-@Mixin(Utf8String.class)
-public abstract class Utf8StringMixin {
+public class AbstractPlayerSession {
+    protected Chapter chapter;
+    protected Scene scene;
+    protected String stitch;
 
-    @ModifyVariable(method = "write", at = @At("HEAD"), ordinal = 0, argsOnly = true)
-    private static int modifyWriteMaxLength(int maxLength) {
-        return narrativecraft$getMaxTagNameLength(maxLength);
+    public Chapter getChapter() {
+        return chapter;
     }
 
-    @ModifyVariable(method = "read", at = @At("HEAD"), ordinal = 0, argsOnly = true)
-    private static int modifyReadMaxLength(int maxLength) {
-        return narrativecraft$getMaxTagNameLength(maxLength);
+    public void setChapter(Chapter chapter) {
+        this.chapter = chapter;
     }
 
-    private static int narrativecraft$getMaxTagNameLength(int maxLength) {
-        return maxLength == 16 ? 64 : maxLength;
+    public Scene getScene() {
+        return scene;
+    }
+
+    public void setScene(Scene scene) {
+        this.scene = scene;
+    }
+
+    public String getStitch() {
+        return stitch;
+    }
+
+    public void setStitch(String stitch) {
+        this.stitch = stitch;
     }
 }

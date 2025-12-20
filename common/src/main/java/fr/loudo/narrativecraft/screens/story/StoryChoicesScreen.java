@@ -101,8 +101,7 @@ public class StoryChoicesScreen extends Screen {
     @Override
     protected void init() {
         if (!initiated) {
-            Identifier soundRes =
-                    Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sfx.choice_appear");
+            Identifier soundRes = Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sfx.choice_appear");
             SoundEvent sound = SoundEvent.createVariableRangeEvent(soundRes);
             this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(sound, 1.0f, 1.0f));
         }

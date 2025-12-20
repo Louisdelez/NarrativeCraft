@@ -24,19 +24,14 @@
 package fr.loudo.narrativecraft;
 
 import fr.loudo.narrativecraft.managers.*;
-import fr.loudo.narrativecraft.options.NarrativeClientOption;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.register.InkActionRegister;
-import fr.loudo.narrativecraft.screens.components.NarrativeCraftLogoRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NarrativeCraftMod {
-    private static final NarrativeCraftMod instance = new NarrativeCraftMod();
+    private static final NarrativeCraftMod INSTANCE = new NarrativeCraftMod();
 
     public static final String MOD_ID = "narrativecraft";
     public static final String MOD_NAME = "NarrativeCraft";
@@ -45,20 +40,16 @@ public class NarrativeCraftMod {
 
     public static boolean firstTime = false;
     public static MinecraftServer server;
-    public static RenderType dialogBackgroundRenderType = RenderTypes.textBackgroundSeeThrough();
 
     private final CharacterManager characterManager = new CharacterManager();
     private final PlayerSessionManager playerSessionManager = new PlayerSessionManager();
     private final ChapterManager chapterManager = new ChapterManager();
     private final RecordingManager recordingManager = new RecordingManager();
     private final PlaybackManager playbackManager = new PlaybackManager();
-    private final NarrativeCraftLogoRenderer narrativeCraftLogoRenderer = new NarrativeCraftLogoRenderer(
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/logo.png"));
-    private NarrativeClientOption narrativeClientOptions = new NarrativeClientOption();
     private NarrativeWorldOption narrativeWorldOption = new NarrativeWorldOption();
 
     public static NarrativeCraftMod getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     public static void commonInit() {
@@ -85,20 +76,8 @@ public class NarrativeCraftMod {
         return playbackManager;
     }
 
-    public NarrativeCraftLogoRenderer getNarrativeCraftLogoRenderer() {
-        return narrativeCraftLogoRenderer;
-    }
-
-    public NarrativeClientOption getNarrativeClientOptions() {
-        return narrativeClientOptions;
-    }
-
     public NarrativeWorldOption getNarrativeWorldOption() {
         return narrativeWorldOption;
-    }
-
-    public void setNarrativeClientOptions(NarrativeClientOption narrativeClientOptions) {
-        this.narrativeClientOptions = narrativeClientOptions;
     }
 
     public void setNarrativeWorldOption(NarrativeWorldOption narrativeWorldOption) {

@@ -25,7 +25,7 @@ package fr.loudo.narrativecraft.narrative.dialog;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.NarrativeCraftModClient;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.dialog.geometric.DialogTail;
 import fr.loudo.narrativecraft.util.Easing;
@@ -195,7 +195,10 @@ public class DialogRenderer3D extends DialogRenderer {
         }
 
         poseStack.popPose();
-        minecraft.renderBuffers().bufferSource().endBatch(NarrativeCraftMod.dialogBackgroundRenderType);
+        minecraft
+                .renderBuffers()
+                .bufferSource()
+                .endBatch(NarrativeCraftModClient.getInstance().dialogBackgroundRenderType());
     }
 
     public void updateBobbing(float value1, float value2) {
@@ -225,7 +228,8 @@ public class DialogRenderer3D extends DialogRenderer {
 
     private void renderDialogBackground(PoseStack poseStack, float partialTick) {
         MultiBufferSource.BufferSource bufferSource = minecraft.renderBuffers().bufferSource();
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(NarrativeCraftMod.dialogBackgroundRenderType);
+        VertexConsumer vertexConsumer =
+                bufferSource.getBuffer(NarrativeCraftModClient.getInstance().dialogBackgroundRenderType());
         Matrix4f matrix4f = poseStack.last().pose();
 
         Side side = dialogOffsetSide();

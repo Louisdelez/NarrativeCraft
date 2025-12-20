@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.story.inkAction.text;
+package fr.loudo.narrativecraft.narrative.story.inkAction.client.text;
 
 import fr.loudo.narrativecraft.gui.ICustomGuiRender;
 import fr.loudo.narrativecraft.narrative.dialog.animation.AbstractDialogScrollText;

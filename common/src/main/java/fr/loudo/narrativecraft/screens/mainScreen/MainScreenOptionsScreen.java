@@ -23,8 +23,8 @@
 
 package fr.loudo.narrativecraft.screens.mainScreen;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.files.NarrativeCraftFile;
+import fr.loudo.narrativecraft.client.NarrativeCraftModClient;
+import fr.loudo.narrativecraft.client.files.NarrativeCraftFileClient;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.options.NarrativeClientOption;
@@ -43,7 +43,8 @@ import net.minecraft.network.chat.Component;
 
 public class MainScreenOptionsScreen extends OptionsSubScreen {
 
-    private final NarrativeClientOption option = NarrativeCraftMod.getInstance().getNarrativeClientOptions();
+    private final NarrativeClientOption option =
+            NarrativeCraftModClient.getInstance().getNarrativeClientOptions();
     private final PlayerSession playerSession;
     private float textSpeed;
     private Checkbox autoSkipCheck;
@@ -61,7 +62,7 @@ public class MainScreenOptionsScreen extends OptionsSubScreen {
             playerSession.getDialogRenderer().getDialogScrollText().setTextSpeed(textSpeed);
         }
         option.autoSkip = autoSkipCheck.selected();
-        NarrativeCraftFile.updateUserOptions(option);
+        NarrativeCraftFileClient.updateUserOptions(option);
         minecraft.setScreen(lastScreen);
     }
 
@@ -76,7 +77,8 @@ public class MainScreenOptionsScreen extends OptionsSubScreen {
 
     @Override
     protected void addContents() {
-        NarrativeClientOption clientOption = NarrativeCraftMod.getInstance().getNarrativeClientOptions();
+        NarrativeClientOption clientOption =
+                NarrativeCraftModClient.getInstance().getNarrativeClientOptions();
         LinearLayout linearlayout =
                 this.layout.addToContents(LinearLayout.vertical()).spacing(8);
         AbstractSliderButton abstractSliderButton =

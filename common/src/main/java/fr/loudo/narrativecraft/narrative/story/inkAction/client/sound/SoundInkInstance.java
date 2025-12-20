@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.story.inkAction.sound;
+package fr.loudo.narrativecraft.narrative.story.inkAction.client.sound;
 
 import net.minecraft.client.resources.sounds.AbstractSoundInstance;
 import net.minecraft.resources.Identifier;

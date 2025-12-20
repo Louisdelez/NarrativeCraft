@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
+import fr.loudo.narrativecraft.client.NarrativeCraftModClient;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import java.util.List;
@@ -69,7 +70,10 @@ public class OnHudRender {
                 .getPlayerSessionManager()
                 .getSessionByPlayer(Minecraft.getInstance().player);
         if (playerSession == null) return;
-        playerSession.getStorySaveIconGui().render(guiGraphics, partialTick);
+        NarrativeCraftModClient.getInstance()
+                .getPlayerSessionClient()
+                .getStorySaveIconGui()
+                .render(guiGraphics, partialTick);
     }
 
     public static void storyDebugRender(GuiGraphics guiGraphics, float partialTick) {

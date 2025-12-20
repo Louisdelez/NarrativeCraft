@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.events;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
+import fr.loudo.narrativecraft.client.NarrativeCraftModClient;
 import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionEyeRenderer;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
@@ -54,7 +55,10 @@ public class OnClientTick {
         playerSession.getInkActions().removeAll(toRemove);
 
         // Renderer
-        playerSession.getStorySaveIconGui().tick();
+        NarrativeCraftModClient.getInstance()
+                .getPlayerSessionClient()
+                .getStorySaveIconGui()
+                .tick();
         InteractionEyeRenderer.tick();
     }
 }

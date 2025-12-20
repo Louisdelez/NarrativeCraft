@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.story.inkAction;
+package fr.loudo.narrativecraft.narrative.story.inkAction.server;
 
 import com.zigythebird.playeranimcore.animation.Animation;
 import fr.loudo.narrativecraft.NarrativeCraftMod;

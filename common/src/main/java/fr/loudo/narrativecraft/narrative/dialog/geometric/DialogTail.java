@@ -25,7 +25,7 @@ package fr.loudo.narrativecraft.narrative.dialog.geometric;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.NarrativeCraftModClient;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer3D;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.LightTexture;
@@ -84,7 +84,8 @@ public class DialogTail {
             }
         }
 
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(NarrativeCraftMod.dialogBackgroundRenderType);
+        VertexConsumer vertexConsumer =
+                bufferSource.getBuffer(NarrativeCraftModClient.getInstance().dialogBackgroundRenderType());
         Matrix4f matrix4f = poseStack.last().pose();
 
         float topRight = -width / 2 + offset;

@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.narrative.story.inkAction;
+package fr.loudo.narrativecraft.narrative.story.inkAction.server;
 
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.StringReader;
@@ -54,8 +54,8 @@ public class MinecraftCommandInkAction extends InkAction {
         command = arguments.get(1);
         command = command.replace("\\{", "{");
         command = command.replace("\\}", "}");
-        CommandSourceStack commandSourceStack =
-                new CommandSourceStack(null, null, null, null, PermissionSet.ALL_PERMISSIONS, null, null, NarrativeCraftMod.server, null);
+        CommandSourceStack commandSourceStack = new CommandSourceStack(
+                null, null, null, null, PermissionSet.ALL_PERMISSIONS, null, null, NarrativeCraftMod.server, null);
         ParseResults<CommandSourceStack> parse = NarrativeCraftMod.server
                 .getCommands()
                 .getDispatcher()

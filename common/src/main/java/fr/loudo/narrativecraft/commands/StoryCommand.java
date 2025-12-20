@@ -51,7 +51,8 @@ public class StoryCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("nc")
-                .requires(commandSourceStack -> commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                .requires(commandSourceStack ->
+                        commandSourceStack.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
                 .then(Commands.literal("story")
                         .then(Commands.literal("validate")
                                 .executes(commandContext -> validateStory(commandContext, true)))
