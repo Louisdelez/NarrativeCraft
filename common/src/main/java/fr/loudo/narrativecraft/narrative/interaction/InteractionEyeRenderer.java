@@ -25,13 +25,13 @@ package fr.loudo.narrativecraft.narrative.interaction;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.util.Easing;
 import fr.loudo.narrativecraft.util.ImageFontConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -84,13 +84,25 @@ public class InteractionEyeRenderer {
         poseStack.scale(-scale, -scale, scale);
 
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
-        VertexConsumer vc = bufferSource.getBuffer(NarrativeCraftMod.dialogBackgroundRenderType);
+        VertexConsumer vc = bufferSource.getBuffer(RenderType.textBackgroundSeeThrough());
         Matrix4f mat = poseStack.last().pose();
 
-        vc.vertex(mat, -SIZE, SIZE, -1).color(0, 0, 0, opacity).endVertex();
-        vc.vertex(mat, SIZE, SIZE, -1).color(0, 0, 0, opacity).endVertex();
-        vc.vertex(mat, SIZE, -SIZE, -1).color(0, 0, 0, opacity).endVertex();
-        vc.vertex(mat, -SIZE, -SIZE, -1).color(0, 0, 0, opacity).endVertex();
+        vc.vertex(mat, -SIZE, SIZE, -1)
+                .color(0, 0, 0, opacity)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .endVertex();
+        vc.vertex(mat, SIZE, SIZE, -1)
+                .color(0, 0, 0, opacity)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .endVertex();
+        vc.vertex(mat, SIZE, -SIZE, -1)
+                .color(0, 0, 0, opacity)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .endVertex();
+        vc.vertex(mat, -SIZE, -SIZE, -1)
+                .color(0, 0, 0, opacity)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .endVertex();
 
         mc.font.drawInBatch(
                 ImageFontConstants.EYE_OPEN,

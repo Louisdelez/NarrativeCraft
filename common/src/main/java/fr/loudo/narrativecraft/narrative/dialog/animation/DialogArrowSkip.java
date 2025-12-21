@@ -28,6 +28,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.util.Easing;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
@@ -92,10 +93,26 @@ public class DialogArrowSkip {
         float xStart = dialogRenderer.getTotalWidth() - width - offset;
         float xEnd = dialogRenderer.getTotalWidth() + width - offset;
 
-        consumer.vertex(matrix4f, xStart, -height, 0.01f).color(color).endVertex();
-        consumer.vertex(matrix4f, xStart, height, 0.01f).color(color).endVertex();
-        consumer.vertex(matrix4f, xEnd, 0, 0.01f).color(color).endVertex();
-        consumer.vertex(matrix4f, xStart, -height, 0.01f).color(color).endVertex();
+        consumer.vertex(matrix4f, xStart, -height, 0.01f)
+                .color(color)
+                .uv(0, 0)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .endVertex();
+        consumer.vertex(matrix4f, xStart, height, 0.01f)
+                .color(color)
+                .uv(0, 0)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .endVertex();
+        consumer.vertex(matrix4f, xEnd, 0, 0.01f)
+                .color(color)
+                .uv(0, 0)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .endVertex();
+        consumer.vertex(matrix4f, xStart, -height - 0.01f, 0.01f)
+                .color(color)
+                .uv(0, 0)
+                .uv2(LightTexture.FULL_BRIGHT)
+                .endVertex();
     }
 
     public void render(GuiGraphics guiGraphics, float partialTick) {

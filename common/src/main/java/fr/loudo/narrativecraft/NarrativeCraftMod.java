@@ -28,7 +28,6 @@ import fr.loudo.narrativecraft.options.NarrativeClientOption;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.register.InkActionRegister;
 import fr.loudo.narrativecraft.screens.components.NarrativeCraftLogoRenderer;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
@@ -44,7 +43,6 @@ public class NarrativeCraftMod {
 
     public static boolean firstTime = false;
     public static MinecraftServer server;
-    public static RenderType dialogBackgroundRenderType;
 
     private final CharacterManager characterManager = new CharacterManager();
     private final PlayerSessionManager playerSessionManager = new PlayerSessionManager();

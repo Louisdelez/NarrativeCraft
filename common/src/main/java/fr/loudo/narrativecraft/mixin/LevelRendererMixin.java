@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.mixin;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.loudo.narrativecraft.events.OnRenderWorld;
 import net.minecraft.client.Camera;
@@ -38,13 +39,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LevelRenderer.class)
 public class LevelRendererMixin {
 
-    @Inject(
-            method = "renderLevel",
-            at =
-                    @At(
-                            value = "INVOKE",
-                            target = "Lnet/minecraft/client/renderer/FogRenderer;setupNoFog()V",
-                            shift = At.Shift.AFTER))
+    @Inject(method = "renderLevel", at = @At("RETURN"))
     private void narrativecraft$renderer(
             PoseStack poseStack,
             float partialTick,
@@ -56,7 +51,11 @@ public class LevelRendererMixin {
             Matrix4f projectionMatrix,
             CallbackInfo ci) {
         poseStack.pushPose();
+        RenderSystem.depthMask(false);
+        RenderSystem.disableDepthTest();
         OnRenderWorld.renderWorld(poseStack, partialTick);
+        RenderSystem.depthMask(true);
+        RenderSystem.enableDepthTest();
         poseStack.popPose();
     }
 }

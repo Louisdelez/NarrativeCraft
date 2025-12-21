@@ -108,7 +108,6 @@ public class DialogScrollTextDialog extends AbstractDialogScrollText {
                     0,
                     LightTexture.FULL_BRIGHT);
         }
-        source.endBatch();
     }
 
     public void render(GuiGraphics guiGraphics, float partialTick) {

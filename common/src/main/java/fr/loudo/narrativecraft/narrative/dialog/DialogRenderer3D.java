@@ -23,16 +23,16 @@
 
 package fr.loudo.narrativecraft.narrative.dialog;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.dialog.geometric.DialogTail;
 import fr.loudo.narrativecraft.util.Easing;
 import fr.loudo.narrativecraft.util.Position2D;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Direction;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
@@ -136,19 +136,16 @@ public class DialogRenderer3D extends DialogRenderer {
             if (dialogStarting && !dialogStopping) dialogStarting = false;
         }
 
-        VertexConsumer consumer = Minecraft.getInstance()
-                .renderBuffers()
-                .bufferSource()
-                .getBuffer(NarrativeCraftMod.dialogBackgroundRenderType);
+        MultiBufferSource.BufferSource bufferSource =
+                Minecraft.getInstance().renderBuffers().bufferSource();
+
+        VertexConsumer consumer = bufferSource.getBuffer(RenderType.textBackgroundSeeThrough());
 
         poseStack.translate(position.x, position.y, position.z);
         poseStack.mulPose(minecraft.getEntityRenderDispatcher().cameraOrientation());
         poseStack.scale(-(originalScale * 0.025F), -(originalScale * 0.025F), originalScale * 0.025F);
 
-        RenderSystem.disableDepthTest();
-        RenderSystem.depthMask(false);
-
-        renderDialogBackground(poseStack, partialTick);
+        renderDialogBackground(poseStack, consumer, partialTick);
 
         Side side = dialogOffsetSide();
         poseStack.pushPose();
@@ -157,7 +154,8 @@ public class DialogRenderer3D extends DialogRenderer {
             poseStack.translate(0, dialogOffset.x == 0 ? height : height / 2.0F + paddingY / 2.0F, 0);
         }
 
-        dialogTail.render(poseStack, partialTick, consumer, minecraft.gameRenderer.getMainCamera());
+        VertexConsumer consumer2 = bufferSource.getBuffer(RenderType.textBackgroundSeeThrough());
+        dialogTail.render(poseStack, partialTick, consumer2, minecraft.gameRenderer.getMainCamera());
 
         poseStack.popPose();
 
@@ -188,12 +186,9 @@ public class DialogRenderer3D extends DialogRenderer {
             poseStack.translate(0, totalHeight, 0);
         }
 
-        minecraft.renderBuffers().bufferSource().endBatch(NarrativeCraftMod.dialogBackgroundRenderType);
-
         if (!dialogStopping) {
             dialogEntityBobbing.partialTick(partialTick);
             dialogScrollTextDialog.render(poseStack, minecraft.renderBuffers().bufferSource(), partialTick);
-            minecraft.renderBuffers().bufferSource().endBatch();
 
             if (dialogScrollTextDialog.isFinished()) {
                 if (!dialogAutoSkipping) {
@@ -204,20 +199,13 @@ public class DialogRenderer3D extends DialogRenderer {
             }
 
             if (!noSkip) {
-                VertexConsumer consumer1 = minecraft
-                        .renderBuffers()
-                        .bufferSource()
-                        .getBuffer(NarrativeCraftMod.dialogBackgroundRenderType);
-                dialogArrowSkip.render(poseStack, consumer1, partialTick);
-                minecraft.renderBuffers().bufferSource().endBatch(NarrativeCraftMod.dialogBackgroundRenderType);
+                VertexConsumer consumer3 = bufferSource.getBuffer(RenderType.textBackgroundSeeThrough());
+                dialogArrowSkip.render(poseStack, consumer3, partialTick);
             }
         }
 
-        RenderSystem.enableDepthTest();
-        RenderSystem.depthMask(true);
-
+        minecraft.renderBuffers().bufferSource().endBatch(RenderType.textBackgroundSeeThrough());
         poseStack.popPose();
-        minecraft.renderBuffers().bufferSource().endBatch(NarrativeCraftMod.dialogBackgroundRenderType);
     }
 
     public void updateBobbing(float value1, float value2) {
@@ -245,9 +233,8 @@ public class DialogRenderer3D extends DialogRenderer {
         return new Vec3(x, y, z);
     }
 
-    private void renderDialogBackground(PoseStack poseStack, float partialTick) {
+    private void renderDialogBackground(PoseStack poseStack, VertexConsumer vertexConsumer, float partialTick) {
         MultiBufferSource.BufferSource bufferSource = minecraft.renderBuffers().bufferSource();
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(NarrativeCraftMod.dialogBackgroundRenderType);
         Matrix4f matrix4f = poseStack.last().pose();
 
         Side side = dialogOffsetSide();
@@ -271,18 +258,22 @@ public class DialogRenderer3D extends DialogRenderer {
                 vertexConsumer
                         .vertex(matrix4f, -originalWidth, 0, 0)
                         .color(backgroundColor)
+                        .uv2(LightTexture.FULL_BRIGHT)
                         .endVertex();
                 vertexConsumer
                         .vertex(matrix4f, originalWidth, 0, 0)
                         .color(backgroundColor)
+                        .uv2(LightTexture.FULL_BRIGHT)
                         .endVertex();
                 vertexConsumer
                         .vertex(matrix4f, originalWidth, -originalHeight, 0)
                         .color(backgroundColor)
+                        .uv2(LightTexture.FULL_BRIGHT)
                         .endVertex();
                 vertexConsumer
                         .vertex(matrix4f, -originalWidth, -originalHeight, 0)
                         .color(backgroundColor)
+                        .uv2(LightTexture.FULL_BRIGHT)
                         .endVertex();
             }
             case RIGHT -> {
@@ -290,52 +281,64 @@ public class DialogRenderer3D extends DialogRenderer {
                     vertexConsumer
                             .vertex(matrix4f, 0, 0, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                     vertexConsumer
                             .vertex(matrix4f, 0, originalHeight, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                     vertexConsumer
                             .vertex(matrix4f, originalWidth * 2, originalHeight, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                     vertexConsumer
                             .vertex(matrix4f, originalWidth * 2, 0, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                 } else if (diffY > 0) {
                     vertexConsumer
                             .vertex(matrix4f, 0, -originalHeight, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                     vertexConsumer
                             .vertex(matrix4f, 0, 0, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                     vertexConsumer
                             .vertex(matrix4f, originalWidth * 2, 0, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                     vertexConsumer
                             .vertex(matrix4f, originalWidth * 2, -originalHeight, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                 } else {
                     vertexConsumer
                             .vertex(matrix4f, 0, -originalHeight / 2, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                     vertexConsumer
                             .vertex(matrix4f, 0, originalHeight / 2, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                     vertexConsumer
                             .vertex(matrix4f, originalWidth * 2, originalHeight / 2, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                     vertexConsumer
                             .vertex(matrix4f, originalWidth * 2, -originalHeight / 2, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                 }
             }
@@ -344,31 +347,38 @@ public class DialogRenderer3D extends DialogRenderer {
                     vertexConsumer
                             .vertex(matrix4f, -originalWidth * 2, 0, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                     vertexConsumer
                             .vertex(matrix4f, -originalWidth * 2, originalHeight, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                     vertexConsumer
                             .vertex(matrix4f, 0, originalHeight, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                     vertexConsumer
                             .vertex(matrix4f, 0, 0, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                 } else if (diffY > 0) {
                     vertexConsumer
                             .vertex(matrix4f, 0, 0, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                     vertexConsumer
                             .vertex(matrix4f, 0, -originalHeight, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                     vertexConsumer
                             .vertex(matrix4f, -originalWidth * 2, -originalHeight, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                     vertexConsumer
                             .vertex(matrix4f, -originalWidth * 2, 0, 0)
@@ -378,18 +388,22 @@ public class DialogRenderer3D extends DialogRenderer {
                     vertexConsumer
                             .vertex(matrix4f, 0, originalHeight / 2, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                     vertexConsumer
                             .vertex(matrix4f, 0, -originalHeight / 2, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                     vertexConsumer
                             .vertex(matrix4f, -originalWidth * 2, -originalHeight / 2, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                     vertexConsumer
                             .vertex(matrix4f, -originalWidth * 2, originalHeight / 2, 0)
                             .color(backgroundColor)
+                            .uv2(LightTexture.FULL_BRIGHT)
                             .endVertex();
                 }
             }
@@ -397,18 +411,22 @@ public class DialogRenderer3D extends DialogRenderer {
                 vertexConsumer
                         .vertex(matrix4f, -originalWidth, originalHeight, 0)
                         .color(backgroundColor)
+                        .uv2(LightTexture.FULL_BRIGHT)
                         .endVertex();
                 vertexConsumer
                         .vertex(matrix4f, originalWidth, originalHeight, 0)
                         .color(backgroundColor)
+                        .uv2(LightTexture.FULL_BRIGHT)
                         .endVertex();
                 vertexConsumer
                         .vertex(matrix4f, originalWidth, 0, 0)
                         .color(backgroundColor)
+                        .uv2(LightTexture.FULL_BRIGHT)
                         .endVertex();
                 vertexConsumer
                         .vertex(matrix4f, -originalWidth, 0, 0)
                         .color(backgroundColor)
+                        .uv2(LightTexture.FULL_BRIGHT)
                         .endVertex();
             }
         }
