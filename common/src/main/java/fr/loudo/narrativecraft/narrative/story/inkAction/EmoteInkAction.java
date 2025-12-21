@@ -67,7 +67,7 @@ public class EmoteInkAction extends InkAction {
             return InkActionResult.error(Translation.message(WRONG_ARGUMENT_TEXT, "Only play or stop"));
         }
         String emoteName = arguments.get(2);
-        emote = getEmote(emoteName, UniversalEmoteSerializer.serverEmotes);
+        emote = getEmote(emoteName, UniversalEmoteSerializer.hiddenServerEmotes);
         if (emote == null) {
             return InkActionResult.error(
                     Translation.message(WRONG_ARGUMENT_TEXT, String.format("Emote %s does not exists.", emoteName)));
