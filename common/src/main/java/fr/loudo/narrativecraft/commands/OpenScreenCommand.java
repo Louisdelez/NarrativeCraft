@@ -28,12 +28,10 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.screens.mainScreen.MainScreen;
-import fr.loudo.narrativecraft.screens.options.StoryOptionsScreen;
-import fr.loudo.narrativecraft.screens.storyManager.chapter.ChaptersScreen;
-import fr.loudo.narrativecraft.screens.storyManager.character.CharactersScreen;
+import fr.loudo.narrativecraft.network.S2COpenScreenPacket;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.util.Translation;
-import net.minecraft.client.Minecraft;
+// import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.permissions.Permissions;
@@ -64,8 +62,8 @@ public class OpenScreenCommand {
             playerSession.getPlayer().sendSystemMessage(Translation.message("record.cant_access"));
             return 0;
         }
-        StoryOptionsScreen screen = new StoryOptionsScreen(playerSession);
-        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
+        //        StoryOptionsScreen screen = new StoryOptionsScreen(playerSession);
+        //        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
         return Command.SINGLE_SUCCESS;
     }
 
@@ -82,9 +80,10 @@ public class OpenScreenCommand {
             return 0;
         }
         if (playerSession.getStoryHandler() != null) return 0;
-        ChaptersScreen chaptersScreen = new ChaptersScreen();
-        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(chaptersScreen));
-        // Services.PACKET_SENDER.sendToPlayer(player, new OpenChaptersScreenPacket("", 13));
+        //        ChaptersScreen chaptersScreen = new ChaptersScreen();
+        //        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(chaptersScreen));
+        Services.PACKET_SENDER.sendToPlayer(context.getSource().getPlayer(), S2COpenScreenPacket.storyManager());
+
         return Command.SINGLE_SUCCESS;
     }
 
@@ -100,8 +99,8 @@ public class OpenScreenCommand {
             playerSession.getPlayer().sendSystemMessage(Translation.message("record.cant_access"));
             return 0;
         }
-        CharactersScreen screen = new CharactersScreen(null);
-        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
+        //        CharactersScreen screen = new CharactersScreen(null);
+        //        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
         return Command.SINGLE_SUCCESS;
     }
 
@@ -118,8 +117,8 @@ public class OpenScreenCommand {
             playerSession.getPlayer().sendSystemMessage(Translation.message("record.cant_access"));
             return 0;
         }
-        MainScreen screen = new MainScreen(playerSession, false, false);
-        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
+        //        MainScreen screen = new MainScreen(playerSession, false, false);
+        //        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
         return Command.SINGLE_SUCCESS;
     }
 }

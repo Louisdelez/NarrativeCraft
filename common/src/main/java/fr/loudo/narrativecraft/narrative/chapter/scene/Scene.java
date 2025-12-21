@@ -34,7 +34,7 @@ import java.util.List;
 
 public class Scene extends NarrativeEntry {
 
-    private final Chapter chapter;
+    private Chapter chapter;
 
     private final List<Animation> animations = new ArrayList<>();
     private final List<Cutscene> cutscenes = new ArrayList<>();
@@ -49,6 +49,15 @@ public class Scene extends NarrativeEntry {
         super(name, description);
         this.chapter = chapter;
         this.rank = chapter.getScenes().size() + 1;
+    }
+
+    public Scene(String name, String description, int rank) {
+        super(name, description);
+        this.rank = rank;
+    }
+
+    public void setChapter(Chapter chapter) {
+        this.chapter = chapter;
     }
 
     public String knotName() {

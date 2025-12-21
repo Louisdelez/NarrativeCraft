@@ -26,9 +26,7 @@ package fr.loudo.narrativecraft.narrative.character;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.NarrativeEntry;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
-import fr.loudo.narrativecraft.util.Util;
 import java.io.IOException;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 
@@ -60,6 +58,16 @@ public class CharacterStory extends NarrativeEntry {
         showNametag = characterType == CharacterType.MAIN;
     }
 
+    public CharacterStory(String name, String description, CharacterType characterType, CharacterModel model) {
+        super(name, description);
+        this.birthDate = "01/01/2000";
+        this.characterType = characterType;
+        this.model = model;
+        this.entityType = EntityType.PLAYER;
+        this.entityTypeId = BuiltInRegistries.ENTITY_TYPE.getId(entityType);
+        this.showNametag = false;
+    }
+
     public void updateEntityType(EntityType<?> entityType, Scene scene) {
         EntityType<?> oldEntityType = this.entityType;
         int oldEntityTypeId = entityTypeId;
@@ -74,8 +82,8 @@ public class CharacterStory extends NarrativeEntry {
         } catch (IOException e) {
             this.entityType = oldEntityType;
             entityTypeId = oldEntityTypeId;
-            Util.sendCrashMessage(Minecraft.getInstance().player, e);
-            Minecraft.getInstance().setScreen(null);
+            //            Util.sendCrashMessage(Minecraft.getInstance().player, e);
+            //            Minecraft.getInstance().setScreen(null);
         }
     }
 

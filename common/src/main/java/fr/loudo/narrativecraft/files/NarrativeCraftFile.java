@@ -519,7 +519,7 @@ public class NarrativeCraftFile extends AbstractNarrativeCraftFile {
             File scenesFolder = getScenesFolder(chapter);
             stringBuilder.append("// Chapter ").append(chapter.getIndex()).append("\n");
             String chapterInkFilePath =
-                    "chapters\\" + chapter.getIndex() + "\\" + chapter.knotName() + EXTENSION_SCRIPT_FILE;
+                    "entries\\" + chapter.getIndex() + "\\" + chapter.knotName() + EXTENSION_SCRIPT_FILE;
             stringBuilder.append("INCLUDE ").append(chapterInkFilePath).append("\n");
             for (Scene scene : chapter.getSortedSceneList()) {
                 File sceneFolder = new File(scenesFolder, Util.snakeCase(scene.getName()));
@@ -528,7 +528,7 @@ public class NarrativeCraftFile extends AbstractNarrativeCraftFile {
                     deleteDirectory(newSceneFolder);
                     Files.move(sceneFolder.toPath(), newSceneFolder.toPath());
                 }
-                String sceneInkFilePath = "chapters\\" + chapter.getIndex() + "\\" + "scenes\\" + scene.folderName()
+                String sceneInkFilePath = "entries\\" + chapter.getIndex() + "\\" + "scenes\\" + scene.folderName()
                         + "\\" + Util.snakeCase(scene.getName()) + EXTENSION_SCRIPT_FILE;
                 stringBuilder.append("INCLUDE ").append(sceneInkFilePath).append("\n");
             }

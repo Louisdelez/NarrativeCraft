@@ -73,6 +73,7 @@ public abstract class StoryElementScreen extends Screen {
     }
 
     protected void initFolderButton() {
+        if (!minecraft.isSingleplayer()) return;
         linearlayout.addChild(Button.builder(ImageFontConstants.FOLDER, button -> {
                     openFolder();
                 })

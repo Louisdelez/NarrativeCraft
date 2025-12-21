@@ -41,6 +41,10 @@ public class Cutscene extends SceneData {
         super(name, description, scene);
     }
 
+    public Cutscene(String name, String description) {
+        super(name, description, null);
+    }
+
     public List<String> getSubscenesName() {
         return getSubscenes().stream().map(Subscene::getName).toList();
     }

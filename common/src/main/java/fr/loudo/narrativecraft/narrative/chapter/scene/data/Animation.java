@@ -40,6 +40,10 @@ public class Animation extends SceneData {
         super(name, "", scene);
     }
 
+    public Animation(String name) {
+        super(name, "", null);
+    }
+
     public Location getFirstLocation() {
         return actionsData.getFirst().getLocations().getFirst();
     }

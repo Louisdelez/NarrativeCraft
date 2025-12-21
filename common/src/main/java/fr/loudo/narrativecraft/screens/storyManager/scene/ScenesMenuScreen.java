@@ -68,7 +68,9 @@ public class ScenesMenuScreen extends StoryElementScreen {
                 this.layout.addToFooter(LinearLayout.horizontal().spacing(8));
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
-        if (playerSession.isSessionSet() && playerSession.getScene().equals(scene)) {
+        if (playerSession != null
+                && playerSession.isSessionSet()
+                && playerSession.getScene().equals(scene)) {
             width = 100;
             linearLayout.addChild(Button.builder(CommonComponents.GUI_BACK, (p_345997_) -> {
                         ScenesScreen screen = new ScenesScreen(scene.getChapter());

@@ -30,10 +30,15 @@ import fr.loudo.narrativecraft.items.CutsceneEditItems;
 import fr.loudo.narrativecraft.managers.PlayerSessionManager;
 import fr.loudo.narrativecraft.managers.RecordingManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryInit;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.recording.Recording;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.network.*;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.util.FakePlayer;
 import fr.loudo.narrativecraft.util.Translation;
+import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
@@ -45,8 +50,12 @@ public class OnPlayerServerConnection {
         initSession(player);
         NarrativeCraftMod.getInstance().setNarrativeWorldOption(NarrativeCraftFile.loadWorldOptions());
         //        NarrativeCraftMod.getInstance().setNarrativeClientOptions(NarrativeCraftFile.loadUserOptions());
-        if (player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR) && NarrativeEntryInit.hasError) {
-            player.sendSystemMessage(Translation.message("crash.narrative-data").withStyle(ChatFormatting.RED));
+        if (player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) {
+            loadStoryDataToClient(player);
+            if (NarrativeEntryInit.hasError) {
+                player.sendSystemMessage(
+                        Translation.message("crash.narrative-data").withStyle(ChatFormatting.RED));
+            }
         }
         CutsceneEditItems.init(player.registryAccess());
         PlayerSession playerSession =
@@ -82,5 +91,32 @@ public class OnPlayerServerConnection {
         PlayerSession playerSession = playerSessionManager.getSessionByPlayer(player);
         if (playerSession == null) return;
         playerSessionManager.removeSession(playerSession);
+    }
+
+    private static void loadStoryDataToClient(ServerPlayer player) {
+        List<Chapter> chapters =
+                NarrativeCraftMod.getInstance().getChapterManager().getChapters();
+        Services.PACKET_SENDER.sendToPlayer(player, new S2CSyncChaptersPacket(chapters));
+        for (Chapter chapter : chapters) {
+            Services.PACKET_SENDER.sendToPlayer(
+                    player, new S2CSyncScenesPacket(chapter.getIndex(), chapter.getScenes()));
+            for (Scene scene : chapter.getScenes()) {
+                Services.PACKET_SENDER.sendToPlayer(
+                        player,
+                        new S2CSyncAnimationsPacket(chapter.getIndex(), scene.getName(), scene.getAnimations()));
+                Services.PACKET_SENDER.sendToPlayer(
+                        player,
+                        new S2CSyncCameraAnglesPacket(chapter.getIndex(), scene.getName(), scene.getCameraAngles()));
+                Services.PACKET_SENDER.sendToPlayer(
+                        player, new S2CSyncSubscenesPacket(chapter.getIndex(), scene.getName(), scene.getSubscenes()));
+                Services.PACKET_SENDER.sendToPlayer(
+                        player, new S2CSyncCutscenesPacket(chapter.getIndex(), scene.getName(), scene.getCutscenes()));
+                Services.PACKET_SENDER.sendToPlayer(
+                        player,
+                        new S2CSyncInteractionsPacket(chapter.getIndex(), scene.getName(), scene.getInteractions()));
+                Services.PACKET_SENDER.sendToPlayer(
+                        player, new S2CSyncNpcsPacket(chapter.getIndex(), scene.getName(), scene.getNpcs()));
+            }
+        }
     }
 }

@@ -21,28 +21,17 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.registers;
+package fr.loudo.narrativecraft.events;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.commands.*;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.RegisterCommandsEvent;
-
-@Mod(NarrativeCraftMod.MOD_ID)
-public class CommandsRegister {
-
-    public CommandsRegister(IEventBus eventBus) {
-        NeoForge.EVENT_BUS.addListener(CommandsRegister::register);
-    }
-
-    public static void register(RegisterCommandsEvent event) {
-        PlayerSessionCommand.register(event.getDispatcher());
-        //        RecordCommand.register(event.getDispatcher());
-        PlaybackCommand.register(event.getDispatcher());
-        OpenScreenCommand.register(event.getDispatcher());
-        StoryCommand.register(event.getDispatcher());
-        LinkCommand.register(event.getDispatcher());
-    }
-}
+// @EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, value = Dist.CLIENT)
+// public class PacketClientRegisterEvent {
+//
+//    @SubscribeEvent
+//    private static void onPackerRegister(RegisterClientPayloadHandlersEvent event) {
+//        event.register(
+//                S2COpenScreenPacket.TYPE,
+//                ClientPacketHandlerNeoForge::screenHandler
+//        );
+//    }
+//
+// }

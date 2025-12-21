@@ -39,6 +39,10 @@ public class CameraAngle extends SceneData {
         super(name, description, scene);
     }
 
+    public CameraAngle(String name, String description) {
+        super(name, description, null);
+    }
+
     public CameraAngleKeyframe getCameraAngleKeyframeByName(String name) {
         for (CameraAngleKeyframe cameraAngleKeyframe : cameraAngleKeyframes) {
             if (cameraAngleKeyframe.getName().equalsIgnoreCase(name)) {

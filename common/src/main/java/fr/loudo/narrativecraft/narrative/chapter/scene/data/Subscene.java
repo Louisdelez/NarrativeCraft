@@ -42,6 +42,10 @@ public class Subscene extends SceneData {
         super(name, description, scene);
     }
 
+    public Subscene(String name, String description) {
+        super(name, description, null);
+    }
+
     public void start(Level level, Environment environment, boolean looping) {
         playbacks = getPlaybacks();
         playbacks.clear();

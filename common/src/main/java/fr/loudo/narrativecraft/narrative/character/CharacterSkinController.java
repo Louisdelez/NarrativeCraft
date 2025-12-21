@@ -23,19 +23,11 @@
 
 package fr.loudo.narrativecraft.narrative.character;
 
-import com.google.common.io.Files;
-import com.mojang.blaze3d.platform.NativeImage;
-import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
-import fr.loudo.narrativecraft.util.Util;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.resources.Identifier;
 
 public class CharacterSkinController {
 
@@ -68,43 +60,46 @@ public class CharacterSkinController {
         }
     }
 
+    // TODO: Skin cache move to client side!
     public void cacheSkins() {
-        if (characterRuntime.getCharacterStory() == null) return;
-        Minecraft minecraft = Minecraft.getInstance();
-        unCacheSkins();
-        initSkins();
-        for (File skin : skins) {
-            String path = "character/"
-                    + Util.snakeCase(characterRuntime.getCharacterStory().getName()) + "/"
-                    + Util.snakeCase(skin.getName());
-            minecraft.execute(() -> {
-                try {
-                    byte[] array = Files.toByteArray(skin);
-                    NativeImage nativeImage = NativeImage.read(array);
-                    DynamicTexture texture = new DynamicTexture(
-                            () -> NarrativeCraftMod.MOD_ID + "_"
-                                    + characterRuntime.getCharacterStory().getName() + "_"
-                                    + Util.snakeCase(skin.getName()) + "_skin_texture",
-                            nativeImage);
-                    minecraft
-                            .getTextureManager()
-                            .register(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, path), texture);
-                } catch (IOException ignored) {
-                }
-            });
-            cachedSkins.add(path);
-        }
-        currentSkin = skinName == null || skinName.isEmpty() ? getMainSkinFile() : getSkinFile(skinName);
+        //        if (characterRuntime.getCharacterStory() == null) return;
+        //        Minecraft minecraft = Minecraft.getInstance();
+        //        unCacheSkins();
+        //        initSkins();
+        //        for (File skin : skins) {
+        //            String path = "character/"
+        //                    + Util.snakeCase(characterRuntime.getCharacterStory().getName()) + "/"
+        //                    + Util.snakeCase(skin.getName());
+        //            minecraft.execute(() -> {
+        //                try {
+        //                    byte[] array = Files.toByteArray(skin);
+        //                    NativeImage nativeImage = NativeImage.read(array);
+        //                    DynamicTexture texture = new DynamicTexture(
+        //                            () -> NarrativeCraftMod.MOD_ID + "_"
+        //                                    + characterRuntime.getCharacterStory().getName() + "_"
+        //                                    + Util.snakeCase(skin.getName()) + "_skin_texture",
+        //                            nativeImage);
+        //                    minecraft
+        //                            .getTextureManager()
+        //                            .register(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, path),
+        // texture);
+        //                } catch (IOException ignored) {
+        //                }
+        //            });
+        //            cachedSkins.add(path);
+        //        }
+        //        currentSkin = skinName == null || skinName.isEmpty() ? getMainSkinFile() : getSkinFile(skinName);
     }
 
     public void unCacheSkins() {
-        Minecraft minecraft = Minecraft.getInstance();
-        for (String path : cachedSkins) {
-            minecraft.execute(() -> {
-                minecraft.getTextureManager().release(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, path));
-            });
-        }
-        cachedSkins.clear();
+        //        Minecraft minecraft = Minecraft.getInstance();
+        //        for (String path : cachedSkins) {
+        //            minecraft.execute(() -> {
+        //
+        // minecraft.getTextureManager().release(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, path));
+        //            });
+        //        }
+        //        cachedSkins.clear();
     }
 
     public File getMainSkinFile() {

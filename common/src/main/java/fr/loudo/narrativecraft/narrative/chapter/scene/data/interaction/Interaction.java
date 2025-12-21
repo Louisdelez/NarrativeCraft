@@ -39,6 +39,10 @@ public class Interaction extends SceneData {
         super(name, description, scene);
     }
 
+    public Interaction(String name, String description) {
+        super(name, description, null);
+    }
+
     public List<CharacterInteraction> getCharacterInteractions() {
         if (characterInteractions == null) {
             characterInteractions = new ArrayList<>();
