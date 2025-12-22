@@ -21,21 +21,21 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.network.common;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.network.common.CommonPackerHandlerNeoForge;
 import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent;
+import fr.loudo.narrativecraft.network.handlers.ClientPacketHandler;
+import fr.loudo.narrativecraft.network.handlers.ServerPacketHandler;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-@EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, value = Dist.CLIENT)
-public class PacketClientRegisterEvent {
+public class CommonPackerHandlerNeoForge {
 
-    @SubscribeEvent
-    private static void onPackerRegister(RegisterClientPayloadHandlersEvent event) {
-        event.register(BiChapterDataPacket.TYPE, CommonPackerHandlerNeoForge::chapterData);
+    public static void chapterData(BiChapterDataPacket packet, IPayloadContext context) {
+        if (context.flow().isServerbound()) {
+            ServerPacketHandler.chapterData(packet, (ServerPlayer) context.player());
+        } else {
+            ClientPacketHandler.chapterData(packet);
+        }
     }
 }

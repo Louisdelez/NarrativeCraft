@@ -28,7 +28,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.network.S2COpenScreenPacket;
+import fr.loudo.narrativecraft.network.S2CScreenPacket;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.util.Translation;
 // import net.minecraft.client.Minecraft;
@@ -82,7 +82,7 @@ public class OpenScreenCommand {
         if (playerSession.getStoryHandler() != null) return 0;
         //        ChaptersScreen chaptersScreen = new ChaptersScreen();
         //        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(chaptersScreen));
-        Services.PACKET_SENDER.sendToPlayer(context.getSource().getPlayer(), S2COpenScreenPacket.storyManager());
+        Services.PACKET_SENDER.sendToPlayer(context.getSource().getPlayer(), S2CScreenPacket.storyManager());
 
         return Command.SINGLE_SUCCESS;
     }

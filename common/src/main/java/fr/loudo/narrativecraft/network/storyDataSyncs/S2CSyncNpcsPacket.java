@@ -21,10 +21,12 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.network.storyDataSyncs;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.CameraAngle;
+import fr.loudo.narrativecraft.narrative.character.CharacterModel;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import io.netty.buffer.ByteBuf;
 import java.util.List;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -32,27 +34,31 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record S2CSyncCameraAnglesPacket(int chapterIndex, String sceneName, List<CameraAngle> cameraAngles)
+public record S2CSyncNpcsPacket(int chapterIndex, String sceneName, List<CharacterStory> npcs)
         implements CustomPacketPayload {
 
-    public static final Type<S2CSyncCameraAnglesPacket> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_sync_camera_angles"));
+    public static final Type<S2CSyncNpcsPacket> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_sync_npcs"));
 
-    public static final StreamCodec<ByteBuf, CameraAngle> CAMERA_ANGLE_STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<ByteBuf, CharacterStory> NPC_STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,
-            CameraAngle::getName,
+            CharacterStory::getName,
             ByteBufCodecs.STRING_UTF8,
-            CameraAngle::getDescription,
-            CameraAngle::new);
+            CharacterStory::getDescription,
+            ByteBufCodecs.idMapper(i -> CharacterType.values()[i], CharacterType::ordinal),
+            npc -> CharacterType.NPC,
+            ByteBufCodecs.idMapper(i -> CharacterModel.values()[i], CharacterModel::ordinal),
+            CharacterStory::getModel,
+            CharacterStory::new);
 
-    public static final StreamCodec<ByteBuf, S2CSyncCameraAnglesPacket> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<ByteBuf, S2CSyncNpcsPacket> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT,
-            S2CSyncCameraAnglesPacket::chapterIndex,
+            S2CSyncNpcsPacket::chapterIndex,
             ByteBufCodecs.STRING_UTF8,
-            S2CSyncCameraAnglesPacket::sceneName,
-            CAMERA_ANGLE_STREAM_CODEC.apply(ByteBufCodecs.list()),
-            S2CSyncCameraAnglesPacket::cameraAngles,
-            S2CSyncCameraAnglesPacket::new);
+            S2CSyncNpcsPacket::sceneName,
+            NPC_STREAM_CODEC.apply(ByteBufCodecs.list()),
+            S2CSyncNpcsPacket::npcs,
+            S2CSyncNpcsPacket::new);
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

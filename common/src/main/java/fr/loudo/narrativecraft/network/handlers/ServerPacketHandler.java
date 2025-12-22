@@ -23,4 +23,39 @@
 
 package fr.loudo.narrativecraft.network.handlers;
 
-public class ServerPacketHandler {}
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.files.NarrativeCraftFile;
+import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.network.S2CScreenPacket;
+import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
+import fr.loudo.narrativecraft.network.data.TypeStoryData;
+import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.util.Util;
+import net.minecraft.server.level.ServerPlayer;
+
+public class ServerPacketHandler {
+    public static void chapterData(BiChapterDataPacket packet, ServerPlayer player) {
+        ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
+        if (packet.typeStoryData() == TypeStoryData.ADD) {
+            Chapter chapter = new Chapter(
+                    packet.name(),
+                    packet.description(),
+                    chapterManager.getChapters().size() + 1);
+            try {
+                chapterManager.addChapter(chapter);
+                NarrativeCraftFile.createChapterDirectory(chapter);
+                NarrativeCraftMod.server.getPlayerList().getPlayers().forEach(player1 -> {
+                    if (player1.getUUID().equals(player.getUUID())) return;
+                    Services.PACKET_SENDER.sendToPlayer(
+                            player1, new BiChapterDataPacket(packet.name(), packet.description(), TypeStoryData.ADD));
+                });
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.storyManager());
+            } catch (Exception e) {
+                chapterManager.removeChapter(chapter);
+                Util.sendCrashMessage(player, e);
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+            }
+        }
+    }
+}

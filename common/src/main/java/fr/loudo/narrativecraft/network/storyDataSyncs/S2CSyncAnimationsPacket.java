@@ -21,10 +21,10 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.network.storyDataSyncs;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import io.netty.buffer.ByteBuf;
 import java.util.List;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -32,27 +32,23 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record S2CSyncCutscenesPacket(int chapterIndex, String sceneName, List<Cutscene> cutscenes)
+public record S2CSyncAnimationsPacket(int chapterIndex, String sceneName, List<Animation> animations)
         implements CustomPacketPayload {
 
-    public static final Type<S2CSyncCutscenesPacket> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_sync_cutscenes"));
+    public static final Type<S2CSyncAnimationsPacket> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_sync_animations"));
 
-    public static final StreamCodec<ByteBuf, Cutscene> CUTSCENE_STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            Cutscene::getName,
-            ByteBufCodecs.STRING_UTF8,
-            Cutscene::getDescription,
-            Cutscene::new);
+    public static final StreamCodec<ByteBuf, Animation> ANIMATION_STREAM_CODEC =
+            StreamCodec.composite(ByteBufCodecs.STRING_UTF8, Animation::getName, Animation::new);
 
-    public static final StreamCodec<ByteBuf, S2CSyncCutscenesPacket> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<ByteBuf, S2CSyncAnimationsPacket> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT,
-            S2CSyncCutscenesPacket::chapterIndex,
+            S2CSyncAnimationsPacket::chapterIndex,
             ByteBufCodecs.STRING_UTF8,
-            S2CSyncCutscenesPacket::sceneName,
-            CUTSCENE_STREAM_CODEC.apply(ByteBufCodecs.list()),
-            S2CSyncCutscenesPacket::cutscenes,
-            S2CSyncCutscenesPacket::new);
+            S2CSyncAnimationsPacket::sceneName,
+            ANIMATION_STREAM_CODEC.apply(ByteBufCodecs.list()),
+            S2CSyncAnimationsPacket::animations,
+            S2CSyncAnimationsPacket::new);
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

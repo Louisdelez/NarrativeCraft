@@ -27,6 +27,9 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
+import fr.loudo.narrativecraft.network.data.TypeStoryData;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.storyManager.EditScreenAdapter;
 import fr.loudo.narrativecraft.util.ScreenUtils;
@@ -60,17 +63,7 @@ public class EditScreenChapterAdapter implements EditScreenAdapter<Chapter> {
                         Translation.message("global.error"), Translation.message("chapter.already_exists", name));
                 return;
             }
-            Chapter chapter =
-                    new Chapter(name, description, chapterManager.getChapters().size() + 1);
-            try {
-                chapterManager.addChapter(chapter);
-                NarrativeCraftFile.createChapterDirectory(chapter);
-                minecraft.setScreen(new ChaptersScreen());
-            } catch (Exception e) {
-                chapterManager.removeChapter(chapter);
-                Util.sendCrashMessage(minecraft.player, e);
-                minecraft.setScreen(null);
-            }
+            Services.PACKET_SENDER.sendToServer(new BiChapterDataPacket(name, description, TypeStoryData.ADD));
         } else {
             Chapter newChapter = new Chapter(name, description, existing.getIndex());
             Chapter oldChapter = new Chapter(existing.getName(), existing.getDescription(), existing.getIndex());

@@ -21,21 +21,9 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.network.data;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.network.common.CommonPackerHandlerNeoForge;
-import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent;
-
-@EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, value = Dist.CLIENT)
-public class PacketClientRegisterEvent {
-
-    @SubscribeEvent
-    private static void onPackerRegister(RegisterClientPayloadHandlersEvent event) {
-        event.register(BiChapterDataPacket.TYPE, CommonPackerHandlerNeoForge::chapterData);
-    }
+public enum TypeStoryData {
+    ADD,
+    EDIT;
 }

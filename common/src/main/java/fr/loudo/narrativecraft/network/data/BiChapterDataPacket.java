@@ -21,34 +21,29 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.network.data;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import io.netty.buffer.ByteBuf;
-import java.util.List;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record S2CSyncAnimationsPacket(int chapterIndex, String sceneName, List<Animation> animations)
+public record BiChapterDataPacket(String name, String description, TypeStoryData typeStoryData)
         implements CustomPacketPayload {
 
-    public static final Type<S2CSyncAnimationsPacket> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_sync_animations"));
+    public static final Type<BiChapterDataPacket> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_chapter_data"));
 
-    public static final StreamCodec<ByteBuf, Animation> ANIMATION_STREAM_CODEC =
-            StreamCodec.composite(ByteBufCodecs.STRING_UTF8, Animation::getName, Animation::new);
-
-    public static final StreamCodec<ByteBuf, S2CSyncAnimationsPacket> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.INT,
-            S2CSyncAnimationsPacket::chapterIndex,
+    public static final StreamCodec<ByteBuf, BiChapterDataPacket> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,
-            S2CSyncAnimationsPacket::sceneName,
-            ANIMATION_STREAM_CODEC.apply(ByteBufCodecs.list()),
-            S2CSyncAnimationsPacket::animations,
-            S2CSyncAnimationsPacket::new);
+            BiChapterDataPacket::name,
+            ByteBufCodecs.STRING_UTF8,
+            BiChapterDataPacket::description,
+            ByteBufCodecs.idMapper(i -> TypeStoryData.values()[i], TypeStoryData::ordinal),
+            BiChapterDataPacket::typeStoryData,
+            BiChapterDataPacket::new);
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

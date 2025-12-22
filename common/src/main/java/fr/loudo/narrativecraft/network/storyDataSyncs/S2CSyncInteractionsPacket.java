@@ -21,10 +21,10 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.network.storyDataSyncs;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.Interaction;
 import io.netty.buffer.ByteBuf;
 import java.util.List;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -32,26 +32,27 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record S2CSyncScenesPacket(int chapterIndex, List<Scene> scenes) implements CustomPacketPayload {
+public record S2CSyncInteractionsPacket(int chapterIndex, String sceneName, List<Interaction> interactions)
+        implements CustomPacketPayload {
 
-    public static final Type<S2CSyncScenesPacket> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_sync_scenes"));
+    public static final Type<S2CSyncInteractionsPacket> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_sync_interactions"));
 
-    public static final StreamCodec<ByteBuf, Scene> SCENE_STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<ByteBuf, Interaction> INTERACTION_STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,
-            Scene::getName,
+            Interaction::getName,
             ByteBufCodecs.STRING_UTF8,
-            Scene::getDescription,
-            ByteBufCodecs.INT,
-            Scene::getRank,
-            Scene::new);
+            Interaction::getDescription,
+            Interaction::new);
 
-    public static final StreamCodec<ByteBuf, S2CSyncScenesPacket> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<ByteBuf, S2CSyncInteractionsPacket> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT,
-            S2CSyncScenesPacket::chapterIndex,
-            SCENE_STREAM_CODEC.apply(ByteBufCodecs.list()),
-            S2CSyncScenesPacket::scenes,
-            S2CSyncScenesPacket::new);
+            S2CSyncInteractionsPacket::chapterIndex,
+            ByteBufCodecs.STRING_UTF8,
+            S2CSyncInteractionsPacket::sceneName,
+            INTERACTION_STREAM_CODEC.apply(ByteBufCodecs.list()),
+            S2CSyncInteractionsPacket::interactions,
+            S2CSyncInteractionsPacket::new);
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

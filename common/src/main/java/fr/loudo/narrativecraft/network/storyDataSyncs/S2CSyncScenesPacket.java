@@ -21,54 +21,40 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.network.storyDataSyncs;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import io.netty.buffer.ByteBuf;
+import java.util.List;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record S2COpenScreenPacket(ScreenType screenType) implements CustomPacketPayload {
+public record S2CSyncScenesPacket(int chapterIndex, List<Scene> scenes) implements CustomPacketPayload {
 
-    public static final CustomPacketPayload.Type<S2COpenScreenPacket> TYPE =
-            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_open_screen"));
+    public static final Type<S2CSyncScenesPacket> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_sync_scenes"));
 
-    public static final StreamCodec<ByteBuf, S2COpenScreenPacket> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.INT.map(ScreenType::fromId, ScreenType::getId),
-            S2COpenScreenPacket::screenType,
-            S2COpenScreenPacket::new);
+    public static final StreamCodec<ByteBuf, Scene> SCENE_STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.STRING_UTF8,
+            Scene::getName,
+            ByteBufCodecs.STRING_UTF8,
+            Scene::getDescription,
+            ByteBufCodecs.INT,
+            Scene::getRank,
+            Scene::new);
+
+    public static final StreamCodec<ByteBuf, S2CSyncScenesPacket> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.INT,
+            S2CSyncScenesPacket::chapterIndex,
+            SCENE_STREAM_CODEC.apply(ByteBufCodecs.list()),
+            S2CSyncScenesPacket::scenes,
+            S2CSyncScenesPacket::new);
 
     @Override
     public Type<? extends CustomPacketPayload> type() {
         return TYPE;
-    }
-
-    public static S2COpenScreenPacket storyManager() {
-        return new S2COpenScreenPacket(ScreenType.STORY_MANAGER);
-    }
-
-    public enum ScreenType {
-        STORY_MANAGER(1);
-
-        private final int id;
-
-        ScreenType(int type) {
-            this.id = type;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public static ScreenType fromId(int id) {
-            for (ScreenType type : values()) {
-                if (type.id == id) {
-                    return type;
-                }
-            }
-            throw new IllegalArgumentException("Unknown ScreenType id: " + id);
-        }
     }
 }

@@ -25,11 +25,12 @@ package fr.loudo.narrativecraft.network.client;
 
 import fr.loudo.narrativecraft.network.*;
 import fr.loudo.narrativecraft.network.handlers.ClientPacketHandler;
+import fr.loudo.narrativecraft.network.storyDataSyncs.*;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class ClientPacketHandlerNeoForge {
 
-    public static void screenHandler(final S2COpenScreenPacket packet, final IPayloadContext context) {
+    public static void screenHandler(final S2CScreenPacket packet, final IPayloadContext context) {
         context.enqueueWork(() -> {
             ClientPacketHandler.screenHandler(packet);
         });

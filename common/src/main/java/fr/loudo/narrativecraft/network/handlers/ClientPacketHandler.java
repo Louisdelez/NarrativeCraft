@@ -34,6 +34,9 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.network.*;
+import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
+import fr.loudo.narrativecraft.network.data.TypeStoryData;
+import fr.loudo.narrativecraft.network.storyDataSyncs.*;
 import fr.loudo.narrativecraft.screens.storyManager.chapter.ChaptersScreen;
 import net.minecraft.client.Minecraft;
 
@@ -41,9 +44,10 @@ public class ClientPacketHandler {
 
     private static final Minecraft minecraft = Minecraft.getInstance();
 
-    public static void screenHandler(final S2COpenScreenPacket packet) {
+    public static void screenHandler(final S2CScreenPacket packet) {
         switch (packet.screenType()) {
             case STORY_MANAGER -> minecraft.setScreen(new ChaptersScreen());
+            case NONE -> minecraft.setScreen(null);
         }
     }
 
@@ -153,6 +157,18 @@ public class ClientPacketHandler {
                     scene.addCameraAngleGroup(cameraAngle);
                 }
             }
+        }
+    }
+
+    public static void chapterData(BiChapterDataPacket packet) {
+        ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
+        if (packet.typeStoryData() == TypeStoryData.ADD) {
+            Chapter chapter = new Chapter(
+                    packet.name(),
+                    packet.description(),
+                    chapterManager.getChapters().size() + 1);
+            if (chapterManager.chapterExists(chapter.getIndex())) return;
+            chapterManager.addChapter(chapter);
         }
     }
 }

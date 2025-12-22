@@ -21,21 +21,40 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.network;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.network.common.CommonPackerHandlerNeoForge;
-import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-@EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, value = Dist.CLIENT)
-public class PacketClientRegisterEvent {
+public record S2CScreenPacket(ScreenType screenType) implements CustomPacketPayload {
 
-    @SubscribeEvent
-    private static void onPackerRegister(RegisterClientPayloadHandlersEvent event) {
-        event.register(BiChapterDataPacket.TYPE, CommonPackerHandlerNeoForge::chapterData);
+    public static final CustomPacketPayload.Type<S2CScreenPacket> TYPE =
+            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_open_screen"));
+
+    public static final StreamCodec<ByteBuf, S2CScreenPacket> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.idMapper(i -> ScreenType.values()[i], ScreenType::ordinal),
+            S2CScreenPacket::screenType,
+            S2CScreenPacket::new);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
+
+    public static S2CScreenPacket storyManager() {
+        return new S2CScreenPacket(ScreenType.STORY_MANAGER);
+    }
+
+    public static S2CScreenPacket none() {
+        return new S2CScreenPacket(ScreenType.NONE);
+    }
+
+    public enum ScreenType {
+        STORY_MANAGER,
+        NONE;
     }
 }

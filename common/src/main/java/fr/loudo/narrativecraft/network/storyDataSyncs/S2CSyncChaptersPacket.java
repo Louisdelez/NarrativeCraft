@@ -21,12 +21,10 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.network.storyDataSyncs;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.character.CharacterModel;
-import fr.loudo.narrativecraft.narrative.character.CharacterStory;
-import fr.loudo.narrativecraft.narrative.character.CharacterType;
+import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import io.netty.buffer.ByteBuf;
 import java.util.List;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -34,31 +32,24 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record S2CSyncNpcsPacket(int chapterIndex, String sceneName, List<CharacterStory> npcs)
-        implements CustomPacketPayload {
+public record S2CSyncChaptersPacket(List<Chapter> chapters) implements CustomPacketPayload {
 
-    public static final Type<S2CSyncNpcsPacket> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_sync_npcs"));
+    public static final CustomPacketPayload.Type<S2CSyncChaptersPacket> TYPE = new CustomPacketPayload.Type<>(
+            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_sync_chapters"));
 
-    public static final StreamCodec<ByteBuf, CharacterStory> NPC_STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<ByteBuf, Chapter> CHAPTER_STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,
-            CharacterStory::getName,
+            Chapter::getName,
             ByteBufCodecs.STRING_UTF8,
-            CharacterStory::getDescription,
-            ByteBufCodecs.idMapper(i -> CharacterType.values()[i], CharacterType::ordinal),
-            npc -> CharacterType.NPC,
-            ByteBufCodecs.idMapper(i -> CharacterModel.values()[i], CharacterModel::ordinal),
-            CharacterStory::getModel,
-            CharacterStory::new);
-
-    public static final StreamCodec<ByteBuf, S2CSyncNpcsPacket> STREAM_CODEC = StreamCodec.composite(
+            Chapter::getDescription,
             ByteBufCodecs.INT,
-            S2CSyncNpcsPacket::chapterIndex,
-            ByteBufCodecs.STRING_UTF8,
-            S2CSyncNpcsPacket::sceneName,
-            NPC_STREAM_CODEC.apply(ByteBufCodecs.list()),
-            S2CSyncNpcsPacket::npcs,
-            S2CSyncNpcsPacket::new);
+            Chapter::getIndex,
+            Chapter::new);
+
+    public static final StreamCodec<ByteBuf, S2CSyncChaptersPacket> STREAM_CODEC = StreamCodec.composite(
+            CHAPTER_STREAM_CODEC.apply(ByteBufCodecs.list()),
+            S2CSyncChaptersPacket::chapters,
+            S2CSyncChaptersPacket::new);
 
     @Override
     public Type<? extends CustomPacketPayload> type() {
