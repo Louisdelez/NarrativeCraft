@@ -51,6 +51,7 @@ public class AbstractClientPlayerMixin {
 
     @Inject(method = "getPlayerInfo", at = @At("RETURN"), cancellable = true)
     private void narrativecraft$getProfile(CallbackInfoReturnable<PlayerInfo> callbackInfo) {
+        if (this.playerInfo == null) return;
         if (!"_username_".equals(this.playerInfo.getProfile().getName())) return;
         GameProfile originalProfile = callbackInfo.getReturnValue().getProfile();
         String playerName = Minecraft.getInstance().player.getName().getString();
