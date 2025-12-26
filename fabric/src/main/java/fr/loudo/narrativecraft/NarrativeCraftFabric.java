@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft;
 
-import fr.loudo.narrativecraft.handler.server.ServerPacketHandlerFabric;
+import fr.loudo.narrativecraft.network.handler.server.ServerPacketHandlerFabric;
 import fr.loudo.narrativecraft.registers.CommandsRegister;
 import fr.loudo.narrativecraft.registers.EventsRegister;
 import fr.loudo.narrativecraft.registers.ModKeysRegister;

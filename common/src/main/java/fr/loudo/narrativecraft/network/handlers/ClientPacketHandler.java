@@ -34,14 +34,12 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.network.data.*;
-import fr.loudo.narrativecraft.network.screen.S2CAnimationsScreenPacket;
-import fr.loudo.narrativecraft.network.screen.S2CCameraAnglesScreenPacket;
-import fr.loudo.narrativecraft.network.screen.S2CSceneScreenPacket;
-import fr.loudo.narrativecraft.network.screen.S2CScreenPacket;
+import fr.loudo.narrativecraft.network.screen.*;
 import fr.loudo.narrativecraft.network.storyDataSyncs.*;
 import fr.loudo.narrativecraft.screens.storyManager.animations.AnimationsScreen;
 import fr.loudo.narrativecraft.screens.storyManager.cameraAngle.CameraAngleScreen;
 import fr.loudo.narrativecraft.screens.storyManager.chapter.ChaptersScreen;
+import fr.loudo.narrativecraft.screens.storyManager.cutscene.CutscenesScreen;
 import fr.loudo.narrativecraft.screens.storyManager.scene.ScenesScreen;
 import net.minecraft.client.Minecraft;
 
@@ -80,6 +78,15 @@ public class ClientPacketHandler {
         if (scene == null) return;
 
         minecraft.setScreen(new CameraAngleScreen(scene));
+    }
+
+    public static void openCutscenesScreen(S2CCutscenesScreenPacket packet) {
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+
+        minecraft.setScreen(new CutscenesScreen(scene));
     }
 
     public static void syncChaptersHandler(final S2CSyncChaptersPacket packet) {
@@ -227,6 +234,21 @@ public class ClientPacketHandler {
             CameraAngle cameraAngle = scene.getCameraAngleByName(packet.cameraAngleName());
             cameraAngle.setName(packet.name());
             cameraAngle.setDescription(packet.description());
+        }
+    }
+
+    public static void cutsceneData(BiCutsceneDataPacket packet) {
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+        if (packet.typeStoryData() == TypeStoryData.ADD) {
+            Cutscene cutscene = new Cutscene(packet.name(), packet.description(), scene);
+            scene.addCutscene(cutscene);
+        } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
+            Cutscene cutscene = scene.getCutsceneByName(packet.cutsceneName());
+            cutscene.setName(packet.name());
+            cutscene.setDescription(packet.description());
         }
     }
 }

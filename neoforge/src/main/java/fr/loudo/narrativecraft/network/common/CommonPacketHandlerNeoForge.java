@@ -23,10 +23,7 @@
 
 package fr.loudo.narrativecraft.network.common;
 
-import fr.loudo.narrativecraft.network.data.BiAnimationDataPacket;
-import fr.loudo.narrativecraft.network.data.BiCameraAngleDataPacket;
-import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
-import fr.loudo.narrativecraft.network.data.BiSceneDataPacket;
+import fr.loudo.narrativecraft.network.data.*;
 import fr.loudo.narrativecraft.network.handlers.ClientPacketHandler;
 import fr.loudo.narrativecraft.network.handlers.ServerPacketHandler;
 import net.minecraft.server.level.ServerPlayer;
@@ -70,6 +67,16 @@ public class CommonPacketHandlerNeoForge {
                 ServerPacketHandler.cameraAngleData(packet, (ServerPlayer) context.player());
             } else {
                 ClientPacketHandler.cameraAngleData(packet);
+            }
+        });
+    }
+
+    public static void cutsceneData(BiCutsceneDataPacket packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (context.flow().isServerbound()) {
+                ServerPacketHandler.cutsceneData(packet, (ServerPlayer) context.player());
+            } else {
+                ClientPacketHandler.cutsceneData(packet);
             }
         });
     }

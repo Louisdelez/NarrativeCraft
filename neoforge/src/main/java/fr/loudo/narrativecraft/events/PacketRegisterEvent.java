@@ -26,14 +26,8 @@ package fr.loudo.narrativecraft.events;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.network.client.ClientPacketHandlerNeoForge;
 import fr.loudo.narrativecraft.network.common.CommonPacketHandlerNeoForge;
-import fr.loudo.narrativecraft.network.data.BiAnimationDataPacket;
-import fr.loudo.narrativecraft.network.data.BiCameraAngleDataPacket;
-import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
-import fr.loudo.narrativecraft.network.data.BiSceneDataPacket;
-import fr.loudo.narrativecraft.network.screen.S2CAnimationsScreenPacket;
-import fr.loudo.narrativecraft.network.screen.S2CCameraAnglesScreenPacket;
-import fr.loudo.narrativecraft.network.screen.S2CSceneScreenPacket;
-import fr.loudo.narrativecraft.network.screen.S2CScreenPacket;
+import fr.loudo.narrativecraft.network.data.*;
+import fr.loudo.narrativecraft.network.screen.*;
 import fr.loudo.narrativecraft.network.storyDataSyncs.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -100,6 +94,10 @@ public class PacketRegisterEvent {
                 S2CCameraAnglesScreenPacket.TYPE,
                 S2CCameraAnglesScreenPacket.STREAM_CODEC,
                 ClientPacketHandlerNeoForge::openCameraAngleScreen);
+        registrar.playToClient(
+                S2CCutscenesScreenPacket.TYPE,
+                S2CCutscenesScreenPacket.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::openCutsceneScreen);
     }
 
     public static void registerBi(PayloadRegistrar registrar) {
@@ -117,5 +115,9 @@ public class PacketRegisterEvent {
                 BiCameraAngleDataPacket.TYPE,
                 BiCameraAngleDataPacket.STREAM_CODEC,
                 CommonPacketHandlerNeoForge::cameraAngleData);
+        registrar.playBidirectional(
+                BiCutsceneDataPacket.TYPE,
+                BiCutsceneDataPacket.STREAM_CODEC,
+                CommonPacketHandlerNeoForge::cutsceneData);
     }
 }

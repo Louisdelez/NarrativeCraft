@@ -30,12 +30,11 @@ import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.CameraAngle;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.network.data.*;
-import fr.loudo.narrativecraft.network.screen.S2CAnimationsScreenPacket;
-import fr.loudo.narrativecraft.network.screen.S2CCameraAnglesScreenPacket;
-import fr.loudo.narrativecraft.network.screen.S2CSceneScreenPacket;
-import fr.loudo.narrativecraft.network.screen.S2CScreenPacket;
+import fr.loudo.narrativecraft.network.screen.*;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.screens.storyManager.cutscene.CutscenesScreen;
 import fr.loudo.narrativecraft.util.Util;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -158,6 +157,39 @@ public class ServerPacketHandler {
             } catch (Exception e) {
                 existingCameraAngleGroup.setName(oldCameraAngleGroup.getName());
                 existingCameraAngleGroup.setDescription(oldCameraAngleGroup.getDescription());
+                Util.sendCrashMessage(player, e);
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+            }
+        }
+    }
+
+    public static void cutsceneData(BiCutsceneDataPacket packet, ServerPlayer player) {
+        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+        if (packet.typeStoryData() == TypeStoryData.ADD) {
+            Cutscene cutscene = new Cutscene(packet.name(), packet.description(), scene);
+            try {
+                scene.addCutscene(cutscene);
+                NarrativeCraftFile.updateCutsceneFile(scene);
+                Services.PACKET_SENDER.sendToPlayer(player, new S2CCutscenesScreenPacket(chapter.getIndex(), scene.getName()));
+            } catch (Exception e) {
+                scene.removeCutscene(cutscene);
+                Util.sendCrashMessage(player, e);
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+            }
+        } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
+            Cutscene existingCutscene = new Cutscene(packet.name(), packet.description(), scene);
+            Cutscene oldCutscene = new Cutscene(existingCutscene.getName(), existingCutscene.getDescription(), scene);
+            try {
+                existingCutscene.setName(packet.name());
+                existingCutscene.setDescription(packet.description());
+                NarrativeCraftFile.updateCutsceneFile(scene);
+                Services.PACKET_SENDER.sendToPlayer(player, new S2CCutscenesScreenPacket(chapter.getIndex(), scene.getName()));
+            } catch (Exception e) {
+                existingCutscene.setName(oldCutscene.getName());
+                existingCutscene.setDescription(oldCutscene.getDescription());
                 Util.sendCrashMessage(player, e);
                 Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
             }

@@ -21,12 +21,9 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.handler.server;
+package fr.loudo.narrativecraft.network.handler.server;
 
-import fr.loudo.narrativecraft.network.data.BiAnimationDataPacket;
-import fr.loudo.narrativecraft.network.data.BiCameraAngleDataPacket;
-import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
-import fr.loudo.narrativecraft.network.data.BiSceneDataPacket;
+import fr.loudo.narrativecraft.network.data.*;
 import fr.loudo.narrativecraft.network.handlers.ServerPacketHandler;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
@@ -44,6 +41,9 @@ public class ServerPacketHandlerFabric {
         });
         ServerPlayNetworking.registerGlobalReceiver(BiCameraAngleDataPacket.TYPE, (payload, context) -> {
             ServerPacketHandler.cameraAngleData(payload, context.player());
+        });
+        ServerPlayNetworking.registerGlobalReceiver(BiCutsceneDataPacket.TYPE, (payload, context) -> {
+            ServerPacketHandler.cutsceneData(payload, context.player());
         });
     }
 }
