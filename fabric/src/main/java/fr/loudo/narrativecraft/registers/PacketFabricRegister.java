@@ -24,9 +24,11 @@
 package fr.loudo.narrativecraft.registers;
 
 import fr.loudo.narrativecraft.network.data.BiAnimationDataPacket;
+import fr.loudo.narrativecraft.network.data.BiCameraAngleDataPacket;
 import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
 import fr.loudo.narrativecraft.network.data.BiSceneDataPacket;
 import fr.loudo.narrativecraft.network.screen.S2CAnimationsScreenPacket;
+import fr.loudo.narrativecraft.network.screen.S2CCameraAnglesScreenPacket;
 import fr.loudo.narrativecraft.network.screen.S2CSceneScreenPacket;
 import fr.loudo.narrativecraft.network.screen.S2CScreenPacket;
 import fr.loudo.narrativecraft.network.storyDataSyncs.*;
@@ -41,6 +43,10 @@ public class PacketFabricRegister {
 
     private static void registerS2C() {
         PayloadTypeRegistry.playS2C().register(S2CScreenPacket.TYPE, S2CScreenPacket.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CSceneScreenPacket.TYPE, S2CSceneScreenPacket.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CAnimationsScreenPacket.TYPE, S2CAnimationsScreenPacket.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C()
+                .register(S2CCameraAnglesScreenPacket.TYPE, S2CCameraAnglesScreenPacket.STREAM_CODEC);
 
         PayloadTypeRegistry.playS2C().register(S2CSyncChaptersPacket.TYPE, S2CSyncChaptersPacket.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(S2CSyncScenesPacket.TYPE, S2CSyncScenesPacket.STREAM_CODEC);
@@ -50,8 +56,6 @@ public class PacketFabricRegister {
         PayloadTypeRegistry.playS2C().register(S2CSyncCutscenesPacket.TYPE, S2CSyncCutscenesPacket.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(S2CSyncInteractionsPacket.TYPE, S2CSyncInteractionsPacket.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(S2CSyncNpcsPacket.TYPE, S2CSyncNpcsPacket.STREAM_CODEC);
-        PayloadTypeRegistry.playS2C().register(S2CSceneScreenPacket.TYPE, S2CSceneScreenPacket.STREAM_CODEC);
-        PayloadTypeRegistry.playS2C().register(S2CAnimationsScreenPacket.TYPE, S2CAnimationsScreenPacket.STREAM_CODEC);
     }
 
     private static void registerBi() {
@@ -63,5 +67,8 @@ public class PacketFabricRegister {
 
         PayloadTypeRegistry.playS2C().register(BiAnimationDataPacket.TYPE, BiAnimationDataPacket.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(BiAnimationDataPacket.TYPE, BiAnimationDataPacket.STREAM_CODEC);
+
+        PayloadTypeRegistry.playS2C().register(BiCameraAngleDataPacket.TYPE, BiCameraAngleDataPacket.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(BiCameraAngleDataPacket.TYPE, BiCameraAngleDataPacket.STREAM_CODEC);
     }
 }

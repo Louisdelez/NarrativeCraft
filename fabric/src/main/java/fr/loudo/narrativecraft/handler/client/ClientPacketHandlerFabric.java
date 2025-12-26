@@ -24,10 +24,12 @@
 package fr.loudo.narrativecraft.handler.client;
 
 import fr.loudo.narrativecraft.network.data.BiAnimationDataPacket;
+import fr.loudo.narrativecraft.network.data.BiCameraAngleDataPacket;
 import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
 import fr.loudo.narrativecraft.network.data.BiSceneDataPacket;
 import fr.loudo.narrativecraft.network.handlers.ClientPacketHandler;
 import fr.loudo.narrativecraft.network.screen.S2CAnimationsScreenPacket;
+import fr.loudo.narrativecraft.network.screen.S2CCameraAnglesScreenPacket;
 import fr.loudo.narrativecraft.network.screen.S2CSceneScreenPacket;
 import fr.loudo.narrativecraft.network.screen.S2CScreenPacket;
 import fr.loudo.narrativecraft.network.storyDataSyncs.*;
@@ -44,6 +46,9 @@ public class ClientPacketHandlerFabric {
         });
         ClientPlayNetworking.registerGlobalReceiver(S2CAnimationsScreenPacket.TYPE, (payload, context) -> {
             ClientPacketHandler.openAnimationsScreen(payload);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(S2CCameraAnglesScreenPacket.TYPE, (payload, context) -> {
+            ClientPacketHandler.openCameraAnglesScreen(payload);
         });
 
         ClientPlayNetworking.registerGlobalReceiver(S2CSyncChaptersPacket.TYPE, (payload, context) -> {
@@ -79,6 +84,9 @@ public class ClientPacketHandlerFabric {
         });
         ClientPlayNetworking.registerGlobalReceiver(BiAnimationDataPacket.TYPE, (payload, context) -> {
             ClientPacketHandler.animationData(payload);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(BiCameraAngleDataPacket.TYPE, (payload, context) -> {
+            ClientPacketHandler.cameraAngleData(payload);
         });
     }
 }

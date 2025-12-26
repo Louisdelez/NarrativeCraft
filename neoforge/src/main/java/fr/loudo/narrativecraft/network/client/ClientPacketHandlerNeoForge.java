@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.network.client;
 
 import fr.loudo.narrativecraft.network.handlers.ClientPacketHandler;
 import fr.loudo.narrativecraft.network.screen.S2CAnimationsScreenPacket;
+import fr.loudo.narrativecraft.network.screen.S2CCameraAnglesScreenPacket;
 import fr.loudo.narrativecraft.network.screen.S2CSceneScreenPacket;
 import fr.loudo.narrativecraft.network.screen.S2CScreenPacket;
 import fr.loudo.narrativecraft.network.storyDataSyncs.*;
@@ -95,6 +96,12 @@ public class ClientPacketHandlerNeoForge {
     public static void openAnimationsScreen(S2CAnimationsScreenPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
             ClientPacketHandler.openAnimationsScreen(packet);
+        });
+    }
+
+    public static void openCameraAngleScreen(S2CCameraAnglesScreenPacket packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            ClientPacketHandler.openCameraAnglesScreen(packet);
         });
     }
 }

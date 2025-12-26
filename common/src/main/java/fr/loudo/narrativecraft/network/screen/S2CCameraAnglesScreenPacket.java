@@ -21,6 +21,29 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network.server;
+package fr.loudo.narrativecraft.network.screen;
 
-public class ServerPacketHandlerNeoForge {}
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
+
+public record S2CCameraAnglesScreenPacket(int chapterIndex, String sceneName) implements CustomPacketPayload {
+
+    public static final Type<S2CCameraAnglesScreenPacket> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_camera_angles_screen"));
+
+    public static final StreamCodec<ByteBuf, S2CCameraAnglesScreenPacket> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.INT,
+            S2CCameraAnglesScreenPacket::chapterIndex,
+            ByteBufCodecs.STRING_UTF8,
+            S2CCameraAnglesScreenPacket::sceneName,
+            S2CCameraAnglesScreenPacket::new);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
+}

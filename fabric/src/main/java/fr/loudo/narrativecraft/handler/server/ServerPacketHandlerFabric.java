@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.handler.server;
 
 import fr.loudo.narrativecraft.network.data.BiAnimationDataPacket;
+import fr.loudo.narrativecraft.network.data.BiCameraAngleDataPacket;
 import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
 import fr.loudo.narrativecraft.network.data.BiSceneDataPacket;
 import fr.loudo.narrativecraft.network.handlers.ServerPacketHandler;
@@ -40,6 +41,9 @@ public class ServerPacketHandlerFabric {
         });
         ServerPlayNetworking.registerGlobalReceiver(BiAnimationDataPacket.TYPE, (payload, context) -> {
             ServerPacketHandler.animationData(payload, context.player());
+        });
+        ServerPlayNetworking.registerGlobalReceiver(BiCameraAngleDataPacket.TYPE, (payload, context) -> {
+            ServerPacketHandler.cameraAngleData(payload, context.player());
         });
     }
 }

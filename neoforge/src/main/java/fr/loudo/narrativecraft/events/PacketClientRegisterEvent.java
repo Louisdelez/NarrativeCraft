@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.events;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.network.common.CommonPacketHandlerNeoForge;
 import fr.loudo.narrativecraft.network.data.BiAnimationDataPacket;
+import fr.loudo.narrativecraft.network.data.BiCameraAngleDataPacket;
 import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
 import fr.loudo.narrativecraft.network.data.BiSceneDataPacket;
 import net.neoforged.api.distmarker.Dist;
@@ -41,5 +42,6 @@ public class PacketClientRegisterEvent {
         event.register(BiChapterDataPacket.TYPE, CommonPacketHandlerNeoForge::chapterData);
         event.register(BiSceneDataPacket.TYPE, CommonPacketHandlerNeoForge::sceneData);
         event.register(BiAnimationDataPacket.TYPE, CommonPacketHandlerNeoForge::animationData);
+        event.register(BiCameraAngleDataPacket.TYPE, CommonPacketHandlerNeoForge::cameraAngleData);
     }
 }

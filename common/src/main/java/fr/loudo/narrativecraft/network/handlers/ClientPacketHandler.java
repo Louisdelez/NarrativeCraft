@@ -33,15 +33,14 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
-import fr.loudo.narrativecraft.network.data.BiAnimationDataPacket;
-import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
-import fr.loudo.narrativecraft.network.data.BiSceneDataPacket;
-import fr.loudo.narrativecraft.network.data.TypeStoryData;
+import fr.loudo.narrativecraft.network.data.*;
 import fr.loudo.narrativecraft.network.screen.S2CAnimationsScreenPacket;
+import fr.loudo.narrativecraft.network.screen.S2CCameraAnglesScreenPacket;
 import fr.loudo.narrativecraft.network.screen.S2CSceneScreenPacket;
 import fr.loudo.narrativecraft.network.screen.S2CScreenPacket;
 import fr.loudo.narrativecraft.network.storyDataSyncs.*;
 import fr.loudo.narrativecraft.screens.storyManager.animations.AnimationsScreen;
+import fr.loudo.narrativecraft.screens.storyManager.cameraAngle.CameraAngleScreen;
 import fr.loudo.narrativecraft.screens.storyManager.chapter.ChaptersScreen;
 import fr.loudo.narrativecraft.screens.storyManager.scene.ScenesScreen;
 import net.minecraft.client.Minecraft;
@@ -72,6 +71,15 @@ public class ClientPacketHandler {
         if (scene == null) return;
 
         minecraft.setScreen(new AnimationsScreen(scene));
+    }
+
+    public static void openCameraAnglesScreen(S2CCameraAnglesScreenPacket packet) {
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+
+        minecraft.setScreen(new CameraAngleScreen(scene));
     }
 
     public static void syncChaptersHandler(final S2CSyncChaptersPacket packet) {
@@ -204,6 +212,21 @@ public class ClientPacketHandler {
             Animation animation = scene.getAnimationByName(packet.animationName());
             animation.setName(packet.name());
             animation.setDescription(packet.description());
+        }
+    }
+
+    public static void cameraAngleData(BiCameraAngleDataPacket packet) {
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+        if (packet.typeStoryData() == TypeStoryData.ADD) {
+            CameraAngle cameraAngle = new CameraAngle(packet.name(), packet.description(), scene);
+            scene.addCameraAngleGroup(cameraAngle);
+        } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
+            CameraAngle cameraAngle = scene.getCameraAngleByName(packet.cameraAngleName());
+            cameraAngle.setName(packet.name());
+            cameraAngle.setDescription(packet.description());
         }
     }
 }
