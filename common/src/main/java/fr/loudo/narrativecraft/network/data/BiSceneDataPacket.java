@@ -21,23 +21,34 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.network.data;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.network.common.CommonPacketHandlerNeoForge;
-import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
-import fr.loudo.narrativecraft.network.data.BiSceneDataPacket;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-@EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, value = Dist.CLIENT)
-public class PacketClientRegisterEvent {
+public record BiSceneDataPacket(String name, String description, int chapterIndex, TypeStoryData typeStoryData)
+        implements CustomPacketPayload {
 
-    @SubscribeEvent
-    private static void onPackerRegister(RegisterClientPayloadHandlersEvent event) {
-        event.register(BiChapterDataPacket.TYPE, CommonPacketHandlerNeoForge::chapterData);
-        event.register(BiSceneDataPacket.TYPE, CommonPacketHandlerNeoForge::sceneData);
+    public static final Type<BiSceneDataPacket> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_scene_data"));
+
+    public static final StreamCodec<ByteBuf, BiSceneDataPacket> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.STRING_UTF8,
+            BiSceneDataPacket::name,
+            ByteBufCodecs.STRING_UTF8,
+            BiSceneDataPacket::description,
+            ByteBufCodecs.INT,
+            BiSceneDataPacket::chapterIndex,
+            ByteBufCodecs.idMapper(i -> TypeStoryData.values()[i], TypeStoryData::ordinal),
+            BiSceneDataPacket::typeStoryData,
+            BiSceneDataPacket::new);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

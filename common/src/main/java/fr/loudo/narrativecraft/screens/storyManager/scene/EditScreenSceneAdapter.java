@@ -26,6 +26,9 @@ package fr.loudo.narrativecraft.screens.storyManager.scene;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.network.data.BiSceneDataPacket;
+import fr.loudo.narrativecraft.network.data.TypeStoryData;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.storyManager.EditScreenAdapter;
 import fr.loudo.narrativecraft.util.ScreenUtils;
@@ -87,17 +90,8 @@ public class EditScreenSceneAdapter implements EditScreenAdapter<Scene> {
                         Translation.message("scene.already_exists", name, chapter.getIndex()));
                 return;
             }
-            Scene scene = new Scene(name, description, chapter);
-            try {
-                NarrativeCraftFile.createSceneFolder(scene);
-                chapter.addScene(scene);
-                NarrativeCraftFile.updateInkIncludes();
-                minecraft.setScreen(new ScenesScreen(chapter));
-            } catch (Exception e) {
-                chapter.removeScene(scene);
-                Util.sendCrashMessage(minecraft.player, e);
-                minecraft.setScreen(null);
-            }
+            Services.PACKET_SENDER.sendToServer(
+                    new BiSceneDataPacket(name, description, chapter.getIndex(), TypeStoryData.ADD));
         } else {
             Scene newScene = new Scene(name, description, chapter);
             newScene.setRank(existing.getRank());

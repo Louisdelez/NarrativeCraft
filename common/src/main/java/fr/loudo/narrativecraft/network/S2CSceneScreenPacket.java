@@ -21,21 +21,25 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network.common;
+package fr.loudo.narrativecraft.network;
 
-import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
-import fr.loudo.narrativecraft.network.handlers.ClientPacketHandler;
-import fr.loudo.narrativecraft.network.handlers.ServerPacketHandler;
-import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public class CommonPackerHandlerNeoForge {
+public record S2CSceneScreenPacket(int chapterIndex) implements CustomPacketPayload {
 
-    public static void chapterData(BiChapterDataPacket packet, IPayloadContext context) {
-        if (context.flow().isServerbound()) {
-            ServerPacketHandler.chapterData(packet, (ServerPlayer) context.player());
-        } else {
-            ClientPacketHandler.chapterData(packet);
-        }
+    public static final Type<S2CSceneScreenPacket> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_open_screen"));
+
+    public static final StreamCodec<ByteBuf, S2CSceneScreenPacket> STREAM_CODEC =
+            StreamCodec.composite(ByteBufCodecs.INT, S2CSceneScreenPacket::chapterIndex, S2CSceneScreenPacket::new);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

@@ -53,6 +53,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
@@ -283,5 +284,19 @@ public class Util {
             }
         }
         return longerText;
+    }
+
+    public static void broadcastPacket(CustomPacketPayload packet, List<ServerPlayer> players) {
+        players.forEach(player -> {
+            Services.PACKET_SENDER.sendToPlayer(player, packet);
+        });
+    }
+
+    public static void broadcastPacketExceptPlayer(
+            CustomPacketPayload packet, List<ServerPlayer> players, ServerPlayer excludedPlayer) {
+        players.forEach(player -> {
+            if (player.getUUID().equals(excludedPlayer.getUUID())) return;
+            Services.PACKET_SENDER.sendToPlayer(player, packet);
+        });
     }
 }

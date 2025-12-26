@@ -35,14 +35,18 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.Interact
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.network.*;
 import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
+import fr.loudo.narrativecraft.network.data.BiSceneDataPacket;
 import fr.loudo.narrativecraft.network.data.TypeStoryData;
 import fr.loudo.narrativecraft.network.storyDataSyncs.*;
 import fr.loudo.narrativecraft.screens.storyManager.chapter.ChaptersScreen;
+import fr.loudo.narrativecraft.screens.storyManager.scene.ScenesScreen;
 import net.minecraft.client.Minecraft;
 
 public class ClientPacketHandler {
 
     private static final Minecraft minecraft = Minecraft.getInstance();
+    private static final ChapterManager CHAPTER_MANAGER =
+            NarrativeCraftMod.getInstance().getChapterManager();
 
     public static void screenHandler(final S2CScreenPacket packet) {
         switch (packet.screenType()) {
@@ -51,11 +55,16 @@ public class ClientPacketHandler {
         }
     }
 
+    public static void openSceneScreen(final S2CSceneScreenPacket packet) {
+        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        minecraft.setScreen(new ScenesScreen(chapter));
+    }
+
     public static void syncChaptersHandler(final S2CSyncChaptersPacket packet) {
-        ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
-        chapterManager.getChapters().clear();
+        CHAPTER_MANAGER.getChapters().clear();
         for (Chapter chapter : packet.chapters()) {
-            chapterManager.addChapter(chapter);
+            CHAPTER_MANAGER.addChapter(chapter);
         }
     }
 
@@ -169,6 +178,15 @@ public class ClientPacketHandler {
                     chapterManager.getChapters().size() + 1);
             if (chapterManager.chapterExists(chapter.getIndex())) return;
             chapterManager.addChapter(chapter);
+        }
+    }
+
+    public static void sceneData(BiSceneDataPacket packet) {
+        Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        if (packet.typeStoryData() == TypeStoryData.ADD) {
+            Scene scene = new Scene(packet.name(), packet.description(), chapter);
+            chapter.addScene(scene);
         }
     }
 }

@@ -26,8 +26,9 @@ package fr.loudo.narrativecraft.events;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.network.*;
 import fr.loudo.narrativecraft.network.client.ClientPacketHandlerNeoForge;
-import fr.loudo.narrativecraft.network.common.CommonPackerHandlerNeoForge;
+import fr.loudo.narrativecraft.network.common.CommonPacketHandlerNeoForge;
 import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
+import fr.loudo.narrativecraft.network.data.BiSceneDataPacket;
 import fr.loudo.narrativecraft.network.storyDataSyncs.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -77,10 +78,16 @@ public class PacketRegisterEvent {
                 ClientPacketHandlerNeoForge::syncInteractionsHandler);
         registrar.playToClient(
                 S2CSyncNpcsPacket.TYPE, S2CSyncNpcsPacket.STREAM_CODEC, ClientPacketHandlerNeoForge::syncNpcsHandler);
+        registrar.playToClient(
+                S2CSceneScreenPacket.TYPE,
+                S2CSceneScreenPacket.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::openSceneScreen);
 
         // Story Data
 
         registrar.playBidirectional(
-                BiChapterDataPacket.TYPE, BiChapterDataPacket.STREAM_CODEC, CommonPackerHandlerNeoForge::chapterData);
+                BiChapterDataPacket.TYPE, BiChapterDataPacket.STREAM_CODEC, CommonPacketHandlerNeoForge::chapterData);
+        registrar.playBidirectional(
+                BiSceneDataPacket.TYPE, BiSceneDataPacket.STREAM_CODEC, CommonPacketHandlerNeoForge::sceneData);
     }
 }

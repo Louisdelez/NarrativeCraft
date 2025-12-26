@@ -33,7 +33,7 @@ import net.minecraft.resources.Identifier;
 public record S2CScreenPacket(ScreenType screenType) implements CustomPacketPayload {
 
     public static final CustomPacketPayload.Type<S2CScreenPacket> TYPE =
-            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_open_screen"));
+            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_scene_screen"));
 
     public static final StreamCodec<ByteBuf, S2CScreenPacket> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.idMapper(i -> ScreenType.values()[i], ScreenType::ordinal),

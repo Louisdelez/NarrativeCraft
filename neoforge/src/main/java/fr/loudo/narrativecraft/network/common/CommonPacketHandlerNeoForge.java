@@ -21,23 +21,30 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.network.common;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.network.common.CommonPacketHandlerNeoForge;
 import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
 import fr.loudo.narrativecraft.network.data.BiSceneDataPacket;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent;
+import fr.loudo.narrativecraft.network.handlers.ClientPacketHandler;
+import fr.loudo.narrativecraft.network.handlers.ServerPacketHandler;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-@EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, value = Dist.CLIENT)
-public class PacketClientRegisterEvent {
+public class CommonPacketHandlerNeoForge {
 
-    @SubscribeEvent
-    private static void onPackerRegister(RegisterClientPayloadHandlersEvent event) {
-        event.register(BiChapterDataPacket.TYPE, CommonPacketHandlerNeoForge::chapterData);
-        event.register(BiSceneDataPacket.TYPE, CommonPacketHandlerNeoForge::sceneData);
+    public static void chapterData(BiChapterDataPacket packet, IPayloadContext context) {
+        if (context.flow().isServerbound()) {
+            ServerPacketHandler.chapterData(packet, (ServerPlayer) context.player());
+        } else {
+            ClientPacketHandler.chapterData(packet);
+        }
+    }
+
+    public static void sceneData(BiSceneDataPacket packet, IPayloadContext context) {
+        if (context.flow().isServerbound()) {
+            ServerPacketHandler.sceneData(packet, (ServerPlayer) context.player());
+        } else {
+            ClientPacketHandler.sceneData(packet);
+        }
     }
 }
