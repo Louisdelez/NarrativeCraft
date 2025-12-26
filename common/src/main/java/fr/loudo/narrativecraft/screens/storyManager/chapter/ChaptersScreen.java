@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.screens.storyManager.chapter;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.NarrativeCraftModClient;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
@@ -66,7 +66,7 @@ public class ChaptersScreen extends StoryElementScreen {
 
     @Override
     protected void addContents() {
-        ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
+        ChapterManager chapterManager = NarrativeCraftModClient.getInstance().getChapterManager();
 
         List<StoryElementList.StoryEntryData> entries = chapterManager.getChapters().stream()
                 .map(chapter -> {

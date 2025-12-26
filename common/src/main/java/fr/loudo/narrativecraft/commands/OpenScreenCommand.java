@@ -28,7 +28,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import fr.loudo.narrativecraft.network.S2CScreenPacket;
+import fr.loudo.narrativecraft.network.screen.S2CScreenPacket;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.util.Translation;
 // import net.minecraft.client.Minecraft;

@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.network.common;
 
+import fr.loudo.narrativecraft.network.data.BiAnimationDataPacket;
 import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
 import fr.loudo.narrativecraft.network.data.BiSceneDataPacket;
 import fr.loudo.narrativecraft.network.handlers.ClientPacketHandler;
@@ -33,18 +34,32 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 public class CommonPacketHandlerNeoForge {
 
     public static void chapterData(BiChapterDataPacket packet, IPayloadContext context) {
-        if (context.flow().isServerbound()) {
-            ServerPacketHandler.chapterData(packet, (ServerPlayer) context.player());
-        } else {
-            ClientPacketHandler.chapterData(packet);
-        }
+        context.enqueueWork(() -> {
+            if (context.flow().isServerbound()) {
+                ServerPacketHandler.chapterData(packet, (ServerPlayer) context.player());
+            } else {
+                ClientPacketHandler.chapterData(packet);
+            }
+        });
     }
 
     public static void sceneData(BiSceneDataPacket packet, IPayloadContext context) {
-        if (context.flow().isServerbound()) {
-            ServerPacketHandler.sceneData(packet, (ServerPlayer) context.player());
-        } else {
-            ClientPacketHandler.sceneData(packet);
-        }
+        context.enqueueWork(() -> {
+            if (context.flow().isServerbound()) {
+                ServerPacketHandler.sceneData(packet, (ServerPlayer) context.player());
+            } else {
+                ClientPacketHandler.sceneData(packet);
+            }
+        });
+    }
+
+    public static void animationData(BiAnimationDataPacket packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (context.flow().isServerbound()) {
+                ServerPacketHandler.animationData(packet, (ServerPlayer) context.player());
+            } else {
+                ClientPacketHandler.animationData(packet);
+            }
+        });
     }
 }

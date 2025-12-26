@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.screens.storyManager.character;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.NarrativeCraftModClient;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
@@ -79,7 +80,8 @@ public class CharactersScreen extends StoryElementScreen {
 
     @Override
     protected void addContents() {
-        CharacterManager characterManager = NarrativeCraftMod.getInstance().getCharacterManager();
+        CharacterManager characterManager =
+                NarrativeCraftModClient.getInstance().getCharacterManager();
         List<CharacterStory> characterStories = scene == null
                 ? characterManager.getCharacterStories().stream()
                         .filter(characterStory ->

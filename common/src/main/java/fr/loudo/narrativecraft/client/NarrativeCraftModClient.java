@@ -25,6 +25,8 @@ package fr.loudo.narrativecraft.client;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.client.player.PlayerSessionClient;
+import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.options.NarrativeClientOption;
 import fr.loudo.narrativecraft.screens.components.NarrativeCraftLogoRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -38,6 +40,8 @@ public class NarrativeCraftModClient {
     private final NarrativeCraftLogoRenderer narrativeCraftLogoRenderer = new NarrativeCraftLogoRenderer(
             Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/logo.png"));
     private final PlayerSessionClient playerSessionClient = new PlayerSessionClient();
+    private final ChapterManager chapterManager = new ChapterManager();
+    private final CharacterManager characterManager = new CharacterManager();
 
     private NarrativeClientOption narrativeClientOptions = new NarrativeClientOption();
 
@@ -51,6 +55,14 @@ public class NarrativeCraftModClient {
 
     public NarrativeCraftLogoRenderer getNarrativeCraftLogoRenderer() {
         return narrativeCraftLogoRenderer;
+    }
+
+    public ChapterManager getChapterManager() {
+        return chapterManager;
+    }
+
+    public CharacterManager getCharacterManager() {
+        return characterManager;
     }
 
     public NarrativeClientOption getNarrativeClientOptions() {

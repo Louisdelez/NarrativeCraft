@@ -21,25 +21,25 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.events;
+package fr.loudo.narrativecraft.network.screen;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.network.common.CommonPacketHandlerNeoForge;
-import fr.loudo.narrativecraft.network.data.BiAnimationDataPacket;
-import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
-import fr.loudo.narrativecraft.network.data.BiSceneDataPacket;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-@EventBusSubscriber(modid = NarrativeCraftMod.MOD_ID, value = Dist.CLIENT)
-public class PacketClientRegisterEvent {
+public record S2CSceneScreenPacket(int chapterIndex) implements CustomPacketPayload {
 
-    @SubscribeEvent
-    private static void onPackerRegister(RegisterClientPayloadHandlersEvent event) {
-        event.register(BiChapterDataPacket.TYPE, CommonPacketHandlerNeoForge::chapterData);
-        event.register(BiSceneDataPacket.TYPE, CommonPacketHandlerNeoForge::sceneData);
-        event.register(BiAnimationDataPacket.TYPE, CommonPacketHandlerNeoForge::animationData);
+    public static final Type<S2CSceneScreenPacket> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_scene_screen"));
+
+    public static final StreamCodec<ByteBuf, S2CSceneScreenPacket> STREAM_CODEC =
+            StreamCodec.composite(ByteBufCodecs.INT, S2CSceneScreenPacket::chapterIndex, S2CSceneScreenPacket::new);
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

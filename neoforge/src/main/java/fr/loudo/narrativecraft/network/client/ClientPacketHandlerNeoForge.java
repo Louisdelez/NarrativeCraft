@@ -23,8 +23,10 @@
 
 package fr.loudo.narrativecraft.network.client;
 
-import fr.loudo.narrativecraft.network.*;
 import fr.loudo.narrativecraft.network.handlers.ClientPacketHandler;
+import fr.loudo.narrativecraft.network.screen.S2CAnimationsScreenPacket;
+import fr.loudo.narrativecraft.network.screen.S2CSceneScreenPacket;
+import fr.loudo.narrativecraft.network.screen.S2CScreenPacket;
 import fr.loudo.narrativecraft.network.storyDataSyncs.*;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
@@ -87,6 +89,12 @@ public class ClientPacketHandlerNeoForge {
     public static void openSceneScreen(S2CSceneScreenPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
             ClientPacketHandler.openSceneScreen(packet);
+        });
+    }
+
+    public static void openAnimationsScreen(S2CAnimationsScreenPacket packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            ClientPacketHandler.openAnimationsScreen(packet);
         });
     }
 }

@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.network.screen;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import io.netty.buffer.ByteBuf;
@@ -30,13 +30,17 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record S2CSceneScreenPacket(int chapterIndex) implements CustomPacketPayload {
+public record S2CAnimationsScreenPacket(int chapterIndex, String sceneName) implements CustomPacketPayload {
 
-    public static final Type<S2CSceneScreenPacket> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_open_screen"));
+    public static final Type<S2CAnimationsScreenPacket> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_animations_screen"));
 
-    public static final StreamCodec<ByteBuf, S2CSceneScreenPacket> STREAM_CODEC =
-            StreamCodec.composite(ByteBufCodecs.INT, S2CSceneScreenPacket::chapterIndex, S2CSceneScreenPacket::new);
+    public static final StreamCodec<ByteBuf, S2CAnimationsScreenPacket> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.INT,
+            S2CAnimationsScreenPacket::chapterIndex,
+            ByteBufCodecs.STRING_UTF8,
+            S2CAnimationsScreenPacket::sceneName,
+            S2CAnimationsScreenPacket::new);
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

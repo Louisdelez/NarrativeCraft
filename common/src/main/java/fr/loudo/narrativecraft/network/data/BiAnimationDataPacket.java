@@ -21,38 +21,41 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network.storyDataSyncs;
+package fr.loudo.narrativecraft.network.data;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import io.netty.buffer.ByteBuf;
-import java.util.List;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record S2CSyncAnimationsPacket(int chapterIndex, String sceneName, List<Animation> animations)
+public record BiAnimationDataPacket(
+        String name,
+        String description,
+        int chapterIndex,
+        String sceneName,
+        String animationName,
+        TypeStoryData typeStoryData)
         implements CustomPacketPayload {
 
-    public static final Type<S2CSyncAnimationsPacket> TYPE =
-            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_sync_animations"));
+    public static final Type<BiAnimationDataPacket> TYPE =
+            new Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_animation_data"));
 
-    public static final StreamCodec<ByteBuf, Animation> ANIMATION_STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<ByteBuf, BiAnimationDataPacket> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,
-            Animation::getName,
+            BiAnimationDataPacket::name,
             ByteBufCodecs.STRING_UTF8,
-            Animation::getDescription,
-            Animation::new);
-
-    public static final StreamCodec<ByteBuf, S2CSyncAnimationsPacket> STREAM_CODEC = StreamCodec.composite(
+            BiAnimationDataPacket::description,
             ByteBufCodecs.INT,
-            S2CSyncAnimationsPacket::chapterIndex,
+            BiAnimationDataPacket::chapterIndex,
             ByteBufCodecs.STRING_UTF8,
-            S2CSyncAnimationsPacket::sceneName,
-            ANIMATION_STREAM_CODEC.apply(ByteBufCodecs.list()),
-            S2CSyncAnimationsPacket::animations,
-            S2CSyncAnimationsPacket::new);
+            BiAnimationDataPacket::sceneName,
+            ByteBufCodecs.STRING_UTF8,
+            BiAnimationDataPacket::animationName,
+            ByteBufCodecs.idMapper(i -> TypeStoryData.values()[i], TypeStoryData::ordinal),
+            BiAnimationDataPacket::typeStoryData,
+            BiAnimationDataPacket::new);
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

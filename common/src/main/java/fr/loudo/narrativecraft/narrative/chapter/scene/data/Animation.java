@@ -40,6 +40,14 @@ public class Animation extends SceneData {
         super(name, "", scene);
     }
 
+    public Animation(String name, String description) {
+        super(name, description, null);
+    }
+
+    public Animation(String name, String description, Scene scene) {
+        super(name, description, scene);
+    }
+
     public Animation(String name) {
         super(name, "", null);
     }

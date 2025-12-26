@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.network.handlers;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.NarrativeCraftModClient;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
@@ -33,11 +33,15 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
-import fr.loudo.narrativecraft.network.*;
+import fr.loudo.narrativecraft.network.data.BiAnimationDataPacket;
 import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
 import fr.loudo.narrativecraft.network.data.BiSceneDataPacket;
 import fr.loudo.narrativecraft.network.data.TypeStoryData;
+import fr.loudo.narrativecraft.network.screen.S2CAnimationsScreenPacket;
+import fr.loudo.narrativecraft.network.screen.S2CSceneScreenPacket;
+import fr.loudo.narrativecraft.network.screen.S2CScreenPacket;
 import fr.loudo.narrativecraft.network.storyDataSyncs.*;
+import fr.loudo.narrativecraft.screens.storyManager.animations.AnimationsScreen;
 import fr.loudo.narrativecraft.screens.storyManager.chapter.ChaptersScreen;
 import fr.loudo.narrativecraft.screens.storyManager.scene.ScenesScreen;
 import net.minecraft.client.Minecraft;
@@ -46,7 +50,7 @@ public class ClientPacketHandler {
 
     private static final Minecraft minecraft = Minecraft.getInstance();
     private static final ChapterManager CHAPTER_MANAGER =
-            NarrativeCraftMod.getInstance().getChapterManager();
+            NarrativeCraftModClient.getInstance().getChapterManager();
 
     public static void screenHandler(final S2CScreenPacket packet) {
         switch (packet.screenType()) {
@@ -61,6 +65,15 @@ public class ClientPacketHandler {
         minecraft.setScreen(new ScenesScreen(chapter));
     }
 
+    public static void openAnimationsScreen(S2CAnimationsScreenPacket packet) {
+        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+
+        minecraft.setScreen(new AnimationsScreen(scene));
+    }
+
     public static void syncChaptersHandler(final S2CSyncChaptersPacket packet) {
         CHAPTER_MANAGER.getChapters().clear();
         for (Chapter chapter : packet.chapters()) {
@@ -69,8 +82,7 @@ public class ClientPacketHandler {
     }
 
     public static void syncScenesHandler(final S2CSyncScenesPacket packet) {
-        ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
-        Chapter chapter = chapterManager.getChapterByIndex(packet.chapterIndex());
+        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
         if (chapter != null) {
             chapter.getScenes().clear();
             for (Scene scene : packet.scenes()) {
@@ -81,8 +93,7 @@ public class ClientPacketHandler {
     }
 
     public static void syncAnimationsHandler(final S2CSyncAnimationsPacket packet) {
-        ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
-        Chapter chapter = chapterManager.getChapterByIndex(packet.chapterIndex());
+        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
         if (chapter != null) {
             Scene scene = chapter.getSceneByName(packet.sceneName());
             if (scene != null) {
@@ -96,8 +107,7 @@ public class ClientPacketHandler {
     }
 
     public static void syncSubscenesHandler(final S2CSyncSubscenesPacket packet) {
-        ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
-        Chapter chapter = chapterManager.getChapterByIndex(packet.chapterIndex());
+        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
         if (chapter != null) {
             Scene scene = chapter.getSceneByName(packet.sceneName());
             if (scene != null) {
@@ -111,8 +121,7 @@ public class ClientPacketHandler {
     }
 
     public static void syncCutscenesHandler(final S2CSyncCutscenesPacket packet) {
-        ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
-        Chapter chapter = chapterManager.getChapterByIndex(packet.chapterIndex());
+        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
         if (chapter != null) {
             Scene scene = chapter.getSceneByName(packet.sceneName());
             if (scene != null) {
@@ -126,8 +135,7 @@ public class ClientPacketHandler {
     }
 
     public static void syncInteractionsHandler(final S2CSyncInteractionsPacket packet) {
-        ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
-        Chapter chapter = chapterManager.getChapterByIndex(packet.chapterIndex());
+        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
         if (chapter != null) {
             Scene scene = chapter.getSceneByName(packet.sceneName());
             if (scene != null) {
@@ -141,8 +149,7 @@ public class ClientPacketHandler {
     }
 
     public static void syncNpcsHandler(final S2CSyncNpcsPacket packet) {
-        ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
-        Chapter chapter = chapterManager.getChapterByIndex(packet.chapterIndex());
+        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
         if (chapter != null) {
             Scene scene = chapter.getSceneByName(packet.sceneName());
             if (scene != null) {
@@ -155,8 +162,7 @@ public class ClientPacketHandler {
     }
 
     public static void syncCameraAnglesHandler(S2CSyncCameraAnglesPacket packet) {
-        ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
-        Chapter chapter = chapterManager.getChapterByIndex(packet.chapterIndex());
+        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
         if (chapter != null) {
             Scene scene = chapter.getSceneByName(packet.sceneName());
             if (scene != null) {
@@ -170,23 +176,34 @@ public class ClientPacketHandler {
     }
 
     public static void chapterData(BiChapterDataPacket packet) {
-        ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
         if (packet.typeStoryData() == TypeStoryData.ADD) {
             Chapter chapter = new Chapter(
                     packet.name(),
                     packet.description(),
-                    chapterManager.getChapters().size() + 1);
-            if (chapterManager.chapterExists(chapter.getIndex())) return;
-            chapterManager.addChapter(chapter);
+                    CHAPTER_MANAGER.getChapters().size() + 1);
+            if (CHAPTER_MANAGER.chapterExists(chapter.getIndex())) return;
+            CHAPTER_MANAGER.addChapter(chapter);
         }
     }
 
     public static void sceneData(BiSceneDataPacket packet) {
-        Chapter chapter = NarrativeCraftMod.getInstance().getChapterManager().getChapterByIndex(packet.chapterIndex());
+        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
         if (chapter == null) return;
         if (packet.typeStoryData() == TypeStoryData.ADD) {
             Scene scene = new Scene(packet.name(), packet.description(), chapter);
             chapter.addScene(scene);
+        }
+    }
+
+    public static void animationData(BiAnimationDataPacket packet) {
+        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+        if (packet.typeStoryData() == TypeStoryData.EDIT) {
+            Animation animation = scene.getAnimationByName(packet.animationName());
+            animation.setName(packet.name());
+            animation.setDescription(packet.description());
         }
     }
 }

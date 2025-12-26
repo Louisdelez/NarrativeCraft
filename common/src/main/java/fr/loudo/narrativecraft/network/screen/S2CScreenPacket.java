@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft.network;
+package fr.loudo.narrativecraft.network.screen;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import io.netty.buffer.ByteBuf;
@@ -33,7 +33,7 @@ import net.minecraft.resources.Identifier;
 public record S2CScreenPacket(ScreenType screenType) implements CustomPacketPayload {
 
     public static final CustomPacketPayload.Type<S2CScreenPacket> TYPE =
-            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_scene_screen"));
+            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "nc_open_screen"));
 
     public static final StreamCodec<ByteBuf, S2CScreenPacket> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.idMapper(i -> ScreenType.values()[i], ScreenType::ordinal),

@@ -85,8 +85,8 @@ public class NarrativeEntryInit {
             Chapter chapterData = gson.fromJson(dataContent, Chapter.class);
             int index = Integer.parseInt(chapterFolder.getName());
             Chapter chapter = new Chapter(chapterData.getName(), chapterData.getDescription(), index);
-            chapterManager.addChapter(chapter);
             initScenesOfChapter(chapter);
+            chapterManager.addChapter(chapter);
         }
     }
 

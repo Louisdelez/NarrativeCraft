@@ -384,7 +384,9 @@ public class NarrativeCraftFile extends AbstractNarrativeCraftFile {
     public static void updateAnimationFile(Animation oldAnimation, Animation newAnimation) throws IOException {
         File animationsFolder = getAnimationsFolder(newAnimation.getScene());
         NarrativeCraftFile.updateAnimationFile(newAnimation);
-        new File(animationsFolder, Util.snakeCase(oldAnimation.getName()) + EXTENSION_DATA_FILE).delete();
+        if (!newAnimation.getName().equalsIgnoreCase(oldAnimation.getName())) {
+            new File(animationsFolder, Util.snakeCase(oldAnimation.getName()) + EXTENSION_DATA_FILE).delete();
+        }
     }
 
     public static void deleteAnimationFile(Animation animation) {
