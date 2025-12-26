@@ -49,7 +49,7 @@ import net.minecraft.client.Minecraft;
 public class ClientPacketHandler {
 
     private static final Minecraft minecraft = Minecraft.getInstance();
-    private static final ChapterManager CHAPTER_MANAGER =
+    private static final ChapterManager CHAPTER_MANAGER_CLIENT =
             NarrativeCraftModClient.getInstance().getChapterManager();
 
     public static void screenHandler(final S2CScreenPacket packet) {
@@ -60,13 +60,13 @@ public class ClientPacketHandler {
     }
 
     public static void openSceneScreen(final S2CSceneScreenPacket packet) {
-        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
         if (chapter == null) return;
         minecraft.setScreen(new ScenesScreen(chapter));
     }
 
     public static void openAnimationsScreen(S2CAnimationsScreenPacket packet) {
-        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
         if (chapter == null) return;
         Scene scene = chapter.getSceneByName(packet.sceneName());
         if (scene == null) return;
@@ -75,14 +75,14 @@ public class ClientPacketHandler {
     }
 
     public static void syncChaptersHandler(final S2CSyncChaptersPacket packet) {
-        CHAPTER_MANAGER.getChapters().clear();
+        CHAPTER_MANAGER_CLIENT.getChapters().clear();
         for (Chapter chapter : packet.chapters()) {
-            CHAPTER_MANAGER.addChapter(chapter);
+            CHAPTER_MANAGER_CLIENT.addChapter(chapter);
         }
     }
 
     public static void syncScenesHandler(final S2CSyncScenesPacket packet) {
-        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
         if (chapter != null) {
             chapter.getScenes().clear();
             for (Scene scene : packet.scenes()) {
@@ -93,7 +93,7 @@ public class ClientPacketHandler {
     }
 
     public static void syncAnimationsHandler(final S2CSyncAnimationsPacket packet) {
-        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
         if (chapter != null) {
             Scene scene = chapter.getSceneByName(packet.sceneName());
             if (scene != null) {
@@ -107,7 +107,7 @@ public class ClientPacketHandler {
     }
 
     public static void syncSubscenesHandler(final S2CSyncSubscenesPacket packet) {
-        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
         if (chapter != null) {
             Scene scene = chapter.getSceneByName(packet.sceneName());
             if (scene != null) {
@@ -121,7 +121,7 @@ public class ClientPacketHandler {
     }
 
     public static void syncCutscenesHandler(final S2CSyncCutscenesPacket packet) {
-        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
         if (chapter != null) {
             Scene scene = chapter.getSceneByName(packet.sceneName());
             if (scene != null) {
@@ -135,7 +135,7 @@ public class ClientPacketHandler {
     }
 
     public static void syncInteractionsHandler(final S2CSyncInteractionsPacket packet) {
-        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
         if (chapter != null) {
             Scene scene = chapter.getSceneByName(packet.sceneName());
             if (scene != null) {
@@ -149,7 +149,7 @@ public class ClientPacketHandler {
     }
 
     public static void syncNpcsHandler(final S2CSyncNpcsPacket packet) {
-        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
         if (chapter != null) {
             Scene scene = chapter.getSceneByName(packet.sceneName());
             if (scene != null) {
@@ -162,7 +162,7 @@ public class ClientPacketHandler {
     }
 
     public static void syncCameraAnglesHandler(S2CSyncCameraAnglesPacket packet) {
-        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
         if (chapter != null) {
             Scene scene = chapter.getSceneByName(packet.sceneName());
             if (scene != null) {
@@ -180,14 +180,14 @@ public class ClientPacketHandler {
             Chapter chapter = new Chapter(
                     packet.name(),
                     packet.description(),
-                    CHAPTER_MANAGER.getChapters().size() + 1);
-            if (CHAPTER_MANAGER.chapterExists(chapter.getIndex())) return;
-            CHAPTER_MANAGER.addChapter(chapter);
+                    CHAPTER_MANAGER_CLIENT.getChapters().size() + 1);
+            if (CHAPTER_MANAGER_CLIENT.chapterExists(chapter.getIndex())) return;
+            CHAPTER_MANAGER_CLIENT.addChapter(chapter);
         }
     }
 
     public static void sceneData(BiSceneDataPacket packet) {
-        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
         if (chapter == null) return;
         if (packet.typeStoryData() == TypeStoryData.ADD) {
             Scene scene = new Scene(packet.name(), packet.description(), chapter);
@@ -196,7 +196,7 @@ public class ClientPacketHandler {
     }
 
     public static void animationData(BiAnimationDataPacket packet) {
-        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
         if (chapter == null) return;
         Scene scene = chapter.getSceneByName(packet.sceneName());
         if (scene == null) return;

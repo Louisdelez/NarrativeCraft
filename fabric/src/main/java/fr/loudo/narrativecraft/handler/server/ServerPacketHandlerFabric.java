@@ -21,17 +21,25 @@
  * SOFTWARE.
  */
 
-package fr.loudo.narrativecraft;
+package fr.loudo.narrativecraft.handler.server;
 
-import fr.loudo.narrativecraft.client.CommonClientInit;
-import fr.loudo.narrativecraft.handler.client.ClientPacketHandlerFabric;
-import net.fabricmc.api.ClientModInitializer;
+import fr.loudo.narrativecraft.network.data.BiAnimationDataPacket;
+import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
+import fr.loudo.narrativecraft.network.data.BiSceneDataPacket;
+import fr.loudo.narrativecraft.network.handlers.ServerPacketHandler;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
-public class NarrativeCraftFabricClient implements ClientModInitializer {
+public class ServerPacketHandlerFabric {
 
-    @Override
-    public void onInitializeClient() {
-        CommonClientInit.init();
-        ClientPacketHandlerFabric.handle();
+    public static void handle() {
+        ServerPlayNetworking.registerGlobalReceiver(BiChapterDataPacket.TYPE, (payload, context) -> {
+            ServerPacketHandler.chapterData(payload, context.player());
+        });
+        ServerPlayNetworking.registerGlobalReceiver(BiSceneDataPacket.TYPE, (payload, context) -> {
+            ServerPacketHandler.sceneData(payload, context.player());
+        });
+        ServerPlayNetworking.registerGlobalReceiver(BiAnimationDataPacket.TYPE, (payload, context) -> {
+            ServerPacketHandler.animationData(payload, context.player());
+        });
     }
 }

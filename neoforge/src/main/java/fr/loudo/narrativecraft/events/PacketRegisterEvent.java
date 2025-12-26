@@ -47,6 +47,11 @@ public class PacketRegisterEvent {
 
     private static void onPackerRegister(RegisterPayloadHandlersEvent event) {
         final PayloadRegistrar registrar = event.registrar("1");
+        registerS2C(registrar);
+        registerBi(registrar);
+    }
+
+    private static void registerS2C(PayloadRegistrar registrar) {
         registrar.playToClient(
                 S2CScreenPacket.TYPE, S2CScreenPacket.STREAM_CODEC, ClientPacketHandlerNeoForge::screenHandler);
 
@@ -89,7 +94,9 @@ public class PacketRegisterEvent {
                 S2CAnimationsScreenPacket.TYPE,
                 S2CAnimationsScreenPacket.STREAM_CODEC,
                 ClientPacketHandlerNeoForge::openAnimationsScreen);
+    }
 
+    public static void registerBi(PayloadRegistrar registrar) {
         // Story Data
 
         registrar.playBidirectional(
