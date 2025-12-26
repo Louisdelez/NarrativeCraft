@@ -23,14 +23,15 @@
 
 package fr.loudo.narrativecraft.screens.storyManager.cameraAngle;
 
-import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.CameraAngle;
+import fr.loudo.narrativecraft.network.data.BiCameraAngleDataPacket;
+import fr.loudo.narrativecraft.network.data.TypeStoryData;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.storyManager.EditScreenAdapter;
 import fr.loudo.narrativecraft.util.ScreenUtils;
 import fr.loudo.narrativecraft.util.Translation;
-import fr.loudo.narrativecraft.util.Util;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -65,29 +66,16 @@ public class EditScreenCameraAngleAdapter implements EditScreenAdapter<CameraAng
                         Translation.message("camera_angle.already_exists", name, scene.getName()));
                 return;
             }
-            CameraAngle cameraAngleGroup = new CameraAngle(name, description, scene);
-            try {
-                scene.addCameraAngleGroup(cameraAngleGroup);
-                NarrativeCraftFile.updateCameraAngles(scene);
-                minecraft.setScreen(new CameraAngleScreen(scene));
-            } catch (Exception e) {
-                scene.removeCameraAngleGroup(cameraAngleGroup);
-                Util.sendCrashMessage(minecraft.player, e);
-                minecraft.setScreen(null);
-            }
+            Services.PACKET_SENDER.sendToServer(new BiCameraAngleDataPacket(
+                    name, description, scene.getChapter().getIndex(), scene.getName(), "", TypeStoryData.ADD));
         } else {
-            CameraAngle oldCameraAngleGroup = new CameraAngle(existing.getName(), existing.getDescription(), scene);
-            try {
-                existing.setName(name);
-                existing.setDescription(description);
-                NarrativeCraftFile.updateCameraAngles(scene);
-                minecraft.setScreen(new CameraAngleScreen(scene));
-            } catch (Exception e) {
-                existing.setName(oldCameraAngleGroup.getName());
-                existing.setDescription(oldCameraAngleGroup.getDescription());
-                Util.sendCrashMessage(minecraft.player, e);
-                minecraft.setScreen(null);
-            }
+            Services.PACKET_SENDER.sendToServer(new BiCameraAngleDataPacket(
+                    name,
+                    description,
+                    scene.getChapter().getIndex(),
+                    scene.getName(),
+                    existing.getName(),
+                    TypeStoryData.EDIT));
         }
     }
 }

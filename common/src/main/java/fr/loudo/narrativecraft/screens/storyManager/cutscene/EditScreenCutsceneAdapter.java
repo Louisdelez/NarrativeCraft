@@ -23,14 +23,15 @@
 
 package fr.loudo.narrativecraft.screens.storyManager.cutscene;
 
-import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
+import fr.loudo.narrativecraft.network.data.BiCutsceneDataPacket;
+import fr.loudo.narrativecraft.network.data.TypeStoryData;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.storyManager.EditScreenAdapter;
 import fr.loudo.narrativecraft.util.ScreenUtils;
 import fr.loudo.narrativecraft.util.Translation;
-import fr.loudo.narrativecraft.util.Util;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -65,29 +66,16 @@ public class EditScreenCutsceneAdapter implements EditScreenAdapter<Cutscene> {
                         Translation.message("cutscene.already_exists", name, scene.getName()));
                 return;
             }
-            Cutscene cutscene = new Cutscene(name, description, scene);
-            try {
-                scene.addCutscene(cutscene);
-                NarrativeCraftFile.updateCutsceneFile(scene);
-                minecraft.setScreen(new CutscenesScreen(scene));
-            } catch (Exception e) {
-                scene.removeCutscene(cutscene);
-                Util.sendCrashMessage(minecraft.player, e);
-                minecraft.setScreen(null);
-            }
+            Services.PACKET_SENDER.sendToServer(new BiCutsceneDataPacket(
+                    name, description, scene.getChapter().getIndex(), scene.getName(), "", TypeStoryData.ADD));
         } else {
-            Cutscene oldCutscene = new Cutscene(existing.getName(), existing.getDescription(), scene);
-            try {
-                existing.setName(name);
-                existing.setDescription(description);
-                NarrativeCraftFile.updateCutsceneFile(scene);
-                minecraft.setScreen(new CutscenesScreen(scene));
-            } catch (Exception e) {
-                existing.setName(oldCutscene.getName());
-                existing.setDescription(oldCutscene.getDescription());
-                Util.sendCrashMessage(minecraft.player, e);
-                minecraft.setScreen(null);
-            }
+            Services.PACKET_SENDER.sendToServer(new BiCutsceneDataPacket(
+                    name,
+                    description,
+                    scene.getChapter().getIndex(),
+                    scene.getName(),
+                    existing.getName(),
+                    TypeStoryData.EDIT));
         }
     }
 }

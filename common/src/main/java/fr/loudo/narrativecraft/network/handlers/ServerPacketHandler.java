@@ -34,7 +34,6 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.network.data.*;
 import fr.loudo.narrativecraft.network.screen.*;
 import fr.loudo.narrativecraft.platform.Services;
-import fr.loudo.narrativecraft.screens.storyManager.cutscene.CutscenesScreen;
 import fr.loudo.narrativecraft.util.Util;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -137,6 +136,15 @@ public class ServerPacketHandler {
             try {
                 scene.addCameraAngleGroup(cameraAngleGroup);
                 NarrativeCraftFile.updateCameraAngles(scene);
+                Util.broadcastPacket(
+                        new BiCameraAngleDataPacket(
+                                packet.name(),
+                                packet.description(),
+                                chapter.getIndex(),
+                                scene.getName(),
+                                "",
+                                TypeStoryData.ADD),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
                 Services.PACKET_SENDER.sendToPlayer(
                         player, new S2CCameraAnglesScreenPacket(chapter.getIndex(), scene.getName()));
             } catch (Exception e) {
@@ -152,6 +160,15 @@ public class ServerPacketHandler {
                 existingCameraAngleGroup.setName(packet.name());
                 existingCameraAngleGroup.setDescription(packet.description());
                 NarrativeCraftFile.updateCameraAngles(scene);
+                Util.broadcastPacket(
+                        new BiCameraAngleDataPacket(
+                                packet.name(),
+                                packet.description(),
+                                chapter.getIndex(),
+                                scene.getName(),
+                                existingCameraAngleGroup.getName(),
+                                TypeStoryData.EDIT),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
                 Services.PACKET_SENDER.sendToPlayer(
                         player, new S2CCameraAnglesScreenPacket(chapter.getIndex(), scene.getName()));
             } catch (Exception e) {
@@ -173,20 +190,40 @@ public class ServerPacketHandler {
             try {
                 scene.addCutscene(cutscene);
                 NarrativeCraftFile.updateCutsceneFile(scene);
-                Services.PACKET_SENDER.sendToPlayer(player, new S2CCutscenesScreenPacket(chapter.getIndex(), scene.getName()));
+                Util.broadcastPacket(
+                        new BiCutsceneDataPacket(
+                                packet.name(),
+                                packet.description(),
+                                chapter.getIndex(),
+                                scene.getName(),
+                                "",
+                                TypeStoryData.ADD),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
+                Services.PACKET_SENDER.sendToPlayer(
+                        player, new S2CCutscenesScreenPacket(chapter.getIndex(), scene.getName()));
             } catch (Exception e) {
                 scene.removeCutscene(cutscene);
                 Util.sendCrashMessage(player, e);
                 Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
             }
         } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
-            Cutscene existingCutscene = new Cutscene(packet.name(), packet.description(), scene);
+            Cutscene existingCutscene = scene.getCutsceneByName(packet.cutsceneName());
             Cutscene oldCutscene = new Cutscene(existingCutscene.getName(), existingCutscene.getDescription(), scene);
             try {
                 existingCutscene.setName(packet.name());
                 existingCutscene.setDescription(packet.description());
                 NarrativeCraftFile.updateCutsceneFile(scene);
-                Services.PACKET_SENDER.sendToPlayer(player, new S2CCutscenesScreenPacket(chapter.getIndex(), scene.getName()));
+                Util.broadcastPacket(
+                        new BiCutsceneDataPacket(
+                                packet.name(),
+                                packet.description(),
+                                chapter.getIndex(),
+                                scene.getName(),
+                                existingCutscene.getName(),
+                                TypeStoryData.EDIT),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
+                Services.PACKET_SENDER.sendToPlayer(
+                        player, new S2CCutscenesScreenPacket(chapter.getIndex(), scene.getName()));
             } catch (Exception e) {
                 existingCutscene.setName(oldCutscene.getName());
                 existingCutscene.setDescription(oldCutscene.getDescription());
