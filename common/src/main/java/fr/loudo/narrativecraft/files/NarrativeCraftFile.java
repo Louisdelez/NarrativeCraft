@@ -554,40 +554,63 @@ public class NarrativeCraftFile extends AbstractNarrativeCraftFile {
             currentFolders.put(folder.getName(), folder);
         }
 
+        Deque<Map.Entry<File, File>> performedMoves = new ArrayDeque<>();
         Map<File, File> tempRenames = new HashMap<>();
-        for (Scene scene : chapter.getSortedSceneList()) {
-            String expectedName = scene.folderName();
-            File existingFolder = currentFolders.values().stream()
-                    .filter(f -> f.getName().startsWith(scene.getChapter().getIndex() + "_")
-                            && f.getName().endsWith("_" + Util.snakeCase(scene.getName())))
-                    .findFirst()
-                    .orElse(null);
 
-            if (existingFolder != null && !existingFolder.getName().equals(expectedName)) {
-                File tempFile = new File(scenesFolder, expectedName + "_tmp");
-                Files.move(existingFolder.toPath(), tempFile.toPath());
-                tempRenames.put(tempFile, new File(scenesFolder, expectedName));
+        try {
+            for (Scene scene : chapter.getSortedSceneList()) {
+                String expectedName = scene.folderName();
+                File existingFolder = currentFolders.values().stream()
+                        .filter(f -> f.getName().startsWith(scene.getChapter().getIndex() + "_")
+                                && f.getName().endsWith("_" + Util.snakeCase(scene.getName())))
+                        .findFirst()
+                        .orElse(null);
+
+                if (existingFolder != null && !existingFolder.getName().equals(expectedName)) {
+                    File tempFile = new File(scenesFolder, expectedName + "_tmp");
+
+                    Files.move(existingFolder.toPath(), tempFile.toPath());
+                    performedMoves.push(Map.entry(tempFile, existingFolder));
+
+                    tempRenames.put(tempFile, new File(scenesFolder, expectedName));
+                }
             }
-        }
 
-        for (Map.Entry<File, File> entry : tempRenames.entrySet()) {
-            File tempFile = entry.getKey();
-            File finalFile = entry.getValue();
-            Files.move(tempFile.toPath(), finalFile.toPath());
-        }
+            for (Map.Entry<File, File> entry : tempRenames.entrySet()) {
+                File tempFile = entry.getKey();
+                File finalFile = entry.getValue();
 
-        for (Scene scene : chapter.getScenes()) {
-            File sceneData = getDataFile(scene);
-
-            if (!sceneData.exists()) continue;
-
-            String content = String.format(
-                    "{\"name\":\"%s\",\"description\":\"%s\",\"rank\":%d}",
-                    scene.getName(), scene.getDescription(), scene.getRank());
-
-            try (Writer writer = new BufferedWriter(new FileWriter(sceneData))) {
-                writer.write(content);
+                Files.move(tempFile.toPath(), finalFile.toPath());
+                performedMoves.push(Map.entry(finalFile, tempFile));
             }
+
+            for (Scene scene : chapter.getScenes()) {
+                File sceneData = getDataFile(scene);
+                if (!sceneData.exists()) continue;
+
+                String content = String.format(
+                        "{\"name\":\"%s\",\"description\":\"%s\",\"rank\":%d}",
+                        scene.getName(), scene.getDescription(), scene.getRank());
+
+                try (Writer writer = new BufferedWriter(new FileWriter(sceneData))) {
+                    writer.write(content);
+                }
+            }
+
+        } catch (Exception e) {
+            while (!performedMoves.isEmpty()) {
+                Map.Entry<File, File> move = performedMoves.pop();
+                File from = move.getKey();
+                File to = move.getValue();
+
+                if (from.exists()) {
+                    try {
+                        Files.move(from.toPath(), to.toPath());
+                    } catch (IOException ignored) {
+                    }
+                }
+            }
+            throw e instanceof IOException ? (IOException) e : new IOException(e);
         }
     }
 
