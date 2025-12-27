@@ -61,11 +61,34 @@ public class ServerPacketHandler {
                 chapterManager.addChapter(chapter);
                 NarrativeCraftFile.createChapterDirectory(chapter);
                 Util.broadcastPacket(
-                        new BiChapterDataPacket(packet.name(), packet.description(), TypeStoryData.ADD),
+                        new BiChapterDataPacket(packet.name(), packet.description(), "", TypeStoryData.ADD),
                         NarrativeCraftMod.server.getPlayerList().getPlayers());
                 Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.storyManager());
             } catch (Exception e) {
                 chapterManager.removeChapter(chapter);
+                Util.sendCrashMessage(player, e);
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+            }
+        } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
+            Chapter existingChapter = CHAPTER_MANAGER.getChapterByName(packet.chapterName());
+            if (existingChapter == null) return;
+            Chapter newChapter = new Chapter(packet.name(), packet.description(), existingChapter.getIndex());
+            Chapter oldChapter = new Chapter(
+                    existingChapter.getName(), existingChapter.getDescription(), existingChapter.getIndex());
+            try {
+                NarrativeCraftFile.updateChapterData(newChapter);
+
+                existingChapter.setName(packet.name());
+                existingChapter.setDescription(packet.description());
+                NarrativeCraftFile.updateInkIncludes();
+                Util.broadcastPacket(
+                        new BiChapterDataPacket(
+                                packet.name(), packet.description(), packet.chapterName(), TypeStoryData.EDIT),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.storyManager());
+            } catch (Exception e) {
+                existingChapter.setName(oldChapter.getName());
+                existingChapter.setDescription(oldChapter.getDescription());
                 Util.sendCrashMessage(player, e);
                 Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
             }
@@ -83,11 +106,52 @@ public class ServerPacketHandler {
                 NarrativeCraftFile.updateInkIncludes();
                 Util.broadcastPacket(
                         new BiSceneDataPacket(
-                                packet.name(), packet.description(), packet.chapterIndex(), TypeStoryData.ADD),
+                                packet.name(),
+                                packet.description(),
+                                packet.chapterIndex(),
+                                scene.getRank(),
+                                "",
+                                TypeStoryData.ADD),
                         NarrativeCraftMod.server.getPlayerList().getPlayers());
                 Services.PACKET_SENDER.sendToPlayer(player, new S2CSceneScreenPacket(chapter.getIndex()));
             } catch (Exception e) {
                 chapter.removeScene(scene);
+                Util.sendCrashMessage(player, e);
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+            }
+        } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
+            Scene existingScene = chapter.getSceneByName(packet.sceneName());
+            if (existingScene == null) return;
+
+            Scene newScene = new Scene(packet.name(), packet.description(), chapter);
+            newScene.setRank(existingScene.getRank());
+            Scene oldScene = new Scene(existingScene.getName(), existingScene.getDescription(), chapter);
+            oldScene.setRank(existingScene.getRank());
+            try {
+                NarrativeCraftFile.updateSceneData(oldScene, newScene);
+                existingScene.setName(packet.name());
+                existingScene.setDescription(packet.description());
+                NarrativeCraftFile.updateSceneNameScript(oldScene, newScene);
+                if (existingScene.getRank() != packet.rank()) {
+                    chapter.setSceneRank(existingScene, packet.rank());
+                    NarrativeCraftFile.updateSceneRankData(chapter);
+                }
+                NarrativeCraftFile.updateMasterSceneKnot(existingScene);
+                NarrativeCraftFile.updateInkIncludes();
+                Util.broadcastPacket(
+                        new BiSceneDataPacket(
+                                packet.name(),
+                                packet.description(),
+                                packet.chapterIndex(),
+                                packet.rank(),
+                                packet.sceneName(),
+                                TypeStoryData.EDIT),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
+                Services.PACKET_SENDER.sendToPlayer(player, new S2CSceneScreenPacket(chapter.getIndex()));
+            } catch (Exception e) {
+                existingScene.setName(oldScene.getName());
+                existingScene.setDescription(oldScene.getDescription());
+                chapter.setSceneRank(existingScene, oldScene.getRank());
                 Util.sendCrashMessage(player, e);
                 Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
             }

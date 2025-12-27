@@ -229,6 +229,11 @@ public class ClientPacketHandler {
                     CHAPTER_MANAGER_CLIENT.getChapters().size() + 1);
             if (CHAPTER_MANAGER_CLIENT.chapterExists(chapter.getIndex())) return;
             CHAPTER_MANAGER_CLIENT.addChapter(chapter);
+        } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
+            Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByName(packet.chapterName());
+            if (chapter == null) return;
+            chapter.setName(packet.name());
+            chapter.setDescription(packet.description());
         }
     }
 
@@ -238,6 +243,12 @@ public class ClientPacketHandler {
         if (packet.typeStoryData() == TypeStoryData.ADD) {
             Scene scene = new Scene(packet.name(), packet.description(), chapter);
             chapter.addScene(scene);
+        } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
+            Scene scene = chapter.getSceneByName(packet.sceneName());
+            if (scene == null) return;
+            scene.setName(packet.name());
+            scene.setDescription(packet.description());
+            chapter.setSceneRank(scene, packet.rank());
         }
     }
 

@@ -24,7 +24,6 @@
 package fr.loudo.narrativecraft.screens.storyManager.chapter;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
@@ -34,7 +33,6 @@ import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.storyManager.EditScreenAdapter;
 import fr.loudo.narrativecraft.util.ScreenUtils;
 import fr.loudo.narrativecraft.util.Translation;
-import fr.loudo.narrativecraft.util.Util;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -63,23 +61,10 @@ public class EditScreenChapterAdapter implements EditScreenAdapter<Chapter> {
                         Translation.message("global.error"), Translation.message("chapter.already_exists", name));
                 return;
             }
-            Services.PACKET_SENDER.sendToServer(new BiChapterDataPacket(name, description, TypeStoryData.ADD));
+            Services.PACKET_SENDER.sendToServer(new BiChapterDataPacket(name, description, "", TypeStoryData.ADD));
         } else {
-            Chapter newChapter = new Chapter(name, description, existing.getIndex());
-            Chapter oldChapter = new Chapter(existing.getName(), existing.getDescription(), existing.getIndex());
-            try {
-                NarrativeCraftFile.updateChapterData(newChapter);
-
-                existing.setName(name);
-                existing.setDescription(description);
-                NarrativeCraftFile.updateInkIncludes();
-                minecraft.setScreen(new ChaptersScreen());
-            } catch (Exception e) {
-                existing.setName(oldChapter.getName());
-                existing.setDescription(oldChapter.getDescription());
-                Util.sendCrashMessage(minecraft.player, e);
-                minecraft.setScreen(null);
-            }
+            Services.PACKET_SENDER.sendToServer(
+                    new BiChapterDataPacket(name, description, existing.getName(), TypeStoryData.EDIT));
         }
     }
 }

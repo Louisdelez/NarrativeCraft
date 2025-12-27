@@ -30,7 +30,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
-public record BiChapterDataPacket(String name, String description, TypeStoryData typeStoryData)
+public record BiChapterDataPacket(String name, String description, String chapterName, TypeStoryData typeStoryData)
         implements CustomPacketPayload {
 
     public static final Type<BiChapterDataPacket> TYPE =
@@ -41,6 +41,8 @@ public record BiChapterDataPacket(String name, String description, TypeStoryData
             BiChapterDataPacket::name,
             ByteBufCodecs.STRING_UTF8,
             BiChapterDataPacket::description,
+            ByteBufCodecs.STRING_UTF8,
+            BiChapterDataPacket::chapterName,
             ByteBufCodecs.idMapper(i -> TypeStoryData.values()[i], TypeStoryData::ordinal),
             BiChapterDataPacket::typeStoryData,
             BiChapterDataPacket::new);

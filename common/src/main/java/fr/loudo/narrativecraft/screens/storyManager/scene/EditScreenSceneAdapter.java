@@ -23,7 +23,6 @@
 
 package fr.loudo.narrativecraft.screens.storyManager.scene;
 
-import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.network.data.BiSceneDataPacket;
@@ -91,46 +90,27 @@ public class EditScreenSceneAdapter implements EditScreenAdapter<Scene> {
                 return;
             }
             Services.PACKET_SENDER.sendToServer(
-                    new BiSceneDataPacket(name, description, chapter.getIndex(), TypeStoryData.ADD));
+                    new BiSceneDataPacket(name, description, chapter.getIndex(), -1, "", TypeStoryData.ADD));
         } else {
-            Scene newScene = new Scene(name, description, chapter);
-            newScene.setRank(existing.getRank());
-            Scene oldScene = new Scene(existing.getName(), existing.getDescription(), chapter);
-            oldScene.setRank(existing.getRank());
-            try {
-                ScreenUtils.LabelBox labelBox = (ScreenUtils.LabelBox) extraFields.get("rank");
-                EditBox editBox = labelBox.getEditBox();
-                int rank = 1;
-                if (!editBox.getValue().isEmpty()) {
-                    rank = Integer.parseInt(editBox.getValue());
-                }
-                if (rank > chapter.getScenes().size()) {
-                    ScreenUtils.sendToast(
-                            Translation.message("global.error"), Translation.message("scene.rank_above_scenes_size"));
-                    return;
-                } else if (rank < 1) {
-                    ScreenUtils.sendToast(
-                            Translation.message("global.error"), Translation.message("scene.rank_no_under_one"));
-                    return;
-                }
-                NarrativeCraftFile.updateSceneData(oldScene, newScene);
-                existing.setName(name);
-                existing.setDescription(description);
-                NarrativeCraftFile.updateSceneNameScript(oldScene, newScene);
-                if (existing.getRank() != rank) {
-                    chapter.setSceneRank(existing, rank);
-                    NarrativeCraftFile.updateSceneRankData(chapter);
-                }
-                NarrativeCraftFile.updateMasterSceneKnot(existing);
-                NarrativeCraftFile.updateInkIncludes();
-                minecraft.setScreen(new ScenesScreen(chapter));
-            } catch (Exception e) {
-                existing.setName(oldScene.getName());
-                existing.setDescription(oldScene.getDescription());
-                chapter.setSceneRank(existing, oldScene.getRank());
-                Util.sendCrashMessage(minecraft.player, e);
-                minecraft.setScreen(null);
+
+            ScreenUtils.LabelBox labelBox = (ScreenUtils.LabelBox) extraFields.get("rank");
+            EditBox editBox = labelBox.getEditBox();
+            int rank = 1;
+            if (!editBox.getValue().isEmpty()) {
+                rank = Integer.parseInt(editBox.getValue());
             }
+            if (rank > chapter.getScenes().size()) {
+                ScreenUtils.sendToast(
+                        Translation.message("global.error"), Translation.message("scene.rank_above_scenes_size"));
+                return;
+            } else if (rank < 1) {
+                ScreenUtils.sendToast(
+                        Translation.message("global.error"), Translation.message("scene.rank_no_under_one"));
+                return;
+            }
+
+            Services.PACKET_SENDER.sendToServer(new BiSceneDataPacket(
+                    name, description, chapter.getIndex(), rank, existing.getName(), TypeStoryData.EDIT));
         }
     }
 }
