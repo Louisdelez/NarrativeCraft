@@ -53,6 +53,9 @@ public class ClientPacketHandlerFabric {
         ClientPlayNetworking.registerGlobalReceiver(S2CNpcsScreenPacket.TYPE, (payload, context) -> {
             ClientPacketHandler.openNpcsScreen(payload);
         });
+        ClientPlayNetworking.registerGlobalReceiver(S2CSubscenesScreenPacket.TYPE, (payload, context) -> {
+            ClientPacketHandler.openSubscenesScreen(payload);
+        });
 
         ClientPlayNetworking.registerGlobalReceiver(S2CSyncChaptersPacket.TYPE, (payload, context) -> {
             ClientPacketHandler.syncChaptersHandler(payload);
@@ -96,6 +99,9 @@ public class ClientPacketHandlerFabric {
         });
         ClientPlayNetworking.registerGlobalReceiver(BiNpcDataPacket.TYPE, (payload, context) -> {
             ClientPacketHandler.npcData(payload);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(BiSubsceneDataPacket.TYPE, (payload, context) -> {
+            ClientPacketHandler.subsceneData(payload);
         });
     }
 }

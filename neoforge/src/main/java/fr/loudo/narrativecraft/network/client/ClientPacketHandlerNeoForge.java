@@ -119,4 +119,10 @@ public class ClientPacketHandlerNeoForge {
             ClientPacketHandler.openNpcsScreen(packet);
         });
     }
+
+    public static void openSubsceneScreen(S2CSubscenesScreenPacket packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            ClientPacketHandler.openSubscenesScreen(packet);
+        });
+    }
 }

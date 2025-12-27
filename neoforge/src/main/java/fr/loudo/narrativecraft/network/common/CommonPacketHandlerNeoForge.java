@@ -100,4 +100,14 @@ public class CommonPacketHandlerNeoForge {
             }
         });
     }
+
+    public static void subsceneData(BiSubsceneDataPacket packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (context.flow().isServerbound()) {
+                ServerPacketHandler.subsceneData(packet, (ServerPlayer) context.player());
+            } else {
+                ClientPacketHandler.subsceneData(packet);
+            }
+        });
+    }
 }

@@ -44,6 +44,7 @@ import fr.loudo.narrativecraft.screens.storyManager.character.CharactersScreen;
 import fr.loudo.narrativecraft.screens.storyManager.cutscene.CutscenesScreen;
 import fr.loudo.narrativecraft.screens.storyManager.interaction.InteractionsScreen;
 import fr.loudo.narrativecraft.screens.storyManager.scene.ScenesScreen;
+import fr.loudo.narrativecraft.screens.storyManager.subscene.SubscenesScreen;
 import net.minecraft.client.Minecraft;
 
 public class ClientPacketHandler {
@@ -108,6 +109,15 @@ public class ClientPacketHandler {
         if (scene == null) return;
 
         minecraft.setScreen(new CharactersScreen(scene));
+    }
+
+    public static void openSubscenesScreen(S2CSubscenesScreenPacket packet) {
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+
+        minecraft.setScreen(new SubscenesScreen(scene));
     }
 
     public static void syncChaptersHandler(final S2CSyncChaptersPacket packet) {
@@ -238,6 +248,7 @@ public class ClientPacketHandler {
         if (scene == null) return;
         if (packet.typeStoryData() == TypeStoryData.EDIT) {
             Animation animation = scene.getAnimationByName(packet.animationName());
+            if (animation == null) return;
             animation.setName(packet.name());
             animation.setDescription(packet.description());
         }
@@ -253,6 +264,7 @@ public class ClientPacketHandler {
             scene.addCameraAngleGroup(cameraAngle);
         } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
             CameraAngle cameraAngle = scene.getCameraAngleByName(packet.cameraAngleName());
+            if (cameraAngle == null) return;
             cameraAngle.setName(packet.name());
             cameraAngle.setDescription(packet.description());
         }
@@ -268,6 +280,7 @@ public class ClientPacketHandler {
             scene.addCutscene(cutscene);
         } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
             Cutscene cutscene = scene.getCutsceneByName(packet.cutsceneName());
+            if (cutscene == null) return;
             cutscene.setName(packet.name());
             cutscene.setDescription(packet.description());
         }
@@ -283,6 +296,7 @@ public class ClientPacketHandler {
             scene.addInteraction(interaction);
         } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
             Interaction interaction = scene.getInteractionByName(packet.interactionName());
+            if (interaction == null) return;
             interaction.setName(packet.name());
             interaction.setDescription(packet.description());
         }
@@ -304,6 +318,22 @@ public class ClientPacketHandler {
             characterStory.setDescription(packet.description());
             characterStory.setModel(packet.characterModel());
             characterStory.setShowNametag(packet.showNametag());
+        }
+    }
+
+    public static void subsceneData(BiSubsceneDataPacket packet) {
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+        if (packet.typeStoryData() == TypeStoryData.ADD) {
+            Subscene subscene = new Subscene(packet.name(), packet.description(), scene);
+            scene.addSubscene(subscene);
+        } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
+            Subscene subscene = scene.getSubsceneByName(packet.subsceneName());
+            if (subscene == null) return;
+            subscene.setName(packet.name());
+            subscene.setDescription(packet.description());
         }
     }
 }

@@ -32,6 +32,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.CameraAngle;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
@@ -108,7 +109,7 @@ public class ServerPacketHandler {
                 exitingAnimation.setDescription(packet.description());
                 NarrativeCraftFile.updateAnimationFile(oldAnimation, exitingAnimation);
                 for (Chapter chapter1 : CHAPTER_MANAGER.getChapters()) {
-                    for (Scene scene1 : chapter.getSortedSceneList()) {
+                    for (Scene scene1 : chapter1.getSortedSceneList()) {
                         NarrativeCraftFile.updateSubsceneFile(scene1);
                         NarrativeCraftFile.updateCutsceneFile(scene1);
                     }
@@ -364,6 +365,66 @@ public class ServerPacketHandler {
         } catch (Exception e) {
             Util.sendCrashMessage(player, e);
             Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+        }
+    }
+
+    public static void subsceneData(BiSubsceneDataPacket packet, ServerPlayer player) {
+        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+
+        if (packet.typeStoryData() == TypeStoryData.ADD) {
+            Subscene subscene = new Subscene(packet.name(), packet.description(), scene);
+            try {
+                scene.addSubscene(subscene);
+                NarrativeCraftFile.updateSubsceneFile(scene);
+                Util.broadcastPacket(
+                        new BiSubsceneDataPacket(
+                                packet.name(),
+                                packet.description(),
+                                chapter.getIndex(),
+                                scene.getName(),
+                                "",
+                                TypeStoryData.ADD),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
+                Services.PACKET_SENDER.sendToPlayer(
+                        player, new S2CSubscenesScreenPacket(chapter.getIndex(), scene.getName()));
+            } catch (Exception e) {
+                scene.removeSubscene(subscene);
+                Util.sendCrashMessage(player, e);
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+            }
+        } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
+            Subscene existingSubscene = scene.getSubsceneByName(packet.subsceneName());
+            if (existingSubscene == null) return;
+            Subscene oldSubscene = new Subscene(existingSubscene.getName(), existingSubscene.getDescription(), scene);
+            try {
+                existingSubscene.setName(packet.name());
+                existingSubscene.setDescription(packet.description());
+                NarrativeCraftFile.updateSubsceneFile(scene);
+                for (Chapter chapter1 : CHAPTER_MANAGER.getChapters()) {
+                    for (Scene scene1 : chapter1.getSortedSceneList()) {
+                        NarrativeCraftFile.updateCutsceneFile(scene1);
+                    }
+                }
+                Util.broadcastPacket(
+                        new BiSubsceneDataPacket(
+                                packet.name(),
+                                packet.description(),
+                                chapter.getIndex(),
+                                scene.getName(),
+                                packet.subsceneName(),
+                                TypeStoryData.EDIT),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
+                Services.PACKET_SENDER.sendToPlayer(
+                        player, new S2CSubscenesScreenPacket(chapter.getIndex(), scene.getName()));
+            } catch (Exception e) {
+                existingSubscene.setName(oldSubscene.getName());
+                existingSubscene.setDescription(oldSubscene.getDescription());
+                Util.sendCrashMessage(player, e);
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+            }
         }
     }
 }
