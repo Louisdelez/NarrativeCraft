@@ -23,7 +23,7 @@
 
 package fr.loudo.narrativecraft.screens.storyManager.chapter;
 
-import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.client.NarrativeCraftModClient;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
@@ -54,13 +54,13 @@ public class EditScreenChapterAdapter implements EditScreenAdapter<Chapter> {
             String name,
             String description) {
 
+        ChapterManager chapterManager = NarrativeCraftModClient.getInstance().getChapterManager();
+        if (chapterManager.chapterExists(name)) {
+            ScreenUtils.sendToast(
+                    Translation.message("global.error"), Translation.message("chapter.already_exists", name));
+            return;
+        }
         if (existing == null) {
-            ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
-            if (chapterManager.chapterExists(name)) {
-                ScreenUtils.sendToast(
-                        Translation.message("global.error"), Translation.message("chapter.already_exists", name));
-                return;
-            }
             Services.PACKET_SENDER.sendToServer(new BiChapterDataPacket(name, description, "", TypeStoryData.ADD));
         } else {
             Services.PACKET_SENDER.sendToServer(

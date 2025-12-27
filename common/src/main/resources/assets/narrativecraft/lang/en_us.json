@@ -46,6 +46,7 @@
 
   "narrativecraft.story.stopped": "Story stopped.",
   "narrativecraft.story.not_playing": "Story is not playing.",
+  "narrtivecraft.story.no_exists": "Your story is not compiled, make sure you compiled your story with Inky, and that you have 'story.json' in the NarrativeCraft build folder",
 
   "narrativecraft.session.set": "Your session is now set to §lChapter %d §rand §lScene %s.",
   "narrativecraft.session.set_to_player": "Session is now set to §lChapter %d §rand §lScene %s for %s.",
@@ -104,6 +105,8 @@
   "narrativecraft.interaction.already_exists": "Interaction %s already exists in %s.",
   "narrativecraft.interaction.no_exists": "Interaction %s does not exists in %s.",
   "narrativecraft.interaction.area_trigger.already_exists": "Area trigger %s already exists in %s.",
+
+  "narrativecraft.npc.already_exists": "Npc %s already exists in %s.",
 
   "narrativecraft.character.already_exists": "Character %s already exists in the story.",
   "narrativecraft.character.no_exists": "Character %s does not exists.",

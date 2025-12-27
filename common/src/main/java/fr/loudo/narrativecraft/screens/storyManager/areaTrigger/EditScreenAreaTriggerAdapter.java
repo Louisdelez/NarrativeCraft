@@ -86,15 +86,15 @@ public class EditScreenAreaTriggerAdapter implements EditScreenAdapter<AreaTrigg
             @Nullable AreaTrigger existing,
             String name,
             String description) {
+        if (interactionController.areaTriggerExists(name)) {
+            ScreenUtils.sendToast(
+                    Translation.message("global.error"),
+                    Translation.message("interaction.area_trigger.already_exists", name, interaction.getName()));
+            return;
+        }
         ScreenUtils.LabelBox stitch = (ScreenUtils.LabelBox) extraFields.get("stitch");
         Checkbox isUniqueBox = (Checkbox) extraFields.get("uniqueBox");
         if (existing == null) {
-            if (interactionController.areaTriggerExists(name)) {
-                ScreenUtils.sendToast(
-                        Translation.message("global.error"),
-                        Translation.message("interaction.area_trigger.already_exists", name, interaction.getName()));
-                return;
-            }
             AreaTrigger areaTrigger = new AreaTrigger(
                     name,
                     description,

@@ -185,6 +185,15 @@ public class Scene extends NarrativeEntry {
         npcs.remove(characterStory);
     }
 
+    public boolean npcExists(String name) {
+        for (CharacterStory characterStory : npcs) {
+            if (characterStory.getName().equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public CharacterStory getNpcByName(String name) {
         for (CharacterStory characterStory : npcs) {
             if (characterStory.getName().equalsIgnoreCase(name)) {

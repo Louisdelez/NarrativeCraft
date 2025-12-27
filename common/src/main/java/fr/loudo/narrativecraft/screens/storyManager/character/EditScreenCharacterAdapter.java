@@ -196,6 +196,12 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
             //            newCharacter = new CharacterStory(name, description, day, month, year, model,
             // CharacterType.MAIN);
         } else {
+            if (scene.npcExists(name)) {
+                ScreenUtils.sendToast(
+                        Translation.message("global.error"),
+                        Translation.message("npc.already_exists", name, scene.getName()));
+                return;
+            }
             if (existing == null) {
                 Services.PACKET_SENDER.sendToServer(new BiNpcDataPacket(
                         name,

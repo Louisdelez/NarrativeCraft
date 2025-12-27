@@ -82,13 +82,13 @@ public class EditScreenSceneAdapter implements EditScreenAdapter<Scene> {
             String name,
             String description) {
 
+        if (chapter.sceneExists(name)) {
+            ScreenUtils.sendToast(
+                    Translation.message("global.error"),
+                    Translation.message("scene.already_exists", name, chapter.getIndex()));
+            return;
+        }
         if (existing == null) {
-            if (chapter.sceneExists(name)) {
-                ScreenUtils.sendToast(
-                        Translation.message("global.error"),
-                        Translation.message("scene.already_exists", name, chapter.getIndex()));
-                return;
-            }
             Services.PACKET_SENDER.sendToServer(
                     new BiSceneDataPacket(name, description, chapter.getIndex(), -1, "", TypeStoryData.ADD));
         } else {

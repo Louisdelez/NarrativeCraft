@@ -30,6 +30,8 @@ import fr.loudo.narrativecraft.network.data.TypeStoryData;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.storyManager.EditScreenAdapter;
+import fr.loudo.narrativecraft.util.ScreenUtils;
+import fr.loudo.narrativecraft.util.Translation;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -57,6 +59,12 @@ public class EditScreenSubsceneAdapter implements EditScreenAdapter<Subscene> {
             @Nullable Subscene existing,
             String name,
             String description) {
+        if (scene.subsceneExists(name)) {
+            ScreenUtils.sendToast(
+                    Translation.message("global.error"),
+                    Translation.message("subscene.already_exists", name, scene.getName()));
+            return;
+        }
         if (existing == null) {
             Services.PACKET_SENDER.sendToServer(new BiSubsceneDataPacket(
                     name, description, scene.getChapter().getIndex(), scene.getName(), "", TypeStoryData.ADD));
