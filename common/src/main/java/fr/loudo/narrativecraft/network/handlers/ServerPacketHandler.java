@@ -36,6 +36,7 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
+import fr.loudo.narrativecraft.narrative.character.MainCharacterAttribute;
 import fr.loudo.narrativecraft.network.data.*;
 import fr.loudo.narrativecraft.network.screen.*;
 import fr.loudo.narrativecraft.platform.Services;
@@ -486,6 +487,94 @@ public class ServerPacketHandler {
             } catch (Exception e) {
                 existingSubscene.setName(oldSubscene.getName());
                 existingSubscene.setDescription(oldSubscene.getDescription());
+                Util.sendCrashMessage(player, e);
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+            }
+        }
+    }
+
+    public static void characterData(BiCharacterDataPacket packet, ServerPlayer player) {
+        CharacterStory characterStory = new CharacterStory(
+                packet.name(),
+                packet.description(),
+                packet.day(),
+                packet.month(),
+                packet.year(),
+                packet.characterModel(),
+                CharacterType.MAIN);
+        if (packet.typeStoryData() == TypeStoryData.ADD) {
+            if (CHARACTER_MANAGER.getCharacterStories().isEmpty()) {
+                characterStory.getMainCharacterAttribute().setMainCharacter(true);
+            }
+            try {
+                NarrativeCraftFile.createCharacterFolder(characterStory);
+                CHARACTER_MANAGER.addCharacter(characterStory);
+                Util.broadcastPacket(
+                        new BiCharacterDataPacket(
+                                packet.name(),
+                                packet.description(),
+                                packet.characterModel(),
+                                packet.day(),
+                                packet.month(),
+                                packet.year(),
+                                packet.showNametag(),
+                                packet.mainCharacter(),
+                                packet.sameSkinAsPlayer(),
+                                packet.sameSkinAsTheir(),
+                                packet.characterName(),
+                                TypeStoryData.ADD),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.characterManager());
+            } catch (IOException e) {
+                Util.sendCrashMessage(player, e);
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+            }
+        } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
+            CharacterStory existingCharacterStory = CHARACTER_MANAGER.getCharacterByName(packet.characterName());
+            try {
+                characterStory.setShowNametag(packet.showNametag());
+                characterStory.setMainCharacterAttribute(new MainCharacterAttribute(
+                        packet.mainCharacter(), packet.sameSkinAsPlayer(), packet.sameSkinAsTheir()));
+                NarrativeCraftFile.updateCharacterData(existingCharacterStory, characterStory);
+
+                CharacterStory currentMainCharacter = CHARACTER_MANAGER.getMainCharacter();
+                existingCharacterStory.setName(characterStory.getName());
+                existingCharacterStory.setDescription(characterStory.getDescription());
+                existingCharacterStory.setMainCharacterAttribute(characterStory.getMainCharacterAttribute());
+                existingCharacterStory.setShowNametag(characterStory.showNametag());
+                existingCharacterStory.setBirthDate(characterStory.getBirthDate());
+                existingCharacterStory.setModel(characterStory.getModel());
+                for (Chapter chapter : CHAPTER_MANAGER.getChapters()) {
+                    for (Scene scene : chapter.getSortedSceneList()) {
+                        for (Animation animation : scene.getAnimations()) {
+                            NarrativeCraftFile.updateAnimationFile(animation);
+                        }
+                        NarrativeCraftFile.updateCameraAngles(scene);
+                    }
+                }
+                if (currentMainCharacter != null
+                        && existingCharacterStory.getMainCharacterAttribute().isMainCharacter()
+                        && !currentMainCharacter.getName().equalsIgnoreCase(packet.name())) {
+                    currentMainCharacter.getMainCharacterAttribute().setMainCharacter(false);
+                    NarrativeCraftFile.updateCharacterData(currentMainCharacter, currentMainCharacter);
+                }
+                Util.broadcastPacket(
+                        new BiCharacterDataPacket(
+                                packet.name(),
+                                packet.description(),
+                                packet.characterModel(),
+                                packet.day(),
+                                packet.month(),
+                                packet.year(),
+                                packet.showNametag(),
+                                packet.mainCharacter(),
+                                packet.sameSkinAsPlayer(),
+                                packet.sameSkinAsTheir(),
+                                packet.characterName(),
+                                TypeStoryData.EDIT),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.characterManager());
+            } catch (Exception e) {
                 Util.sendCrashMessage(player, e);
                 Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
             }

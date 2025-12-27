@@ -110,4 +110,14 @@ public class CommonPacketHandlerNeoForge {
             }
         });
     }
+
+    public static void characterData(BiCharacterDataPacket packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (context.flow().isServerbound()) {
+                ServerPacketHandler.characterData(packet, (ServerPlayer) context.player());
+            } else {
+                ClientPacketHandler.characterData(packet);
+            }
+        });
+    }
 }

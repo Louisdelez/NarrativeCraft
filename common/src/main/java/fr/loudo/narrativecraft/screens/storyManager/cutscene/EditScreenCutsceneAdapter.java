@@ -59,7 +59,8 @@ public class EditScreenCutsceneAdapter implements EditScreenAdapter<Cutscene> {
             @Nullable Cutscene existing,
             String name,
             String description) {
-        if (scene.cutsceneExists(name)) {
+        if (scene.cutsceneExists(name)
+                && (existing == null || !existing.getName().equals(name))) {
             ScreenUtils.sendToast(
                     Translation.message("global.error"),
                     Translation.message("cutscene.already_exists", name, scene.getName()));

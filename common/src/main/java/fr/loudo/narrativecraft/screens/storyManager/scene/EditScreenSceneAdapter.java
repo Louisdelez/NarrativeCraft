@@ -82,7 +82,8 @@ public class EditScreenSceneAdapter implements EditScreenAdapter<Scene> {
             String name,
             String description) {
 
-        if (chapter.sceneExists(name)) {
+        if (chapter.sceneExists(name)
+                && (existing == null || !existing.getName().equals(name))) {
             ScreenUtils.sendToast(
                     Translation.message("global.error"),
                     Translation.message("scene.already_exists", name, chapter.getIndex()));

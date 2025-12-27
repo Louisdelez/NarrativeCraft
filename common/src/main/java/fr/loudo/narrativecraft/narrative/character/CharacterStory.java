@@ -44,6 +44,24 @@ public class CharacterStory extends NarrativeEntry {
     public CharacterStory(
             String name,
             String description,
+            String birthDate,
+            CharacterModel model,
+            CharacterType characterType,
+            boolean showNametag,
+            MainCharacterAttribute mainCharacterAttribute) {
+        super(name, description);
+        this.birthDate = birthDate;
+        this.model = model;
+        this.characterType = characterType;
+        this.showNametag = showNametag;
+        this.mainCharacterAttribute = mainCharacterAttribute;
+        this.entityType = EntityType.PLAYER;
+        this.entityTypeId = BuiltInRegistries.ENTITY_TYPE.getId(entityType);
+    }
+
+    public CharacterStory(
+            String name,
+            String description,
             String day,
             String month,
             String year,

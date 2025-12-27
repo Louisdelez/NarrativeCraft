@@ -59,7 +59,8 @@ public class EditScreenInteractionAdapter implements EditScreenAdapter<Interacti
             @Nullable Interaction existing,
             String name,
             String description) {
-        if (scene.interactionExists(name)) {
+        if (scene.interactionExists(name)
+                && (existing == null || !existing.getName().equals(name))) {
             ScreenUtils.sendToast(
                     Translation.message("global.error"),
                     Translation.message("interaction.already_exists", name, scene.getName()));

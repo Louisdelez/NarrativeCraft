@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.network.handlers;
 
 import fr.loudo.narrativecraft.client.NarrativeCraftModClient;
 import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
@@ -52,10 +53,13 @@ public class ClientPacketHandler {
     private static final Minecraft minecraft = Minecraft.getInstance();
     private static final ChapterManager CHAPTER_MANAGER_CLIENT =
             NarrativeCraftModClient.getInstance().getChapterManager();
+    private static final CharacterManager CHARACTER_MANAGER_CLIENT =
+            NarrativeCraftModClient.getInstance().getCharacterManager();
 
     public static void screenHandler(final S2CScreenPacket packet) {
         switch (packet.screenType()) {
             case STORY_MANAGER -> minecraft.setScreen(new ChaptersScreen());
+            case CHARACTER_MANAGER -> minecraft.setScreen(new CharactersScreen(null));
             case NONE -> minecraft.setScreen(null);
         }
     }
@@ -207,6 +211,13 @@ public class ClientPacketHandler {
         }
     }
 
+    public static void syncCharactersHandler(final S2CSyncCharactersPacket packet) {
+        CHARACTER_MANAGER_CLIENT.getCharacterStories().clear();
+        for (CharacterStory character : packet.characters()) {
+            CHARACTER_MANAGER_CLIENT.addCharacter(character);
+        }
+    }
+
     public static void syncCameraAnglesHandler(S2CSyncCameraAnglesPacket packet) {
         Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
         if (chapter != null) {
@@ -345,6 +356,39 @@ public class ClientPacketHandler {
             if (subscene == null) return;
             subscene.setName(packet.name());
             subscene.setDescription(packet.description());
+        }
+    }
+
+    public static void characterData(BiCharacterDataPacket packet) {
+        if (packet.typeStoryData() == TypeStoryData.ADD) {
+            CharacterStory characterStory = new CharacterStory(
+                    packet.name(),
+                    packet.description(),
+                    packet.day(),
+                    packet.month(),
+                    packet.year(),
+                    packet.characterModel(),
+                    CharacterType.MAIN);
+            characterStory.getMainCharacterAttribute().setMainCharacter(packet.mainCharacter());
+            characterStory.getMainCharacterAttribute().setSameSkinAsPlayer(packet.sameSkinAsPlayer());
+            characterStory.getMainCharacterAttribute().setSameSkinAsTheir(packet.sameSkinAsTheir());
+            CHARACTER_MANAGER_CLIENT.addCharacter(characterStory);
+        } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
+            CharacterStory characterStory = CHARACTER_MANAGER_CLIENT.getCharacterByName(packet.characterName());
+            if (characterStory == null) return;
+            CharacterStory currentMainCharacter = CHARACTER_MANAGER_CLIENT.getMainCharacter();
+            characterStory.setName(packet.name());
+            characterStory.setDescription(packet.description());
+            characterStory.setModel(packet.characterModel());
+            characterStory.setShowNametag(packet.showNametag());
+            characterStory.getMainCharacterAttribute().setMainCharacter(packet.mainCharacter());
+            characterStory.getMainCharacterAttribute().setSameSkinAsPlayer(packet.sameSkinAsPlayer());
+            characterStory.getMainCharacterAttribute().setSameSkinAsTheir(packet.sameSkinAsTheir());
+            if (currentMainCharacter != null
+                    && characterStory.getMainCharacterAttribute().isMainCharacter()
+                    && !currentMainCharacter.getName().equalsIgnoreCase(packet.name())) {
+                currentMainCharacter.getMainCharacterAttribute().setMainCharacter(false);
+            }
         }
     }
 }

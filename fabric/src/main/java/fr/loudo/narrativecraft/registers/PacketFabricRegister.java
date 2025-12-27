@@ -77,5 +77,8 @@ public class PacketFabricRegister {
 
         PayloadTypeRegistry.playS2C().register(BiSubsceneDataPacket.TYPE, BiSubsceneDataPacket.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(BiSubsceneDataPacket.TYPE, BiSubsceneDataPacket.STREAM_CODEC);
+
+        PayloadTypeRegistry.playS2C().register(BiCharacterDataPacket.TYPE, BiCharacterDataPacket.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(BiCharacterDataPacket.TYPE, BiCharacterDataPacket.STREAM_CODEC);
     }
 }

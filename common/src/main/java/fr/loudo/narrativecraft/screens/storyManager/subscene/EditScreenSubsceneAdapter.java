@@ -59,7 +59,8 @@ public class EditScreenSubsceneAdapter implements EditScreenAdapter<Subscene> {
             @Nullable Subscene existing,
             String name,
             String description) {
-        if (scene.subsceneExists(name)) {
+        if (scene.subsceneExists(name)
+                && (existing == null || !existing.getName().equals(name))) {
             ScreenUtils.sendToast(
                     Translation.message("global.error"),
                     Translation.message("subscene.already_exists", name, scene.getName()));

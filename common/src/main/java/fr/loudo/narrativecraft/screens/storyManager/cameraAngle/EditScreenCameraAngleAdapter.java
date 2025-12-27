@@ -59,7 +59,8 @@ public class EditScreenCameraAngleAdapter implements EditScreenAdapter<CameraAng
             @Nullable CameraAngle existing,
             String name,
             String description) {
-        if (scene.cameraAngleExists(name)) {
+        if (scene.cameraAngleExists(name)
+                && (existing == null || !existing.getName().equals(name))) {
             ScreenUtils.sendToast(
                     Translation.message("global.error"),
                     Translation.message("camera_angle.already_exists", name, scene.getName()));

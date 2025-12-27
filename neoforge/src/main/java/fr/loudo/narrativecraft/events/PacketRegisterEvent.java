@@ -83,6 +83,10 @@ public class PacketRegisterEvent {
         registrar.playToClient(
                 S2CSyncNpcsPacket.TYPE, S2CSyncNpcsPacket.STREAM_CODEC, ClientPacketHandlerNeoForge::syncNpcsHandler);
         registrar.playToClient(
+                S2CSyncCharactersPacket.TYPE,
+                S2CSyncCharactersPacket.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::syncCharactersHandler);
+        registrar.playToClient(
                 S2CSceneScreenPacket.TYPE,
                 S2CSceneScreenPacket.STREAM_CODEC,
                 ClientPacketHandlerNeoForge::openSceneScreen);
@@ -139,5 +143,9 @@ public class PacketRegisterEvent {
                 BiSubsceneDataPacket.TYPE,
                 BiSubsceneDataPacket.STREAM_CODEC,
                 CommonPacketHandlerNeoForge::subsceneData);
+        registrar.playBidirectional(
+                BiCharacterDataPacket.TYPE,
+                BiCharacterDataPacket.STREAM_CODEC,
+                CommonPacketHandlerNeoForge::characterData);
     }
 }

@@ -78,6 +78,9 @@ public class ClientPacketHandlerFabric {
         ClientPlayNetworking.registerGlobalReceiver(S2CSyncNpcsPacket.TYPE, (payload, context) -> {
             ClientPacketHandler.syncNpcsHandler(payload);
         });
+        ClientPlayNetworking.registerGlobalReceiver(S2CSyncCharactersPacket.TYPE, (payload, context) -> {
+            ClientPacketHandler.syncCharactersHandler(payload);
+        });
         ClientPlayNetworking.registerGlobalReceiver(S2CSyncCameraAnglesPacket.TYPE, (payload, context) -> {
             ClientPacketHandler.syncCameraAnglesHandler(payload);
         });
@@ -102,6 +105,9 @@ public class ClientPacketHandlerFabric {
         });
         ClientPlayNetworking.registerGlobalReceiver(BiSubsceneDataPacket.TYPE, (payload, context) -> {
             ClientPacketHandler.subsceneData(payload);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(BiCharacterDataPacket.TYPE, (payload, context) -> {
+            ClientPacketHandler.characterData(payload);
         });
     }
 }

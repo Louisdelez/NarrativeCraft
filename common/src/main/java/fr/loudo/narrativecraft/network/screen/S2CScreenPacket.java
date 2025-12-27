@@ -49,12 +49,17 @@ public record S2CScreenPacket(ScreenType screenType) implements CustomPacketPayl
         return new S2CScreenPacket(ScreenType.STORY_MANAGER);
     }
 
+    public static S2CScreenPacket characterManager() {
+        return new S2CScreenPacket(ScreenType.CHARACTER_MANAGER);
+    }
+
     public static S2CScreenPacket none() {
         return new S2CScreenPacket(ScreenType.NONE);
     }
 
     public enum ScreenType {
         STORY_MANAGER,
+        CHARACTER_MANAGER,
         NONE;
     }
 }

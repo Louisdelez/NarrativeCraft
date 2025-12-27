@@ -84,6 +84,12 @@ public class ClientPacketHandlerNeoForge {
         });
     }
 
+    public static void syncCharactersHandler(final S2CSyncCharactersPacket packet, final IPayloadContext context) {
+        context.enqueueWork(() -> {
+            ClientPacketHandler.syncCharactersHandler(packet);
+        });
+    }
+
     public static void openSceneScreen(S2CSceneScreenPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
             ClientPacketHandler.openSceneScreen(packet);

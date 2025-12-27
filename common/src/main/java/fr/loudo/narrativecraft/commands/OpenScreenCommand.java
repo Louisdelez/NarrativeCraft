@@ -80,8 +80,6 @@ public class OpenScreenCommand {
             return 0;
         }
         if (playerSession.getStoryHandler() != null) return 0;
-        //        ChaptersScreen chaptersScreen = new ChaptersScreen();
-        //        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(chaptersScreen));
         Services.PACKET_SENDER.sendToPlayer(context.getSource().getPlayer(), S2CScreenPacket.storyManager());
 
         return Command.SINGLE_SUCCESS;
@@ -99,8 +97,7 @@ public class OpenScreenCommand {
             playerSession.getPlayer().sendSystemMessage(Translation.message("record.cant_access"));
             return 0;
         }
-        //        CharactersScreen screen = new CharactersScreen(null);
-        //        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(screen));
+        Services.PACKET_SENDER.sendToPlayer(context.getSource().getPlayer(), S2CScreenPacket.characterManager());
         return Command.SINGLE_SUCCESS;
     }
 

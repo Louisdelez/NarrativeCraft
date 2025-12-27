@@ -118,5 +118,9 @@ public class OnPlayerServerConnection {
                         player, new S2CSyncNpcsPacket(chapter.getIndex(), scene.getName(), scene.getNpcs()));
             }
         }
+        Services.PACKET_SENDER.sendToPlayer(
+                player,
+                new S2CSyncCharactersPacket(
+                        NarrativeCraftMod.getInstance().getCharacterManager().getCharacterStories()));
     }
 }

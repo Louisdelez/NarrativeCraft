@@ -60,7 +60,7 @@ public class EditScreenAnimationAdapter implements EditScreenAdapter<Animation> 
             String name,
             String description) {
         if (existing == null) return;
-        if (scene.animationExists(name)) {
+        if (scene.animationExists(name) && !existing.getName().equals(name)) {
             ScreenUtils.sendToast(
                     Translation.message("global.error"),
                     Translation.message("animation.already_exists", name, scene.getName()));

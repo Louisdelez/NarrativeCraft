@@ -55,7 +55,8 @@ public class EditScreenChapterAdapter implements EditScreenAdapter<Chapter> {
             String description) {
 
         ChapterManager chapterManager = NarrativeCraftModClient.getInstance().getChapterManager();
-        if (chapterManager.chapterExists(name)) {
+        if (chapterManager.chapterExists(name)
+                && (existing == null || !existing.getName().equals(name))) {
             ScreenUtils.sendToast(
                     Translation.message("global.error"), Translation.message("chapter.already_exists", name));
             return;
