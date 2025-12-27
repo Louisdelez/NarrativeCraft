@@ -98,6 +98,10 @@ public class PacketRegisterEvent {
                 S2CCutscenesScreenPacket.TYPE,
                 S2CCutscenesScreenPacket.STREAM_CODEC,
                 ClientPacketHandlerNeoForge::openCutsceneScreen);
+        registrar.playToClient(
+                S2CInteractionsScreenPacket.TYPE,
+                S2CInteractionsScreenPacket.STREAM_CODEC,
+                ClientPacketHandlerNeoForge::openInteractionScreen);
     }
 
     public static void registerBi(PayloadRegistrar registrar) {
@@ -119,5 +123,9 @@ public class PacketRegisterEvent {
                 BiCutsceneDataPacket.TYPE,
                 BiCutsceneDataPacket.STREAM_CODEC,
                 CommonPacketHandlerNeoForge::cutsceneData);
+        registrar.playBidirectional(
+                BiInteractionDataPacket.TYPE,
+                BiInteractionDataPacket.STREAM_CODEC,
+                CommonPacketHandlerNeoForge::interactionData);
     }
 }

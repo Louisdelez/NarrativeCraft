@@ -23,14 +23,8 @@
 
 package fr.loudo.narrativecraft.registers;
 
-import fr.loudo.narrativecraft.network.data.BiAnimationDataPacket;
-import fr.loudo.narrativecraft.network.data.BiCameraAngleDataPacket;
-import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
-import fr.loudo.narrativecraft.network.data.BiSceneDataPacket;
-import fr.loudo.narrativecraft.network.screen.S2CAnimationsScreenPacket;
-import fr.loudo.narrativecraft.network.screen.S2CCameraAnglesScreenPacket;
-import fr.loudo.narrativecraft.network.screen.S2CSceneScreenPacket;
-import fr.loudo.narrativecraft.network.screen.S2CScreenPacket;
+import fr.loudo.narrativecraft.network.data.*;
+import fr.loudo.narrativecraft.network.screen.*;
 import fr.loudo.narrativecraft.network.storyDataSyncs.*;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
@@ -47,6 +41,7 @@ public class PacketFabricRegister {
         PayloadTypeRegistry.playS2C().register(S2CAnimationsScreenPacket.TYPE, S2CAnimationsScreenPacket.STREAM_CODEC);
         PayloadTypeRegistry.playS2C()
                 .register(S2CCameraAnglesScreenPacket.TYPE, S2CCameraAnglesScreenPacket.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CInteractionsScreenPacket.TYPE, S2CInteractionsScreenPacket.STREAM_CODEC);
 
         PayloadTypeRegistry.playS2C().register(S2CSyncChaptersPacket.TYPE, S2CSyncChaptersPacket.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(S2CSyncScenesPacket.TYPE, S2CSyncScenesPacket.STREAM_CODEC);
@@ -70,5 +65,8 @@ public class PacketFabricRegister {
 
         PayloadTypeRegistry.playS2C().register(BiCameraAngleDataPacket.TYPE, BiCameraAngleDataPacket.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(BiCameraAngleDataPacket.TYPE, BiCameraAngleDataPacket.STREAM_CODEC);
+
+        PayloadTypeRegistry.playS2C().register(BiInteractionDataPacket.TYPE, BiInteractionDataPacket.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(BiInteractionDataPacket.TYPE, BiInteractionDataPacket.STREAM_CODEC);
     }
 }

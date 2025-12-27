@@ -80,4 +80,14 @@ public class CommonPacketHandlerNeoForge {
             }
         });
     }
+
+    public static void interactionData(BiInteractionDataPacket packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (context.flow().isServerbound()) {
+                ServerPacketHandler.interactionData(packet, (ServerPlayer) context.player());
+            } else {
+                ClientPacketHandler.interactionData(packet);
+            }
+        });
+    }
 }

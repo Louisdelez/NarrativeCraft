@@ -40,6 +40,7 @@ import fr.loudo.narrativecraft.screens.storyManager.animations.AnimationsScreen;
 import fr.loudo.narrativecraft.screens.storyManager.cameraAngle.CameraAngleScreen;
 import fr.loudo.narrativecraft.screens.storyManager.chapter.ChaptersScreen;
 import fr.loudo.narrativecraft.screens.storyManager.cutscene.CutscenesScreen;
+import fr.loudo.narrativecraft.screens.storyManager.interaction.InteractionsScreen;
 import fr.loudo.narrativecraft.screens.storyManager.scene.ScenesScreen;
 import net.minecraft.client.Minecraft;
 
@@ -87,6 +88,15 @@ public class ClientPacketHandler {
         if (scene == null) return;
 
         minecraft.setScreen(new CutscenesScreen(scene));
+    }
+
+    public static void openInteractionScreen(S2CInteractionsScreenPacket packet) {
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+
+        minecraft.setScreen(new InteractionsScreen(scene));
     }
 
     public static void syncChaptersHandler(final S2CSyncChaptersPacket packet) {
@@ -249,6 +259,21 @@ public class ClientPacketHandler {
             Cutscene cutscene = scene.getCutsceneByName(packet.cutsceneName());
             cutscene.setName(packet.name());
             cutscene.setDescription(packet.description());
+        }
+    }
+
+    public static void interactionData(BiInteractionDataPacket packet) {
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+        if (packet.typeStoryData() == TypeStoryData.ADD) {
+            Interaction interaction = new Interaction(packet.name(), packet.description(), scene);
+            scene.addInteraction(interaction);
+        } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
+            Interaction interaction = scene.getInteractionByName(packet.interactionName());
+            interaction.setName(packet.name());
+            interaction.setDescription(packet.description());
         }
     }
 }

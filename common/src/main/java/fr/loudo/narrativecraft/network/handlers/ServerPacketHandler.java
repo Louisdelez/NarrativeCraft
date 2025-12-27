@@ -31,11 +31,15 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.CameraAngle;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.Interaction;
 import fr.loudo.narrativecraft.network.data.*;
 import fr.loudo.narrativecraft.network.screen.*;
 import fr.loudo.narrativecraft.platform.Services;
+import fr.loudo.narrativecraft.screens.storyManager.interaction.InteractionsScreen;
 import fr.loudo.narrativecraft.util.Util;
 import net.minecraft.server.level.ServerPlayer;
+
+import java.io.IOException;
 
 public class ServerPacketHandler {
 
@@ -227,6 +231,58 @@ public class ServerPacketHandler {
             } catch (Exception e) {
                 existingCutscene.setName(oldCutscene.getName());
                 existingCutscene.setDescription(oldCutscene.getDescription());
+                Util.sendCrashMessage(player, e);
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+            }
+        }
+    }
+
+    public static void interactionData(BiInteractionDataPacket packet, ServerPlayer player) {
+        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+        if (packet.typeStoryData() == TypeStoryData.ADD) {
+            Interaction interaction = new Interaction(packet.name(), packet.description(), scene);
+            try {
+                scene.addInteraction(interaction);
+                NarrativeCraftFile.updateInteractionsFile(scene);
+                Util.broadcastPacket(
+                        new BiInteractionDataPacket(
+                                packet.name(),
+                                packet.description(),
+                                chapter.getIndex(),
+                                scene.getName(),
+                                "",
+                                TypeStoryData.ADD),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
+                Services.PACKET_SENDER.sendToPlayer(player, new S2CInteractionsScreenPacket(chapter.getIndex(), scene.getName()));
+            } catch (IOException e) {
+                scene.removeInteraction(interaction);
+                Util.sendCrashMessage(player, e);
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+            }
+        }  else if (packet.typeStoryData() == TypeStoryData.EDIT) {
+            Interaction existingInteraction = scene.getInteractionByName(packet.interactionName());
+            Interaction oldInteraction = new Interaction(existingInteraction.getName(), existingInteraction.getDescription(), scene);
+
+            try {
+                existingInteraction.setName(packet.name());
+                existingInteraction.setDescription(packet.description());
+                NarrativeCraftFile.updateInteractionsFile(scene);
+                Util.broadcastPacket(
+                        new BiInteractionDataPacket(
+                                packet.name(),
+                                packet.description(),
+                                chapter.getIndex(),
+                                scene.getName(),
+                                "",
+                                TypeStoryData.EDIT),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
+                Services.PACKET_SENDER.sendToPlayer(player, new S2CInteractionsScreenPacket(chapter.getIndex(), scene.getName()));
+            } catch (Exception e) {
+                existingInteraction.setName(oldInteraction.getName());
+                existingInteraction.setDescription(oldInteraction.getDescription());
                 Util.sendCrashMessage(player, e);
                 Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
             }

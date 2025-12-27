@@ -45,5 +45,8 @@ public class ServerPacketHandlerFabric {
         ServerPlayNetworking.registerGlobalReceiver(BiCutsceneDataPacket.TYPE, (payload, context) -> {
             ServerPacketHandler.cutsceneData(payload, context.player());
         });
+        ServerPlayNetworking.registerGlobalReceiver(BiInteractionDataPacket.TYPE, (payload, context) -> {
+            ServerPacketHandler.interactionData(payload, context.player());
+        });
     }
 }

@@ -107,4 +107,10 @@ public class ClientPacketHandlerNeoForge {
             ClientPacketHandler.openCutscenesScreen(packet);
         });
     }
+
+    public static void openInteractionScreen(S2CInteractionsScreenPacket packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            ClientPacketHandler.openInteractionScreen(packet);
+        });
+    }
 }

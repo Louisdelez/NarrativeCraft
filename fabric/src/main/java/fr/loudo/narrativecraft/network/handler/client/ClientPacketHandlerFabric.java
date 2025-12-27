@@ -47,6 +47,9 @@ public class ClientPacketHandlerFabric {
         ClientPlayNetworking.registerGlobalReceiver(S2CCutscenesScreenPacket.TYPE, (payload, context) -> {
             ClientPacketHandler.openCutscenesScreen(payload);
         });
+        ClientPlayNetworking.registerGlobalReceiver(S2CInteractionsScreenPacket.TYPE, (payload, context) -> {
+            ClientPacketHandler.openInteractionScreen(payload);
+        });
 
         ClientPlayNetworking.registerGlobalReceiver(S2CSyncChaptersPacket.TYPE, (payload, context) -> {
             ClientPacketHandler.syncChaptersHandler(payload);
