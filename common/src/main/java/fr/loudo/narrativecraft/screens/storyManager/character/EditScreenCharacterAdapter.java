@@ -26,13 +26,13 @@ package fr.loudo.narrativecraft.screens.storyManager.character;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.managers.CharacterManager;
-import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.character.CharacterModel;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
-import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.narrative.character.MainCharacterAttribute;
+import fr.loudo.narrativecraft.network.data.BiNpcDataPacket;
+import fr.loudo.narrativecraft.network.data.TypeStoryData;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.screens.characters.CharacterAdvancedScreen;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.storyManager.EditScreenAdapter;
@@ -41,7 +41,6 @@ import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -194,69 +193,91 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
             String year = ((ScreenUtils.LabelBox) extraFields.get("year"))
                     .getEditBox()
                     .getValue();
-            newCharacter = new CharacterStory(name, description, day, month, year, model, CharacterType.MAIN);
+            //            newCharacter = new CharacterStory(name, description, day, month, year, model,
+            // CharacterType.MAIN);
         } else {
-            newCharacter = new CharacterStory(name, description, "You", "are", "handsome <3", model, CharacterType.NPC);
-        }
-        if (existing == null) {
-            if (characterManager.characterExists(name)) {
-                ScreenUtils.sendToast(
-                        Translation.message("global.error"), Translation.message("character.already_exists", name));
-                return;
-            }
-            try {
-                if (scene == null) {
-                    if (characterManager.getCharacterStories().isEmpty()) {
-                        newCharacter.getMainCharacterAttribute().setMainCharacter(true);
-                    }
-                    NarrativeCraftFile.createCharacterFolder(newCharacter);
-                    characterManager.addCharacter(newCharacter);
-                } else {
-                    NarrativeCraftFile.createCharacterFolder(newCharacter, scene);
-                    scene.addNpc(newCharacter);
-                }
-                newCharacter.setMainCharacterAttribute(attribute);
-                updateMainCharacter(currentMainCharacter, newCharacter);
-                minecraft.setScreen(new CharactersScreen(scene));
-            } catch (Exception e) {
-                Util.sendCrashMessage(minecraft.player, e);
-                minecraft.setScreen(null);
-            }
-        } else {
-            List<Chapter> chapters =
-                    NarrativeCraftMod.getInstance().getChapterManager().getChapters();
-            try {
-                newCharacter.setShowNametag(existing.showNametag());
-                if (scene == null) {
-                    newCharacter.setMainCharacterAttribute(existing.getMainCharacterAttribute());
-                    NarrativeCraftFile.updateCharacterData(existing, newCharacter);
-                } else {
-                    newCharacter.setMainCharacterAttribute(null);
-                    NarrativeCraftFile.updateCharacterData(existing, newCharacter, scene);
-                }
-                existing.setName(newCharacter.getName());
-                existing.setDescription(newCharacter.getDescription());
-                existing.setMainCharacterAttribute(newCharacter.getMainCharacterAttribute());
-                existing.setShowNametag(newCharacter.showNametag());
-                if (scene == null) {
-                    existing.setBirthDate(newCharacter.getBirthDate());
-                }
-                existing.setModel(newCharacter.getModel());
-                for (Chapter chapter : chapters) {
-                    for (Scene scene : chapter.getSortedSceneList()) {
-                        for (Animation animation : scene.getAnimations()) {
-                            NarrativeCraftFile.updateAnimationFile(animation);
-                        }
-                        NarrativeCraftFile.updateCameraAngles(scene);
-                    }
-                }
-                updateMainCharacter(currentMainCharacter, newCharacter);
-                minecraft.setScreen(new CharactersScreen(scene));
-            } catch (Exception e) {
-                Util.sendCrashMessage(minecraft.player, e);
-                minecraft.setScreen(null);
+            if (existing == null) {
+                Services.PACKET_SENDER.sendToServer(new BiNpcDataPacket(
+                        name,
+                        description,
+                        model,
+                        false,
+                        scene.getChapter().getIndex(),
+                        scene.getName(),
+                        "",
+                        TypeStoryData.ADD));
+            } else {
+                Services.PACKET_SENDER.sendToServer(new BiNpcDataPacket(
+                        name,
+                        description,
+                        model,
+                        existing.showNametag(),
+                        scene.getChapter().getIndex(),
+                        scene.getName(),
+                        existing.getName(),
+                        TypeStoryData.EDIT));
             }
         }
+        //        if (existing == null) {
+        //            if (characterManager.characterExists(name)) {
+        //                ScreenUtils.sendToast(
+        //                        Translation.message("global.error"), Translation.message("character.already_exists",
+        // name));
+        //                return;
+        //            }
+        //            try {
+        //                if (scene == null) {
+        //                    if (characterManager.getCharacterStories().isEmpty()) {
+        //                        newCharacter.getMainCharacterAttribute().setMainCharacter(true);
+        //                    }
+        //                    NarrativeCraftFile.createCharacterFolder(newCharacter);
+        //                    characterManager.addCharacter(newCharacter);
+        //                } else {
+        //                    NarrativeCraftFile.createCharacterFolder(newCharacter, scene);
+        //                    scene.addNpc(newCharacter);
+        //                }
+        //                newCharacter.setMainCharacterAttribute(attribute);
+        //                updateMainCharacter(currentMainCharacter, newCharacter);
+        //                minecraft.setScreen(new CharactersScreen(scene));
+        //            } catch (Exception e) {
+        //                Util.sendCrashMessage(minecraft.player, e);
+        //                minecraft.setScreen(null);
+        //            }
+        //        } else {
+        //            List<Chapter> chapters =
+        //                    NarrativeCraftMod.getInstance().getChapterManager().getChapters();
+        //            try {
+        //                newCharacter.setShowNametag(existing.showNametag());
+        //                if (scene == null) {
+        //                    newCharacter.setMainCharacterAttribute(existing.getMainCharacterAttribute());
+        //                    NarrativeCraftFile.updateCharacterData(existing, newCharacter);
+        //                } else {
+        //                    newCharacter.setMainCharacterAttribute(null);
+        //                    NarrativeCraftFile.updateCharacterData(existing, newCharacter, scene);
+        //                }
+        //                existing.setName(newCharacter.getName());
+        //                existing.setDescription(newCharacter.getDescription());
+        //                existing.setMainCharacterAttribute(newCharacter.getMainCharacterAttribute());
+        //                existing.setShowNametag(newCharacter.showNametag());
+        //                if (scene == null) {
+        //                    existing.setBirthDate(newCharacter.getBirthDate());
+        //                }
+        //                existing.setModel(newCharacter.getModel());
+        //                for (Chapter chapter : chapters) {
+        //                    for (Scene scene : chapter.getSortedSceneList()) {
+        //                        for (Animation animation : scene.getAnimations()) {
+        //                            NarrativeCraftFile.updateAnimationFile(animation);
+        //                        }
+        //                        NarrativeCraftFile.updateCameraAngles(scene);
+        //                    }
+        //                }
+        //                updateMainCharacter(currentMainCharacter, newCharacter);
+        //                minecraft.setScreen(new CharactersScreen(scene));
+        //            } catch (Exception e) {
+        //                Util.sendCrashMessage(minecraft.player, e);
+        //                minecraft.setScreen(null);
+        //            }
+        //        }
     }
 
     private void updateMainCharacter(CharacterStory currentMainCharacter, CharacterStory newCharacter)

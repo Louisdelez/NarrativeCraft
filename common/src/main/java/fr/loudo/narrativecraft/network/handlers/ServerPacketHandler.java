@@ -26,25 +26,28 @@ package fr.loudo.narrativecraft.network.handlers;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.managers.ChapterManager;
+import fr.loudo.narrativecraft.managers.CharacterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.CameraAngle;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.Interaction;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.network.data.*;
 import fr.loudo.narrativecraft.network.screen.*;
 import fr.loudo.narrativecraft.platform.Services;
-import fr.loudo.narrativecraft.screens.storyManager.interaction.InteractionsScreen;
 import fr.loudo.narrativecraft.util.Util;
-import net.minecraft.server.level.ServerPlayer;
-
 import java.io.IOException;
+import net.minecraft.server.level.ServerPlayer;
 
 public class ServerPacketHandler {
 
     private static final ChapterManager CHAPTER_MANAGER =
             NarrativeCraftMod.getInstance().getChapterManager();
+    private static final CharacterManager CHARACTER_MANAGER =
+            NarrativeCraftMod.getInstance().getCharacterManager();
 
     public static void chapterData(BiChapterDataPacket packet, ServerPlayer player) {
         ChapterManager chapterManager = NarrativeCraftMod.getInstance().getChapterManager();
@@ -212,6 +215,7 @@ public class ServerPacketHandler {
             }
         } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
             Cutscene existingCutscene = scene.getCutsceneByName(packet.cutsceneName());
+            if (existingCutscene == null) return;
             Cutscene oldCutscene = new Cutscene(existingCutscene.getName(), existingCutscene.getDescription(), scene);
             try {
                 existingCutscene.setName(packet.name());
@@ -256,15 +260,18 @@ public class ServerPacketHandler {
                                 "",
                                 TypeStoryData.ADD),
                         NarrativeCraftMod.server.getPlayerList().getPlayers());
-                Services.PACKET_SENDER.sendToPlayer(player, new S2CInteractionsScreenPacket(chapter.getIndex(), scene.getName()));
+                Services.PACKET_SENDER.sendToPlayer(
+                        player, new S2CInteractionsScreenPacket(chapter.getIndex(), scene.getName()));
             } catch (IOException e) {
                 scene.removeInteraction(interaction);
                 Util.sendCrashMessage(player, e);
                 Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
             }
-        }  else if (packet.typeStoryData() == TypeStoryData.EDIT) {
+        } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
             Interaction existingInteraction = scene.getInteractionByName(packet.interactionName());
-            Interaction oldInteraction = new Interaction(existingInteraction.getName(), existingInteraction.getDescription(), scene);
+            if (existingInteraction == null) return;
+            Interaction oldInteraction =
+                    new Interaction(existingInteraction.getName(), existingInteraction.getDescription(), scene);
 
             try {
                 existingInteraction.setName(packet.name());
@@ -279,13 +286,84 @@ public class ServerPacketHandler {
                                 "",
                                 TypeStoryData.EDIT),
                         NarrativeCraftMod.server.getPlayerList().getPlayers());
-                Services.PACKET_SENDER.sendToPlayer(player, new S2CInteractionsScreenPacket(chapter.getIndex(), scene.getName()));
+                Services.PACKET_SENDER.sendToPlayer(
+                        player, new S2CInteractionsScreenPacket(chapter.getIndex(), scene.getName()));
             } catch (Exception e) {
                 existingInteraction.setName(oldInteraction.getName());
                 existingInteraction.setDescription(oldInteraction.getDescription());
                 Util.sendCrashMessage(player, e);
                 Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
             }
+        }
+    }
+
+    public static void npcData(BiNpcDataPacket packet, ServerPlayer player) {
+        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+
+        CharacterStory characterStory = new CharacterStory(
+                packet.name(),
+                packet.description(),
+                "GG",
+                "you found",
+                "an easter egg, you like being curious don't you?",
+                packet.characterModel(),
+                CharacterType.NPC);
+        characterStory.setMainCharacterAttribute(null);
+        try {
+            if (packet.typeStoryData() == TypeStoryData.ADD) {
+                NarrativeCraftFile.createCharacterFolder(characterStory, scene);
+                Util.broadcastPacket(
+                        new BiNpcDataPacket(
+                                packet.name(),
+                                packet.description(),
+                                packet.characterModel(),
+                                packet.showNametag(),
+                                chapter.getIndex(),
+                                scene.getName(),
+                                "",
+                                TypeStoryData.ADD),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
+                scene.addNpc(characterStory);
+                Services.PACKET_SENDER.sendToPlayer(
+                        player, new S2CNpcsScreenPacket(chapter.getIndex(), scene.getName()));
+            } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
+                CharacterStory existingCharacter = scene.getNpcByName(packet.npcName());
+                if (existingCharacter == null) return;
+                characterStory.setShowNametag(packet.showNametag());
+                NarrativeCraftFile.updateCharacterData(existingCharacter, characterStory, scene);
+                existingCharacter.setName(characterStory.getName());
+                existingCharacter.setDescription(characterStory.getDescription());
+                existingCharacter.setShowNametag(characterStory.showNametag());
+                existingCharacter.setModel(characterStory.getModel());
+                existingCharacter.setShowNametag(characterStory.showNametag());
+                for (Chapter chapter1 : CHAPTER_MANAGER.getChapters()) {
+                    for (Scene scene1 : chapter1.getSortedSceneList()) {
+                        for (Animation animation : scene1.getAnimations()) {
+                            NarrativeCraftFile.updateAnimationFile(animation);
+                        }
+                        NarrativeCraftFile.updateCameraAngles(scene);
+                    }
+                }
+                Util.broadcastPacket(
+                        new BiNpcDataPacket(
+                                packet.name(),
+                                packet.description(),
+                                packet.characterModel(),
+                                packet.showNametag(),
+                                chapter.getIndex(),
+                                scene.getName(),
+                                packet.npcName(),
+                                TypeStoryData.EDIT),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
+                Services.PACKET_SENDER.sendToPlayer(
+                        player, new S2CNpcsScreenPacket(chapter.getIndex(), scene.getName()));
+            }
+        } catch (Exception e) {
+            Util.sendCrashMessage(player, e);
+            Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
         }
     }
 }

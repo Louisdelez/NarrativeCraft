@@ -78,8 +78,7 @@ public class EditInfoScreen<T extends NarrativeEntry> extends Screen {
             "Play Signalis",
             "The pain of your absence is sharp and haunting\nAnd i would give anything not to know it; anything but never knowing you at all, which would be worse",
             "The amazing digital circus is the best animation out there",
-            "1, 2, 3, 4, 5, 6.... 7\nDid you get it??"
-    );
+            "1, 2, 3, 4, 5, 6.... 7\nDid you get it??");
 
     /**
      * Creates a new {@code EditInfoScreen}.

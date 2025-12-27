@@ -33,12 +33,14 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.Interaction;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.network.data.*;
 import fr.loudo.narrativecraft.network.screen.*;
 import fr.loudo.narrativecraft.network.storyDataSyncs.*;
 import fr.loudo.narrativecraft.screens.storyManager.animations.AnimationsScreen;
 import fr.loudo.narrativecraft.screens.storyManager.cameraAngle.CameraAngleScreen;
 import fr.loudo.narrativecraft.screens.storyManager.chapter.ChaptersScreen;
+import fr.loudo.narrativecraft.screens.storyManager.character.CharactersScreen;
 import fr.loudo.narrativecraft.screens.storyManager.cutscene.CutscenesScreen;
 import fr.loudo.narrativecraft.screens.storyManager.interaction.InteractionsScreen;
 import fr.loudo.narrativecraft.screens.storyManager.scene.ScenesScreen;
@@ -97,6 +99,15 @@ public class ClientPacketHandler {
         if (scene == null) return;
 
         minecraft.setScreen(new InteractionsScreen(scene));
+    }
+
+    public static void openNpcsScreen(S2CNpcsScreenPacket packet) {
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+
+        minecraft.setScreen(new CharactersScreen(scene));
     }
 
     public static void syncChaptersHandler(final S2CSyncChaptersPacket packet) {
@@ -274,6 +285,25 @@ public class ClientPacketHandler {
             Interaction interaction = scene.getInteractionByName(packet.interactionName());
             interaction.setName(packet.name());
             interaction.setDescription(packet.description());
+        }
+    }
+
+    public static void npcData(BiNpcDataPacket packet) {
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+        if (packet.typeStoryData() == TypeStoryData.ADD) {
+            CharacterStory characterStory =
+                    new CharacterStory(packet.name(), packet.description(), CharacterType.NPC, packet.characterModel());
+            scene.addNpc(characterStory);
+        } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
+            CharacterStory characterStory = scene.getNpcByName(packet.npcName());
+            if (characterStory == null) return;
+            characterStory.setName(packet.name());
+            characterStory.setDescription(packet.description());
+            characterStory.setModel(packet.characterModel());
+            characterStory.setShowNametag(packet.showNametag());
         }
     }
 }

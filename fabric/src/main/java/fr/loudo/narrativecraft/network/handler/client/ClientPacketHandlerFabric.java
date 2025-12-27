@@ -50,6 +50,9 @@ public class ClientPacketHandlerFabric {
         ClientPlayNetworking.registerGlobalReceiver(S2CInteractionsScreenPacket.TYPE, (payload, context) -> {
             ClientPacketHandler.openInteractionScreen(payload);
         });
+        ClientPlayNetworking.registerGlobalReceiver(S2CNpcsScreenPacket.TYPE, (payload, context) -> {
+            ClientPacketHandler.openNpcsScreen(payload);
+        });
 
         ClientPlayNetworking.registerGlobalReceiver(S2CSyncChaptersPacket.TYPE, (payload, context) -> {
             ClientPacketHandler.syncChaptersHandler(payload);
@@ -90,6 +93,9 @@ public class ClientPacketHandlerFabric {
         });
         ClientPlayNetworking.registerGlobalReceiver(BiCutsceneDataPacket.TYPE, (payload, context) -> {
             ClientPacketHandler.cutsceneData(payload);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(BiNpcDataPacket.TYPE, (payload, context) -> {
+            ClientPacketHandler.npcData(payload);
         });
     }
 }

@@ -90,4 +90,14 @@ public class CommonPacketHandlerNeoForge {
             }
         });
     }
+
+    public static void npcData(BiNpcDataPacket packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (context.flow().isServerbound()) {
+                ServerPacketHandler.npcData(packet, (ServerPlayer) context.player());
+            } else {
+                ClientPacketHandler.npcData(packet);
+            }
+        });
+    }
 }
