@@ -44,14 +44,11 @@ import fr.loudo.narrativecraft.util.Util;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.regex.Matcher;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.entity.player.PlayerSkin;
 import net.minecraft.world.level.storage.LevelResource;
 
 public class NarrativeCraftFile extends AbstractNarrativeCraftFile {
@@ -402,46 +399,19 @@ public class NarrativeCraftFile extends AbstractNarrativeCraftFile {
 
     public static void createCharacterFolder(CharacterStory characterStory) throws IOException {
         File characterFolder = getCharacterFolder(characterStory);
-        File skinsFolder = createDirectory(characterFolder, SKINS_FOLDER_NAME);
         File dataFile = getDataFile(characterFolder);
-        File mainSkinFile = createFile(skinsFolder, "main.png");
-        PlayerSkin defaultPlayerSkin = DefaultPlayerSkin.get(UUID.randomUUID());
-        try (InputStream inputStream = Minecraft.getInstance()
-                .getResourceManager()
-                .open(defaultPlayerSkin.body().texturePath())) {
-            Files.copy(inputStream, mainSkinFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException ignored) {
-        }
         Gson gson = new Gson();
         try (Writer writer = new BufferedWriter(new FileWriter(dataFile))) {
             gson.toJson(characterStory, writer);
-        }
-        try {
-            characterStory.setModel(
-                    CharacterModel.valueOf(defaultPlayerSkin.model().name()));
-        } catch (IllegalArgumentException ignored) {
         }
     }
 
     public static void createCharacterFolder(CharacterStory characterStory, Scene scene) throws IOException {
         File characterFolder = getCharacterFolder(characterStory, scene);
-        File mainSkinFile = createFile(characterFolder, "main.png");
         File dataFile = createFile(characterFolder, DATA_FILE_NAME);
-        PlayerSkin defaultPlayerSkin = DefaultPlayerSkin.get(UUID.randomUUID());
-        try (InputStream inputStream = Minecraft.getInstance()
-                .getResourceManager()
-                .open(defaultPlayerSkin.body().texturePath())) {
-            Files.copy(inputStream, mainSkinFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException ignored) {
-        }
         Gson gson = new Gson();
         try (Writer writer = new BufferedWriter(new FileWriter(dataFile))) {
             gson.toJson(characterStory, writer);
-        }
-        try {
-            characterStory.setModel(
-                    CharacterModel.valueOf(defaultPlayerSkin.model().name()));
-        } catch (IllegalArgumentException ignored) {
         }
     }
 

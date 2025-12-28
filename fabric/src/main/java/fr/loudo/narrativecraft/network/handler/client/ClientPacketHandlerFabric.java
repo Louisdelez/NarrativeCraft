@@ -106,6 +106,9 @@ public class ClientPacketHandlerFabric {
         ClientPlayNetworking.registerGlobalReceiver(BiSubsceneDataPacket.TYPE, (payload, context) -> {
             ClientPacketHandler.subsceneData(payload);
         });
+        ClientPlayNetworking.registerGlobalReceiver(BiNpcDataPacket.TYPE, (payload, context) -> {
+            ClientPacketHandler.npcData(payload);
+        });
         ClientPlayNetworking.registerGlobalReceiver(BiCharacterDataPacket.TYPE, (payload, context) -> {
             ClientPacketHandler.characterData(payload);
         });

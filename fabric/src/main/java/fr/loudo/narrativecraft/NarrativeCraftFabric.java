@@ -26,7 +26,6 @@ package fr.loudo.narrativecraft;
 import fr.loudo.narrativecraft.network.handler.server.ServerPacketHandlerFabric;
 import fr.loudo.narrativecraft.registers.CommandsRegister;
 import fr.loudo.narrativecraft.registers.EventsRegister;
-import fr.loudo.narrativecraft.registers.ModKeysRegister;
 import fr.loudo.narrativecraft.registers.PacketFabricRegister;
 import net.fabricmc.api.ModInitializer;
 
@@ -37,8 +36,7 @@ public class NarrativeCraftFabric implements ModInitializer {
 
         NarrativeCraftMod.commonInit();
         CommandsRegister.register();
-        EventsRegister.register();
-        ModKeysRegister.register();
+        EventsRegister.serverRegister();
         PacketFabricRegister.register();
         ServerPacketHandlerFabric.handle();
         //

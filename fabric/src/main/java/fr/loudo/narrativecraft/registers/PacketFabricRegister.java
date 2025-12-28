@@ -45,6 +45,8 @@ public class PacketFabricRegister {
                 .register(S2CInteractionsScreenPacket.TYPE, S2CInteractionsScreenPacket.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(S2CNpcsScreenPacket.TYPE, S2CNpcsScreenPacket.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(S2CSubscenesScreenPacket.TYPE, S2CSubscenesScreenPacket.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CCutscenesScreenPacket.TYPE, S2CCutscenesScreenPacket.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(S2CSyncCharactersPacket.TYPE, S2CSyncCharactersPacket.STREAM_CODEC);
 
         PayloadTypeRegistry.playS2C().register(S2CSyncChaptersPacket.TYPE, S2CSyncChaptersPacket.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(S2CSyncScenesPacket.TYPE, S2CSyncScenesPacket.STREAM_CODEC);
@@ -68,6 +70,9 @@ public class PacketFabricRegister {
 
         PayloadTypeRegistry.playS2C().register(BiCameraAngleDataPacket.TYPE, BiCameraAngleDataPacket.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(BiCameraAngleDataPacket.TYPE, BiCameraAngleDataPacket.STREAM_CODEC);
+
+        PayloadTypeRegistry.playS2C().register(BiCutsceneDataPacket.TYPE, BiCutsceneDataPacket.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(BiCutsceneDataPacket.TYPE, BiCutsceneDataPacket.STREAM_CODEC);
 
         PayloadTypeRegistry.playS2C().register(BiInteractionDataPacket.TYPE, BiInteractionDataPacket.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(BiInteractionDataPacket.TYPE, BiInteractionDataPacket.STREAM_CODEC);

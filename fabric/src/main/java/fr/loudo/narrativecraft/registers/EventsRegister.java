@@ -38,13 +38,11 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 
 public class EventsRegister {
 
-    public static void register() {
+    public static void serverRegister() {
         ServerLifecycleEvents.SERVER_STARTED.register(LifecycleEvent::onServerStart);
         ServerLifecycleEvents.SERVER_STOPPING.register(LifecycleEvent::onServerStop);
         ServerPlayConnectionEvents.JOIN.register(PlayerServerConnection::onPlayerJoin);
         ServerPlayConnectionEvents.DISCONNECT.register(PlayerServerConnection::onPlayerLeave);
-        ClientTickEvents.END_CLIENT_TICK.register(PressKeyListener::onPressKey);
-        ClientTickEvents.END_CLIENT_TICK.register(OnClientTick::clientTick);
         ServerTickEvents.END_SERVER_TICK.register(RecordingTickHandler::tick);
         ServerTickEvents.END_SERVER_TICK.register(PlaybackTickHandler::tick);
         ServerTickEvents.END_SERVER_TICK.register(OnServerTick::tick);
@@ -52,5 +50,10 @@ public class EventsRegister {
         ServerPlayerEvents.AFTER_RESPAWN.register(RespawnEvent::onRespawn);
         PlayerBlockBreakEvents.AFTER.register(BlockBreakEvent::onBlockBreak);
         UseBlockCallback.EVENT.register(RightClickBlock::onRightClickBlock);
+    }
+
+    public static void clientRegister() {
+        ClientTickEvents.END_CLIENT_TICK.register(PressKeyListener::onPressKey);
+        ClientTickEvents.END_CLIENT_TICK.register(OnClientTick::clientTick);
     }
 }

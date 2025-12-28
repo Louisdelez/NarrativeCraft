@@ -50,8 +50,8 @@ public class OnPlayerServerConnection {
         initSession(player);
         NarrativeCraftMod.getInstance().setNarrativeWorldOption(NarrativeCraftFile.loadWorldOptions());
         //        NarrativeCraftMod.getInstance().setNarrativeClientOptions(NarrativeCraftFile.loadUserOptions());
+        loadStoryDataToClient(player);
         if (player.permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) {
-            loadStoryDataToClient(player);
             if (NarrativeEntryInit.hasError) {
                 player.sendSystemMessage(
                         Translation.message("crash.narrative-data").withStyle(ChatFormatting.RED));

@@ -35,7 +35,7 @@ import net.minecraft.network.chat.Component;
 
 public abstract class StoryElementScreen extends Screen {
 
-    protected final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
+    protected HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     protected LinearLayout linearlayout;
     protected StoryElementList storyElementList;
 
@@ -51,6 +51,12 @@ public abstract class StoryElementScreen extends Screen {
         this.addFooter();
         this.layout.visitWidgets(this::addRenderableWidget);
         this.repositionElements();
+    }
+
+    public void reload() {
+        this.clearWidgets();
+        this.layout = new HeaderAndFooterLayout(this);
+        this.init();
     }
 
     protected void addTitle() {

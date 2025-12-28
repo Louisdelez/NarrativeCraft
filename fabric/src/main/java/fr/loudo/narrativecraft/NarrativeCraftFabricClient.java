@@ -25,6 +25,8 @@ package fr.loudo.narrativecraft;
 
 import fr.loudo.narrativecraft.client.CommonClientInit;
 import fr.loudo.narrativecraft.network.handler.client.ClientPacketHandlerFabric;
+import fr.loudo.narrativecraft.registers.EventsRegister;
+import fr.loudo.narrativecraft.registers.ModKeysRegister;
 import net.fabricmc.api.ClientModInitializer;
 
 public class NarrativeCraftFabricClient implements ClientModInitializer {
@@ -33,5 +35,7 @@ public class NarrativeCraftFabricClient implements ClientModInitializer {
     public void onInitializeClient() {
         CommonClientInit.init();
         ClientPacketHandlerFabric.handle();
+        EventsRegister.clientRegister();
+        ModKeysRegister.register();
     }
 }

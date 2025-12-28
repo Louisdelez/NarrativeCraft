@@ -38,6 +38,7 @@ import fr.loudo.narrativecraft.narrative.character.CharacterType;
 import fr.loudo.narrativecraft.network.data.*;
 import fr.loudo.narrativecraft.network.screen.*;
 import fr.loudo.narrativecraft.network.storyDataSyncs.*;
+import fr.loudo.narrativecraft.screens.storyManager.StoryElementScreen;
 import fr.loudo.narrativecraft.screens.storyManager.animations.AnimationsScreen;
 import fr.loudo.narrativecraft.screens.storyManager.cameraAngle.CameraAngleScreen;
 import fr.loudo.narrativecraft.screens.storyManager.chapter.ChaptersScreen;
@@ -240,6 +241,7 @@ public class ClientPacketHandler {
                     CHAPTER_MANAGER_CLIENT.getChapters().size() + 1);
             if (CHAPTER_MANAGER_CLIENT.chapterExists(chapter.getIndex())) return;
             CHAPTER_MANAGER_CLIENT.addChapter(chapter);
+            updateStoryElementScreen();
         } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
             Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByName(packet.chapterName());
             if (chapter == null) return;
@@ -254,6 +256,7 @@ public class ClientPacketHandler {
         if (packet.typeStoryData() == TypeStoryData.ADD) {
             Scene scene = new Scene(packet.name(), packet.description(), chapter);
             chapter.addScene(scene);
+            updateStoryElementScreen();
         } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
             Scene scene = chapter.getSceneByName(packet.sceneName());
             if (scene == null) return;
@@ -284,6 +287,7 @@ public class ClientPacketHandler {
         if (packet.typeStoryData() == TypeStoryData.ADD) {
             CameraAngle cameraAngle = new CameraAngle(packet.name(), packet.description(), scene);
             scene.addCameraAngleGroup(cameraAngle);
+            updateStoryElementScreen();
         } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
             CameraAngle cameraAngle = scene.getCameraAngleByName(packet.cameraAngleName());
             if (cameraAngle == null) return;
@@ -300,6 +304,7 @@ public class ClientPacketHandler {
         if (packet.typeStoryData() == TypeStoryData.ADD) {
             Cutscene cutscene = new Cutscene(packet.name(), packet.description(), scene);
             scene.addCutscene(cutscene);
+            updateStoryElementScreen();
         } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
             Cutscene cutscene = scene.getCutsceneByName(packet.cutsceneName());
             if (cutscene == null) return;
@@ -316,6 +321,7 @@ public class ClientPacketHandler {
         if (packet.typeStoryData() == TypeStoryData.ADD) {
             Interaction interaction = new Interaction(packet.name(), packet.description(), scene);
             scene.addInteraction(interaction);
+            updateStoryElementScreen();
         } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
             Interaction interaction = scene.getInteractionByName(packet.interactionName());
             if (interaction == null) return;
@@ -333,6 +339,7 @@ public class ClientPacketHandler {
             CharacterStory characterStory =
                     new CharacterStory(packet.name(), packet.description(), CharacterType.NPC, packet.characterModel());
             scene.addNpc(characterStory);
+            updateStoryElementScreen();
         } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
             CharacterStory characterStory = scene.getNpcByName(packet.npcName());
             if (characterStory == null) return;
@@ -351,6 +358,7 @@ public class ClientPacketHandler {
         if (packet.typeStoryData() == TypeStoryData.ADD) {
             Subscene subscene = new Subscene(packet.name(), packet.description(), scene);
             scene.addSubscene(subscene);
+            updateStoryElementScreen();
         } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
             Subscene subscene = scene.getSubsceneByName(packet.subsceneName());
             if (subscene == null) return;
@@ -373,6 +381,7 @@ public class ClientPacketHandler {
             characterStory.getMainCharacterAttribute().setSameSkinAsPlayer(packet.sameSkinAsPlayer());
             characterStory.getMainCharacterAttribute().setSameSkinAsTheir(packet.sameSkinAsTheir());
             CHARACTER_MANAGER_CLIENT.addCharacter(characterStory);
+            updateStoryElementScreen();
         } else if (packet.typeStoryData() == TypeStoryData.EDIT) {
             CharacterStory characterStory = CHARACTER_MANAGER_CLIENT.getCharacterByName(packet.characterName());
             if (characterStory == null) return;
@@ -389,6 +398,12 @@ public class ClientPacketHandler {
                     && !currentMainCharacter.getName().equalsIgnoreCase(packet.name())) {
                 currentMainCharacter.getMainCharacterAttribute().setMainCharacter(false);
             }
+        }
+    }
+
+    private static void updateStoryElementScreen() {
+        if (minecraft.screen instanceof StoryElementScreen screen) {
+            screen.reload();
         }
     }
 }

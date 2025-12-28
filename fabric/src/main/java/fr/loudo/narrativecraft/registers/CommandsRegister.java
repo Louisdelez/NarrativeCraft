@@ -34,7 +34,7 @@ public class CommandsRegister {
             RecordCommand.register(commandDispatcher);
             PlaybackCommand.register(commandDispatcher);
             //            StoryCommand.register(commandDispatcher);
-            //            OpenScreenCommand.register(commandDispatcher);
+            OpenScreenCommand.register(commandDispatcher);
             LinkCommand.register(commandDispatcher);
         });
     }
