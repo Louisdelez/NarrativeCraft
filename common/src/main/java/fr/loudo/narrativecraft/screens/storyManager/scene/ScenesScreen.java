@@ -26,6 +26,9 @@ package fr.loudo.narrativecraft.screens.storyManager.scene;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.network.data.BiSceneDataPacket;
+import fr.loudo.narrativecraft.network.data.TypeStoryData;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.components.StoryElementList;
 import fr.loudo.narrativecraft.screens.storyManager.StoryElementScreen;
@@ -82,21 +85,13 @@ public class ScenesScreen extends StoryElementScreen {
                                         new EditInfoScreen<>(this, scene, new EditScreenSceneAdapter(chapter)));
                             },
                             () -> {
-                                try {
-                                    chapter.removeScene(scene);
-                                    NarrativeCraftFile.deleteSceneDirectory(scene);
-                                    if (scene.getRank() == 1
-                                            && chapter.getSortedSceneList().size() > 1) {
-                                        NarrativeCraftFile.updateMasterSceneKnot(
-                                                chapter.getSortedSceneList().getFirst());
-                                    }
-                                    minecraft.setScreen(new ScenesScreen(chapter));
-                                } catch (Exception e) {
-                                    chapter.addScene(scene);
-                                    chapter.setSceneRank(scene, scene.getRank());
-                                    fr.loudo.narrativecraft.util.Util.sendCrashMessage(minecraft.player, e);
-                                    minecraft.setScreen(null);
-                                }
+                                Services.PACKET_SENDER.sendToServer(new BiSceneDataPacket(
+                                        scene.getName(),
+                                        scene.getDescription(),
+                                        chapter.getIndex(),
+                                        scene.getRank(),
+                                        scene.getName(),
+                                        TypeStoryData.REMOVE));
                             });
                 })
                 .toList();

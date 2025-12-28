@@ -27,6 +27,9 @@ import fr.loudo.narrativecraft.client.NarrativeCraftModClient;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.managers.ChapterManager;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
+import fr.loudo.narrativecraft.network.data.BiChapterDataPacket;
+import fr.loudo.narrativecraft.network.data.TypeStoryData;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.components.StoryElementList;
 import fr.loudo.narrativecraft.screens.storyManager.StoryElementScreen;
@@ -87,14 +90,11 @@ public class ChaptersScreen extends StoryElementScreen {
                                         new EditInfoScreen<>(this, chapter, new EditScreenChapterAdapter()));
                             },
                             () -> {
-                                try {
-                                    chapterManager.removeChapter(chapter);
-                                    NarrativeCraftFile.deleteChapterDirectory(chapter);
-                                    minecraft.setScreen(new ChaptersScreen());
-                                } catch (Exception e) {
-                                    chapterManager.addChapter(chapter);
-                                    fr.loudo.narrativecraft.util.Util.sendCrashMessage(minecraft.player, e);
-                                }
+                                Services.PACKET_SENDER.sendToServer(new BiChapterDataPacket(
+                                        chapter.getName(),
+                                        chapter.getDescription(),
+                                        chapter.getName(),
+                                        TypeStoryData.REMOVE));
                             });
                 })
                 .toList();

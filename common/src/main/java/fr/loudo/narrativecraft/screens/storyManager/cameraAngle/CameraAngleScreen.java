@@ -29,6 +29,9 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.CameraAngle;
+import fr.loudo.narrativecraft.network.data.BiCameraAngleDataPacket;
+import fr.loudo.narrativecraft.network.data.TypeStoryData;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.components.StoryElementList;
 import fr.loudo.narrativecraft.screens.storyManager.StoryElementScreen;
@@ -90,14 +93,13 @@ public class CameraAngleScreen extends StoryElementScreen {
                                         this, cameraAngle, new EditScreenCameraAngleAdapter(scene)));
                             },
                             () -> {
-                                try {
-                                    scene.removeCameraAngleGroup(cameraAngle);
-                                    NarrativeCraftFile.updateCameraAngles(scene);
-                                } catch (Exception e) {
-                                    scene.addCameraAngleGroup(cameraAngle);
-                                    fr.loudo.narrativecraft.util.Util.sendCrashMessage(minecraft.player, e);
-                                }
-                                minecraft.setScreen(new CameraAngleScreen(scene));
+                                Services.PACKET_SENDER.sendToServer(new BiCameraAngleDataPacket(
+                                        cameraAngle.getName(),
+                                        cameraAngle.getDescription(),
+                                        scene.getChapter().getIndex(),
+                                        scene.getName(),
+                                        cameraAngle.getName(),
+                                        TypeStoryData.REMOVE));
                             });
                 })
                 .toList();

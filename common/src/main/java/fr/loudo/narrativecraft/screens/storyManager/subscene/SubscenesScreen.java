@@ -27,6 +27,9 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
+import fr.loudo.narrativecraft.network.data.BiSubsceneDataPacket;
+import fr.loudo.narrativecraft.network.data.TypeStoryData;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.components.PickElementScreen;
 import fr.loudo.narrativecraft.screens.components.StoryElementList;
@@ -128,15 +131,13 @@ public class SubscenesScreen extends StoryElementScreen {
                                         new EditInfoScreen<>(this, subscene, new EditScreenSubsceneAdapter(scene)));
                             },
                             () -> {
-                                minecraft.setScreen(new SubscenesScreen(scene));
-                                try {
-                                    scene.removeSubscene(subscene);
-                                    NarrativeCraftFile.updateSubsceneFile(scene);
-                                    minecraft.setScreen(new SubscenesScreen(scene));
-                                } catch (Exception e) {
-                                    scene.addSubscene(subscene);
-                                    fr.loudo.narrativecraft.util.Util.sendCrashMessage(minecraft.player, e);
-                                }
+                                Services.PACKET_SENDER.sendToServer(new BiSubsceneDataPacket(
+                                        subscene.getName(),
+                                        subscene.getDescription(),
+                                        scene.getChapter().getIndex(),
+                                        scene.getName(),
+                                        subscene.getName(),
+                                        TypeStoryData.REMOVE));
                             });
                 })
                 .toList();

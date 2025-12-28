@@ -27,6 +27,9 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.network.data.BiAnimationDataPacket;
+import fr.loudo.narrativecraft.network.data.TypeStoryData;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.screens.components.ChooseCharacterScreen;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.components.StoryElementList;
@@ -83,10 +86,13 @@ public class AnimationsScreen extends StoryElementScreen {
                                         new EditInfoScreen<>(this, animation, new EditScreenAnimationAdapter(scene)));
                             },
                             () -> {
-                                minecraft.setScreen(new AnimationsScreen(scene));
-                                scene.removeAnimation(animation);
-                                NarrativeCraftFile.deleteAnimationFile(animation);
-                                minecraft.setScreen(new AnimationsScreen(scene));
+                                Services.PACKET_SENDER.sendToServer(new BiAnimationDataPacket(
+                                        animation.getName(),
+                                        animation.getDescription(),
+                                        scene.getChapter().getIndex(),
+                                        scene.getName(),
+                                        animation.getName(),
+                                        TypeStoryData.REMOVE));
                             });
                 })
                 .toList();

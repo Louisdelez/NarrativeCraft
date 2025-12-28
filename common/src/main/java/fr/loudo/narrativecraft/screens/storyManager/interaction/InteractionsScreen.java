@@ -29,6 +29,9 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.Environment;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.Interaction;
+import fr.loudo.narrativecraft.network.data.BiInteractionDataPacket;
+import fr.loudo.narrativecraft.network.data.TypeStoryData;
+import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
 import fr.loudo.narrativecraft.screens.components.StoryElementList;
 import fr.loudo.narrativecraft.screens.storyManager.StoryElementScreen;
@@ -90,14 +93,13 @@ public class InteractionsScreen extends StoryElementScreen {
                                         this, interaction, new EditScreenInteractionAdapter(scene)));
                             },
                             () -> {
-                                try {
-                                    scene.removeInteraction(interaction);
-                                    NarrativeCraftFile.updateInteractionsFile(scene);
-                                } catch (Exception e) {
-                                    scene.addInteraction(interaction);
-                                    fr.loudo.narrativecraft.util.Util.sendCrashMessage(minecraft.player, e);
-                                }
-                                minecraft.setScreen(new InteractionsScreen(scene));
+                                Services.PACKET_SENDER.sendToServer(new BiInteractionDataPacket(
+                                        interaction.getName(),
+                                        interaction.getDescription(),
+                                        scene.getChapter().getIndex(),
+                                        scene.getName(),
+                                        interaction.getName(),
+                                        TypeStoryData.REMOVE));
                             });
                 })
                 .toList();

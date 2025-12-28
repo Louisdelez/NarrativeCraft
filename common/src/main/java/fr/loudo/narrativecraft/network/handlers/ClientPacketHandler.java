@@ -247,6 +247,11 @@ public class ClientPacketHandler {
             if (chapter == null) return;
             chapter.setName(packet.name());
             chapter.setDescription(packet.description());
+        } else if (packet.typeStoryData() == TypeStoryData.REMOVE) {
+            Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByName(packet.chapterName());
+            if (chapter == null) return;
+            CHAPTER_MANAGER_CLIENT.removeChapter(chapter);
+            updateStoryElementScreen();
         }
     }
 
@@ -263,6 +268,11 @@ public class ClientPacketHandler {
             scene.setName(packet.name());
             scene.setDescription(packet.description());
             chapter.setSceneRank(scene, packet.rank());
+        } else if (packet.typeStoryData() == TypeStoryData.REMOVE) {
+            Scene scene = chapter.getSceneByName(packet.sceneName());
+            if (scene == null) return;
+            chapter.removeScene(scene);
+            updateStoryElementScreen();
         }
     }
 
@@ -276,6 +286,11 @@ public class ClientPacketHandler {
             if (animation == null) return;
             animation.setName(packet.name());
             animation.setDescription(packet.description());
+        } else if (packet.typeStoryData() == TypeStoryData.REMOVE) {
+            Animation animation = scene.getAnimationByName(packet.animationName());
+            if (animation == null) return;
+            scene.removeAnimation(animation);
+            updateStoryElementScreen();
         }
     }
 
@@ -293,6 +308,11 @@ public class ClientPacketHandler {
             if (cameraAngle == null) return;
             cameraAngle.setName(packet.name());
             cameraAngle.setDescription(packet.description());
+        } else if (packet.typeStoryData() == TypeStoryData.REMOVE) {
+            CameraAngle cameraAngle = scene.getCameraAngleByName(packet.cameraAngleName());
+            if (cameraAngle == null) return;
+            scene.removeCameraAngleGroup(cameraAngle);
+            updateStoryElementScreen();
         }
     }
 
@@ -310,6 +330,11 @@ public class ClientPacketHandler {
             if (cutscene == null) return;
             cutscene.setName(packet.name());
             cutscene.setDescription(packet.description());
+        } else if (packet.typeStoryData() == TypeStoryData.REMOVE) {
+            Cutscene cutscene = scene.getCutsceneByName(packet.cutsceneName());
+            if (cutscene == null) return;
+            scene.removeCutscene(cutscene);
+            updateStoryElementScreen();
         }
     }
 
@@ -327,6 +352,11 @@ public class ClientPacketHandler {
             if (interaction == null) return;
             interaction.setName(packet.name());
             interaction.setDescription(packet.description());
+        } else if (packet.typeStoryData() == TypeStoryData.REMOVE) {
+            Interaction interaction = scene.getInteractionByName(packet.interactionName());
+            if (interaction == null) return;
+            scene.removeInteraction(interaction);
+            updateStoryElementScreen();
         }
     }
 
@@ -347,6 +377,11 @@ public class ClientPacketHandler {
             characterStory.setDescription(packet.description());
             characterStory.setModel(packet.characterModel());
             characterStory.setShowNametag(packet.showNametag());
+        } else if (packet.typeStoryData() == TypeStoryData.REMOVE) {
+            CharacterStory characterStory = scene.getNpcByName(packet.npcName());
+            if (characterStory == null) return;
+            scene.removeNpc(characterStory);
+            updateStoryElementScreen();
         }
     }
 
@@ -364,6 +399,11 @@ public class ClientPacketHandler {
             if (subscene == null) return;
             subscene.setName(packet.name());
             subscene.setDescription(packet.description());
+        } else if (packet.typeStoryData() == TypeStoryData.REMOVE) {
+            Subscene subscene = scene.getSubsceneByName(packet.subsceneName());
+            if (subscene == null) return;
+            scene.removeSubscene(subscene);
+            updateStoryElementScreen();
         }
     }
 
@@ -398,6 +438,11 @@ public class ClientPacketHandler {
                     && !currentMainCharacter.getName().equalsIgnoreCase(packet.name())) {
                 currentMainCharacter.getMainCharacterAttribute().setMainCharacter(false);
             }
+        } else if (packet.typeStoryData() == TypeStoryData.REMOVE) {
+            CharacterStory characterStory = CHARACTER_MANAGER_CLIENT.getCharacterByName(packet.characterName());
+            if (characterStory == null) return;
+            CHARACTER_MANAGER_CLIENT.removeCharacter(characterStory);
+            updateStoryElementScreen();
         }
     }
 

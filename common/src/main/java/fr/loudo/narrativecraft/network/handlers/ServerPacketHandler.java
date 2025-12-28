@@ -93,6 +93,21 @@ public class ServerPacketHandler {
                 Util.sendCrashMessage(player, e);
                 Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
             }
+        } else if (packet.typeStoryData() == TypeStoryData.REMOVE) {
+            Chapter chapter = CHAPTER_MANAGER.getChapterByName(packet.chapterName());
+            if (chapter == null) return;
+            try {
+                chapterManager.removeChapter(chapter);
+                NarrativeCraftFile.deleteChapterDirectory(chapter);
+                Util.broadcastPacket(
+                        new BiChapterDataPacket(
+                                packet.name(), packet.description(), packet.chapterName(), TypeStoryData.REMOVE),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.storyManager());
+            } catch (Exception e) {
+                chapterManager.addChapter(chapter);
+                Util.sendCrashMessage(player, e);
+            }
         }
     }
 
@@ -156,6 +171,32 @@ public class ServerPacketHandler {
                 Util.sendCrashMessage(player, e);
                 Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
             }
+        } else if (packet.typeStoryData() == TypeStoryData.REMOVE) {
+            Scene scene = chapter.getSceneByName(packet.sceneName());
+            if (scene == null) return;
+            try {
+                chapter.removeScene(scene);
+                NarrativeCraftFile.deleteSceneDirectory(scene);
+                if (scene.getRank() == 1 && chapter.getSortedSceneList().size() > 1) {
+                    NarrativeCraftFile.updateMasterSceneKnot(
+                            chapter.getSortedSceneList().getFirst());
+                }
+                Util.broadcastPacket(
+                        new BiSceneDataPacket(
+                                scene.getName(),
+                                scene.getDescription(),
+                                chapter.getIndex(),
+                                scene.getRank(),
+                                "",
+                                TypeStoryData.REMOVE),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
+                Services.PACKET_SENDER.sendToPlayer(player, new S2CSceneScreenPacket(chapter.getIndex()));
+            } catch (Exception e) {
+                chapter.addScene(scene);
+                chapter.setSceneRank(scene, scene.getRank());
+                Util.sendCrashMessage(player, e);
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+            }
         }
     }
 
@@ -193,6 +234,28 @@ public class ServerPacketHandler {
             } catch (Exception e) {
                 exitingAnimation.setName(oldAnimation.getName());
                 exitingAnimation.setDescription(oldAnimation.getDescription());
+                Util.sendCrashMessage(player, e);
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+            }
+        } else if (packet.typeStoryData() == TypeStoryData.REMOVE) {
+            Animation animation = scene.getAnimationByName(packet.animationName());
+            if (animation == null) return;
+            try {
+                scene.removeAnimation(animation);
+                NarrativeCraftFile.deleteAnimationFile(animation);
+                Util.broadcastPacket(
+                        new BiAnimationDataPacket(
+                                animation.getName(),
+                                animation.getDescription(),
+                                chapter.getIndex(),
+                                scene.getName(),
+                                "",
+                                TypeStoryData.REMOVE),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
+                Services.PACKET_SENDER.sendToPlayer(
+                        player, new S2CAnimationsScreenPacket(chapter.getIndex(), scene.getName()));
+            } catch (Exception e) {
+                scene.addAnimation(animation);
                 Util.sendCrashMessage(player, e);
                 Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
             }
@@ -250,6 +313,28 @@ public class ServerPacketHandler {
                 Util.sendCrashMessage(player, e);
                 Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
             }
+        } else if (packet.typeStoryData() == TypeStoryData.REMOVE) {
+            CameraAngle cameraAngle = scene.getCameraAngleByName(packet.cameraAngleName());
+            if (cameraAngle == null) return;
+            try {
+                scene.removeCameraAngleGroup(cameraAngle);
+                NarrativeCraftFile.updateCameraAngles(scene);
+                Util.broadcastPacket(
+                        new BiCameraAngleDataPacket(
+                                cameraAngle.getName(),
+                                cameraAngle.getDescription(),
+                                chapter.getIndex(),
+                                scene.getName(),
+                                "",
+                                TypeStoryData.REMOVE),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
+                Services.PACKET_SENDER.sendToPlayer(
+                        player, new S2CCameraAnglesScreenPacket(chapter.getIndex(), scene.getName()));
+            } catch (Exception e) {
+                scene.addCameraAngleGroup(cameraAngle);
+                Util.sendCrashMessage(player, e);
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+            }
         }
     }
 
@@ -301,6 +386,28 @@ public class ServerPacketHandler {
             } catch (Exception e) {
                 existingCutscene.setName(oldCutscene.getName());
                 existingCutscene.setDescription(oldCutscene.getDescription());
+                Util.sendCrashMessage(player, e);
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+            }
+        } else if (packet.typeStoryData() == TypeStoryData.REMOVE) {
+            Cutscene cutscene = scene.getCutsceneByName(packet.cutsceneName());
+            if (cutscene == null) return;
+            try {
+                scene.removeCutscene(cutscene);
+                NarrativeCraftFile.updateCutsceneFile(scene);
+                Util.broadcastPacket(
+                        new BiCutsceneDataPacket(
+                                cutscene.getName(),
+                                cutscene.getDescription(),
+                                chapter.getIndex(),
+                                scene.getName(),
+                                "",
+                                TypeStoryData.REMOVE),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
+                Services.PACKET_SENDER.sendToPlayer(
+                        player, new S2CCutscenesScreenPacket(chapter.getIndex(), scene.getName()));
+            } catch (Exception e) {
+                scene.addCutscene(cutscene);
                 Util.sendCrashMessage(player, e);
                 Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
             }
@@ -357,6 +464,28 @@ public class ServerPacketHandler {
             } catch (Exception e) {
                 existingInteraction.setName(oldInteraction.getName());
                 existingInteraction.setDescription(oldInteraction.getDescription());
+                Util.sendCrashMessage(player, e);
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+            }
+        } else if (packet.typeStoryData() == TypeStoryData.REMOVE) {
+            Interaction interaction = scene.getInteractionByName(packet.interactionName());
+            if (interaction == null) return;
+            try {
+                scene.removeInteraction(interaction);
+                NarrativeCraftFile.updateInteractionsFile(scene);
+                Util.broadcastPacket(
+                        new BiInteractionDataPacket(
+                                interaction.getName(),
+                                interaction.getDescription(),
+                                chapter.getIndex(),
+                                scene.getName(),
+                                "",
+                                TypeStoryData.REMOVE),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
+                Services.PACKET_SENDER.sendToPlayer(
+                        player, new S2CInteractionsScreenPacket(chapter.getIndex(), scene.getName()));
+            } catch (Exception e) {
+                scene.addInteraction(interaction);
                 Util.sendCrashMessage(player, e);
                 Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
             }
@@ -426,6 +555,31 @@ public class ServerPacketHandler {
                         NarrativeCraftMod.server.getPlayerList().getPlayers());
                 Services.PACKET_SENDER.sendToPlayer(
                         player, new S2CNpcsScreenPacket(chapter.getIndex(), scene.getName()));
+            } else if (packet.typeStoryData() == TypeStoryData.REMOVE) {
+                characterStory = scene.getNpcByName(packet.npcName());
+                if (characterStory == null) return;
+                scene.removeNpc(characterStory);
+                NarrativeCraftFile.deleteCharacterFolder(characterStory, scene);
+                for (Animation animation : scene.getAnimations()) {
+                    if (animation.getCharacter() != null
+                            && animation.getCharacter().getName().equals(characterStory.getName())) {
+                        animation.setCharacter(null);
+                        NarrativeCraftFile.updateAnimationFile(animation);
+                    }
+                }
+                Util.broadcastPacket(
+                        new BiNpcDataPacket(
+                                characterStory.getName(),
+                                characterStory.getDescription(),
+                                characterStory.getModel(),
+                                characterStory.showNametag(),
+                                chapter.getIndex(),
+                                scene.getName(),
+                                "",
+                                TypeStoryData.REMOVE),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
+                Services.PACKET_SENDER.sendToPlayer(
+                        player, new S2CNpcsScreenPacket(chapter.getIndex(), scene.getName()));
             }
         } catch (Exception e) {
             Util.sendCrashMessage(player, e);
@@ -487,6 +641,28 @@ public class ServerPacketHandler {
             } catch (Exception e) {
                 existingSubscene.setName(oldSubscene.getName());
                 existingSubscene.setDescription(oldSubscene.getDescription());
+                Util.sendCrashMessage(player, e);
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+            }
+        } else if (packet.typeStoryData() == TypeStoryData.REMOVE) {
+            Subscene subscene = scene.getSubsceneByName(packet.subsceneName());
+            if (subscene == null) return;
+            try {
+                scene.removeSubscene(subscene);
+                NarrativeCraftFile.updateSubsceneFile(scene);
+                Util.broadcastPacket(
+                        new BiSubsceneDataPacket(
+                                subscene.getName(),
+                                subscene.getDescription(),
+                                chapter.getIndex(),
+                                scene.getName(),
+                                "",
+                                TypeStoryData.REMOVE),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
+                Services.PACKET_SENDER.sendToPlayer(
+                        player, new S2CSubscenesScreenPacket(chapter.getIndex(), scene.getName()));
+            } catch (Exception e) {
+                scene.addSubscene(subscene);
                 Util.sendCrashMessage(player, e);
                 Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
             }
@@ -572,6 +748,49 @@ public class ServerPacketHandler {
                                 packet.sameSkinAsTheir(),
                                 packet.characterName(),
                                 TypeStoryData.EDIT),
+                        NarrativeCraftMod.server.getPlayerList().getPlayers());
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.characterManager());
+            } catch (Exception e) {
+                Util.sendCrashMessage(player, e);
+                Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+            }
+        } else if (packet.typeStoryData() == TypeStoryData.REMOVE) {
+            characterStory = CHARACTER_MANAGER.getCharacterByName(packet.characterName());
+            if (characterStory == null) return;
+            try {
+                if (characterStory.getMainCharacterAttribute().isMainCharacter()) {
+                    CharacterStory newMainCharacter =
+                            CHARACTER_MANAGER.getCharacterStories().get(0);
+                    newMainCharacter.getMainCharacterAttribute().setMainCharacter(true);
+                    NarrativeCraftFile.updateCharacterData(newMainCharacter, newMainCharacter);
+                }
+                NarrativeCraftFile.deleteCharacterFolder(characterStory);
+                CHARACTER_MANAGER.removeCharacter(characterStory);
+                for (Chapter chapter : CHAPTER_MANAGER.getChapters()) {
+                    for (Scene scene : chapter.getSortedSceneList()) {
+                        for (Animation animation : scene.getAnimations()) {
+                            if (animation.getCharacter() != null
+                                    && animation.getCharacter().getName().equals(characterStory.getName())) {
+                                animation.setCharacter(null);
+                                NarrativeCraftFile.updateAnimationFile(animation);
+                            }
+                        }
+                    }
+                }
+                Util.broadcastPacket(
+                        new BiCharacterDataPacket(
+                                packet.name(),
+                                packet.description(),
+                                packet.characterModel(),
+                                packet.day(),
+                                packet.month(),
+                                packet.year(),
+                                packet.showNametag(),
+                                packet.mainCharacter(),
+                                packet.sameSkinAsPlayer(),
+                                packet.sameSkinAsTheir(),
+                                packet.characterName(),
+                                TypeStoryData.REMOVE),
                         NarrativeCraftMod.server.getPlayerList().getPlayers());
                 Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.characterManager());
             } catch (Exception e) {

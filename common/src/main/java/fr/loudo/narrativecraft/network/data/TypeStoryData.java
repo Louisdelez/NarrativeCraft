@@ -25,5 +25,6 @@ package fr.loudo.narrativecraft.network.data;
 
 public enum TypeStoryData {
     ADD,
-    EDIT;
+    EDIT,
+    REMOVE;
 }
