@@ -147,5 +147,9 @@ public class PacketRegisterEvent {
                 BiCharacterDataPacket.TYPE,
                 BiCharacterDataPacket.STREAM_CODEC,
                 CommonPacketHandlerNeoForge::characterData);
+        registrar.playBidirectional(
+                BiSubsceneAnimationLinkDataPacket.TYPE,
+                BiSubsceneAnimationLinkDataPacket.STREAM_CODEC,
+                CommonPacketHandlerNeoForge::subsceneAnimationLinkData);
     }
 }

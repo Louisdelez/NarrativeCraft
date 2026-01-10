@@ -120,4 +120,14 @@ public class CommonPacketHandlerNeoForge {
             }
         });
     }
+
+    public static void subsceneAnimationLinkData(BiSubsceneAnimationLinkDataPacket packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (context.flow().isServerbound()) {
+                ServerPacketHandler.subsceneAnimationLinkData(packet, (ServerPlayer) context.player());
+            } else {
+                ClientPacketHandler.subsceneAnimationLinkData(packet);
+            }
+        });
+    }
 }

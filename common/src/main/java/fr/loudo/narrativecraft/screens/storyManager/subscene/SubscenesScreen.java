@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
+import fr.loudo.narrativecraft.network.data.BiSubsceneAnimationLinkDataPacket;
 import fr.loudo.narrativecraft.network.data.BiSubsceneDataPacket;
 import fr.loudo.narrativecraft.network.data.TypeStoryData;
 import fr.loudo.narrativecraft.platform.Services;
@@ -98,23 +99,17 @@ public class SubscenesScreen extends StoryElementScreen {
                                         availableAnimations,
                                         subscene.getAnimations(),
                                         entries1 -> {
-                                            List<Animation> oldAnimations = subscene.getAnimations();
-                                            List<Animation> selected = new ArrayList<>();
+                                            List<String> selected = new ArrayList<>();
                                             for (var entry : entries1) {
                                                 Animation a = (Animation) entry.getNarrativeEntry();
-                                                selected.add(a);
+                                                selected.add(a.getName());
                                             }
-                                            try {
-                                                subscene.getAnimations().clear();
-                                                subscene.getAnimations().addAll(selected);
-                                                NarrativeCraftFile.updateSubsceneFile(scene);
-                                                minecraft.setScreen(new SubscenesScreen(scene));
-                                            } catch (Exception e) {
-                                                subscene.getAnimations().clear();
-                                                subscene.getAnimations().addAll(oldAnimations);
-                                                fr.loudo.narrativecraft.util.Util.sendCrashMessage(minecraft.player, e);
-                                                minecraft.setScreen(null);
-                                            }
+
+                                            Services.PACKET_SENDER.sendToServer(new BiSubsceneAnimationLinkDataPacket(
+                                                    scene.getChapter().getIndex(),
+                                                    scene.getName(),
+                                                    subscene.getName(),
+                                                    selected));
                                         });
                                 this.minecraft.setScreen(screen);
                             })

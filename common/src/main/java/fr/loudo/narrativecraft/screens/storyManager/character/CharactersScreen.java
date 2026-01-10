@@ -130,8 +130,12 @@ public class CharactersScreen extends StoryElementScreen {
                                             character
                                                     .getMainCharacterAttribute()
                                                     .isMainCharacter(),
-                                            character.getMainCharacterAttribute().isSameSkinAsPlayer(),
-                                            character.getMainCharacterAttribute().isSameSkinAsTheir(),
+                                            character
+                                                    .getMainCharacterAttribute()
+                                                    .isSameSkinAsPlayer(),
+                                            character
+                                                    .getMainCharacterAttribute()
+                                                    .isSameSkinAsTheir(),
                                             character.getName(),
                                             TypeStoryData.REMOVE));
                                 } else {
@@ -157,8 +161,7 @@ public class CharactersScreen extends StoryElementScreen {
         if (scene == null) {
             Util.getPlatform().openPath(NarrativeCraftFile.characterDirectory.toPath());
         } else {
-            Util.getPlatform()
-                    .openPath(NarrativeCraftFile.getNpcFolder(scene).toPath());
+            Util.getPlatform().openPath(NarrativeCraftFile.getNpcFolder(scene).toPath());
         }
     }
 }

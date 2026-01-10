@@ -42,6 +42,8 @@ import fr.loudo.narrativecraft.network.screen.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.util.Util;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.server.level.ServerPlayer;
 
 public class ServerPacketHandler {
@@ -797,6 +799,39 @@ public class ServerPacketHandler {
                 Util.sendCrashMessage(player, e);
                 Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
             }
+        }
+    }
+
+    public static void subsceneAnimationLinkData(BiSubsceneAnimationLinkDataPacket packet, ServerPlayer player) {
+        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+        Subscene subscene = scene.getSubsceneByName(packet.subsceneName());
+        if (subscene == null) return;
+
+        List<Animation> oldAnimations = new ArrayList<>(subscene.getAnimations());
+        List<Animation> newAnimations = new ArrayList<>();
+        for (String animName : packet.animationNames()) {
+            Animation anim = scene.getAnimationByName(animName);
+            if (anim != null) {
+                newAnimations.add(anim);
+            }
+        }
+
+        try {
+            subscene.getAnimations().clear();
+            subscene.getAnimations().addAll(newAnimations);
+            NarrativeCraftFile.updateSubsceneFile(scene);
+            Util.broadcastPacket(
+                    packet, NarrativeCraftMod.server.getPlayerList().getPlayers());
+            Services.PACKET_SENDER.sendToPlayer(
+                    player, new S2CSubscenesScreenPacket(chapter.getIndex(), scene.getName()));
+        } catch (Exception e) {
+            subscene.getAnimations().clear();
+            subscene.getAnimations().addAll(oldAnimations);
+            Util.sendCrashMessage(player, e);
+            Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
         }
     }
 }

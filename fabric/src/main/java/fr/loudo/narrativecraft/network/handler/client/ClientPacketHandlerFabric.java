@@ -112,5 +112,8 @@ public class ClientPacketHandlerFabric {
         ClientPlayNetworking.registerGlobalReceiver(BiCharacterDataPacket.TYPE, (payload, context) -> {
             ClientPacketHandler.characterData(payload);
         });
+        ClientPlayNetworking.registerGlobalReceiver(BiSubsceneAnimationLinkDataPacket.TYPE, (payload, context) -> {
+            ClientPacketHandler.subsceneAnimationLinkData(payload);
+        });
     }
 }

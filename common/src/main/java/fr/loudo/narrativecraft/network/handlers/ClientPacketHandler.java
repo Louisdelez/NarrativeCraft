@@ -47,6 +47,8 @@ import fr.loudo.narrativecraft.screens.storyManager.cutscene.CutscenesScreen;
 import fr.loudo.narrativecraft.screens.storyManager.interaction.InteractionsScreen;
 import fr.loudo.narrativecraft.screens.storyManager.scene.ScenesScreen;
 import fr.loudo.narrativecraft.screens.storyManager.subscene.SubscenesScreen;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 
 public class ClientPacketHandler {
@@ -450,5 +452,26 @@ public class ClientPacketHandler {
         if (minecraft.screen instanceof StoryElementScreen screen) {
             screen.reload();
         }
+    }
+
+    public static void subsceneAnimationLinkData(BiSubsceneAnimationLinkDataPacket packet) {
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+        Subscene subscene = scene.getSubsceneByName(packet.subsceneName());
+        if (subscene == null) return;
+
+        List<Animation> newAnimations = new ArrayList<>();
+        for (String animName : packet.animationNames()) {
+            Animation anim = scene.getAnimationByName(animName);
+            if (anim != null) {
+                newAnimations.add(anim);
+            }
+        }
+        subscene.getAnimations().clear();
+        subscene.getAnimations().addAll(newAnimations);
+
+        updateStoryElementScreen();
     }
 }
