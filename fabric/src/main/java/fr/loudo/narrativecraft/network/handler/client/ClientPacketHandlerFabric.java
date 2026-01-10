@@ -34,8 +34,9 @@ public class ClientPacketHandlerFabric {
     public static void handle() {
         ClientPlayNetworking.registerGlobalReceiver(S2CScreenPacket.TYPE, (payload, context) -> {
             ClientPacketHandler.screenHandler(payload);
-        });
-        ClientPlayNetworking.registerGlobalReceiver(S2CSceneScreenPacket.TYPE, (payload, context) -> {
+        });        ClientPlayNetworking.registerGlobalReceiver(S2CLinksSyncPacket.TYPE, (payload, context) -> {
+            ClientPacketHandler.syncLinksHandler(payload);
+        });        ClientPlayNetworking.registerGlobalReceiver(S2CSceneScreenPacket.TYPE, (payload, context) -> {
             ClientPacketHandler.openSceneScreen(payload);
         });
         ClientPlayNetworking.registerGlobalReceiver(S2CAnimationsScreenPacket.TYPE, (payload, context) -> {
@@ -114,6 +115,12 @@ public class ClientPacketHandlerFabric {
         });
         ClientPlayNetworking.registerGlobalReceiver(BiSubsceneAnimationLinkDataPacket.TYPE, (payload, context) -> {
             ClientPacketHandler.subsceneAnimationLinkData(payload);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(BiCutsceneSubsceneLinkDataPacket.TYPE, (payload, context) -> {
+            ClientPacketHandler.cutsceneSubsceneLinkData(payload);
+        });
+        ClientPlayNetworking.registerGlobalReceiver(BiCutsceneAnimationLinkDataPacket.TYPE, (payload, context) -> {
+            ClientPacketHandler.cutsceneAnimationLinkData(payload);
         });
     }
 }

@@ -32,13 +32,17 @@ import fr.loudo.narrativecraft.managers.RecordingManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryInit;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.recording.Recording;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.network.storyDataSyncs.*;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.util.FakePlayer;
 import fr.loudo.narrativecraft.util.Translation;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import net.minecraft.ChatFormatting;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
@@ -116,6 +120,28 @@ public class OnPlayerServerConnection {
                         new S2CSyncInteractionsPacket(chapter.getIndex(), scene.getName(), scene.getInteractions()));
                 Services.PACKET_SENDER.sendToPlayer(
                         player, new S2CSyncNpcsPacket(chapter.getIndex(), scene.getName(), scene.getNpcs()));
+
+                // Sync links (animations for subscenes, subscenes/animations for cutscenes)
+                Map<String, List<String>> subsceneAnimations = new HashMap<>();
+                for (Subscene subscene : scene.getSubscenes()) {
+                    subsceneAnimations.put(subscene.getName(), subscene.getAnimationsName());
+                }
+
+                Map<String, List<String>> cutsceneSubscenes = new HashMap<>();
+                Map<String, List<String>> cutsceneAnimations = new HashMap<>();
+                for (Cutscene cutscene : scene.getCutscenes()) {
+                    cutsceneSubscenes.put(cutscene.getName(), cutscene.getSubscenesName());
+                    cutsceneAnimations.put(cutscene.getName(), cutscene.getAnimationsName());
+                }
+
+                Services.PACKET_SENDER.sendToPlayer(
+                        player,
+                        new S2CLinksSyncPacket(
+                                chapter.getIndex(),
+                                scene.getName(),
+                                subsceneAnimations,
+                                cutsceneSubscenes,
+                                cutsceneAnimations));
             }
         }
         Services.PACKET_SENDER.sendToPlayer(

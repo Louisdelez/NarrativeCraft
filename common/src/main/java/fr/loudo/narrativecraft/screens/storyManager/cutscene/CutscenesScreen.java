@@ -32,7 +32,9 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
+import fr.loudo.narrativecraft.network.data.BiCutsceneAnimationLinkDataPacket;
 import fr.loudo.narrativecraft.network.data.BiCutsceneDataPacket;
+import fr.loudo.narrativecraft.network.data.BiCutsceneSubsceneLinkDataPacket;
 import fr.loudo.narrativecraft.network.data.TypeStoryData;
 import fr.loudo.narrativecraft.platform.Services;
 import fr.loudo.narrativecraft.screens.components.EditInfoScreen;
@@ -144,22 +146,17 @@ public class CutscenesScreen extends StoryElementScreen {
                                 animationsAvailable,
                                 cutscene.getAnimations(),
                                 entries -> {
-                                    List<Animation> selectedAnimations = new ArrayList<>();
+                                    List<String> selectedAnimations = new ArrayList<>();
                                     for (PickElementScreen.TransferableStorySelectionList.Entry entry : entries) {
                                         Animation animation = (Animation) entry.getNarrativeEntry();
-                                        selectedAnimations.add(animation);
+                                        selectedAnimations.add(animation.getName());
                                     }
-                                    List<Animation> oldAnimations = cutscene.getAnimations();
-                                    try {
-                                        cutscene.getAnimations().clear();
-                                        cutscene.getAnimations().addAll(selectedAnimations);
-                                        NarrativeCraftFile.updateCutsceneFile(scene);
-                                        this.minecraft.setScreen(new CutscenesScreen(scene));
-                                    } catch (Exception e) {
-                                        cutscene.getAnimations().addAll(oldAnimations);
-                                        fr.loudo.narrativecraft.util.Util.sendCrashMessage(minecraft.player, e);
-                                        minecraft.setScreen(null);
-                                    }
+
+                                    Services.PACKET_SENDER.sendToServer(new BiCutsceneAnimationLinkDataPacket(
+                                            scene.getChapter().getIndex(),
+                                            scene.getName(),
+                                            cutscene.getName(),
+                                            selectedAnimations));
                                 });
                     } else {
                         screen = new PickElementScreen(
@@ -172,22 +169,17 @@ public class CutscenesScreen extends StoryElementScreen {
                                 subscenesAvailable,
                                 cutscene.getSubscenes(),
                                 entries -> {
-                                    List<Subscene> selectedSubscene = new ArrayList<>();
+                                    List<String> selectedSubscene = new ArrayList<>();
                                     for (PickElementScreen.TransferableStorySelectionList.Entry entry : entries) {
                                         Subscene subscene = (Subscene) entry.getNarrativeEntry();
-                                        selectedSubscene.add(subscene);
+                                        selectedSubscene.add(subscene.getName());
                                     }
-                                    List<Subscene> oldSubscenes = cutscene.getSubscenes();
-                                    try {
-                                        cutscene.getSubscenes().clear();
-                                        cutscene.getSubscenes().addAll(selectedSubscene);
-                                        NarrativeCraftFile.updateCutsceneFile(scene);
-                                        this.minecraft.setScreen(new CutscenesScreen(scene));
-                                    } catch (Exception e) {
-                                        cutscene.getSubscenes().addAll(oldSubscenes);
-                                        fr.loudo.narrativecraft.util.Util.sendCrashMessage(minecraft.player, e);
-                                        minecraft.setScreen(null);
-                                    }
+
+                                    Services.PACKET_SENDER.sendToServer(new BiCutsceneSubsceneLinkDataPacket(
+                                            scene.getChapter().getIndex(),
+                                            scene.getName(),
+                                            cutscene.getName(),
+                                            selectedSubscene));
                                 });
                     }
                     this.minecraft.setScreen(screen);

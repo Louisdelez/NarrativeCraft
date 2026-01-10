@@ -46,5 +46,7 @@ public class PacketClientRegisterEvent {
         event.register(BiSubsceneDataPacket.TYPE, CommonPacketHandlerNeoForge::subsceneData);
         event.register(BiCharacterDataPacket.TYPE, CommonPacketHandlerNeoForge::characterData);
         event.register(BiSubsceneAnimationLinkDataPacket.TYPE, CommonPacketHandlerNeoForge::subsceneAnimationLinkData);
+        event.register(BiCutsceneSubsceneLinkDataPacket.TYPE, CommonPacketHandlerNeoForge::cutsceneSubsceneLinkData);
+        event.register(BiCutsceneAnimationLinkDataPacket.TYPE, CommonPacketHandlerNeoForge::cutsceneAnimationLinkData);
     }
 }

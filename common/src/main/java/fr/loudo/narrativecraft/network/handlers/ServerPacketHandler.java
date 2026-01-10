@@ -834,4 +834,70 @@ public class ServerPacketHandler {
             Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
         }
     }
+
+    public static void cutsceneSubsceneLinkData(BiCutsceneSubsceneLinkDataPacket packet, ServerPlayer player) {
+        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+        Cutscene cutscene = scene.getCutsceneByName(packet.cutsceneName());
+        if (cutscene == null) return;
+
+        List<Subscene> oldSubscenes = new ArrayList<>(cutscene.getSubscenes());
+        List<Subscene> newSubscenes = new ArrayList<>();
+        for (String subName : packet.subsceneNames()) {
+            Subscene sub = scene.getSubsceneByName(subName);
+            if (sub != null) {
+                newSubscenes.add(sub);
+            }
+        }
+
+        try {
+            cutscene.getSubscenes().clear();
+            cutscene.getSubscenes().addAll(newSubscenes);
+            NarrativeCraftFile.updateCutsceneFile(scene);
+            Util.broadcastPacket(
+                    packet, NarrativeCraftMod.server.getPlayerList().getPlayers());
+            Services.PACKET_SENDER.sendToPlayer(
+                    player, new S2CCutscenesScreenPacket(chapter.getIndex(), scene.getName()));
+        } catch (Exception e) {
+            cutscene.getSubscenes().clear();
+            cutscene.getSubscenes().addAll(oldSubscenes);
+            Util.sendCrashMessage(player, e);
+            Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+        }
+    }
+
+    public static void cutsceneAnimationLinkData(BiCutsceneAnimationLinkDataPacket packet, ServerPlayer player) {
+        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+        Cutscene cutscene = scene.getCutsceneByName(packet.cutsceneName());
+        if (cutscene == null) return;
+
+        List<Animation> oldAnimations = new ArrayList<>(cutscene.getAnimations());
+        List<Animation> newAnimations = new ArrayList<>();
+        for (String animName : packet.animationNames()) {
+            Animation anim = scene.getAnimationByName(animName);
+            if (anim != null) {
+                newAnimations.add(anim);
+            }
+        }
+
+        try {
+            cutscene.getAnimations().clear();
+            cutscene.getAnimations().addAll(newAnimations);
+            NarrativeCraftFile.updateCutsceneFile(scene);
+            Util.broadcastPacket(
+                    packet, NarrativeCraftMod.server.getPlayerList().getPlayers());
+            Services.PACKET_SENDER.sendToPlayer(
+                    player, new S2CCutscenesScreenPacket(chapter.getIndex(), scene.getName()));
+        } catch (Exception e) {
+            cutscene.getAnimations().clear();
+            cutscene.getAnimations().addAll(oldAnimations);
+            Util.sendCrashMessage(player, e);
+            Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+        }
+    }
 }

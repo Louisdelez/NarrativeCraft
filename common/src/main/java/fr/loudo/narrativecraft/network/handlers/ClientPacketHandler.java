@@ -474,4 +474,92 @@ public class ClientPacketHandler {
 
         updateStoryElementScreen();
     }
+
+    public static void cutsceneSubsceneLinkData(BiCutsceneSubsceneLinkDataPacket packet) {
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+        Cutscene cutscene = scene.getCutsceneByName(packet.cutsceneName());
+        if (cutscene == null) return;
+
+        List<Subscene> newSubscenes = new ArrayList<>();
+        for (String subName : packet.subsceneNames()) {
+            Subscene sub = scene.getSubsceneByName(subName);
+            if (sub != null) {
+                newSubscenes.add(sub);
+            }
+        }
+        cutscene.getSubscenes().clear();
+        cutscene.getSubscenes().addAll(newSubscenes);
+
+        updateStoryElementScreen();
+    }
+
+    public static void cutsceneAnimationLinkData(BiCutsceneAnimationLinkDataPacket packet) {
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+        Cutscene cutscene = scene.getCutsceneByName(packet.cutsceneName());
+        if (cutscene == null) return;
+
+        List<Animation> newAnimations = new ArrayList<>();
+        for (String animName : packet.animationNames()) {
+            Animation anim = scene.getAnimationByName(animName);
+            if (anim != null) {
+                newAnimations.add(anim);
+            }
+        }
+        cutscene.getAnimations().clear();
+        cutscene.getAnimations().addAll(newAnimations);
+
+        updateStoryElementScreen();
+    }
+
+    public static void syncLinksHandler(S2CLinksSyncPacket packet) {
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+
+        packet.subsceneAnimations().forEach((subName, animNames) -> {
+            Subscene subscene = scene.getSubsceneByName(subName);
+            if (subscene != null) {
+                List<Animation> anims = new ArrayList<>();
+                for (String name : animNames) {
+                    Animation a = scene.getAnimationByName(name);
+                    if (a != null) anims.add(a);
+                }
+                subscene.getAnimations().clear();
+                subscene.getAnimations().addAll(anims);
+            }
+        });
+
+        packet.cutsceneSubscenes().forEach((cutName, subNames) -> {
+            Cutscene cutscene = scene.getCutsceneByName(cutName);
+            if (cutscene != null) {
+                List<Subscene> subs = new ArrayList<>();
+                for (String name : subNames) {
+                    Subscene s = scene.getSubsceneByName(name);
+                    if (s != null) subs.add(s);
+                }
+                cutscene.getSubscenes().clear();
+                cutscene.getSubscenes().addAll(subs);
+            }
+        });
+
+        packet.cutsceneAnimations().forEach((cutName, animNames) -> {
+            Cutscene cutscene = scene.getCutsceneByName(cutName);
+            if (cutscene != null) {
+                List<Animation> anims = new ArrayList<>();
+                for (String name : animNames) {
+                    Animation a = scene.getAnimationByName(name);
+                    if (a != null) anims.add(a);
+                }
+                cutscene.getAnimations().clear();
+                cutscene.getAnimations().addAll(anims);
+            }
+        });
+    }
 }

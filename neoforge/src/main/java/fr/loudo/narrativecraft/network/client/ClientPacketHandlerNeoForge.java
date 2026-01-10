@@ -90,6 +90,12 @@ public class ClientPacketHandlerNeoForge {
         });
     }
 
+    public static void syncLinksHandler(final S2CLinksSyncPacket packet, final IPayloadContext context) {
+        context.enqueueWork(() -> {
+            ClientPacketHandler.syncLinksHandler(packet);
+        });
+    }
+
     public static void openSceneScreen(S2CSceneScreenPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
             ClientPacketHandler.openSceneScreen(packet);

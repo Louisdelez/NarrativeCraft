@@ -60,5 +60,11 @@ public class ServerPacketHandlerFabric {
         ServerPlayNetworking.registerGlobalReceiver(BiSubsceneAnimationLinkDataPacket.TYPE, (payload, context) -> {
             ServerPacketHandler.subsceneAnimationLinkData(payload, context.player());
         });
+        ServerPlayNetworking.registerGlobalReceiver(BiCutsceneSubsceneLinkDataPacket.TYPE, (payload, context) -> {
+            ServerPacketHandler.cutsceneSubsceneLinkData(payload, context.player());
+        });
+        ServerPlayNetworking.registerGlobalReceiver(BiCutsceneAnimationLinkDataPacket.TYPE, (payload, context) -> {
+            ServerPacketHandler.cutsceneAnimationLinkData(payload, context.player());
+        });
     }
 }

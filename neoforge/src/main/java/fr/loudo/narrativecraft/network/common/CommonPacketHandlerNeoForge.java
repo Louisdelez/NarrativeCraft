@@ -130,4 +130,24 @@ public class CommonPacketHandlerNeoForge {
             }
         });
     }
+
+    public static void cutsceneSubsceneLinkData(BiCutsceneSubsceneLinkDataPacket packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (context.flow().isServerbound()) {
+                ServerPacketHandler.cutsceneSubsceneLinkData(packet, (ServerPlayer) context.player());
+            } else {
+                ClientPacketHandler.cutsceneSubsceneLinkData(packet);
+            }
+        });
+    }
+
+    public static void cutsceneAnimationLinkData(BiCutsceneAnimationLinkDataPacket packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (context.flow().isServerbound()) {
+                ServerPacketHandler.cutsceneAnimationLinkData(packet, (ServerPlayer) context.player());
+            } else {
+                ClientPacketHandler.cutsceneAnimationLinkData(packet);
+            }
+        });
+    }
 }
