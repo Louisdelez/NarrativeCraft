@@ -32,8 +32,9 @@ import fr.loudo.narrativecraft.managers.RecordingManager;
 import fr.loudo.narrativecraft.narrative.NarrativeEntryInit;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
-import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Cutscene;
+import fr.loudo.narrativecraft.narrative.chapter.scene.data.Subscene;
 import fr.loudo.narrativecraft.narrative.recording.Recording;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.network.storyDataSyncs.*;
@@ -98,6 +99,10 @@ public class OnPlayerServerConnection {
     }
 
     private static void loadStoryDataToClient(ServerPlayer player) {
+        Services.PACKET_SENDER.sendToPlayer(
+                player,
+                new S2CSyncCharactersPacket(
+                        NarrativeCraftMod.getInstance().getCharacterManager().getCharacterStories()));
         List<Chapter> chapters =
                 NarrativeCraftMod.getInstance().getChapterManager().getChapters();
         Services.PACKET_SENDER.sendToPlayer(player, new S2CSyncChaptersPacket(chapters));
@@ -134,6 +139,14 @@ public class OnPlayerServerConnection {
                     cutsceneAnimations.put(cutscene.getName(), cutscene.getAnimationsName());
                 }
 
+                Map<String, String> animationCharacters = new HashMap<>();
+                for (Animation animation : scene.getAnimations()) {
+                    if (animation.getCharacter() != null) {
+                        animationCharacters.put(
+                                animation.getName(), animation.getCharacter().getName());
+                    }
+                }
+
                 Services.PACKET_SENDER.sendToPlayer(
                         player,
                         new S2CLinksSyncPacket(
@@ -141,12 +154,9 @@ public class OnPlayerServerConnection {
                                 scene.getName(),
                                 subsceneAnimations,
                                 cutsceneSubscenes,
-                                cutsceneAnimations));
+                                cutsceneAnimations,
+                                animationCharacters));
             }
         }
-        Services.PACKET_SENDER.sendToPlayer(
-                player,
-                new S2CSyncCharactersPacket(
-                        NarrativeCraftMod.getInstance().getCharacterManager().getCharacterStories()));
     }
 }

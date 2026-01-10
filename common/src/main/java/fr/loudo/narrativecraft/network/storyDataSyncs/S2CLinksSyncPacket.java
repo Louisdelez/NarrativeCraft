@@ -39,7 +39,8 @@ public record S2CLinksSyncPacket(
         String sceneName,
         Map<String, List<String>> subsceneAnimations,
         Map<String, List<String>> cutsceneSubscenes,
-        Map<String, List<String>> cutsceneAnimations)
+        Map<String, List<String>> cutsceneAnimations,
+        Map<String, String> animationCharacters)
         implements CustomPacketPayload {
 
     public static final Type<S2CLinksSyncPacket> TYPE =
@@ -65,6 +66,8 @@ public record S2CLinksSyncPacket(
                     ByteBufCodecs.STRING_UTF8,
                     ByteBufCodecs.collection(ArrayList::new, ByteBufCodecs.STRING_UTF8)),
             S2CLinksSyncPacket::cutsceneAnimations,
+            ByteBufCodecs.map(HashMap::new, ByteBufCodecs.STRING_UTF8, ByteBufCodecs.STRING_UTF8),
+            S2CLinksSyncPacket::animationCharacters,
             S2CLinksSyncPacket::new);
 
     @Override

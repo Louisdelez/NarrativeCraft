@@ -900,4 +900,29 @@ public class ServerPacketHandler {
             Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
         }
     }
+
+    public static void animationCharacterLinkData(BiAnimationCharacterLinkDataPacket packet, ServerPlayer player) {
+        Chapter chapter = CHAPTER_MANAGER.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+        Animation animation = scene.getAnimationByName(packet.animationName());
+        if (animation == null) return;
+        CharacterStory character = CHARACTER_MANAGER.getCharacterByName(packet.characterName());
+        // null character means unlinking
+
+        CharacterStory oldCharacter = animation.getCharacter();
+        try {
+            animation.setCharacter(character);
+            NarrativeCraftFile.updateAnimationFile(animation);
+            Util.broadcastPacket(
+                    packet, NarrativeCraftMod.server.getPlayerList().getPlayers());
+            Services.PACKET_SENDER.sendToPlayer(
+                    player, new S2CAnimationsScreenPacket(chapter.getIndex(), scene.getName()));
+        } catch (Exception e) {
+            animation.setCharacter(oldCharacter);
+            Util.sendCrashMessage(player, e);
+            Services.PACKET_SENDER.sendToPlayer(player, S2CScreenPacket.none());
+        }
+    }
 }

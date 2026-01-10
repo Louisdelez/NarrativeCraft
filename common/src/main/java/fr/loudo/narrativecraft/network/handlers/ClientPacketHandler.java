@@ -517,6 +517,20 @@ public class ClientPacketHandler {
         updateStoryElementScreen();
     }
 
+    public static void animationCharacterLinkData(BiAnimationCharacterLinkDataPacket packet) {
+        Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
+        if (chapter == null) return;
+        Scene scene = chapter.getSceneByName(packet.sceneName());
+        if (scene == null) return;
+        Animation animation = scene.getAnimationByName(packet.animationName());
+        if (animation == null) return;
+        CharacterStory character = CHARACTER_MANAGER_CLIENT.getCharacterByName(packet.characterName());
+
+        animation.setCharacter(character);
+
+        updateStoryElementScreen();
+    }
+
     public static void syncLinksHandler(S2CLinksSyncPacket packet) {
         Chapter chapter = CHAPTER_MANAGER_CLIENT.getChapterByIndex(packet.chapterIndex());
         if (chapter == null) return;
@@ -559,6 +573,14 @@ public class ClientPacketHandler {
                 }
                 cutscene.getAnimations().clear();
                 cutscene.getAnimations().addAll(anims);
+            }
+        });
+
+        packet.animationCharacters().forEach((animName, charName) -> {
+            Animation animation = scene.getAnimationByName(animName);
+            CharacterStory character = CHARACTER_MANAGER_CLIENT.getCharacterByName(charName);
+            if (animation != null && character != null) {
+                animation.setCharacter(character);
             }
         });
     }

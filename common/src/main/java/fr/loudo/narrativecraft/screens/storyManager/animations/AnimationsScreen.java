@@ -26,7 +26,7 @@ package fr.loudo.narrativecraft.screens.storyManager.animations;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.data.Animation;
-import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.network.data.BiAnimationCharacterLinkDataPacket;
 import fr.loudo.narrativecraft.network.data.BiAnimationDataPacket;
 import fr.loudo.narrativecraft.network.data.TypeStoryData;
 import fr.loudo.narrativecraft.platform.Services;
@@ -38,7 +38,6 @@ import fr.loudo.narrativecraft.screens.storyManager.scene.ScenesMenuScreen;
 import fr.loudo.narrativecraft.util.ImageFontConstants;
 import fr.loudo.narrativecraft.util.ScreenUtils;
 import fr.loudo.narrativecraft.util.Translation;
-import java.io.IOException;
 import java.util.List;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.CommonComponents;
@@ -116,14 +115,12 @@ public class AnimationsScreen extends StoryElementScreen {
                                             Translation.message("character.must_link_character"));
                                     return;
                                 }
-                                CharacterStory oldCharacter = animation.getCharacter();
-                                try {
-                                    animation.setCharacter(characterStory);
-                                    NarrativeCraftFile.updateAnimationFile(animation);
-                                } catch (IOException e) {
-                                    fr.loudo.narrativecraft.util.Util.sendCrashMessage(minecraft.player, e);
-                                    animation.setCharacter(oldCharacter);
-                                }
+
+                                Services.PACKET_SENDER.sendToServer(new BiAnimationCharacterLinkDataPacket(
+                                        scene.getChapter().getIndex(),
+                                        scene.getName(),
+                                        animation.getName(),
+                                        characterStory.getName()));
                             });
                     this.minecraft.setScreen(screen);
                 })

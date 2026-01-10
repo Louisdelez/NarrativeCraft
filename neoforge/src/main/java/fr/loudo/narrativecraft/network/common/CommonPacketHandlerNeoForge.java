@@ -150,4 +150,14 @@ public class CommonPacketHandlerNeoForge {
             }
         });
     }
+
+    public static void animationCharacterLinkData(BiAnimationCharacterLinkDataPacket packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (context.flow().isServerbound()) {
+                ServerPacketHandler.animationCharacterLinkData(packet, (ServerPlayer) context.player());
+            } else {
+                ClientPacketHandler.animationCharacterLinkData(packet);
+            }
+        });
+    }
 }
