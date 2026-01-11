@@ -53,6 +53,7 @@ public class NarrativeCraftMod {
      * Added in v1.2.0 for cross-version compatibility validation.
      */
     public static final String MULTI_VERSION_BUILD = "5-target-v1.2.0";
+
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
 
     public static boolean firstTime = false;
@@ -104,8 +105,8 @@ public class NarrativeCraftMod {
     private final RecordingManager recordingManager = new RecordingManager();
     private final PlaybackManager playbackManager = new PlaybackManager();
     private final NarrativeStateManagerImpl narrativeStateManager = new NarrativeStateManagerImpl();
-    private final NarrativeCraftLogoRenderer narrativeCraftLogoRenderer = new NarrativeCraftLogoRenderer(
-            NcId.of(NarrativeCraftMod.MOD_ID, "textures/logo.png"));
+    private final NarrativeCraftLogoRenderer narrativeCraftLogoRenderer =
+            new NarrativeCraftLogoRenderer(NcId.of(NarrativeCraftMod.MOD_ID, "textures/logo.png"));
     private NarrativeClientOption narrativeClientOptions = new NarrativeClientOption();
     private NarrativeWorldOption narrativeWorldOption = new NarrativeWorldOption();
 

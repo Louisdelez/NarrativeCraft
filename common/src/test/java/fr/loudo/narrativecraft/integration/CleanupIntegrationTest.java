@@ -23,21 +23,18 @@
 
 package fr.loudo.narrativecraft.integration;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import fr.loudo.narrativecraft.narrative.cleanup.CleanupHandler;
-import fr.loudo.narrativecraft.narrative.cleanup.CleanupHandlerRegistry;
 import fr.loudo.narrativecraft.narrative.state.NarrativeState;
 import fr.loudo.narrativecraft.narrative.state.NarrativeStateManagerImpl;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Integration tests for cleanup scenarios.

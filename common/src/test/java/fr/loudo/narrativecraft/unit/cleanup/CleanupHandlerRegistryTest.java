@@ -23,18 +23,17 @@
 
 package fr.loudo.narrativecraft.unit.cleanup;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import fr.loudo.narrativecraft.narrative.cleanup.CleanupHandler;
 import fr.loudo.narrativecraft.narrative.cleanup.CleanupHandlerRegistry;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("CleanupHandlerRegistry")
 class CleanupHandlerRegistryTest {

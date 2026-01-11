@@ -32,8 +32,7 @@ import net.minecraft.client.gui.GuiGraphics;
 
 public class NarrativeCraftLogoRenderer {
 
-    public static final NcId LOGO =
-            NcId.of(NarrativeCraftMod.MOD_ID, "textures/logo.png");
+    public static final NcId LOGO = NcId.of(NarrativeCraftMod.MOD_ID, "textures/logo.png");
 
     private final NcId resourceLocation;
     private int[] logoRes;
@@ -56,17 +55,7 @@ public class NarrativeCraftLogoRenderer {
 
     public void render(GuiGraphics guiGraphics, int x, int y) {
         IGuiRenderCompat guiCompat = VersionAdapterLoader.getAdapter().getGuiRenderCompat();
-        guiCompat.blitTexture(
-                guiGraphics,
-                LOGO.toString(),
-                x,
-                y,
-                0,
-                0,
-                256,
-                imageHeight,
-                256,
-                imageHeight);
+        guiCompat.blitTexture(guiGraphics, LOGO.toString(), x, y, 0, 0, 256, imageHeight, 256, imageHeight);
     }
 
     public int getImageHeight() {

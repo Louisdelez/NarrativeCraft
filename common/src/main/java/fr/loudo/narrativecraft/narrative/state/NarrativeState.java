@@ -66,9 +66,7 @@ public enum NarrativeState {
     private final boolean locksCamera;
     private final boolean modifiesHud;
 
-    private static final Set<NarrativeState> ACTIVE_STATES = EnumSet.of(
-            DIALOGUE, CUTSCENE, RECORDING, PLAYBACK
-    );
+    private static final Set<NarrativeState> ACTIVE_STATES = EnumSet.of(DIALOGUE, CUTSCENE, RECORDING, PLAYBACK);
 
     NarrativeState(boolean capturesInput, boolean locksCamera, boolean modifiesHud) {
         this.capturesInput = capturesInput;

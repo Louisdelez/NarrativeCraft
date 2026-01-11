@@ -37,6 +37,7 @@ import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+
 public class DialogParametersInkAction extends InkAction {
 
     private static final Set<String> VALID_PARAMETERS = Set.of(

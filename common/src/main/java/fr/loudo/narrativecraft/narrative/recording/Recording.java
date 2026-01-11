@@ -58,7 +58,8 @@ public class Recording {
     // T095/T096: Changed from List to HashSet for O(1) contains() lookup
     // Before: List<Entity> + stream().map().toList() each tick
     // After: Set<UUID> - zero allocation lookup via contains()
-    private final Set<UUID> trackedEntityUUIDs = new HashSet<>(NarrativeCraftConstants.TRACKED_ENTITIES_INITIAL_CAPACITY);
+    private final Set<UUID> trackedEntityUUIDs =
+            new HashSet<>(NarrativeCraftConstants.TRACKED_ENTITIES_INITIAL_CAPACITY);
     private final List<RecordingData> recordingDataList = new ArrayList<>();
     private final PlayerSession playerSession;
     private List<Subscene> subscenesPlaying = new ArrayList<>();
@@ -148,7 +149,10 @@ public class Recording {
                 .level()
                 .getEntities(
                         entityRecorderData.getEntity(),
-                        entityRecorderData.getEntity().getBoundingBox().inflate(NarrativeCraftConstants.ENTITY_TRACKING_RADIUS));
+                        entityRecorderData
+                                .getEntity()
+                                .getBoundingBox()
+                                .inflate(NarrativeCraftConstants.ENTITY_TRACKING_RADIUS));
 
         for (Entity entity : nearbyEntities) {
             UUID entityUUID = entity.getUUID();

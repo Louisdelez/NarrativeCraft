@@ -23,12 +23,12 @@
 
 package fr.loudo.narrativecraft.unit.cleanup;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import fr.loudo.narrativecraft.narrative.cleanup.CleanupHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for HUD cleanup handler behavior.

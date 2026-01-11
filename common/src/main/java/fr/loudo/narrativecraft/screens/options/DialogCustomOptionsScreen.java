@@ -238,7 +238,10 @@ public class DialogCustomOptionsScreen extends Screen {
                 startX,
                 currentY,
                 ScreenUtils.Align.HORIZONTAL);
-        bcColorBox.getEditBox().setValue(Integer.toHexString(NarrativeCraftMod.getColorCompat().color(0, dialogData.getBackgroundColor())));
+        bcColorBox
+                .getEditBox()
+                .setValue(Integer.toHexString(
+                        NarrativeCraftMod.getColorCompat().color(0, dialogData.getBackgroundColor())));
         this.addRenderableWidget(bcColorBox.getStringWidget());
         this.addRenderableWidget(bcColorBox.getEditBox());
         currentY += bcColorBox.getEditBox().getHeight() + gap;
@@ -251,7 +254,9 @@ public class DialogCustomOptionsScreen extends Screen {
                 startX,
                 currentY,
                 ScreenUtils.Align.HORIZONTAL);
-        textColorBox.getEditBox().setValue(Integer.toHexString(NarrativeCraftMod.getColorCompat().color(0, dialogData.getTextColor())));
+        textColorBox
+                .getEditBox()
+                .setValue(Integer.toHexString(NarrativeCraftMod.getColorCompat().color(0, dialogData.getTextColor())));
         this.addRenderableWidget(textColorBox.getStringWidget());
         this.addRenderableWidget(textColorBox.getEditBox());
         currentY += textColorBox.getEditBox().getHeight() + gap;

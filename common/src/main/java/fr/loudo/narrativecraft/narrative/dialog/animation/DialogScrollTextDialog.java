@@ -129,7 +129,12 @@ public class DialogScrollTextDialog extends AbstractDialogScrollText {
             }
             ((ICustomGuiRender) guiGraphics)
                     .narrativecraft$drawStringFloat(
-                            String.valueOf(letter.letter()), minecraft.font, x, y, NarrativeCraftMod.getColorCompat().color(255, textColor), false);
+                            String.valueOf(letter.letter()),
+                            minecraft.font,
+                            x,
+                            y,
+                            NarrativeCraftMod.getColorCompat().color(255, textColor),
+                            false);
         }
     }
 }

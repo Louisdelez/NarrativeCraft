@@ -1,11 +1,33 @@
-package fr.loudo.narrativecraft.util;
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package fr.loudo.narrativecraft.util;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Lightweight performance profiler for NarrativeCraft subsystems.
@@ -28,8 +50,7 @@ public final class NarrativeProfiler {
     private static volatile boolean enabled = false;
 
     // Thread-local storage for in-progress timings
-    private static final ThreadLocal<Map<String, Long>> activeTimings =
-        ThreadLocal.withInitial(ConcurrentHashMap::new);
+    private static final ThreadLocal<Map<String, Long>> activeTimings = ThreadLocal.withInitial(ConcurrentHashMap::new);
 
     // Accumulated statistics per subsystem
     private static final Map<String, SubsystemStats> stats = new ConcurrentHashMap<>();
@@ -117,22 +138,27 @@ public final class NarrativeProfiler {
         }
 
         LOGGER.info("[Profiler] === Performance Summary ===");
-        LOGGER.info("[Profiler] {:20s} {:>10s} {:>12s} {:>12s} {:>12s}",
-            "Subsystem", "Calls", "Total (ms)", "Avg (us)", "Max (us)");
+        LOGGER.info(
+                "[Profiler] {:20s} {:>10s} {:>12s} {:>12s} {:>12s}",
+                "Subsystem",
+                "Calls",
+                "Total (ms)",
+                "Avg (us)",
+                "Max (us)");
         LOGGER.info("[Profiler] {}", "-".repeat(70));
 
         stats.entrySet().stream()
-            .sorted(Map.Entry.comparingByValue((a, b) ->
-                Long.compare(b.getTotalNanos(), a.getTotalNanos())))
-            .forEach(entry -> {
-                SubsystemStats s = entry.getValue();
-                LOGGER.info("[Profiler] {:20s} {:>10d} {:>12.2f} {:>12.2f} {:>12.2f}",
-                    entry.getKey(),
-                    s.getCallCount(),
-                    s.getTotalNanos() / 1_000_000.0,
-                    s.getAverageNanos() / 1_000.0,
-                    s.getMaxNanos() / 1_000.0);
-            });
+                .sorted(Map.Entry.comparingByValue((a, b) -> Long.compare(b.getTotalNanos(), a.getTotalNanos())))
+                .forEach(entry -> {
+                    SubsystemStats s = entry.getValue();
+                    LOGGER.info(
+                            "[Profiler] {:20s} {:>10d} {:>12.2f} {:>12.2f} {:>12.2f}",
+                            entry.getKey(),
+                            s.getCallCount(),
+                            s.getTotalNanos() / 1_000_000.0,
+                            s.getAverageNanos() / 1_000.0,
+                            s.getMaxNanos() / 1_000.0);
+                });
 
         LOGGER.info("[Profiler] =============================");
     }

@@ -85,7 +85,8 @@ public class DialogTail {
             }
         }
 
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(NarrativeCraftMod.getRenderType(RenderChannel.DIALOG_BACKGROUND));
+        VertexConsumer vertexConsumer =
+                bufferSource.getBuffer(NarrativeCraftMod.getRenderType(RenderChannel.DIALOG_BACKGROUND));
         Matrix4f matrix4f = poseStack.last().pose();
 
         float topRight = -width / 2 + offset;

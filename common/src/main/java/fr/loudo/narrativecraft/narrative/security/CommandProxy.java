@@ -25,7 +25,6 @@ package fr.loudo.narrativecraft.narrative.security;
 
 import fr.loudo.narrativecraft.narrative.validation.ValidationError;
 import fr.loudo.narrativecraft.narrative.validation.ValidationResult;
-
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -49,91 +48,91 @@ public class CommandProxy {
      * These commands don't modify world state in dangerous ways.
      */
     private static final Set<String> WHITELISTED_COMMANDS = Set.of(
-        // Visual/Audio effects (cosmetic only)
-        "effect",           // Apply status effects to entities
-        "particle",         // Spawn particles
-        "playsound",        // Play sounds
-        "stopsound",        // Stop sounds
-        "title",            // Display title text
-        "subtitle",         // Display subtitle text
+            // Visual/Audio effects (cosmetic only)
+            "effect", // Apply status effects to entities
+            "particle", // Spawn particles
+            "playsound", // Play sounds
+            "stopsound", // Stop sounds
+            "title", // Display title text
+            "subtitle", // Display subtitle text
 
-        // Entity manipulation (for NPCs/narratives)
-        "tp",               // Teleport entities
-        "teleport",         // Teleport entities (alias)
-        "summon",           // Summon entities
-        "kill",             // Kill specific entities
+            // Entity manipulation (for NPCs/narratives)
+            "tp", // Teleport entities
+            "teleport", // Teleport entities (alias)
+            "summon", // Summon entities
+            "kill", // Kill specific entities
 
-        // Time/Weather (cosmetic world changes)
-        "time",             // Set/query time
-        "weather",          // Set weather
+            // Time/Weather (cosmetic world changes)
+            "time", // Set/query time
+            "weather", // Set weather
 
-        // Messages
-        "say",              // Broadcast message
-        "tell",             // Private message
-        "tellraw",          // JSON formatted message
-        "msg",              // Private message (alias)
+            // Messages
+            "say", // Broadcast message
+            "tell", // Private message
+            "tellraw", // JSON formatted message
+            "msg", // Private message (alias)
 
-        // Item/Inventory (for rewards/story items)
-        "give",             // Give items to players
-        "clear",            // Clear items from inventory
+            // Item/Inventory (for rewards/story items)
+            "give", // Give items to players
+            "clear", // Clear items from inventory
 
-        // Game mechanics
-        "gamemode",         // Change gamemode
-        "xp",               // Add/remove XP
-        "experience",       // Add/remove XP (alias)
-        "scoreboard",       // Scoreboard operations
-        "tag",              // Entity tags
-        "attribute",        // Entity attributes
-        "spawnpoint",       // Set spawn point
+            // Game mechanics
+            "gamemode", // Change gamemode
+            "xp", // Add/remove XP
+            "experience", // Add/remove XP (alias)
+            "scoreboard", // Scoreboard operations
+            "tag", // Entity tags
+            "attribute", // Entity attributes
+            "spawnpoint", // Set spawn point
 
-        // Function execution
-        "function",         // Execute data pack functions
+            // Function execution
+            "function", // Execute data pack functions
 
-        // Advancement
-        "advancement"       // Grant/revoke advancements
-    );
+            // Advancement
+            "advancement" // Grant/revoke advancements
+            );
 
     /**
      * Commands that are explicitly blocked for security reasons.
      * These commands can cause severe damage or security issues.
      */
     private static final Set<String> BLOCKED_COMMANDS = Set.of(
-        // Server administration (critical security risk)
-        "op",               // Grant operator status
-        "deop",             // Revoke operator status
-        "ban",              // Ban players
-        "ban-ip",           // IP ban
-        "banlist",          // View ban list
-        "pardon",           // Unban player
-        "pardon-ip",        // Unban IP
-        "kick",             // Kick players
-        "stop",             // Stop server
-        "save-all",         // Force world save
-        "save-off",         // Disable auto-save
-        "save-on",          // Enable auto-save
+            // Server administration (critical security risk)
+            "op", // Grant operator status
+            "deop", // Revoke operator status
+            "ban", // Ban players
+            "ban-ip", // IP ban
+            "banlist", // View ban list
+            "pardon", // Unban player
+            "pardon-ip", // Unban IP
+            "kick", // Kick players
+            "stop", // Stop server
+            "save-all", // Force world save
+            "save-off", // Disable auto-save
+            "save-on", // Enable auto-save
 
-        // World destruction
-        "fill",             // Can fill large areas (lag/griefing)
-        "clone",            // Clone blocks (lag risk)
-        "setblock",         // Modify blocks (griefing)
+            // World destruction
+            "fill", // Can fill large areas (lag/griefing)
+            "clone", // Clone blocks (lag risk)
+            "setblock", // Modify blocks (griefing)
 
-        // File system access
-        "debug",            // Debug commands
-        "data",             // NBT data modification
-        "datapack",         // Data pack management
+            // File system access
+            "debug", // Debug commands
+            "data", // NBT data modification
+            "datapack", // Data pack management
 
-        // Player data modification
-        "whitelist",        // Server whitelist management
+            // Player data modification
+            "whitelist", // Server whitelist management
 
-        // Dangerous defaults
-        "execute",          // Can execute any command (bypass)
-        "spreadplayers",    // Teleport many players (abuse)
-        "forceload",        // Chunk loading (performance)
-        "worldborder",      // World border (can trap players)
+            // Dangerous defaults
+            "execute", // Can execute any command (bypass)
+            "spreadplayers", // Teleport many players (abuse)
+            "forceload", // Chunk loading (performance)
+            "worldborder", // World border (can trap players)
 
-        // Seed exposure
-        "seed"              // Reveals world seed
-    );
+            // Seed exposure
+            "seed" // Reveals world seed
+            );
 
     /**
      * Pattern for validating command format.
@@ -164,41 +163,42 @@ public class CommandProxy {
      * @param lineNumber The line number for error reporting
      * @return ValidationResult indicating if the command is allowed
      */
-    public ValidationResult validateCommand(String command, String storyName,
-                                            String sceneName, int lineNumber) {
+    public ValidationResult validateCommand(String command, String storyName, String sceneName, int lineNumber) {
         if (command == null || command.trim().isEmpty()) {
-            return ValidationResult.failure(
-                ValidationError.securityViolation("command", command, storyName, sceneName, lineNumber,
-                    "Empty command is not allowed")
-            );
+            return ValidationResult.failure(ValidationError.securityViolation(
+                    "command", command, storyName, sceneName, lineNumber, "Empty command is not allowed"));
         }
 
         String trimmedCommand = command.trim();
         String commandName = extractCommandName(trimmedCommand);
 
         if (commandName == null) {
-            return ValidationResult.failure(
-                ValidationError.securityViolation("command", trimmedCommand, storyName, sceneName, lineNumber,
-                    "Invalid command format")
-            );
+            return ValidationResult.failure(ValidationError.securityViolation(
+                    "command", trimmedCommand, storyName, sceneName, lineNumber, "Invalid command format"));
         }
 
         String lowerCommandName = commandName.toLowerCase();
 
         // Check explicit blocklist first (highest priority)
         if (isBlocked(lowerCommandName)) {
-            return ValidationResult.failure(
-                ValidationError.securityViolation("command", trimmedCommand, storyName, sceneName, lineNumber,
-                    "Command '" + commandName + "' is blocked for security reasons")
-            );
+            return ValidationResult.failure(ValidationError.securityViolation(
+                    "command",
+                    trimmedCommand,
+                    storyName,
+                    sceneName,
+                    lineNumber,
+                    "Command '" + commandName + "' is blocked for security reasons"));
         }
 
         // Check whitelist
         if (!isWhitelisted(lowerCommandName)) {
-            return ValidationResult.failure(
-                ValidationError.securityViolation("command", trimmedCommand, storyName, sceneName, lineNumber,
-                    "Command '" + commandName + "' is not in the allowed command list")
-            );
+            return ValidationResult.failure(ValidationError.securityViolation(
+                    "command",
+                    trimmedCommand,
+                    storyName,
+                    sceneName,
+                    lineNumber,
+                    "Command '" + commandName + "' is not in the allowed command list"));
         }
 
         return ValidationResult.success();
@@ -230,16 +230,14 @@ public class CommandProxy {
      * Checks if a command name is whitelisted.
      */
     private boolean isWhitelisted(String commandName) {
-        return WHITELISTED_COMMANDS.contains(commandName) ||
-               customWhitelist.contains(commandName);
+        return WHITELISTED_COMMANDS.contains(commandName) || customWhitelist.contains(commandName);
     }
 
     /**
      * Checks if a command name is blocked.
      */
     private boolean isBlocked(String commandName) {
-        return BLOCKED_COMMANDS.contains(commandName) ||
-               customBlacklist.contains(commandName);
+        return BLOCKED_COMMANDS.contains(commandName) || customBlacklist.contains(commandName);
     }
 
     /**

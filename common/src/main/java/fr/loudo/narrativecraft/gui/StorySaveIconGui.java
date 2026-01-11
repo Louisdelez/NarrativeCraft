@@ -90,7 +90,13 @@ public class StorySaveIconGui {
 
         int x = width - logoWidth - 30;
         int y = height - 30;
-        guiGraphics.drawString(minecraft.font, logo, x, y, NarrativeCraftMod.getColorCompat().color((int) (opacity * 255.0), 0xFFFFFF), false);
+        guiGraphics.drawString(
+                minecraft.font,
+                logo,
+                x,
+                y,
+                NarrativeCraftMod.getColorCompat().color((int) (opacity * 255.0), 0xFFFFFF),
+                false);
         if (debugMode) {
             Component message = Translation.message("debug.fake_save");
             guiGraphics.drawString(

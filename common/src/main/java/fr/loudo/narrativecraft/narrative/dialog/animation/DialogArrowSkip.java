@@ -91,7 +91,8 @@ public class DialogArrowSkip {
     }
 
     private void draw(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, int color) {
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(NarrativeCraftMod.getRenderType(RenderChannel.DIALOG_BACKGROUND));
+        VertexConsumer vertexConsumer =
+                bufferSource.getBuffer(NarrativeCraftMod.getRenderType(RenderChannel.DIALOG_BACKGROUND));
         Matrix4f matrix4f = poseStack.last().pose();
 
         float xStart = dialogRenderer.getTotalWidth() - width - offset;
@@ -129,7 +130,8 @@ public class DialogArrowSkip {
         poseStack.translate((float) translateX + offset, 0);
 
         ((ICustomGuiRender) guiGraphics)
-                .narrativecraft$drawDialogSkip(width, height, NarrativeCraftMod.getColorCompat().color((int) (opacity * 255), color));
+                .narrativecraft$drawDialogSkip(
+                        width, height, NarrativeCraftMod.getColorCompat().color((int) (opacity * 255), color));
 
         poseStack.popMatrix();
     }

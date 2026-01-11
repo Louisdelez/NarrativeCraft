@@ -31,7 +31,6 @@ import fr.loudo.narrativecraft.util.Translation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import net.minecraft.network.chat.Component;
 
 public class CrashScreen extends AbstractTextBoxScreen {
 

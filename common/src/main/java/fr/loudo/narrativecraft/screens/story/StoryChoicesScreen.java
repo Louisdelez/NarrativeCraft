@@ -40,7 +40,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.resources.sounds.SoundInstance;
-import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
 public class StoryChoicesScreen extends Screen {
@@ -102,8 +101,8 @@ public class StoryChoicesScreen extends Screen {
     protected void init() {
         if (!initiated) {
             NcId soundRes = NcId.of(NarrativeCraftMod.MOD_ID, "sfx.choice_appear");
-            SoundInstance sound = (SoundInstance) VersionAdapterLoader.getAdapter()
-                    .getUtilCompat().createSimpleSoundInstance(soundRes, 1.0f, 1.0f);
+            SoundInstance sound = (SoundInstance)
+                    VersionAdapterLoader.getAdapter().getUtilCompat().createSimpleSoundInstance(soundRes, 1.0f, 1.0f);
             this.minecraft.getSoundManager().play(sound);
         }
         choiceButtonWidgetList.clear();

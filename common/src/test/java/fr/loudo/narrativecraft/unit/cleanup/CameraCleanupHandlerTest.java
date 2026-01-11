@@ -23,12 +23,12 @@
 
 package fr.loudo.narrativecraft.unit.cleanup;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import fr.loudo.narrativecraft.narrative.cleanup.CleanupHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for camera cleanup handler behavior.
@@ -53,8 +53,8 @@ class CameraCleanupHandlerTest {
     @BeforeEach
     void setUp() {
         cameraLocked = true;
-        cameraPosition = new float[]{100f, 64f, 200f};
-        cameraRotation = new float[]{45f, 180f};
+        cameraPosition = new float[] {100f, 64f, 200f};
+        cameraRotation = new float[] {45f, 180f};
         currentCamera = new Object(); // Simulates a camera lock
         handler = new MockCameraCleanupHandler();
     }

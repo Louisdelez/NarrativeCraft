@@ -41,26 +41,37 @@ public class TagValidator {
 
     /** All valid NarrativeCraft tag names */
     private static final Set<String> VALID_TAGS = Set.of(
-        "animation", "border", "camera", "time", "cutscene", "wait",
-        "dialog", "command", "emote", "fade", "kill", "on enter",
-        "save", "sfx", "song", "subscene", "weather", "shake",
-        "interaction", "gameplay", "text"
-    );
+            "animation",
+            "border",
+            "camera",
+            "time",
+            "cutscene",
+            "wait",
+            "dialog",
+            "command",
+            "emote",
+            "fade",
+            "kill",
+            "on enter",
+            "save",
+            "sfx",
+            "song",
+            "subscene",
+            "weather",
+            "shake",
+            "interaction",
+            "gameplay",
+            "text");
 
     /** Valid time units for wait/cooldown */
-    private static final Set<String> VALID_TIME_UNITS = Set.of(
-        "second", "seconds", "minute", "minutes", "hour", "hours"
-    );
+    private static final Set<String> VALID_TIME_UNITS =
+            Set.of("second", "seconds", "minute", "minutes", "hour", "hours");
 
     /** Valid weather types */
-    private static final Set<String> VALID_WEATHER_TYPES = Set.of(
-        "clear", "rain", "thunder"
-    );
+    private static final Set<String> VALID_WEATHER_TYPES = Set.of("clear", "rain", "thunder");
 
     /** Valid sound actions */
-    private static final Set<String> VALID_SOUND_ACTIONS = Set.of(
-        "start", "stop"
-    );
+    private static final Set<String> VALID_SOUND_ACTIONS = Set.of("start", "stop");
 
     /** Pattern for hex color validation */
     private static final Pattern HEX_COLOR_PATTERN = Pattern.compile("^[0-9A-Fa-f]{6}$");
@@ -98,10 +109,8 @@ public class TagValidator {
         // Check for unknown tag
         if (!isValidTag(tagName)) {
             Optional<String> suggestion = tagSuggester.suggest(tagName);
-            return ValidationResult.failure(
-                ValidationError.unknownTag(tagName, trimmedCommand, storyName, sceneName, lineNumber,
-                    suggestion.orElse(null))
-            );
+            return ValidationResult.failure(ValidationError.unknownTag(
+                    tagName, trimmedCommand, storyName, sceneName, lineNumber, suggestion.orElse(null)));
         }
 
         // Validate tag-specific arguments
@@ -172,8 +181,8 @@ public class TagValidator {
     /**
      * Validates arguments for a specific tag.
      */
-    private ValidationResult validateTagArguments(String tagName, String[] args, String command,
-                                                   String storyName, String sceneName, int lineNumber) {
+    private ValidationResult validateTagArguments(
+            String tagName, String[] args, String command, String storyName, String sceneName, int lineNumber) {
         return switch (tagName) {
             case "fade" -> validateFade(args, command, storyName, sceneName, lineNumber);
             case "wait" -> validateWait(args, command, storyName, sceneName, lineNumber);
@@ -190,41 +199,37 @@ public class TagValidator {
     /**
      * Validates fade tag: fade fadeIn staySeconds fadeOut [color]
      */
-    private ValidationResult validateFade(String[] args, String command,
-                                          String storyName, String sceneName, int lineNumber) {
+    private ValidationResult validateFade(
+            String[] args, String command, String storyName, String sceneName, int lineNumber) {
         if (args.length < 3) {
-            return ValidationResult.failure(
-                ValidationError.missingArgument("fade", command, storyName, sceneName, lineNumber,
-                    args.length == 0 ? "fadeInSeconds" :
-                    args.length == 1 ? "staySeconds" : "fadeOutSeconds",
-                    "float")
-            );
+            return ValidationResult.failure(ValidationError.missingArgument(
+                    "fade",
+                    command,
+                    storyName,
+                    sceneName,
+                    lineNumber,
+                    args.length == 0 ? "fadeInSeconds" : args.length == 1 ? "staySeconds" : "fadeOutSeconds",
+                    "float"));
         }
 
         // Validate all three time values
         String[] argNames = {"fadeInSeconds", "staySeconds", "fadeOutSeconds"};
         for (int i = 0; i < 3; i++) {
             if (!isValidNumber(args[i])) {
-                return ValidationResult.failure(
-                    ValidationError.invalidArgumentType("fade", command, storyName, sceneName, lineNumber,
-                        argNames[i], "number", args[i])
-                );
+                return ValidationResult.failure(ValidationError.invalidArgumentType(
+                        "fade", command, storyName, sceneName, lineNumber, argNames[i], "number", args[i]));
             }
             double value = Double.parseDouble(args[i]);
             if (value < 0) {
-                return ValidationResult.failure(
-                    ValidationError.invalidArgumentValue("fade", command, storyName, sceneName, lineNumber,
-                        argNames[i], args[i], "must be >= 0")
-                );
+                return ValidationResult.failure(ValidationError.invalidArgumentValue(
+                        "fade", command, storyName, sceneName, lineNumber, argNames[i], args[i], "must be >= 0"));
             }
         }
 
         // Validate optional color
         if (args.length >= 4 && !isValidHexColor(args[3])) {
-            return ValidationResult.failure(
-                ValidationError.invalidArgumentType("fade", command, storyName, sceneName, lineNumber,
-                    "color", "hex color (e.g., FF0000)", args[3])
-            );
+            return ValidationResult.failure(ValidationError.invalidArgumentType(
+                    "fade", command, storyName, sceneName, lineNumber, "color", "hex color (e.g., FF0000)", args[3]));
         }
 
         return ValidationResult.success();
@@ -233,34 +238,33 @@ public class TagValidator {
     /**
      * Validates wait tag: wait time unit
      */
-    private ValidationResult validateWait(String[] args, String command,
-                                          String storyName, String sceneName, int lineNumber) {
+    private ValidationResult validateWait(
+            String[] args, String command, String storyName, String sceneName, int lineNumber) {
         if (args.length < 1) {
-            return ValidationResult.failure(
-                ValidationError.missingArgument("wait", command, storyName, sceneName, lineNumber,
-                    "timeValue", "number")
-            );
+            return ValidationResult.failure(ValidationError.missingArgument(
+                    "wait", command, storyName, sceneName, lineNumber, "timeValue", "number"));
         }
 
         if (!isValidNumber(args[0])) {
-            return ValidationResult.failure(
-                ValidationError.invalidArgumentType("wait", command, storyName, sceneName, lineNumber,
-                    "timeValue", "number", args[0])
-            );
+            return ValidationResult.failure(ValidationError.invalidArgumentType(
+                    "wait", command, storyName, sceneName, lineNumber, "timeValue", "number", args[0]));
         }
 
         if (args.length < 2) {
-            return ValidationResult.failure(
-                ValidationError.missingArgument("wait", command, storyName, sceneName, lineNumber,
-                    "timeUnit", "second(s)|minute(s)|hour(s)")
-            );
+            return ValidationResult.failure(ValidationError.missingArgument(
+                    "wait", command, storyName, sceneName, lineNumber, "timeUnit", "second(s)|minute(s)|hour(s)"));
         }
 
         if (!VALID_TIME_UNITS.contains(args[1].toLowerCase())) {
-            return ValidationResult.failure(
-                ValidationError.invalidArgumentType("wait", command, storyName, sceneName, lineNumber,
-                    "timeUnit", "second(s)|minute(s)|hour(s)", args[1])
-            );
+            return ValidationResult.failure(ValidationError.invalidArgumentType(
+                    "wait",
+                    command,
+                    storyName,
+                    sceneName,
+                    lineNumber,
+                    "timeUnit",
+                    "second(s)|minute(s)|hour(s)",
+                    args[1]));
         }
 
         return ValidationResult.success();
@@ -269,20 +273,23 @@ public class TagValidator {
     /**
      * Validates weather tag: weather type [--instant]
      */
-    private ValidationResult validateWeather(String[] args, String command,
-                                             String storyName, String sceneName, int lineNumber) {
+    private ValidationResult validateWeather(
+            String[] args, String command, String storyName, String sceneName, int lineNumber) {
         if (args.length < 1) {
-            return ValidationResult.failure(
-                ValidationError.missingArgument("weather", command, storyName, sceneName, lineNumber,
-                    "weatherType", "clear|rain|thunder")
-            );
+            return ValidationResult.failure(ValidationError.missingArgument(
+                    "weather", command, storyName, sceneName, lineNumber, "weatherType", "clear|rain|thunder"));
         }
 
         if (!VALID_WEATHER_TYPES.contains(args[0].toLowerCase())) {
-            return ValidationResult.failure(
-                ValidationError.invalidArgumentType("weather", command, storyName, sceneName, lineNumber,
-                    "weatherType", "clear|rain|thunder", args[0])
-            );
+            return ValidationResult.failure(ValidationError.invalidArgumentType(
+                    "weather",
+                    command,
+                    storyName,
+                    sceneName,
+                    lineNumber,
+                    "weatherType",
+                    "clear|rain|thunder",
+                    args[0]));
         }
 
         return ValidationResult.success();
@@ -291,24 +298,20 @@ public class TagValidator {
     /**
      * Validates shake tag: shake strength decayRate speed
      */
-    private ValidationResult validateShake(String[] args, String command,
-                                           String storyName, String sceneName, int lineNumber) {
+    private ValidationResult validateShake(
+            String[] args, String command, String storyName, String sceneName, int lineNumber) {
         String[] argNames = {"strength", "decayRate", "speed"};
 
         if (args.length < 3) {
             String missing = argNames[args.length];
-            return ValidationResult.failure(
-                ValidationError.missingArgument("shake", command, storyName, sceneName, lineNumber,
-                    missing, "float")
-            );
+            return ValidationResult.failure(ValidationError.missingArgument(
+                    "shake", command, storyName, sceneName, lineNumber, missing, "float"));
         }
 
         for (int i = 0; i < 3; i++) {
             if (!isValidNumber(args[i])) {
-                return ValidationResult.failure(
-                    ValidationError.invalidArgumentType("shake", command, storyName, sceneName, lineNumber,
-                        argNames[i], "number", args[i])
-                );
+                return ValidationResult.failure(ValidationError.invalidArgumentType(
+                        "shake", command, storyName, sceneName, lineNumber, argNames[i], "number", args[i]));
             }
         }
 
@@ -318,13 +321,11 @@ public class TagValidator {
     /**
      * Validates sound tags: sfx/song start/stop soundId [volume] [pitch]
      */
-    private ValidationResult validateSound(String tagName, String[] args, String command,
-                                           String storyName, String sceneName, int lineNumber) {
+    private ValidationResult validateSound(
+            String tagName, String[] args, String command, String storyName, String sceneName, int lineNumber) {
         if (args.length < 1) {
-            return ValidationResult.failure(
-                ValidationError.missingArgument(tagName, command, storyName, sceneName, lineNumber,
-                    "action", "start|stop")
-            );
+            return ValidationResult.failure(ValidationError.missingArgument(
+                    tagName, command, storyName, sceneName, lineNumber, "action", "start|stop"));
         }
 
         // Handle "sfx stop all" special case
@@ -333,17 +334,13 @@ public class TagValidator {
         }
 
         if (!VALID_SOUND_ACTIONS.contains(args[0].toLowerCase())) {
-            return ValidationResult.failure(
-                ValidationError.invalidArgumentType(tagName, command, storyName, sceneName, lineNumber,
-                    "action", "start|stop", args[0])
-            );
+            return ValidationResult.failure(ValidationError.invalidArgumentType(
+                    tagName, command, storyName, sceneName, lineNumber, "action", "start|stop", args[0]));
         }
 
         if (args.length < 2) {
-            return ValidationResult.failure(
-                ValidationError.missingArgument(tagName, command, storyName, sceneName, lineNumber,
-                    "soundId", "namespace:category.name")
-            );
+            return ValidationResult.failure(ValidationError.missingArgument(
+                    tagName, command, storyName, sceneName, lineNumber, "soundId", "namespace:category.name"));
         }
 
         return ValidationResult.success();
@@ -352,18 +349,15 @@ public class TagValidator {
     /**
      * Validates border tag: border up right down left [color] [opacity] OR border clear/out
      */
-    private ValidationResult validateBorder(String[] args, String command,
-                                            String storyName, String sceneName, int lineNumber) {
+    private ValidationResult validateBorder(
+            String[] args, String command, String storyName, String sceneName, int lineNumber) {
         if (args.length < 1) {
-            return ValidationResult.failure(
-                ValidationError.missingArgument("border", command, storyName, sceneName, lineNumber,
-                    "up|clear|out", "int or action")
-            );
+            return ValidationResult.failure(ValidationError.missingArgument(
+                    "border", command, storyName, sceneName, lineNumber, "up|clear|out", "int or action"));
         }
 
         // Handle clear/out actions
-        if (args[0].equalsIgnoreCase("clear") || args[0].equalsIgnoreCase("out") ||
-            args[0].equalsIgnoreCase("in")) {
+        if (args[0].equalsIgnoreCase("clear") || args[0].equalsIgnoreCase("out") || args[0].equalsIgnoreCase("in")) {
             return ValidationResult.success();
         }
 
@@ -371,45 +365,42 @@ public class TagValidator {
         if (args.length < 4) {
             String[] argNames = {"up", "right", "down", "left"};
             String missing = argNames[args.length];
-            return ValidationResult.failure(
-                ValidationError.missingArgument("border", command, storyName, sceneName, lineNumber,
-                    missing, "int (pixels)")
-            );
+            return ValidationResult.failure(ValidationError.missingArgument(
+                    "border", command, storyName, sceneName, lineNumber, missing, "int (pixels)"));
         }
 
         // Validate pixel values
         String[] argNames = {"up", "right", "down", "left"};
         for (int i = 0; i < 4; i++) {
             if (!isValidInteger(args[i])) {
-                return ValidationResult.failure(
-                    ValidationError.invalidArgumentType("border", command, storyName, sceneName, lineNumber,
-                        argNames[i], "integer", args[i])
-                );
+                return ValidationResult.failure(ValidationError.invalidArgumentType(
+                        "border", command, storyName, sceneName, lineNumber, argNames[i], "integer", args[i]));
             }
         }
 
         // Validate optional color
         if (args.length >= 5 && !isValidHexColor(args[4])) {
-            return ValidationResult.failure(
-                ValidationError.invalidArgumentType("border", command, storyName, sceneName, lineNumber,
-                    "color", "hex color (e.g., 000000)", args[4])
-            );
+            return ValidationResult.failure(ValidationError.invalidArgumentType(
+                    "border", command, storyName, sceneName, lineNumber, "color", "hex color (e.g., 000000)", args[4]));
         }
 
         // Validate optional opacity
         if (args.length >= 6) {
             if (!isValidNumber(args[5])) {
-                return ValidationResult.failure(
-                    ValidationError.invalidArgumentType("border", command, storyName, sceneName, lineNumber,
-                        "opacity", "float (0.0-1.0)", args[5])
-                );
+                return ValidationResult.failure(ValidationError.invalidArgumentType(
+                        "border", command, storyName, sceneName, lineNumber, "opacity", "float (0.0-1.0)", args[5]));
             }
             double opacity = Double.parseDouble(args[5]);
             if (opacity < 0.0 || opacity > 1.0) {
-                return ValidationResult.failure(
-                    ValidationError.invalidArgumentValue("border", command, storyName, sceneName, lineNumber,
-                        "opacity", args[5], "must be between 0.0 and 1.0")
-                );
+                return ValidationResult.failure(ValidationError.invalidArgumentValue(
+                        "border",
+                        command,
+                        storyName,
+                        sceneName,
+                        lineNumber,
+                        "opacity",
+                        args[5],
+                        "must be between 0.0 and 1.0"));
             }
         }
 
@@ -419,13 +410,11 @@ public class TagValidator {
     /**
      * Validates "on enter" tag
      */
-    private ValidationResult validateOnEnter(String[] args, String command,
-                                             String storyName, String sceneName, int lineNumber) {
+    private ValidationResult validateOnEnter(
+            String[] args, String command, String storyName, String sceneName, int lineNumber) {
         if (args.length < 1 || !args[0].equalsIgnoreCase("enter")) {
-            return ValidationResult.failure(
-                ValidationError.unknownTag("on " + (args.length > 0 ? args[0] : ""), command,
-                    storyName, sceneName, lineNumber, "on enter")
-            );
+            return ValidationResult.failure(ValidationError.unknownTag(
+                    "on " + (args.length > 0 ? args[0] : ""), command, storyName, sceneName, lineNumber, "on enter"));
         }
         return ValidationResult.success();
     }

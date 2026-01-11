@@ -62,13 +62,18 @@ public class NarrativeException extends RuntimeException {
 
     private final ErrorCategory category;
     private final String errorCode;
+
     @Nullable
     private final String storyName;
+
     @Nullable
     private final String sceneName;
+
     private final int lineNumber;
+
     @Nullable
     private final String originalCommand;
+
     @Nullable
     private final String suggestion;
 
@@ -90,15 +95,15 @@ public class NarrativeException extends RuntimeException {
      */
     public static NarrativeException fromValidationError(ValidationError error) {
         return new Builder()
-            .category(ErrorCategory.VALIDATION)
-            .errorCode(error.getCode().name())
-            .message(error.getReason())
-            .storyName(error.getStoryName())
-            .sceneName(error.getSceneName())
-            .lineNumber(error.getLineNumber())
-            .originalCommand(error.getOriginalCommand())
-            .suggestion(error.getSuggestion())
-            .build();
+                .category(ErrorCategory.VALIDATION)
+                .errorCode(error.getCode().name())
+                .message(error.getReason())
+                .storyName(error.getStoryName())
+                .sceneName(error.getSceneName())
+                .lineNumber(error.getLineNumber())
+                .originalCommand(error.getOriginalCommand())
+                .suggestion(error.getSuggestion())
+                .build();
     }
 
     /**
@@ -106,11 +111,11 @@ public class NarrativeException extends RuntimeException {
      */
     public static NarrativeException loadingError(String message, String storyName) {
         return new Builder()
-            .category(ErrorCategory.LOADING)
-            .errorCode("LOAD_FAILED")
-            .message(message)
-            .storyName(storyName)
-            .build();
+                .category(ErrorCategory.LOADING)
+                .errorCode("LOAD_FAILED")
+                .message(message)
+                .storyName(storyName)
+                .build();
     }
 
     /**
@@ -118,43 +123,43 @@ public class NarrativeException extends RuntimeException {
      */
     public static NarrativeException loadingError(String message, String storyName, Throwable cause) {
         return new Builder()
-            .category(ErrorCategory.LOADING)
-            .errorCode("LOAD_FAILED")
-            .message(message)
-            .storyName(storyName)
-            .cause(cause)
-            .build();
+                .category(ErrorCategory.LOADING)
+                .errorCode("LOAD_FAILED")
+                .message(message)
+                .storyName(storyName)
+                .cause(cause)
+                .build();
     }
 
     /**
      * Creates an execution error (runtime error during narrative).
      */
-    public static NarrativeException executionError(String message, String storyName,
-                                                     String sceneName, String command) {
+    public static NarrativeException executionError(
+            String message, String storyName, String sceneName, String command) {
         return new Builder()
-            .category(ErrorCategory.EXECUTION)
-            .errorCode("EXEC_FAILED")
-            .message(message)
-            .storyName(storyName)
-            .sceneName(sceneName)
-            .originalCommand(command)
-            .build();
+                .category(ErrorCategory.EXECUTION)
+                .errorCode("EXEC_FAILED")
+                .message(message)
+                .storyName(storyName)
+                .sceneName(sceneName)
+                .originalCommand(command)
+                .build();
     }
 
     /**
      * Creates an execution error with cause.
      */
-    public static NarrativeException executionError(String message, String storyName,
-                                                     String sceneName, String command, Throwable cause) {
+    public static NarrativeException executionError(
+            String message, String storyName, String sceneName, String command, Throwable cause) {
         return new Builder()
-            .category(ErrorCategory.EXECUTION)
-            .errorCode("EXEC_FAILED")
-            .message(message)
-            .storyName(storyName)
-            .sceneName(sceneName)
-            .originalCommand(command)
-            .cause(cause)
-            .build();
+                .category(ErrorCategory.EXECUTION)
+                .errorCode("EXEC_FAILED")
+                .message(message)
+                .storyName(storyName)
+                .sceneName(sceneName)
+                .originalCommand(command)
+                .cause(cause)
+                .build();
     }
 
     /**
@@ -162,41 +167,40 @@ public class NarrativeException extends RuntimeException {
      */
     public static NarrativeException stateError(String message, String currentState, String attemptedAction) {
         return new Builder()
-            .category(ErrorCategory.STATE)
-            .errorCode("STATE_INVALID")
-            .message(message + " (current: " + currentState + ", attempted: " + attemptedAction + ")")
-            .build();
+                .category(ErrorCategory.STATE)
+                .errorCode("STATE_INVALID")
+                .message(message + " (current: " + currentState + ", attempted: " + attemptedAction + ")")
+                .build();
     }
 
     /**
      * Creates a security error (blocked command, etc.).
      */
-    public static NarrativeException securityError(String message, String command,
-                                                    String storyName, String sceneName) {
+    public static NarrativeException securityError(String message, String command, String storyName, String sceneName) {
         return new Builder()
-            .category(ErrorCategory.SECURITY)
-            .errorCode("SECURITY_BLOCKED")
-            .message(message)
-            .storyName(storyName)
-            .sceneName(sceneName)
-            .originalCommand(command)
-            .suggestion("Use only whitelisted commands")
-            .build();
+                .category(ErrorCategory.SECURITY)
+                .errorCode("SECURITY_BLOCKED")
+                .message(message)
+                .storyName(storyName)
+                .sceneName(sceneName)
+                .originalCommand(command)
+                .suggestion("Use only whitelisted commands")
+                .build();
     }
 
     /**
      * Creates a resource not found error.
      */
-    public static NarrativeException resourceNotFound(String resourceType, String resourceName,
-                                                       String storyName, String sceneName) {
+    public static NarrativeException resourceNotFound(
+            String resourceType, String resourceName, String storyName, String sceneName) {
         return new Builder()
-            .category(ErrorCategory.RESOURCE)
-            .errorCode("RESOURCE_NOT_FOUND")
-            .message("The " + resourceType + " '" + resourceName + "' was not found")
-            .storyName(storyName)
-            .sceneName(sceneName)
-            .suggestion("Check that the " + resourceType + " exists and the name is spelled correctly")
-            .build();
+                .category(ErrorCategory.RESOURCE)
+                .errorCode("RESOURCE_NOT_FOUND")
+                .message("The " + resourceType + " '" + resourceName + "' was not found")
+                .storyName(storyName)
+                .sceneName(sceneName)
+                .suggestion("Check that the " + resourceType + " exists and the name is spelled correctly")
+                .build();
     }
 
     /**
@@ -204,11 +208,11 @@ public class NarrativeException extends RuntimeException {
      */
     public static NarrativeException internalError(String message, Throwable cause) {
         return new Builder()
-            .category(ErrorCategory.INTERNAL)
-            .errorCode("INTERNAL_ERROR")
-            .message(message)
-            .cause(cause)
-            .build();
+                .category(ErrorCategory.INTERNAL)
+                .errorCode("INTERNAL_ERROR")
+                .message(message)
+                .cause(cause)
+                .build();
     }
 
     // Getters

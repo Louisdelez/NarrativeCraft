@@ -32,12 +32,10 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
 
 public class FinishedStoryScreen extends Screen {
 
-    private static final NcId WINDOW_LOCATION =
-            NcId.of("minecraft", "textures/gui/advancements/window.png");
+    private static final NcId WINDOW_LOCATION = NcId.of("minecraft", "textures/gui/advancements/window.png");
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     private final Screen oldScreen;
 
@@ -94,7 +92,8 @@ public class FinishedStoryScreen extends Screen {
 
     public void renderWindow(GuiGraphics guiGraphics, int offsetX, int offsetY) {
         IGuiRenderCompat guiCompat = VersionAdapterLoader.getAdapter().getGuiRenderCompat();
-        guiCompat.blitTexture(guiGraphics, WINDOW_LOCATION.toString(), offsetX, offsetY, 0.0F, 0.0F, 252, 140, 256, 256);
+        guiCompat.blitTexture(
+                guiGraphics, WINDOW_LOCATION.toString(), offsetX, offsetY, 0.0F, 0.0F, 252, 140, 256, 256);
     }
 
     @Override

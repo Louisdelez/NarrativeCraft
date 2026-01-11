@@ -26,32 +26,29 @@ package fr.loudo.narrativecraft.util;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.compat.api.IUtilCompat;
 import fr.loudo.narrativecraft.compat.api.VersionAdapterLoader;
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.platform.Services;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.nbt.Tag;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-
-import fr.loudo.narrativecraft.narrative.character.CharacterStory;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiFunction;
 
 /**
  * Core utility class with version-agnostic methods.
@@ -167,21 +164,22 @@ public class Util {
     }
 
     public static LivingEntity createEntityFromCharacter(CharacterStory characterStory, Level level) {
-        com.mojang.authlib.GameProfile gameProfile = new com.mojang.authlib.GameProfile(
-                java.util.UUID.randomUUID(), characterStory.getName());
+        com.mojang.authlib.GameProfile gameProfile =
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), characterStory.getName());
 
         LivingEntity entity;
         if (net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getId(characterStory.getEntityType())
-                == net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getId(net.minecraft.world.entity.EntityType.PLAYER)) {
+                == net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getId(
+                        net.minecraft.world.entity.EntityType.PLAYER)) {
             entity = new FakePlayer((net.minecraft.server.level.ServerLevel) level, gameProfile);
             // Set player skin layers - uses AvatarAccessor which is in common
-            entity.getEntityData().set(
-                    fr.loudo.narrativecraft.mixin.accessor.AvatarAccessor.getDATA_PLAYER_MODE_CUSTOMISATION(),
-                    (byte) 0b01111111);
+            entity.getEntityData()
+                    .set(
+                            fr.loudo.narrativecraft.mixin.accessor.AvatarAccessor.getDATA_PLAYER_MODE_CUSTOMISATION(),
+                            (byte) 0b01111111);
         } else {
             // Use compat layer for entity creation (handles EntitySpawnReason differences)
-            entity = (LivingEntity) getUtilCompat().createEntityFromType(
-                    characterStory.getEntityType(), level);
+            entity = (LivingEntity) getUtilCompat().createEntityFromType(characterStory.getEntityType(), level);
             if (entity != null) {
                 entity.setInvulnerable(true);
             }
@@ -192,13 +190,15 @@ public class Util {
 
     public static void spawnEntity(Entity entity, Level level) {
         if (entity instanceof FakePlayer fakePlayer) {
-            ((fr.loudo.narrativecraft.mixin.accessor.PlayerListAccessor) level.getServer().getPlayerList())
+            ((fr.loudo.narrativecraft.mixin.accessor.PlayerListAccessor)
+                            level.getServer().getPlayerList())
                     .getPlayersByUUID()
                     .put(fakePlayer.getUUID(), fakePlayer);
             level.getServer()
                     .getPlayerList()
                     .broadcastAll(new net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket(
-                            net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
+                            net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER,
+                            fakePlayer));
             if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
                 serverLevel.addNewPlayer(fakePlayer);
             }
@@ -268,7 +268,8 @@ public class Util {
      */
     public static Object createCutsceneEasingsScreen(Object parentScreen, Object keyframe) {
         if (cutsceneEasingsScreenFactory == null) {
-            throw new IllegalStateException("CutsceneEasingsScreen factory not registered - version module not initialized?");
+            throw new IllegalStateException(
+                    "CutsceneEasingsScreen factory not registered - version module not initialized?");
         }
         return cutsceneEasingsScreenFactory.apply(parentScreen, keyframe);
     }

@@ -35,8 +35,10 @@ import org.jetbrains.annotations.Nullable;
 public class InkTagHandlerException extends Exception {
 
     private final String tagName;
+
     @Nullable
     private final String sceneName;
+
     @Nullable
     private final String suggestion;
 
@@ -47,8 +49,8 @@ public class InkTagHandlerException extends Exception {
         this.suggestion = null;
     }
 
-    public InkTagHandlerException(Class<? extends InkAction> inkActionClass, String message,
-                                   String sceneName, String suggestion) {
+    public InkTagHandlerException(
+            Class<? extends InkAction> inkActionClass, String message, String sceneName, String suggestion) {
         super("Tag " + inkActionClass.getSimpleName() + " cannot be executed! " + message);
         this.tagName = inkActionClass.getSimpleName();
         this.sceneName = sceneName;

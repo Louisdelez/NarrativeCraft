@@ -77,7 +77,7 @@ public class SoundInkAction extends InkAction {
         } else if (action.equals("stop")) {
             newVolume = (float) Mth.lerp(t, volume, 0.0);
         }
-        ((VolumeAudio)soundManager).narrativecraft$setVolume(simpleSoundInstance, newVolume);
+        ((VolumeAudio) soundManager).narrativecraft$setVolume(simpleSoundInstance, newVolume);
         if (newVolume == 0.0 && action.equals("stop")) {
             soundManager.stop(simpleSoundInstance);
         }
@@ -149,7 +149,7 @@ public class SoundInkAction extends InkAction {
             simpleSoundInstance = getSimpleSoundInstance();
             soundManager.play(simpleSoundInstance);
             if (fadeTime > 0) {
-                ((VolumeAudio)soundManager).narrativecraft$setVolume(simpleSoundInstance, 0f);
+                ((VolumeAudio) soundManager).narrativecraft$setVolume(simpleSoundInstance, 0f);
             }
         } else if (action.equals("stop") && arguments.size() > 3) {
             String fadeValue = arguments.get(3);
@@ -173,7 +173,7 @@ public class SoundInkAction extends InkAction {
             simpleSoundInstance = getSimpleSoundInstance();
             soundManager.play(simpleSoundInstance);
             if (fadeTime > 0) {
-                ((VolumeAudio)soundManager).narrativecraft$setVolume(simpleSoundInstance, 0);
+                ((VolumeAudio) soundManager).narrativecraft$setVolume(simpleSoundInstance, 0);
             }
         } else if (action.equals("stop")) {
             for (InkAction inkAction : playerSession.getInkActions()) {
@@ -208,17 +208,21 @@ public class SoundInkAction extends InkAction {
         if (simpleSoundInstance == null) {
             NcId ncId = NcId.of(identifier, name);
             // Use compat layer to create sound instance - handles Identifier vs ResourceLocation
-            simpleSoundInstance = (SoundInstance) VersionAdapterLoader.getAdapter().getUtilCompat().createSoundInstance(
-                    ncId,
-                    SoundSource.MASTER,
-                    volume,
-                    pitch,
-                    SoundInstance.createUnseededRandom(),
-                    isLooping,
-                    0,
-                    0, // Attenuation.NONE = 0
-                    0, 0, 0,
-                    true);
+            simpleSoundInstance = (SoundInstance) VersionAdapterLoader.getAdapter()
+                    .getUtilCompat()
+                    .createSoundInstance(
+                            ncId,
+                            SoundSource.MASTER,
+                            volume,
+                            pitch,
+                            SoundInstance.createUnseededRandom(),
+                            isLooping,
+                            0,
+                            0, // Attenuation.NONE = 0
+                            0,
+                            0,
+                            0,
+                            true);
         }
         return simpleSoundInstance;
     }

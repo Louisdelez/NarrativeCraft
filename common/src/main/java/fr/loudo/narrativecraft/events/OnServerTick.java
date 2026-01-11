@@ -57,7 +57,8 @@ public class OnServerTick {
             // T095: Use Iterator to avoid ArrayList allocation for removal
             // Before: List<InkAction> toRemove = new ArrayList<>(); + removeAll()
             // After: Iterator with remove() - zero allocations
-            Iterator<InkAction> iterator = playerSession.getServerSideInkActions().iterator();
+            Iterator<InkAction> iterator =
+                    playerSession.getServerSideInkActions().iterator();
             while (iterator.hasNext()) {
                 InkAction inkAction = iterator.next();
                 inkAction.tick();

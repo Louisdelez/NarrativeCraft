@@ -154,7 +154,8 @@ public abstract class AbstractDialogScrollText {
 
     protected void playLetterSound() {
         float pitch = 0.8F + new Random().nextFloat() * 0.4F;
-        SoundEvent soundEvent = (SoundEvent) VersionAdapterLoader.getAdapter().getUtilCompat().createSoundEvent(letterSound);
+        SoundEvent soundEvent =
+                (SoundEvent) VersionAdapterLoader.getAdapter().getUtilCompat().createSoundEvent(letterSound);
         minecraft.player.playSound(soundEvent, 1.0F, pitch);
     }
 

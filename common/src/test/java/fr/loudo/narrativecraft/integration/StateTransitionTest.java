@@ -23,20 +23,18 @@
 
 package fr.loudo.narrativecraft.integration;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import fr.loudo.narrativecraft.narrative.cleanup.CleanupHandler;
-import fr.loudo.narrativecraft.narrative.cleanup.CleanupHandlerRegistry;
 import fr.loudo.narrativecraft.narrative.state.NarrativeState;
 import fr.loudo.narrativecraft.narrative.state.NarrativeStateManagerImpl;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Integration tests for state machine transitions and cleanup handler execution.
@@ -132,8 +130,7 @@ class StateTransitionTest {
         void dialogueToCutscene_shouldThrow() {
             stateManager.enterState(NarrativeState.DIALOGUE, null);
 
-            assertThrows(IllegalStateException.class,
-                () -> stateManager.enterState(NarrativeState.CUTSCENE, null));
+            assertThrows(IllegalStateException.class, () -> stateManager.enterState(NarrativeState.CUTSCENE, null));
         }
 
         @Test
@@ -141,8 +138,7 @@ class StateTransitionTest {
         void cutsceneToDialogue_shouldThrow() {
             stateManager.enterState(NarrativeState.CUTSCENE, null);
 
-            assertThrows(IllegalStateException.class,
-                () -> stateManager.enterState(NarrativeState.DIALOGUE, null));
+            assertThrows(IllegalStateException.class, () -> stateManager.enterState(NarrativeState.DIALOGUE, null));
         }
 
         @Test
@@ -150,8 +146,7 @@ class StateTransitionTest {
         void playbackToRecording_shouldThrow() {
             stateManager.enterState(NarrativeState.PLAYBACK, null);
 
-            assertThrows(IllegalStateException.class,
-                () -> stateManager.enterState(NarrativeState.RECORDING, null));
+            assertThrows(IllegalStateException.class, () -> stateManager.enterState(NarrativeState.RECORDING, null));
         }
     }
 
@@ -163,14 +158,13 @@ class StateTransitionTest {
         @DisplayName("Cleanup handlers should execute in priority order (lowest first)")
         void cleanupHandlers_shouldExecuteInPriorityOrder() {
             // Register handlers in random priority order
-            stateManager.registerCleanupHandler("Audio", CleanupHandler.PRIORITY_AUDIO,
-                () -> cleanupOrder.add("audio"));
-            stateManager.registerCleanupHandler("HUD", CleanupHandler.PRIORITY_HUD,
-                () -> cleanupOrder.add("hud"));
-            stateManager.registerCleanupHandler("Camera", CleanupHandler.PRIORITY_CAMERA,
-                () -> cleanupOrder.add("camera"));
-            stateManager.registerCleanupHandler("Input", CleanupHandler.PRIORITY_INPUT,
-                () -> cleanupOrder.add("input"));
+            stateManager.registerCleanupHandler(
+                    "Audio", CleanupHandler.PRIORITY_AUDIO, () -> cleanupOrder.add("audio"));
+            stateManager.registerCleanupHandler("HUD", CleanupHandler.PRIORITY_HUD, () -> cleanupOrder.add("hud"));
+            stateManager.registerCleanupHandler(
+                    "Camera", CleanupHandler.PRIORITY_CAMERA, () -> cleanupOrder.add("camera"));
+            stateManager.registerCleanupHandler(
+                    "Input", CleanupHandler.PRIORITY_INPUT, () -> cleanupOrder.add("input"));
 
             // Enter and exit a state
             stateManager.enterState(NarrativeState.DIALOGUE, null);
@@ -328,8 +322,7 @@ class StateTransitionTest {
         @Test
         @DisplayName("null target state should throw IllegalArgumentException")
         void nullTargetState_shouldThrow() {
-            assertThrows(IllegalArgumentException.class,
-                () -> stateManager.enterState(null, null));
+            assertThrows(IllegalArgumentException.class, () -> stateManager.enterState(null, null));
         }
     }
 }

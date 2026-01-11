@@ -33,7 +33,6 @@ import java.util.function.Consumer;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
 
 public class ChooseCharacterScreen extends GenericSelectionScreen<CharacterStory> {
     private final CharacterType characterType;
@@ -72,7 +71,9 @@ public class ChooseCharacterScreen extends GenericSelectionScreen<CharacterStory
     protected void addCustomTitleButtons(LinearLayout layout) {
         if (scene == null) return;
         layout.addChild(Button.builder(
-                        characterType == CharacterType.NPC ? Translation.message("button.main") : Translation.message("button.npc"),
+                        characterType == CharacterType.NPC
+                                ? Translation.message("button.main")
+                                : Translation.message("button.npc"),
                         button -> {
                             Screen screen = new ChooseCharacterScreen(
                                     lastScreen,

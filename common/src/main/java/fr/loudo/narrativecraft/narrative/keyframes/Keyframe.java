@@ -35,7 +35,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.decoration.ArmorStand;
-import net.minecraft.world.phys.Vec3;
 
 /**
  * Base keyframe class for camera positioning.
@@ -84,10 +83,7 @@ public class Keyframe {
         camera.setYHeadRot(keyframeLocation.getYaw());
 
         // Position the entity - use teleportTo which is compatible across versions
-        camera.teleportTo(
-                keyframeLocation.getX(),
-                keyframeLocation.getY() - 1,
-                keyframeLocation.getZ());
+        camera.teleportTo(keyframeLocation.getX(), keyframeLocation.getY() - 1, keyframeLocation.getZ());
         camera.setYRot(keyframeLocation.getYaw());
         camera.setXRot(keyframeLocation.getPitch());
 

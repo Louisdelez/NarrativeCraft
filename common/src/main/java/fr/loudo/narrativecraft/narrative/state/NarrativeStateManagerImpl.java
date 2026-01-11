@@ -26,7 +26,6 @@ package fr.loudo.narrativecraft.narrative.state;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.cleanup.CleanupHandler;
 import fr.loudo.narrativecraft.narrative.cleanup.CleanupHandlerRegistry;
-
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
@@ -58,8 +57,8 @@ public class NarrativeStateManagerImpl implements NarrativeStateManager {
         NarrativeState current = currentState.get();
 
         if (!current.canTransitionTo(state)) {
-            NarrativeCraftMod.LOGGER.warn("Invalid state transition: {} -> {}. Only GAMEPLAY can enter active states.",
-                    current, state);
+            NarrativeCraftMod.LOGGER.warn(
+                    "Invalid state transition: {} -> {}. Only GAMEPLAY can enter active states.", current, state);
             throw new IllegalStateException(
                     String.format("Cannot transition from %s to %s. Must exit to GAMEPLAY first.", current, state));
         }
@@ -81,8 +80,11 @@ public class NarrativeStateManagerImpl implements NarrativeStateManager {
             NarrativeState oldState = currentState.getAndSet(state);
             currentContext.set(context);
 
-            NarrativeCraftMod.LOGGER.info("Narrative state changed: {} -> {} (context: {})",
-                    oldState, state, context != null ? context.getDescription() : "none");
+            NarrativeCraftMod.LOGGER.info(
+                    "Narrative state changed: {} -> {} (context: {})",
+                    oldState,
+                    state,
+                    context != null ? context.getDescription() : "none");
 
             notifyListeners(oldState, state, context);
             return true;
@@ -114,8 +116,7 @@ public class NarrativeStateManagerImpl implements NarrativeStateManager {
             StateContext oldContext = currentContext.getAndSet(null);
 
             long durationMs = oldContext != null ? oldContext.getDurationMs() : 0;
-            NarrativeCraftMod.LOGGER.info("Exited {} state after {}ms, returned to GAMEPLAY",
-                    oldState, durationMs);
+            NarrativeCraftMod.LOGGER.info("Exited {} state after {}ms, returned to GAMEPLAY", oldState, durationMs);
 
             notifyListeners(oldState, NarrativeState.GAMEPLAY, null);
         } finally {
@@ -191,8 +192,8 @@ public class NarrativeStateManagerImpl implements NarrativeStateManager {
             NarrativeCraftMod.LOGGER.debug("Executing {} cleanup handlers", handlerCount);
             int successCount = cleanupRegistry.executeAll();
             if (successCount < handlerCount) {
-                NarrativeCraftMod.LOGGER.warn("Some cleanup handlers failed: {}/{} succeeded",
-                        successCount, handlerCount);
+                NarrativeCraftMod.LOGGER.warn(
+                        "Some cleanup handlers failed: {}/{} succeeded", successCount, handlerCount);
             }
         }
     }

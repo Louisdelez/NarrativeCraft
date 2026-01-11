@@ -195,7 +195,10 @@ public class DialogRenderer3D extends DialogRenderer {
         }
 
         poseStack.popPose();
-        minecraft.renderBuffers().bufferSource().endBatch(NarrativeCraftMod.getRenderType(RenderChannel.DIALOG_BACKGROUND));
+        minecraft
+                .renderBuffers()
+                .bufferSource()
+                .endBatch(NarrativeCraftMod.getRenderType(RenderChannel.DIALOG_BACKGROUND));
     }
 
     public void updateBobbing(float value1, float value2) {
@@ -225,7 +228,8 @@ public class DialogRenderer3D extends DialogRenderer {
 
     private void renderDialogBackground(PoseStack poseStack, float partialTick) {
         MultiBufferSource.BufferSource bufferSource = minecraft.renderBuffers().bufferSource();
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(NarrativeCraftMod.getRenderType(RenderChannel.DIALOG_BACKGROUND));
+        VertexConsumer vertexConsumer =
+                bufferSource.getBuffer(NarrativeCraftMod.getRenderType(RenderChannel.DIALOG_BACKGROUND));
         Matrix4f matrix4f = poseStack.last().pose();
 
         Side side = dialogOffsetSide();

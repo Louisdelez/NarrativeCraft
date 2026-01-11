@@ -133,7 +133,8 @@ public class NarrativeCleanupService {
             return;
         }
 
-        NarrativeCraftMod.LOGGER.debug("NarrativeCleanupService: Cleaning up session for player {}",
+        NarrativeCraftMod.LOGGER.debug(
+                "NarrativeCleanupService: Cleaning up session for player {}",
                 playerSession.getPlayer().getName().getString());
 
         try {

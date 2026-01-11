@@ -40,8 +40,7 @@ import net.minecraft.util.FormattedCharSequence;
 
 public abstract class AbstractTextBoxScreen extends Screen {
 
-    private static final NcId WINDOW_LOCATION =
-            NcId.of("minecraft", "textures/gui/advancements/window.png");
+    private static final NcId WINDOW_LOCATION = NcId.of("minecraft", "textures/gui/advancements/window.png");
 
     protected final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
 

@@ -23,16 +23,15 @@
 
 package fr.loudo.narrativecraft.unit.error;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import fr.loudo.narrativecraft.narrative.error.ErrorFormatter;
 import fr.loudo.narrativecraft.narrative.validation.ValidationError;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for ErrorFormatter.
@@ -55,53 +54,62 @@ class ErrorFormatterTest {
         @Test
         @DisplayName("Formatted error should contain WHAT component")
         void formattedErrorShouldContainWhatComponent() {
-            ValidationError error = ValidationError.unknownTag("unknowntag", "fade 1.0 2.0 1.0", "test_story", "test_scene", 42, null);
+            ValidationError error =
+                    ValidationError.unknownTag("unknowntag", "fade 1.0 2.0 1.0", "test_story", "test_scene", 42, null);
 
             String formatted = formatter.format(error);
 
-            assertTrue(formatted.contains("[WHAT]") || formatted.toLowerCase().contains("error:"),
-                "Should contain WHAT component identifying the error");
-            assertTrue(formatted.contains("unknown") || formatted.contains("unrecognized"),
-                "Should describe unknown tag");
+            assertTrue(
+                    formatted.contains("[WHAT]") || formatted.toLowerCase().contains("error:"),
+                    "Should contain WHAT component identifying the error");
+            assertTrue(
+                    formatted.contains("unknown") || formatted.contains("unrecognized"), "Should describe unknown tag");
         }
 
         @Test
         @DisplayName("Formatted error should contain WHERE component")
         void formattedErrorShouldContainWhereComponent() {
-            ValidationError error = ValidationError.unknownTag("unknowntag", "unknowntag arg", "my_story", "intro_scene", 42, null);
+            ValidationError error =
+                    ValidationError.unknownTag("unknowntag", "unknowntag arg", "my_story", "intro_scene", 42, null);
 
             String formatted = formatter.format(error);
 
-            assertTrue(formatted.contains("[WHERE]") || formatted.contains("my_story"),
-                "Should contain WHERE component with story name");
-            assertTrue(formatted.contains("intro_scene"),
-                "Should contain scene name");
-            assertTrue(formatted.contains("42") || formatted.contains("line 42"),
-                "Should contain line number");
+            assertTrue(
+                    formatted.contains("[WHERE]") || formatted.contains("my_story"),
+                    "Should contain WHERE component with story name");
+            assertTrue(formatted.contains("intro_scene"), "Should contain scene name");
+            assertTrue(formatted.contains("42") || formatted.contains("line 42"), "Should contain line number");
         }
 
         @Test
         @DisplayName("Formatted error should contain WHY component")
         void formattedErrorShouldContainWhyComponent() {
-            ValidationError error = ValidationError.unknownTag("unknowntag", "unknowntag arg", "test_story", "test_scene", 10, null);
+            ValidationError error =
+                    ValidationError.unknownTag("unknowntag", "unknowntag arg", "test_story", "test_scene", 10, null);
 
             String formatted = formatter.format(error);
 
-            assertTrue(formatted.contains("[WHY]") || formatted.toLowerCase().contains("because") || formatted.toLowerCase().contains("reason"),
-                "Should contain WHY component explaining the cause");
+            assertTrue(
+                    formatted.contains("[WHY]")
+                            || formatted.toLowerCase().contains("because")
+                            || formatted.toLowerCase().contains("reason"),
+                    "Should contain WHY component explaining the cause");
         }
 
         @Test
         @DisplayName("Formatted error should contain FIX component")
         void formattedErrorShouldContainFixComponent() {
-            ValidationError error = ValidationError.unknownTag("sund", "sund start sound", "test_story", "test_scene", 10, "sfx");
+            ValidationError error =
+                    ValidationError.unknownTag("sund", "sund start sound", "test_story", "test_scene", 10, "sfx");
 
             String formatted = formatter.format(error);
 
-            assertTrue(formatted.contains("[FIX]") || formatted.toLowerCase().contains("suggestion") || formatted.toLowerCase().contains("try"),
-                "Should contain FIX component with suggestion");
-            assertTrue(formatted.contains("sfx"),
-                "Should contain the suggested correction");
+            assertTrue(
+                    formatted.contains("[FIX]")
+                            || formatted.toLowerCase().contains("suggestion")
+                            || formatted.toLowerCase().contains("try"),
+                    "Should contain FIX component with suggestion");
+            assertTrue(formatted.contains("sfx"), "Should contain the suggested correction");
         }
     }
 
@@ -112,51 +120,71 @@ class ErrorFormatterTest {
         @Test
         @DisplayName("Unknown tag error should have clear message")
         void unknownTagErrorShouldHaveClearMessage() {
-            ValidationError error = ValidationError.unknownTag("badtag", "badtag arg1", "test_story", "test_scene", 10, null);
+            ValidationError error =
+                    ValidationError.unknownTag("badtag", "badtag arg1", "test_story", "test_scene", 10, null);
 
             String formatted = formatter.format(error);
 
             assertTrue(formatted.contains("badtag"));
-            assertTrue(formatted.toLowerCase().contains("unknown") || formatted.toLowerCase().contains("unrecognized"));
+            assertTrue(formatted.toLowerCase().contains("unknown")
+                    || formatted.toLowerCase().contains("unrecognized"));
         }
 
         @Test
         @DisplayName("Missing argument error should list expected arguments")
         void missingArgumentErrorShouldListExpectedArguments() {
-            ValidationError error = ValidationError.missingArgument("fade", "fade 1.0", "test_story", "test_scene", 15,
-                "staySeconds", "float");
+            ValidationError error = ValidationError.missingArgument(
+                    "fade", "fade 1.0", "test_story", "test_scene", 15, "staySeconds", "float");
 
             String formatted = formatter.format(error);
 
             assertTrue(formatted.contains("fade"));
-            assertTrue(formatted.toLowerCase().contains("missing") || formatted.toLowerCase().contains("required"));
+            assertTrue(formatted.toLowerCase().contains("missing")
+                    || formatted.toLowerCase().contains("required"));
             assertTrue(formatted.contains("staySeconds") || formatted.contains("stay"));
         }
 
         @Test
         @DisplayName("Invalid type error should show expected vs actual")
         void invalidTypeErrorShouldShowExpectedVsActual() {
-            ValidationError error = ValidationError.invalidArgumentType("fade", "fade notanumber 2.0 1.0", "test_story", "test_scene", 20,
-                "fadeInSeconds", "number", "notanumber");
+            ValidationError error = ValidationError.invalidArgumentType(
+                    "fade",
+                    "fade notanumber 2.0 1.0",
+                    "test_story",
+                    "test_scene",
+                    20,
+                    "fadeInSeconds",
+                    "number",
+                    "notanumber");
 
             String formatted = formatter.format(error);
 
             assertTrue(formatted.contains("fade"));
-            assertTrue(formatted.contains("notanumber") || formatted.toLowerCase().contains("invalid"));
-            assertTrue(formatted.toLowerCase().contains("number") || formatted.toLowerCase().contains("numeric"));
+            assertTrue(
+                    formatted.contains("notanumber") || formatted.toLowerCase().contains("invalid"));
+            assertTrue(formatted.toLowerCase().contains("number")
+                    || formatted.toLowerCase().contains("numeric"));
         }
 
         @Test
         @DisplayName("Invalid value error should show constraints")
         void invalidValueErrorShouldShowConstraints() {
-            ValidationError error = ValidationError.invalidArgumentValue("fade", "fade -1.0 2.0 1.0", "test_story", "test_scene", 25,
-                "fadeInSeconds", "-1.0", "must be >= 0");
+            ValidationError error = ValidationError.invalidArgumentValue(
+                    "fade",
+                    "fade -1.0 2.0 1.0",
+                    "test_story",
+                    "test_scene",
+                    25,
+                    "fadeInSeconds",
+                    "-1.0",
+                    "must be >= 0");
 
             String formatted = formatter.format(error);
 
             assertTrue(formatted.contains("fade"));
             assertTrue(formatted.contains("-1.0") || formatted.toLowerCase().contains("negative"));
-            assertTrue(formatted.toLowerCase().contains("0") || formatted.toLowerCase().contains("positive"));
+            assertTrue(formatted.toLowerCase().contains("0")
+                    || formatted.toLowerCase().contains("positive"));
         }
     }
 
@@ -168,10 +196,10 @@ class ErrorFormatterTest {
         @DisplayName("Multiple errors should be formatted together")
         void multipleErrorsShouldBeFormattedTogether() {
             List<ValidationError> errors = List.of(
-                ValidationError.unknownTag("badtag1", "badtag1 arg", "test_story", "scene1", 10, null),
-                ValidationError.unknownTag("badtag2", "badtag2 arg", "test_story", "scene2", 20, null),
-                ValidationError.missingArgument("fade", "fade 1.0", "test_story", "scene3", 30, "staySeconds", "float")
-            );
+                    ValidationError.unknownTag("badtag1", "badtag1 arg", "test_story", "scene1", 10, null),
+                    ValidationError.unknownTag("badtag2", "badtag2 arg", "test_story", "scene2", 20, null),
+                    ValidationError.missingArgument(
+                            "fade", "fade 1.0", "test_story", "scene3", 30, "staySeconds", "float"));
 
             String formatted = formatter.formatAll(errors);
 
@@ -187,14 +215,14 @@ class ErrorFormatterTest {
         @DisplayName("Should include error count header")
         void shouldIncludeErrorCountHeader() {
             List<ValidationError> errors = List.of(
-                ValidationError.unknownTag("badtag1", "badtag1 arg", "test_story", "scene1", 10, null),
-                ValidationError.unknownTag("badtag2", "badtag2 arg", "test_story", "scene2", 20, null)
-            );
+                    ValidationError.unknownTag("badtag1", "badtag1 arg", "test_story", "scene1", 10, null),
+                    ValidationError.unknownTag("badtag2", "badtag2 arg", "test_story", "scene2", 20, null));
 
             String formatted = formatter.formatAll(errors);
 
-            assertTrue(formatted.contains("2") || formatted.toLowerCase().contains("errors"),
-                "Should indicate number of errors found");
+            assertTrue(
+                    formatted.contains("2") || formatted.toLowerCase().contains("errors"),
+                    "Should indicate number of errors found");
         }
 
         @Test
@@ -204,7 +232,9 @@ class ErrorFormatterTest {
 
             String formatted = formatter.formatAll(errors);
 
-            assertTrue(formatted.toLowerCase().contains("no errors") || formatted.toLowerCase().contains("valid") || formatted.toLowerCase().contains("success"));
+            assertTrue(formatted.toLowerCase().contains("no errors")
+                    || formatted.toLowerCase().contains("valid")
+                    || formatted.toLowerCase().contains("success"));
         }
     }
 
@@ -215,7 +245,8 @@ class ErrorFormatterTest {
         @Test
         @DisplayName("Console format should be readable")
         void consoleFormatShouldBeReadable() {
-            ValidationError error = ValidationError.unknownTag("badtag", "badtag arg", "my_story", "intro", 42, "border");
+            ValidationError error =
+                    ValidationError.unknownTag("badtag", "badtag arg", "my_story", "intro", 42, "border");
 
             String formatted = formatter.formatForConsole(error);
 
@@ -242,7 +273,8 @@ class ErrorFormatterTest {
         @Test
         @DisplayName("Chat format should be concise")
         void chatFormatShouldBeConcise() {
-            ValidationError error = ValidationError.unknownTag("badtag", "badtag arg", "my_story", "intro", 42, "border");
+            ValidationError error =
+                    ValidationError.unknownTag("badtag", "badtag arg", "my_story", "intro", 42, "border");
 
             String formatted = formatter.formatForChat(error);
 
@@ -253,7 +285,8 @@ class ErrorFormatterTest {
         @Test
         @DisplayName("Chat format should include key information")
         void chatFormatShouldIncludeKeyInformation() {
-            ValidationError error = ValidationError.unknownTag("badtag", "badtag arg", "my_story", "intro", 42, "border");
+            ValidationError error =
+                    ValidationError.unknownTag("badtag", "badtag arg", "my_story", "intro", 42, "border");
 
             String formatted = formatter.formatForChat(error);
 

@@ -140,18 +140,14 @@ public class ValidationResult {
      * Returns errors filtered by error code.
      */
     public List<ValidationError> getErrorsByCode(ValidationError.ErrorCode code) {
-        return errors.stream()
-            .filter(e -> e.getCode() == code)
-            .toList();
+        return errors.stream().filter(e -> e.getCode() == code).toList();
     }
 
     /**
      * Returns errors for a specific story.
      */
     public List<ValidationError> getErrorsForStory(String storyName) {
-        return errors.stream()
-            .filter(e -> storyName.equals(e.getStoryName()))
-            .toList();
+        return errors.stream().filter(e -> storyName.equals(e.getStoryName())).toList();
     }
 
     /**
@@ -159,8 +155,8 @@ public class ValidationResult {
      */
     public List<ValidationError> getErrorsForScene(String storyName, String sceneName) {
         return errors.stream()
-            .filter(e -> storyName.equals(e.getStoryName()) && sceneName.equals(e.getSceneName()))
-            .toList();
+                .filter(e -> storyName.equals(e.getStoryName()) && sceneName.equals(e.getSceneName()))
+                .toList();
     }
 
     @Override

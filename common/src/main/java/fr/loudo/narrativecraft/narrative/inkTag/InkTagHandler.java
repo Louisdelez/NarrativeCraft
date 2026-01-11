@@ -57,7 +57,9 @@ public class InkTagHandler {
             // T071: Report unknown tags with helpful error message and typo suggestions
             if (inkAction == null) {
                 InkValidationService validationService = InkValidationService.getInstance();
-                String sceneName = playerSession.getScene() != null ? playerSession.getScene().getName() : "unknown";
+                String sceneName = playerSession.getScene() != null
+                        ? playerSession.getScene().getName()
+                        : "unknown";
                 ValidationError error = validationService.createUnknownTagError(tag, "story", sceneName, 0);
                 // Log the error but continue - unknown tags are warnings, not fatal errors
                 validationService.logError(error);

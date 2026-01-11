@@ -29,9 +29,8 @@ import fr.loudo.narrativecraft.narrative.cleanup.CleanupHandler;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.inkAction.sound.SoundInkAction;
 import fr.loudo.narrativecraft.screens.mainScreen.MainScreen;
-import net.minecraft.client.Minecraft;
-
 import java.util.List;
+import net.minecraft.client.Minecraft;
 
 /**
  * Cleanup handler for audio state restoration.
@@ -90,7 +89,8 @@ public class AudioCleanupHandler implements CleanupHandler {
                             soundAction.stop();
                             NarrativeCraftMod.LOGGER.debug("AudioCleanupHandler: Stopped SoundInkAction");
                         } catch (Exception e) {
-                            NarrativeCraftMod.LOGGER.debug("AudioCleanupHandler: Failed to stop SoundInkAction: {}", e.getMessage());
+                            NarrativeCraftMod.LOGGER.debug(
+                                    "AudioCleanupHandler: Failed to stop SoundInkAction: {}", e.getMessage());
                         }
                     }
                 }

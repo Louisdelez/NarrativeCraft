@@ -88,8 +88,7 @@ public class DialogScrollTextInkAction extends AbstractDialogScrollText {
 
         Component longerText = Component.literal(getLongerTextLine()).withStyle(style -> {
             if (attribute.getCustomFont() == null) return style;
-            return (Style) VersionAdapterLoader.getAdapter().getUtilCompat()
-                    .withFont(style, attribute.getCustomFont());
+            return (Style) VersionAdapterLoader.getAdapter().getUtilCompat().withFont(style, attribute.getCustomFont());
         });
 
         int textWidth = font.width(longerText.getVisualOrderText());
@@ -192,9 +191,10 @@ public class DialogScrollTextInkAction extends AbstractDialogScrollText {
                             font,
                             x,
                             y,
-                            NarrativeCraftMod.getColorCompat().color(
-                                    (int) (opacity * 255.0),
-                                    textInkAction.getAttribute().getColor()),
+                            NarrativeCraftMod.getColorCompat()
+                                    .color(
+                                            (int) (opacity * 255.0),
+                                            textInkAction.getAttribute().getColor()),
                             attribute.isDropShadow());
         }
 

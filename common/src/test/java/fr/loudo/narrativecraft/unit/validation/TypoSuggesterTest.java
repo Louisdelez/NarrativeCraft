@@ -23,16 +23,15 @@
 
 package fr.loudo.narrativecraft.unit.validation;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import fr.loudo.narrativecraft.narrative.validation.TypoSuggester;
+import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.Optional;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for TypoSuggester.
@@ -48,11 +47,27 @@ class TypoSuggesterTest {
     void setUp() {
         // All valid NarrativeCraft tags
         validTags = Set.of(
-            "animation", "border", "camera", "time", "cutscene", "wait",
-            "dialog", "command", "emote", "fade", "kill", "on enter",
-            "save", "sfx", "song", "subscene", "weather", "shake",
-            "interaction", "gameplay", "text"
-        );
+                "animation",
+                "border",
+                "camera",
+                "time",
+                "cutscene",
+                "wait",
+                "dialog",
+                "command",
+                "emote",
+                "fade",
+                "kill",
+                "on enter",
+                "save",
+                "sfx",
+                "song",
+                "subscene",
+                "weather",
+                "shake",
+                "interaction",
+                "gameplay",
+                "text");
         suggester = new TypoSuggester(validTags);
     }
 
@@ -82,7 +97,8 @@ class TypoSuggesterTest {
         @Test
         @DisplayName("Multiple character differences should have correct distance")
         void multipleCharacterDifferencesShouldHaveCorrectDistance() {
-            assertEquals(2, TypoSuggester.levenshteinDistance("fade", "face"));  // d->c, e->e = 1... actually just 1 (d->c)
+            assertEquals(
+                    2, TypoSuggester.levenshteinDistance("fade", "face")); // d->c, e->e = 1... actually just 1 (d->c)
             assertEquals(3, TypoSuggester.levenshteinDistance("fade", "border"));
             assertEquals(4, TypoSuggester.levenshteinDistance("fade", "animation"));
         }

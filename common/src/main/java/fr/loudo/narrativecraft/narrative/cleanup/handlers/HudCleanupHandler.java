@@ -29,9 +29,8 @@ import fr.loudo.narrativecraft.narrative.cleanup.CleanupHandler;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.inkAction.BorderInkAction;
 import fr.loudo.narrativecraft.narrative.story.inkAction.FadeInkAction;
-import net.minecraft.client.Minecraft;
-
 import java.util.List;
+import net.minecraft.client.Minecraft;
 
 /**
  * Cleanup handler for HUD state restoration.
@@ -97,7 +96,8 @@ public class HudCleanupHandler implements CleanupHandler {
                             try {
                                 action.stop();
                             } catch (Exception e) {
-                                NarrativeCraftMod.LOGGER.debug("HudCleanupHandler: Failed to stop InkAction: {}", e.getMessage());
+                                NarrativeCraftMod.LOGGER.debug(
+                                        "HudCleanupHandler: Failed to stop InkAction: {}", e.getMessage());
                             }
                         }
                     }

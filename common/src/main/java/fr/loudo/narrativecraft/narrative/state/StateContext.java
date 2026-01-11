@@ -86,8 +86,8 @@ public class StateContext {
 
     @Override
     public String toString() {
-        return String.format("StateContext{sessionId=%s, description='%s', durationMs=%d}",
-                sessionId, description, getDurationMs());
+        return String.format(
+                "StateContext{sessionId=%s, description='%s', durationMs=%d}", sessionId, description, getDurationMs());
     }
 
     /**

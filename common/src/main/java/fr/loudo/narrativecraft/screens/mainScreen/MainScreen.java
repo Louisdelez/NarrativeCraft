@@ -25,13 +25,15 @@ package fr.loudo.narrativecraft.screens.mainScreen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.compat.api.IGuiRenderCompat;
+import fr.loudo.narrativecraft.compat.api.NcId;
+import fr.loudo.narrativecraft.compat.api.VersionAdapterLoader;
 import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
 import fr.loudo.narrativecraft.controllers.cutscene.CutscenePlayback;
 import fr.loudo.narrativecraft.controllers.mainScreen.MainScreenController;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.Environment;
-import fr.loudo.narrativecraft.narrative.cleanup.NarrativeCleanupService;
 import fr.loudo.narrativecraft.narrative.data.MainScreenData;
 import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframe;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
@@ -55,30 +57,37 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
-import fr.loudo.narrativecraft.compat.api.IGuiRenderCompat;
-import fr.loudo.narrativecraft.compat.api.NcId;
-import fr.loudo.narrativecraft.compat.api.VersionAdapterLoader;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
+
 public class MainScreen extends Screen {
 
     public static final NcId BACKGROUND_IMAGE =
             NcId.of(NarrativeCraftMod.MOD_ID, "textures/main_screen/background.png");
-    public static final NcId MUSIC =
-            NcId.of(NarrativeCraftMod.MOD_ID, "main_screen.music");
+    public static final NcId MUSIC = NcId.of(NarrativeCraftMod.MOD_ID, "main_screen.music");
 
     // Lazy initialization to use compat layer for cross-version support
     private static SoundInstance musicInstance;
 
     public static SoundInstance getMusicInstance() {
         if (musicInstance == null) {
-            musicInstance = (SoundInstance) VersionAdapterLoader.getAdapter().getUtilCompat()
-                    .createSoundInstance(MUSIC, SoundSource.MASTER, 0.7f, 1,
-                            SoundInstance.createUnseededRandom(), true, 0, 0, // Attenuation.NONE = 0
-                            0.0, 0.0, 0.0, true);
+            musicInstance = (SoundInstance) VersionAdapterLoader.getAdapter()
+                    .getUtilCompat()
+                    .createSoundInstance(
+                            MUSIC,
+                            SoundSource.MASTER,
+                            0.7f,
+                            1,
+                            SoundInstance.createUnseededRandom(),
+                            true,
+                            0,
+                            0, // Attenuation.NONE = 0
+                            0.0,
+                            0.0,
+                            0.0,
+                            true);
         }
         return musicInstance;
     }
@@ -447,7 +456,12 @@ public class MainScreen extends Screen {
                     guiGraphics.guiWidth(),
                     guiGraphics.guiHeight());
         } else {
-            guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), NarrativeCraftMod.getColorCompat().colorFromFloat(1, 0, 0, 0));
+            guiGraphics.fill(
+                    0,
+                    0,
+                    guiGraphics.guiWidth(),
+                    guiGraphics.guiHeight(),
+                    NarrativeCraftMod.getColorCompat().colorFromFloat(1, 0, 0, 0));
         }
     }
 

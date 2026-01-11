@@ -23,17 +23,16 @@
 
 package fr.loudo.narrativecraft.unit.validation;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import fr.loudo.narrativecraft.narrative.validation.TagValidator;
 import fr.loudo.narrativecraft.narrative.validation.ValidationError;
 import fr.loudo.narrativecraft.narrative.validation.ValidationResult;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for TagValidator.
@@ -71,35 +70,38 @@ class TagValidatorTest {
         @DisplayName("Should suggest similar tag for typo")
         void shouldSuggestSimilarTagForTypo() {
             // "sund" is a typo for "sound" or "sfx"
-            ValidationResult result = validator.validateTag("sund start minecraft:entity.generic.explode", "test_story", "test_scene", 10);
+            ValidationResult result = validator.validateTag(
+                    "sund start minecraft:entity.generic.explode", "test_story", "test_scene", 10);
 
             assertFalse(result.isValid());
             ValidationError error = result.getErrors().get(0);
             assertEquals(ValidationError.ErrorCode.UNKNOWN_TAG, error.getCode());
             assertNotNull(error.getSuggestion());
-            assertTrue(error.getSuggestion().contains("sfx") || error.getSuggestion().contains("sound") || error.getSuggestion().contains("song"));
+            assertTrue(error.getSuggestion().contains("sfx")
+                    || error.getSuggestion().contains("sound")
+                    || error.getSuggestion().contains("song"));
         }
 
         @Test
         @DisplayName("Should accept valid tag names")
         void shouldAcceptValidTagNames() {
             Set<String> validTags = Set.of(
-                "fade 1.0 2.0 1.0",
-                "sfx start minecraft:entity.generic.explode",
-                "song start minecraft:music.creative",
-                "wait 2 seconds",
-                "weather clear",
-                "shake 1.0 0.5 0.3",
-                "save",
-                "gameplay",
-                "border 10 10 10 10"
-            );
+                    "fade 1.0 2.0 1.0",
+                    "sfx start minecraft:entity.generic.explode",
+                    "song start minecraft:music.creative",
+                    "wait 2 seconds",
+                    "weather clear",
+                    "shake 1.0 0.5 0.3",
+                    "save",
+                    "gameplay",
+                    "border 10 10 10 10");
 
             for (String tag : validTags) {
                 ValidationResult result = validator.validateTag(tag, "test_story", "test_scene", 1);
-                assertTrue(result.getErrors().stream()
-                    .noneMatch(e -> e.getCode() == ValidationError.ErrorCode.UNKNOWN_TAG),
-                    "Tag should be recognized: " + tag);
+                assertTrue(
+                        result.getErrors().stream()
+                                .noneMatch(e -> e.getCode() == ValidationError.ErrorCode.UNKNOWN_TAG),
+                        "Tag should be recognized: " + tag);
             }
         }
     }
@@ -181,7 +183,8 @@ class TagValidatorTest {
         @DisplayName("Should detect invalid action for sound")
         void shouldDetectInvalidActionForSound() {
             // sfx action must be start or stop
-            ValidationResult result = validator.validateTag("sfx pause minecraft:entity.generic.explode", "test_story", "test_scene", 45);
+            ValidationResult result =
+                    validator.validateTag("sfx pause minecraft:entity.generic.explode", "test_story", "test_scene", 45);
 
             assertFalse(result.isValid());
             ValidationError error = result.getErrors().get(0);
@@ -227,7 +230,8 @@ class TagValidatorTest {
         @DisplayName("Should detect opacity out of range for border")
         void shouldDetectOpacityOutOfRangeForBorder() {
             // opacity should be 0.0-1.0
-            ValidationResult result = validator.validateTag("border 10 10 10 10 000000 1.5", "test_story", "test_scene", 65);
+            ValidationResult result =
+                    validator.validateTag("border 10 10 10 10 000000 1.5", "test_story", "test_scene", 65);
 
             assertFalse(result.isValid());
             ValidationError error = result.getErrors().get(0);
@@ -302,7 +306,8 @@ class TagValidatorTest {
         @Test
         @DisplayName("Valid sound tag should pass")
         void validSoundTagShouldPass() {
-            ValidationResult result = validator.validateTag("sfx start minecraft:entity.generic.explode", "test_story", "test_scene", 1);
+            ValidationResult result =
+                    validator.validateTag("sfx start minecraft:entity.generic.explode", "test_story", "test_scene", 1);
             assertTrue(result.isValid());
         }
 
@@ -358,27 +363,23 @@ class TagValidatorTest {
         void shouldValidateMultipleTagsAndCollectAllErrors() {
             String[] tags = {
                 "unknowntag arg",
-                "fade 1.0 2.0 1.0",  // valid
-                "wait 5",            // missing time unit
-                "sfx pause sound"    // invalid action
+                "fade 1.0 2.0 1.0", // valid
+                "wait 5", // missing time unit
+                "sfx pause sound" // invalid action
             };
 
-            ValidationResult result = validator.validateTags(tags, "test_story", "test_scene", new int[]{1, 2, 3, 4});
+            ValidationResult result = validator.validateTags(tags, "test_story", "test_scene", new int[] {1, 2, 3, 4});
 
             assertFalse(result.isValid());
-            assertEquals(3, result.getErrors().size());  // 3 invalid tags
+            assertEquals(3, result.getErrors().size()); // 3 invalid tags
         }
 
         @Test
         @DisplayName("All valid tags should result in valid result")
         void allValidTagsShouldResultInValidResult() {
-            String[] tags = {
-                "fade 1.0 2.0 1.0",
-                "save",
-                "weather clear"
-            };
+            String[] tags = {"fade 1.0 2.0 1.0", "save", "weather clear"};
 
-            ValidationResult result = validator.validateTags(tags, "test_story", "test_scene", new int[]{1, 2, 3});
+            ValidationResult result = validator.validateTags(tags, "test_story", "test_scene", new int[] {1, 2, 3});
 
             assertTrue(result.isValid());
             assertEquals(0, result.getErrors().size());

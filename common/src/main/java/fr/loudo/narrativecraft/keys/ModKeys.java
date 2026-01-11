@@ -25,8 +25,6 @@ package fr.loudo.narrativecraft.keys;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.compat.api.NcId;
-import fr.loudo.narrativecraft.compat.api.VersionAdapterLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,8 +43,8 @@ public class ModKeys {
     private static final Map<Integer, Boolean> previousStatesKeyCode = new HashMap<>();
     private static final List<KeyMapping> ALL_KEYS = new ArrayList<>();
     // 1.21.x requires KeyMapping.Category with Identifier
-    private static final KeyMapping.Category CATEGORY = new KeyMapping.Category(
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main"));
+    private static final KeyMapping.Category CATEGORY =
+            new KeyMapping.Category(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main"));
 
     public static final KeyMapping OPEN_STORY_MANAGER = registerKey("key.screen.story.open", InputConstants.KEY_N);
     public static final KeyMapping START_ANIMATION_RECORDING =

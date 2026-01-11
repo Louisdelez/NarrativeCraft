@@ -28,12 +28,11 @@ import fr.loudo.narrativecraft.api.inkAction.InkActionRegistry;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.error.ErrorFormatter;
 import fr.loudo.narrativecraft.narrative.security.CommandProxy;
+import java.util.ArrayList;
+import java.util.List;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Service for validating Ink tags during story loading and execution.
@@ -101,9 +100,8 @@ public class InkValidationService {
         if (tagName(tag).equalsIgnoreCase("command")) {
             String commandContent = extractCommandContent(tag);
             if (commandContent != null) {
-                ValidationResult securityResult = commandProxy.validateCommand(
-                    commandContent, storyName, sceneName, lineNumber
-                );
+                ValidationResult securityResult =
+                        commandProxy.validateCommand(commandContent, storyName, sceneName, lineNumber);
                 if (securityResult.hasErrors()) {
                     return securityResult;
                 }

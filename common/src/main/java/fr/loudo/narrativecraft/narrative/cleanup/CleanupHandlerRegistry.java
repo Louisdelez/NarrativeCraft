@@ -24,7 +24,6 @@
 package fr.loudo.narrativecraft.narrative.cleanup;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -53,8 +52,8 @@ public class CleanupHandlerRegistry {
             throw new IllegalArgumentException("CleanupHandler cannot be null");
         }
         handlers.add(handler);
-        NarrativeCraftMod.LOGGER.debug("Registered cleanup handler: {} (priority: {})",
-                handler.name(), handler.priority());
+        NarrativeCraftMod.LOGGER.debug(
+                "Registered cleanup handler: {} (priority: {})", handler.name(), handler.priority());
     }
 
     /**
@@ -100,16 +99,15 @@ public class CleanupHandlerRegistry {
                 successCount++;
                 NarrativeCraftMod.LOGGER.debug("Cleanup handler {} completed successfully", handler.name());
             } catch (Exception e) {
-                NarrativeCraftMod.LOGGER.error("Cleanup handler {} failed: {}",
-                        handler.name(), e.getMessage(), e);
+                NarrativeCraftMod.LOGGER.error("Cleanup handler {} failed: {}", handler.name(), e.getMessage(), e);
             }
         }
 
         handlers.clear();
 
         if (successCount < totalCount) {
-            NarrativeCraftMod.LOGGER.warn("Cleanup completed with {} failures out of {} handlers",
-                    totalCount - successCount, totalCount);
+            NarrativeCraftMod.LOGGER.warn(
+                    "Cleanup completed with {} failures out of {} handlers", totalCount - successCount, totalCount);
         } else {
             NarrativeCraftMod.LOGGER.debug("All {} cleanup handlers completed successfully", totalCount);
         }

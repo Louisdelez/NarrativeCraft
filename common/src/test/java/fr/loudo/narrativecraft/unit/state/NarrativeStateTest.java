@@ -23,16 +23,15 @@
 
 package fr.loudo.narrativecraft.unit.state;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import fr.loudo.narrativecraft.narrative.state.NarrativeState;
+import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("NarrativeState")
 class NarrativeStateTest {
@@ -100,7 +99,8 @@ class NarrativeStateTest {
         @DisplayName("All states can transition to GAMEPLAY")
         void allStatesCanTransitionToGameplay() {
             for (NarrativeState state : NarrativeState.values()) {
-                assertTrue(state.canTransitionTo(NarrativeState.GAMEPLAY),
+                assertTrue(
+                        state.canTransitionTo(NarrativeState.GAMEPLAY),
                         state + " should be able to transition to GAMEPLAY");
             }
         }
@@ -110,8 +110,7 @@ class NarrativeStateTest {
         void gameplayCanTransitionToActiveStates() {
             NarrativeState gameplay = NarrativeState.GAMEPLAY;
             for (NarrativeState target : NarrativeState.getActiveStates()) {
-                assertTrue(gameplay.canTransitionTo(target),
-                        "GAMEPLAY should be able to transition to " + target);
+                assertTrue(gameplay.canTransitionTo(target), "GAMEPLAY should be able to transition to " + target);
             }
         }
 
@@ -122,8 +121,7 @@ class NarrativeStateTest {
             for (NarrativeState from : activeStates) {
                 for (NarrativeState to : activeStates) {
                     if (from != to) {
-                        assertFalse(from.canTransitionTo(to),
-                                from + " should NOT be able to transition to " + to);
+                        assertFalse(from.canTransitionTo(to), from + " should NOT be able to transition to " + to);
                     }
                 }
             }
@@ -133,16 +131,14 @@ class NarrativeStateTest {
         @EnumSource(NarrativeState.class)
         @DisplayName("All states can transition to themselves")
         void statesCanTransitionToSelf(NarrativeState state) {
-            assertTrue(state.canTransitionTo(state),
-                    state + " should be able to transition to itself");
+            assertTrue(state.canTransitionTo(state), state + " should be able to transition to itself");
         }
 
         @Test
         @DisplayName("Null transition target should be rejected")
         void nullTransitionTargetRejected() {
             for (NarrativeState state : NarrativeState.values()) {
-                assertFalse(state.canTransitionTo(null),
-                        state + " should not allow null transition");
+                assertFalse(state.canTransitionTo(null), state + " should not allow null transition");
             }
         }
     }
@@ -173,8 +169,7 @@ class NarrativeStateTest {
         @DisplayName("Active states set should be immutable")
         void activeStatesSetIsImmutable() {
             Set<NarrativeState> activeStates = NarrativeState.getActiveStates();
-            assertThrows(UnsupportedOperationException.class,
-                    () -> activeStates.add(NarrativeState.GAMEPLAY));
+            assertThrows(UnsupportedOperationException.class, () -> activeStates.add(NarrativeState.GAMEPLAY));
         }
     }
 
@@ -189,7 +184,9 @@ class NarrativeStateTest {
         }
 
         @ParameterizedTest
-        @EnumSource(value = NarrativeState.class, names = {"DIALOGUE", "CUTSCENE", "RECORDING", "PLAYBACK"})
+        @EnumSource(
+                value = NarrativeState.class,
+                names = {"DIALOGUE", "CUTSCENE", "RECORDING", "PLAYBACK"})
         @DisplayName("Non-GAMEPLAY states isActive returns true")
         void activeStatesAreActive(NarrativeState state) {
             assertTrue(state.isActive(), state + " should be active");

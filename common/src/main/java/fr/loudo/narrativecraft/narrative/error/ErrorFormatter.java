@@ -24,7 +24,6 @@
 package fr.loudo.narrativecraft.narrative.error;
 
 import fr.loudo.narrativecraft.narrative.validation.ValidationError;
-
 import java.util.List;
 
 /**
@@ -94,7 +93,11 @@ public class ErrorFormatter {
 
         // Each error
         for (int i = 0; i < errors.size(); i++) {
-            sb.append("Error ").append(i + 1).append(" of ").append(errors.size()).append(":\n");
+            sb.append("Error ")
+                    .append(i + 1)
+                    .append(" of ")
+                    .append(errors.size())
+                    .append(":\n");
             sb.append(format(errors.get(i)));
             sb.append("\n");
         }
@@ -170,7 +173,11 @@ public class ErrorFormatter {
         StringBuilder sb = new StringBuilder();
 
         // [WHAT] in red
-        sb.append(RED).append("[WHAT] ").append(error.getCode().getDescription()).append(RESET).append("\n");
+        sb.append(RED)
+                .append("[WHAT] ")
+                .append(error.getCode().getDescription())
+                .append(RESET)
+                .append("\n");
         sb.append("  Error: ").append(error.getTagName()).append(" tag is invalid\n");
 
         // [WHERE] in cyan
@@ -179,15 +186,27 @@ public class ErrorFormatter {
         sb.append(" / Scene: ").append(error.getSceneName());
         sb.append(" / Line: ").append(error.getLineNumber()).append("\n");
         if (error.getOriginalCommand() != null) {
-            sb.append("  Command: ").append(WHITE).append(error.getOriginalCommand()).append(RESET).append("\n");
+            sb.append("  Command: ")
+                    .append(WHITE)
+                    .append(error.getOriginalCommand())
+                    .append(RESET)
+                    .append("\n");
         }
 
         // [WHY] in yellow
-        sb.append(YELLOW).append("[WHY] ").append(error.getReason()).append(RESET).append("\n");
+        sb.append(YELLOW)
+                .append("[WHY] ")
+                .append(error.getReason())
+                .append(RESET)
+                .append("\n");
 
         // [FIX] in white
         if (error.getSuggestion() != null) {
-            sb.append(WHITE).append("[FIX] ").append(error.getSuggestion()).append(RESET).append("\n");
+            sb.append(WHITE)
+                    .append("[FIX] ")
+                    .append(error.getSuggestion())
+                    .append(RESET)
+                    .append("\n");
         }
 
         return sb.toString();
@@ -206,17 +225,17 @@ public class ErrorFormatter {
 
         // Count by type
         long unknownTags = errors.stream()
-            .filter(e -> e.getCode() == ValidationError.ErrorCode.UNKNOWN_TAG)
-            .count();
+                .filter(e -> e.getCode() == ValidationError.ErrorCode.UNKNOWN_TAG)
+                .count();
         long missingArgs = errors.stream()
-            .filter(e -> e.getCode() == ValidationError.ErrorCode.MISSING_ARGUMENT)
-            .count();
+                .filter(e -> e.getCode() == ValidationError.ErrorCode.MISSING_ARGUMENT)
+                .count();
         long invalidTypes = errors.stream()
-            .filter(e -> e.getCode() == ValidationError.ErrorCode.INVALID_ARGUMENT_TYPE)
-            .count();
+                .filter(e -> e.getCode() == ValidationError.ErrorCode.INVALID_ARGUMENT_TYPE)
+                .count();
         long invalidValues = errors.stream()
-            .filter(e -> e.getCode() == ValidationError.ErrorCode.INVALID_ARGUMENT_VALUE)
-            .count();
+                .filter(e -> e.getCode() == ValidationError.ErrorCode.INVALID_ARGUMENT_VALUE)
+                .count();
 
         StringBuilder sb = new StringBuilder();
         sb.append("Validation failed: ").append(errors.size()).append(" error(s) (");

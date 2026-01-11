@@ -120,19 +120,14 @@ public class StoryValidation {
                     InkValidationService validationService = InkValidationService.getInstance();
                     String sceneName = scene != null ? scene.getName() : "unknown";
                     String storyName = chapter != null ? "chapter_" + chapter.getIndex() : sceneName;
-                    ValidationError error = validationService.createUnknownTagError(
-                            command, storyName, sceneName, i + 1);
+                    ValidationError error =
+                            validationService.createUnknownTagError(command, storyName, sceneName, i + 1);
                     String errorMessage = error.getReason();
                     if (error.getSuggestion() != null) {
                         errorMessage += " " + error.getSuggestion();
                     }
                     errorLines.add(new ErrorLine(
-                            i + 1,
-                            chapter,
-                            chapter == null ? scene : null,
-                            errorMessage,
-                            command,
-                            false));
+                            i + 1, chapter, chapter == null ? scene : null, errorMessage, command, false));
                     continue;
                 }
 

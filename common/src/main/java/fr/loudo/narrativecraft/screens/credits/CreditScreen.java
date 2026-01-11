@@ -40,24 +40,21 @@ import net.minecraft.client.gui.screens.WinScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvent;
+
 public class CreditScreen extends WinScreen {
 
-    public static final NcId LOGO =
-            NcId.of(NarrativeCraftMod.MOD_ID, "textures/logo.png");
+    public static final NcId LOGO = NcId.of(NarrativeCraftMod.MOD_ID, "textures/logo.png");
 
-    private static final NcId BACKGROUND_IMAGE =
-            NcId.of(NarrativeCraftMod.MOD_ID, "textures/credits/background.png");
-    private static final NcId MUSIC =
-            NcId.of(NarrativeCraftMod.MOD_ID, "credits.music");
+    private static final NcId BACKGROUND_IMAGE = NcId.of(NarrativeCraftMod.MOD_ID, "textures/credits/background.png");
+    private static final NcId MUSIC = NcId.of(NarrativeCraftMod.MOD_ID, "credits.music");
 
     // Lazy initialization to use compat layer
     private static SimpleSoundInstance MUSIC_INSTANCE;
 
     public static SimpleSoundInstance getMusicInstance() {
         if (MUSIC_INSTANCE == null) {
-            MUSIC_INSTANCE = (SimpleSoundInstance) VersionAdapterLoader.getAdapter()
-                    .getUtilCompat().createSimpleSoundInstance(MUSIC, 1, 1);
+            MUSIC_INSTANCE = (SimpleSoundInstance)
+                    VersionAdapterLoader.getAdapter().getUtilCompat().createSimpleSoundInstance(MUSIC, 1, 1);
         }
         return MUSIC_INSTANCE;
     }
@@ -89,7 +86,8 @@ public class CreditScreen extends WinScreen {
         alreadyInit = true;
         minecraft.getSoundManager().play(getMusicInstance());
         ((WinScreenInvoker) this)
-                .callAddCreditsLine(Translation.message("credits.tool_used").copy().withStyle(ChatFormatting.GRAY), false, false);
+                .callAddCreditsLine(
+                        Translation.message("credits.tool_used").copy().withStyle(ChatFormatting.GRAY), false, false);
         ((WinScreenInvoker) this)
                 .callAddCreditsLine(
                         Component.literal("           ")
@@ -139,7 +137,12 @@ public class CreditScreen extends WinScreen {
                     p_282239_.guiWidth(),
                     p_282239_.guiHeight());
         } else {
-            p_282239_.fill(0, 0, p_282239_.guiWidth(), p_282239_.guiHeight(), NarrativeCraftMod.getColorCompat().colorFromFloat(1, 0, 0, 0));
+            p_282239_.fill(
+                    0,
+                    0,
+                    p_282239_.guiWidth(),
+                    p_282239_.guiHeight(),
+                    NarrativeCraftMod.getColorCompat().colorFromFloat(1, 0, 0, 0));
         }
     }
 }

@@ -27,9 +27,8 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.narrative.cleanup.CleanupHandler;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import net.minecraft.client.Minecraft;
-
 import java.util.List;
+import net.minecraft.client.Minecraft;
 
 /**
  * Cleanup handler for input state restoration.
@@ -100,7 +99,8 @@ public class InputCleanupHandler implements CleanupHandler {
                         try {
                             action.stop();
                         } catch (Exception e) {
-                            NarrativeCraftMod.LOGGER.debug("InputCleanupHandler: Failed to stop InkAction: {}", e.getMessage());
+                            NarrativeCraftMod.LOGGER.debug(
+                                    "InputCleanupHandler: Failed to stop InkAction: {}", e.getMessage());
                         }
                     }
                     inkActions.clear();

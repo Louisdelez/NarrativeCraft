@@ -135,12 +135,12 @@ public class TypoSuggester {
                 int cost = (s1.charAt(i - 1) == s2.charAt(j - 1)) ? 0 : 1;
 
                 dp[i][j] = Math.min(
-                    Math.min(
-                        dp[i - 1][j] + 1,      // deletion
-                        dp[i][j - 1] + 1       // insertion
-                    ),
-                    dp[i - 1][j - 1] + cost    // substitution
-                );
+                        Math.min(
+                                dp[i - 1][j] + 1, // deletion
+                                dp[i][j - 1] + 1 // insertion
+                                ),
+                        dp[i - 1][j - 1] + cost // substitution
+                        );
             }
         }
 

@@ -29,8 +29,6 @@ import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
 import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.controllers.interaction.InteractionController;
-import fr.loudo.narrativecraft.narrative.cleanup.NarrativeCleanupService;
-import fr.loudo.narrativecraft.narrative.state.NarrativeState;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.hud.StoryDebugHud;
 import fr.loudo.narrativecraft.narrative.Environment;
@@ -43,10 +41,12 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.StitchIn
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterStoryData;
+import fr.loudo.narrativecraft.narrative.cleanup.NarrativeCleanupService;
 import fr.loudo.narrativecraft.narrative.dialog.*;
 import fr.loudo.narrativecraft.narrative.inkTag.InkTagHandlerException;
 import fr.loudo.narrativecraft.narrative.playback.Playback;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.narrative.state.NarrativeState;
 import fr.loudo.narrativecraft.narrative.story.inkAction.GameplayInkAction;
 import fr.loudo.narrativecraft.options.NarrativeClientOption;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
@@ -121,8 +121,7 @@ public class StoryHandler {
         // Register cleanup handlers BEFORE any state modifications
         // This ensures cleanup runs even if start() fails partway through
         NarrativeCleanupService.registerAllHandlers(playerSession);
-        NarrativeCraftMod.getInstance().getNarrativeStateManager()
-                .enterState(NarrativeState.DIALOGUE, null);
+        NarrativeCraftMod.getInstance().getNarrativeStateManager().enterState(NarrativeState.DIALOGUE, null);
 
         if (playerSession.getController() != null) {
             playerSession.getController().stopSession(false);

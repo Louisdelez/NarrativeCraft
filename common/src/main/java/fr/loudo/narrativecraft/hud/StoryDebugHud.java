@@ -32,6 +32,7 @@ import java.util.Comparator;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+
 public class StoryDebugHud {
 
     private final Minecraft minecraft = Minecraft.getInstance();

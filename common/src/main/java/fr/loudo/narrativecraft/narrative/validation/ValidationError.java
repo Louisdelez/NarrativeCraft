@@ -65,12 +65,16 @@ public class ValidationError {
     private final String sceneName;
     private final int lineNumber;
     private final String reason;
+
     @Nullable
     private final String suggestion;
+
     @Nullable
     private final String expectedType;
+
     @Nullable
     private final String actualValue;
+
     @Nullable
     private final String argumentName;
 
@@ -93,120 +97,141 @@ public class ValidationError {
     /**
      * Creates an error for an unknown/unrecognized tag.
      */
-    public static ValidationError unknownTag(String tagName, String originalCommand,
-                                              String storyName, String sceneName,
-                                              int lineNumber, @Nullable String suggestion) {
+    public static ValidationError unknownTag(
+            String tagName,
+            String originalCommand,
+            String storyName,
+            String sceneName,
+            int lineNumber,
+            @Nullable String suggestion) {
         return new Builder()
-            .code(ErrorCode.UNKNOWN_TAG)
-            .tagName(tagName)
-            .originalCommand(originalCommand)
-            .storyName(storyName)
-            .sceneName(sceneName)
-            .lineNumber(lineNumber)
-            .reason("The tag '" + tagName + "' is not a recognized NarrativeCraft tag")
-            .suggestion(suggestion != null ? "Did you mean '" + suggestion + "'?" : null)
-            .build();
+                .code(ErrorCode.UNKNOWN_TAG)
+                .tagName(tagName)
+                .originalCommand(originalCommand)
+                .storyName(storyName)
+                .sceneName(sceneName)
+                .lineNumber(lineNumber)
+                .reason("The tag '" + tagName + "' is not a recognized NarrativeCraft tag")
+                .suggestion(suggestion != null ? "Did you mean '" + suggestion + "'?" : null)
+                .build();
     }
 
     /**
      * Creates an error for a missing required argument.
      */
-    public static ValidationError missingArgument(String tagName, String originalCommand,
-                                                   String storyName, String sceneName,
-                                                   int lineNumber, String argumentName,
-                                                   String expectedType) {
+    public static ValidationError missingArgument(
+            String tagName,
+            String originalCommand,
+            String storyName,
+            String sceneName,
+            int lineNumber,
+            String argumentName,
+            String expectedType) {
         return new Builder()
-            .code(ErrorCode.MISSING_ARGUMENT)
-            .tagName(tagName)
-            .originalCommand(originalCommand)
-            .storyName(storyName)
-            .sceneName(sceneName)
-            .lineNumber(lineNumber)
-            .argumentName(argumentName)
-            .expectedType(expectedType)
-            .reason("The tag '" + tagName + "' requires the argument '" + argumentName + "'")
-            .suggestion("Add the '" + argumentName + "' argument (type: " + expectedType + ")")
-            .build();
+                .code(ErrorCode.MISSING_ARGUMENT)
+                .tagName(tagName)
+                .originalCommand(originalCommand)
+                .storyName(storyName)
+                .sceneName(sceneName)
+                .lineNumber(lineNumber)
+                .argumentName(argumentName)
+                .expectedType(expectedType)
+                .reason("The tag '" + tagName + "' requires the argument '" + argumentName + "'")
+                .suggestion("Add the '" + argumentName + "' argument (type: " + expectedType + ")")
+                .build();
     }
 
     /**
      * Creates an error for an invalid argument type.
      */
-    public static ValidationError invalidArgumentType(String tagName, String originalCommand,
-                                                       String storyName, String sceneName,
-                                                       int lineNumber, String argumentName,
-                                                       String expectedType, String actualValue) {
+    public static ValidationError invalidArgumentType(
+            String tagName,
+            String originalCommand,
+            String storyName,
+            String sceneName,
+            int lineNumber,
+            String argumentName,
+            String expectedType,
+            String actualValue) {
         return new Builder()
-            .code(ErrorCode.INVALID_ARGUMENT_TYPE)
-            .tagName(tagName)
-            .originalCommand(originalCommand)
-            .storyName(storyName)
-            .sceneName(sceneName)
-            .lineNumber(lineNumber)
-            .argumentName(argumentName)
-            .expectedType(expectedType)
-            .actualValue(actualValue)
-            .reason("Expected " + expectedType + " but got '" + actualValue + "'")
-            .suggestion("Change '" + actualValue + "' to a valid " + expectedType)
-            .build();
+                .code(ErrorCode.INVALID_ARGUMENT_TYPE)
+                .tagName(tagName)
+                .originalCommand(originalCommand)
+                .storyName(storyName)
+                .sceneName(sceneName)
+                .lineNumber(lineNumber)
+                .argumentName(argumentName)
+                .expectedType(expectedType)
+                .actualValue(actualValue)
+                .reason("Expected " + expectedType + " but got '" + actualValue + "'")
+                .suggestion("Change '" + actualValue + "' to a valid " + expectedType)
+                .build();
     }
 
     /**
      * Creates an error for an invalid argument value (correct type, wrong value).
      */
-    public static ValidationError invalidArgumentValue(String tagName, String originalCommand,
-                                                        String storyName, String sceneName,
-                                                        int lineNumber, String argumentName,
-                                                        String actualValue, String constraint) {
+    public static ValidationError invalidArgumentValue(
+            String tagName,
+            String originalCommand,
+            String storyName,
+            String sceneName,
+            int lineNumber,
+            String argumentName,
+            String actualValue,
+            String constraint) {
         return new Builder()
-            .code(ErrorCode.INVALID_ARGUMENT_VALUE)
-            .tagName(tagName)
-            .originalCommand(originalCommand)
-            .storyName(storyName)
-            .sceneName(sceneName)
-            .lineNumber(lineNumber)
-            .argumentName(argumentName)
-            .actualValue(actualValue)
-            .reason("The value '" + actualValue + "' is invalid: " + constraint)
-            .suggestion("Use a value that " + constraint)
-            .build();
+                .code(ErrorCode.INVALID_ARGUMENT_VALUE)
+                .tagName(tagName)
+                .originalCommand(originalCommand)
+                .storyName(storyName)
+                .sceneName(sceneName)
+                .lineNumber(lineNumber)
+                .argumentName(argumentName)
+                .actualValue(actualValue)
+                .reason("The value '" + actualValue + "' is invalid: " + constraint)
+                .suggestion("Use a value that " + constraint)
+                .build();
     }
 
     /**
      * Creates an error for a security violation (e.g., blocked command).
      */
-    public static ValidationError securityViolation(String tagName, String originalCommand,
-                                                     String storyName, String sceneName,
-                                                     int lineNumber, String reason) {
+    public static ValidationError securityViolation(
+            String tagName, String originalCommand, String storyName, String sceneName, int lineNumber, String reason) {
         return new Builder()
-            .code(ErrorCode.SECURITY_VIOLATION)
-            .tagName(tagName)
-            .originalCommand(originalCommand)
-            .storyName(storyName)
-            .sceneName(sceneName)
-            .lineNumber(lineNumber)
-            .reason(reason)
-            .suggestion("Use only whitelisted commands")
-            .build();
+                .code(ErrorCode.SECURITY_VIOLATION)
+                .tagName(tagName)
+                .originalCommand(originalCommand)
+                .storyName(storyName)
+                .sceneName(sceneName)
+                .lineNumber(lineNumber)
+                .reason(reason)
+                .suggestion("Use only whitelisted commands")
+                .build();
     }
 
     /**
      * Creates an error for a resource not found (e.g., missing scene, animation).
      */
-    public static ValidationError resourceNotFound(String tagName, String originalCommand,
-                                                    String storyName, String sceneName,
-                                                    int lineNumber, String resourceType,
-                                                    String resourceName) {
+    public static ValidationError resourceNotFound(
+            String tagName,
+            String originalCommand,
+            String storyName,
+            String sceneName,
+            int lineNumber,
+            String resourceType,
+            String resourceName) {
         return new Builder()
-            .code(ErrorCode.RESOURCE_NOT_FOUND)
-            .tagName(tagName)
-            .originalCommand(originalCommand)
-            .storyName(storyName)
-            .sceneName(sceneName)
-            .lineNumber(lineNumber)
-            .reason("The " + resourceType + " '" + resourceName + "' was not found")
-            .suggestion("Check that the " + resourceType + " exists and the name is spelled correctly")
-            .build();
+                .code(ErrorCode.RESOURCE_NOT_FOUND)
+                .tagName(tagName)
+                .originalCommand(originalCommand)
+                .storyName(storyName)
+                .sceneName(sceneName)
+                .lineNumber(lineNumber)
+                .reason("The " + resourceType + " '" + resourceName + "' was not found")
+                .suggestion("Check that the " + resourceType + " exists and the name is spelled correctly")
+                .build();
     }
 
     // Getters

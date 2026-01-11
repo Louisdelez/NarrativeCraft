@@ -73,7 +73,8 @@ public class CameraCleanupHandler implements CleanupHandler {
 
             // Null check for player (fixes CameraMixin:60)
             if (minecraft.player == null) {
-                NarrativeCraftMod.LOGGER.debug("CameraCleanupHandler: Player is null, skipping player-specific cleanup");
+                NarrativeCraftMod.LOGGER.debug(
+                        "CameraCleanupHandler: Player is null, skipping player-specific cleanup");
             }
 
             // Restore camera to first-person mode
@@ -99,7 +100,8 @@ public class CameraCleanupHandler implements CleanupHandler {
                         });
                         NarrativeCraftMod.LOGGER.debug("CameraCleanupHandler: Requested controller stop");
                     } catch (Exception e) {
-                        NarrativeCraftMod.LOGGER.warn("CameraCleanupHandler: Failed to stop controller: {}", e.getMessage());
+                        NarrativeCraftMod.LOGGER.warn(
+                                "CameraCleanupHandler: Failed to stop controller: {}", e.getMessage());
                     }
                 }
             }
