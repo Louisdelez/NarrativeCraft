@@ -58,10 +58,8 @@ dependencies {
     // Version-specific compat module
     implementation project(':compat-mc121x')
 
-    // blade-ink included via jarJar from local libs folder
-    def bladeInkJar = files("${rootProject.projectDir}/libs/blade-ink-${blade_ink_version}.jar")
-    jarJar(bladeInkJar)
-    implementation(bladeInkJar)
+    // blade-ink from local libs folder (classes included in jar task)
+    implementation files("${rootProject.projectDir}/libs/blade-ink-${blade_ink_version}.jar")
     compileOnly("io.github.kosmx.emotes:emotesAPI:${emotesAPI_version}") {
         exclude group: 'com.google.guava', module: 'guava'
     }
@@ -78,4 +76,9 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 // Custom JAR naming for version identification
 tasks.named('jar') {
     archiveBaseName = "${mod_id}-neoforge-1.21.11"
+    // Include blade-ink JAR classes in the final mod jar
+    from(zipTree("${rootProject.projectDir}/libs/blade-ink-${blade_ink_version}.jar")) {
+        exclude 'META-INF/**'
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

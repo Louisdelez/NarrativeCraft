@@ -48,10 +48,8 @@ repositories {
 }
 
 dependencies {
-    // blade-ink included via jarJar from local libs folder
-    def bladeInkJar = files("${rootProject.projectDir}/libs/blade-ink-${blade_ink_version}.jar")
-    jarJar(bladeInkJar)
-    implementation(bladeInkJar)
+    // blade-ink from local libs folder (classes included in jar task)
+    implementation files("${rootProject.projectDir}/libs/blade-ink-${blade_ink_version}.jar")
     compileOnly("io.github.kosmx.emotes:emotesAPI:${emotesAPI_version}") {
         exclude group: 'com.google.guava', module: 'guava'
     }
@@ -64,3 +62,11 @@ dependencies {
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+// Include blade-ink JAR classes in the final mod jar
+tasks.named('jar') {
+    from(zipTree("${rootProject.projectDir}/libs/blade-ink-${blade_ink_version}.jar")) {
+        exclude 'META-INF/**'
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

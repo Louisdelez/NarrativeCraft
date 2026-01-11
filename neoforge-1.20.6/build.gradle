@@ -61,10 +61,8 @@ dependencies {
     // Javassist for mixin Opcode (provided by Fabric Loom but not NeoForge ModDev)
     compileOnly 'org.javassist:javassist:3.29.2-GA'
 
-    // blade-ink included via jarJar from local libs folder
-    def bladeInkJar = files("${rootProject.projectDir}/libs/blade-ink-${blade_ink_version}.jar")
-    jarJar(bladeInkJar)
-    implementation(bladeInkJar)
+    // blade-ink from local libs folder (classes included in jar task)
+    implementation files("${rootProject.projectDir}/libs/blade-ink-${blade_ink_version}.jar")
     // EmotesAPI optional - exclude guava + playeranim transitives to avoid version conflicts with MC 1.20.6
     compileOnly("io.github.kosmx.emotes:emotesAPI:${emotesAPI_version}") {
         exclude group: 'com.google.guava', module: 'guava'
@@ -89,4 +87,9 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 // Custom JAR naming for version identification
 tasks.named('jar') {
     archiveBaseName = "${mod_id}-neoforge-1.20.6"
+    // Include blade-ink JAR classes in the final mod jar
+    from(zipTree("${rootProject.projectDir}/libs/blade-ink-${blade_ink_version}.jar")) {
+        exclude 'META-INF/**'
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
