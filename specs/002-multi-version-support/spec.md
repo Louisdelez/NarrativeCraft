@@ -2,7 +2,8 @@
 
 **Feature Branch**: `002-multi-version-support`
 **Created**: 2026-01-09
-**Status**: Draft
+**Status**: DONE
+**Completed**: 2026-01-11
 **Input**: User description: "Je veux ajouter à NarrativeCraft une compatibilité multi-versions Minecraft, afin que le mod fonctionne proprement et soit publiable de Minecraft 1.19 jusqu'à 1.21.11 inclus."
 
 ## Clarifications
