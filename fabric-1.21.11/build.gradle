@@ -75,10 +75,18 @@ tasks.named('jar') {
 
 tasks.named('remapJar') {
     archiveBaseName = "${mod_id}-fabric-1.21.11"
+    // Declare dependencies on compat modules
+    dependsOn ':compat-api:classes', ':compat-mc121x:classes'
     // Include blade-ink JAR classes in the final mod jar
     from(zipTree("${rootProject.projectDir}/libs/blade-ink-${blade_ink_version}.jar")) {
         exclude 'META-INF/**'
         exclude 'fabric.mod.json'
     }
+    // Include compat-api classes and resources
+    from(project(':compat-api').sourceSets.main.output.classesDirs)
+    from(project(':compat-api').sourceSets.main.output.resourcesDir)
+    // Include compat-mc121x classes and resources (including META-INF/services)
+    from(project(':compat-mc121x').sourceSets.main.output.classesDirs)
+    from(project(':compat-mc121x').sourceSets.main.output.resourcesDir)
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
