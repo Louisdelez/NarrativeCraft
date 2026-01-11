@@ -27,6 +27,8 @@ import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
 import fr.loudo.narrativecraft.audio.VolumeAudio;
+import fr.loudo.narrativecraft.compat.api.NcId;
+import fr.loudo.narrativecraft.compat.api.VersionAdapterLoader;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.util.Translation;
@@ -34,7 +36,6 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundManager;
-import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 
@@ -114,8 +115,8 @@ public class SoundInkAction extends InkAction {
             identifier = splitName[0];
             name = splitName[1];
         }
-        Identifier location = Identifier.fromNamespaceAndPath(identifier, name);
-        if (soundManager.getSoundEvent(location) == null) {
+        NcId ncId = NcId.of(identifier, name);
+        if (VersionAdapterLoader.getAdapter().getUtilCompat().getSoundEvent(soundManager, ncId) == null) {
             return InkActionResult.warn(Translation.message(
                     "ink_action.validation.sound", type.name().toLowerCase(), name));
         }
@@ -205,18 +206,18 @@ public class SoundInkAction extends InkAction {
 
     private SoundInstance getSimpleSoundInstance() {
         if (simpleSoundInstance == null) {
-            simpleSoundInstance = new SoundInkInstance(
-                    Identifier.fromNamespaceAndPath(identifier, name),
+            NcId ncId = NcId.of(identifier, name);
+            // Use compat layer to create sound instance - handles Identifier vs ResourceLocation
+            simpleSoundInstance = (SoundInstance) VersionAdapterLoader.getAdapter().getUtilCompat().createSoundInstance(
+                    ncId,
                     SoundSource.MASTER,
                     volume,
                     pitch,
                     SoundInstance.createUnseededRandom(),
                     isLooping,
                     0,
-                    SoundInstance.Attenuation.NONE,
-                    0,
-                    0,
-                    0,
+                    0, // Attenuation.NONE = 0
+                    0, 0, 0,
                     true);
         }
         return simpleSoundInstance;

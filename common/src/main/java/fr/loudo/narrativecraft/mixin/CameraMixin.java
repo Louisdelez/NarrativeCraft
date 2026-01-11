@@ -57,12 +57,17 @@ public abstract class CameraMixin {
     @Inject(method = "setup", at = @At("RETURN"))
     private void narrativecraft$cameraSetup(
             Level p_454891_, Entity p_90577_, boolean p_90578_, boolean p_90579_, float partialTick, CallbackInfo ci) {
+        // T055: Null safety check for player (fixes audit issue CameraMixin:60)
         LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null) return;
+
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
         if (playerSession == null) return;
         if (playerSession.getController() instanceof CutsceneController controller) {
-            controller.getCutscenePlayback().cameraInterpolation(partialTick);
+            if (controller.getCutscenePlayback() != null) {
+                controller.getCutscenePlayback().cameraInterpolation(partialTick);
+            }
         }
 
         if (playerSession.getCurrentCamera() == null) return;

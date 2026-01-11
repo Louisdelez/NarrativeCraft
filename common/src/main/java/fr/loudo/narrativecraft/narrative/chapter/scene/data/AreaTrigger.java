@@ -25,12 +25,13 @@ package fr.loudo.narrativecraft.narrative.chapter.scene.data;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.compat.api.RenderChannel;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.chapter.scene.SceneData;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
@@ -107,7 +108,7 @@ public class AreaTrigger extends SceneData {
 
         PoseStack.Pose matrix4f = poseStack.last();
         MultiBufferSource.BufferSource bufferSource = minecraft.renderBuffers().bufferSource();
-        VertexConsumer vertex = bufferSource.getBuffer(RenderTypes.lines());
+        VertexConsumer vertex = bufferSource.getBuffer(NarrativeCraftMod.getRenderType(RenderChannel.DEBUG_LINES));
 
         double minX = Math.min(x1, x2);
         double minY = Math.min(y1, y2);
@@ -150,7 +151,7 @@ public class AreaTrigger extends SceneData {
         drawEdge(vertex, matrix, p101, p111, r, g, b, a);
         drawEdge(vertex, matrix, p001, p011, r, g, b, a);
 
-        bufferSource.endBatch(RenderTypes.lines());
+        bufferSource.endBatch(NarrativeCraftMod.getRenderType(RenderChannel.DEBUG_LINES));
     }
 
     private void drawEdge(

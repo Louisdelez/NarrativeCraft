@@ -1,0 +1,79 @@
+/**
+ * Version-specific common code for Minecraft 1.20.x
+ * Contains code that depends on 1.20.x-specific APIs:
+ * - Alternative Permissions handling
+ * - Different KeyEvent/MouseButtonEvent signatures
+ * - Different entity package structure
+ * - Different NBT serialization APIs
+ */
+plugins {
+    id 'java-library'
+    id 'fabric-loom'
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+        name = 'Sponge'
+        url = 'https://repo.spongepowered.org/repository/maven-public'
+    }
+    maven {
+        name = 'ParchmentMC'
+        url = 'https://maven.parchmentmc.org/'
+    }
+    maven {
+        url 'https://maven.kosmx.dev/'
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${mc_1206_version}"
+    mappings loom.layered {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${mc_1206_parchment_mc}:${mc_1206_parchment}@zip")
+    }
+
+    // Compat API (compile-only since it's pure Java)
+    compileOnly project(':compat-api')
+
+    // blade-ink for Story/InkAction classes
+    compileOnly "com.bladecoder.ink:blade-ink:${blade_ink_version}"
+
+    compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
+    compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
+    annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
+
+    compileOnly("io.github.kosmx.emotes:emotesAPI:${emotesAPI_version}") {
+        exclude group: 'com.google.guava', module: 'guava'
+        exclude group: 'com.zigythebird.playeranim', module: 'PlayerAnimationLibCore'
+    }
+}
+
+// Skip compilation of this module - sources are compiled together with common in the loader modules
+// This module just provides source files for mc120-specific overrides
+compileJava.enabled = false
+processResources.enabled = false
+
+// Export sources for inclusion in loader modules
+configurations {
+    mc120Java {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+    mc120Resources {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+}
+
+artifacts {
+    mc120Java sourceSets.main.java.sourceDirectories.singleFile
+    mc120Resources sourceSets.main.resources.sourceDirectories.singleFile
+}

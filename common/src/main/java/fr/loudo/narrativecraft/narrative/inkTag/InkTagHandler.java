@@ -29,6 +29,8 @@ import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
+import fr.loudo.narrativecraft.narrative.validation.InkValidationService;
+import fr.loudo.narrativecraft.narrative.validation.ValidationError;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +54,15 @@ public class InkTagHandler {
                 tag = InkActionUtil.parseVariables(storyHandler.getStory(), tag);
             }
             InkAction inkAction = InkActionRegistry.findByCommand(tag);
-            if (inkAction == null) continue;
+            // T071: Report unknown tags with helpful error message and typo suggestions
+            if (inkAction == null) {
+                InkValidationService validationService = InkValidationService.getInstance();
+                String sceneName = playerSession.getScene() != null ? playerSession.getScene().getName() : "unknown";
+                ValidationError error = validationService.createUnknownTagError(tag, "story", sceneName, 0);
+                // Log the error but continue - unknown tags are warnings, not fatal errors
+                validationService.logError(error);
+                continue;
+            }
             result = inkAction.validate(tag, playerSession.getScene());
             if (result.isError()) {
                 throw new InkTagHandlerException(inkAction.getClass(), result.errorMessage());

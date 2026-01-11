@@ -26,13 +26,13 @@ package fr.loudo.narrativecraft.narrative.dialog.animation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.compat.api.RenderChannel;
 import fr.loudo.narrativecraft.gui.ICustomGuiRender;
 import fr.loudo.narrativecraft.narrative.dialog.DialogRenderer;
 import fr.loudo.narrativecraft.util.Easing;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import org.joml.Matrix3x2fStack;
 import org.joml.Matrix4f;
@@ -54,7 +54,7 @@ public class DialogArrowSkip {
         this.height = height;
         this.xTranslatePoint = xTranslatePoint;
         this.offset = offset;
-        this.color = ARGB.color((int) (0.8 * 255), color);
+        this.color = NarrativeCraftMod.getColorCompat().color((int) (0.8 * 255), color);
         totalTick = (int) (translateTime * 20.0);
     }
 
@@ -84,14 +84,14 @@ public class DialogArrowSkip {
             t = Easing.SMOOTH.interpolate(t);
             translateX = Mth.lerp(t, translateX + xTranslatePoint, translateX);
             opacity = Mth.lerp(t, 0.0, 0.8);
-            originalColor = ARGB.color((int) (opacity * 255.0), color);
+            originalColor = NarrativeCraftMod.getColorCompat().color((int) (opacity * 255.0), color);
         }
         poseStack.translate(translateX, 0, 0);
         draw(poseStack, bufferSource, originalColor);
     }
 
     private void draw(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, int color) {
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(NarrativeCraftMod.dialogBackgroundRenderType);
+        VertexConsumer vertexConsumer = bufferSource.getBuffer(NarrativeCraftMod.getRenderType(RenderChannel.DIALOG_BACKGROUND));
         Matrix4f matrix4f = poseStack.last().pose();
 
         float xStart = dialogRenderer.getTotalWidth() - width - offset;
@@ -129,7 +129,7 @@ public class DialogArrowSkip {
         poseStack.translate((float) translateX + offset, 0);
 
         ((ICustomGuiRender) guiGraphics)
-                .narrativecraft$drawDialogSkip(width, height, ARGB.color((int) (opacity * 255), color));
+                .narrativecraft$drawDialogSkip(width, height, NarrativeCraftMod.getColorCompat().color((int) (opacity * 255), color));
 
         poseStack.popMatrix();
     }

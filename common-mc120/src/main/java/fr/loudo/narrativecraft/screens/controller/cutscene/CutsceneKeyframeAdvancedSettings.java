@@ -1,0 +1,58 @@
+/*
+ * NarrativeCraft - Create your own stories, easily, and freely in Minecraft.
+ * Copyright (c) 2025 LOUDO and contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package fr.loudo.narrativecraft.screens.controller.cutscene;
+
+import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframe;
+import fr.loudo.narrativecraft.screens.components.ButtonListScreen;
+import fr.loudo.narrativecraft.util.Translation;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+
+/**
+ * MC 1.20.x version of CutsceneKeyframeAdvancedSettings.
+ * Key differences from 1.21.x:
+ * - Directly uses CutsceneKeyframeEasingsScreen instead of factory pattern
+ *   (factory pattern is used in 1.21.x for version compatibility abstraction)
+ */
+public class CutsceneKeyframeAdvancedSettings extends ButtonListScreen {
+
+    private final CutsceneKeyframe keyframe;
+
+    public CutsceneKeyframeAdvancedSettings(Screen lastScreen, CutsceneKeyframe keyframe) {
+        super(lastScreen, Translation.message("screen.keyframe_advanced.name"));
+        this.keyframe = keyframe;
+    }
+
+    @Override
+    protected void addContents() {
+        Button easingsButton = Button.builder(Translation.message("screen.keyframe_advanced.easings"), button -> {
+                    // 1.20.x: Directly use CutsceneKeyframeEasingsScreen instead of factory
+                    CutsceneKeyframeEasingsScreen screen = new CutsceneKeyframeEasingsScreen(this, keyframe);
+                    this.minecraft.setScreen(screen);
+                })
+                .build();
+
+        objectListScreen.addButton(easingsButton);
+    }
+}

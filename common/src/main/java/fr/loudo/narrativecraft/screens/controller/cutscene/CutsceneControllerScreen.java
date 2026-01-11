@@ -51,7 +51,7 @@ public class CutsceneControllerScreen extends Screen {
     private final CutsceneController cutsceneController;
 
     public CutsceneControllerScreen(CutsceneController cutsceneController) {
-        super(Component.literal("Cutscene Controller Screen"));
+        super(Translation.message("screen.cutscene.title"));
         this.cutsceneController = cutsceneController;
     }
 

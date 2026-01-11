@@ -23,8 +23,8 @@
 
 package fr.loudo.narrativecraft.narrative.playback;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.compat.api.IUtilCompat;
 import fr.loudo.narrativecraft.mixin.invoker.LivingEntityInvoker;
 import fr.loudo.narrativecraft.narrative.recording.Location;
 import fr.loudo.narrativecraft.narrative.recording.actions.Action;
@@ -109,11 +109,12 @@ public class PlaybackData {
     public void spawnEntity(Location location) {
         if (actionsData.getEntityId() == BuiltInRegistries.ENTITY_TYPE.getId(EntityType.PLAYER)) return;
         EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.byId(actionsData.getEntityId());
-        entity = entityType.create(playback.getLevel(), EntitySpawnReason.MOB_SUMMONED);
+        IUtilCompat utilCompat = NarrativeCraftMod.getUtilCompat();
+        entity = (Entity) utilCompat.createEntityFromType(entityType, playback.getLevel());
         if (entity == null) return;
         try {
-            entity.load(Util.valueInputFromCompoundTag(entity.registryAccess(), actionsData.getNbtData()));
-        } catch (CommandSyntaxException e) {
+            utilCompat.loadEntityFromNbt(entity, actionsData.getNbtData());
+        } catch (RuntimeException e) {
             NarrativeCraftMod.LOGGER.error("Unexpected error when trying to load nbt entity data! ", e);
             return;
         }

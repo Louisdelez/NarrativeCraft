@@ -1,0 +1,91 @@
+plugins {
+    id 'multiloader-loader'
+    id 'net.neoforged.moddev'
+}
+
+// Include version-specific common for MC 1.20.x
+useCommonMc120()
+
+// Version-specific properties for MC 1.20.6
+def mcVersion = rootProject.mc_1206_version
+def neoforgeVersion = rootProject.mc_1206_neoforge
+
+neoForge {
+    version = neoforgeVersion
+    // Automatically enable neoforge AccessTransformers if the file exists
+    def at = project(':common').file('src/main/resources/META-INF/accesstransformer.cfg')
+    if (at.exists()) {
+        accessTransformers.from(at.absolutePath)
+    }
+    parchment {
+        minecraftVersion = mc_1206_parchment_mc
+        mappingsVersion = mc_1206_parchment
+    }
+    runs {
+        configureEach {
+            systemProperty('neoforge.enabledGameTestNamespaces', mod_id)
+            ideName = "NeoForge 1.20.6 ${it.name.capitalize()} (${project.path})"
+        }
+        client {
+            client()
+        }
+        data {
+            clientData()
+        }
+        server {
+            server()
+        }
+    }
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url 'https://maven.kosmx.dev/'
+    }
+    maven { url = "https://repo.redlance.org/public" }
+}
+
+dependencies {
+    // Version-specific compat module
+    implementation project(':compat-mc120x')
+
+    // Javassist for mixin Opcode (provided by Fabric Loom but not NeoForge ModDev)
+    compileOnly 'org.javassist:javassist:3.29.2-GA'
+
+    jarJar(implementation("com.bladecoder.ink:blade-ink")) {
+        version {
+            prefer blade_ink_version
+        }
+    }
+    implementation "com.bladecoder.ink:blade-ink:${blade_ink_version}"
+    // EmotesAPI optional - exclude guava + playeranim transitives to avoid version conflicts with MC 1.20.6
+    compileOnly("io.github.kosmx.emotes:emotesAPI:${emotesAPI_version}") {
+        exclude group: 'com.google.guava', module: 'guava'
+        exclude group: 'com.zigythebird.playeranim'
+    }
+    compileOnly("io.github.kosmx.emotes:emotesServer:${emotesAPI_version}") {
+        exclude group: 'com.google.guava', module: 'guava'
+        exclude group: 'com.zigythebird.playeranim'
+    }
+    compileOnly("io.github.kosmx.emotes:emotesMc:${emotesAPI_version}") {
+        exclude group: 'com.google.guava', module: 'guava'
+        exclude group: 'com.zigythebird.playeranim'
+    }
+    // Provide playeranim stub for compilation only
+    compileOnly("com.zigythebird.playeranim:PlayerAnimationLibCore:1.1.3+alpha.1+mc.1.21.11") {
+        transitive = false
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+// Custom JAR naming for version identification
+tasks.named('jar') {
+    archiveBaseName = "${mod_id}-neoforge-1.20.6"
+}

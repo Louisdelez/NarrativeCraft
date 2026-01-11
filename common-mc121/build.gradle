@@ -1,0 +1,82 @@
+/**
+ * Version-specific common code for Minecraft 1.21.x
+ * Contains code that depends on 1.21.x-specific APIs:
+ * - Permissions API
+ * - KeyEvent/MouseButtonEvent
+ * - PositionMoveRotation
+ * - TagValueInput/TagValueOutput
+ * - Avatar/AvatarRenderer
+ * - Entity package structure (vehicle.boat, animal.equine)
+ */
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev'
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+        name = 'Sponge'
+        url = 'https://repo.spongepowered.org/repository/maven-public'
+    }
+    maven {
+        name = 'ParchmentMC'
+        url = 'https://maven.parchmentmc.org/'
+    }
+    maven {
+        name = "NeoForge"
+        url = 'https://maven.neoforged.net/releases'
+    }
+    maven {
+        url 'https://maven.kosmx.dev/'
+    }
+}
+
+neoForge {
+    neoFormVersion = neo_form_version
+    parchment {
+        minecraftVersion = parchment_minecraft
+        mappingsVersion = parchment_version
+    }
+}
+
+dependencies {
+    // Core common module (narrative logic, pure Java parts)
+    api project(':common')
+
+    // Compat API
+    api project(':compat-api')
+
+    compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
+    compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
+    annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
+
+    compileOnly("io.github.kosmx.emotes:emotesAPI:${emotesAPI_version}") {
+        exclude group: 'com.google.guava', module: 'guava'
+        exclude group: 'com.zigythebird.playeranim', module: 'PlayerAnimationLibCore'
+    }
+}
+
+// Export sources for inclusion in loader modules
+configurations {
+    mc121Java {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+    mc121Resources {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+}
+
+artifacts {
+    mc121Java sourceSets.main.java.sourceDirectories.singleFile
+    mc121Resources sourceSets.main.resources.sourceDirectories.singleFile
+}

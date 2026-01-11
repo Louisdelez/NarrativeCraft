@@ -26,13 +26,13 @@ package fr.loudo.narrativecraft.narrative.interaction;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.compat.api.RenderChannel;
 import fr.loudo.narrativecraft.util.Easing;
 import fr.loudo.narrativecraft.util.ImageFontConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
@@ -84,7 +84,7 @@ public class InteractionEyeRenderer {
         poseStack.scale(scale, -scale, scale);
 
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
-        VertexConsumer vc = bufferSource.getBuffer(NarrativeCraftMod.dialogBackgroundRenderType);
+        VertexConsumer vc = bufferSource.getBuffer(NarrativeCraftMod.getRenderType(RenderChannel.DIALOG_BACKGROUND));
         Matrix4f mat = poseStack.last().pose();
 
         vc.addVertex(mat, -SIZE, SIZE, -1).setColor(0, 0, 0, opacity).setLight(LightTexture.FULL_BRIGHT);
@@ -96,7 +96,7 @@ public class InteractionEyeRenderer {
                 ImageFontConstants.EYE_OPEN,
                 -mc.font.width(ImageFontConstants.EYE_OPEN) / 2f,
                 -mc.font.lineHeight / 2f,
-                ARGB.color(opacity, 0xFFFFFF),
+                NarrativeCraftMod.getColorCompat().color(opacity, 0xFFFFFF),
                 false,
                 mat,
                 bufferSource,

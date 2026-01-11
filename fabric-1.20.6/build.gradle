@@ -1,0 +1,77 @@
+plugins {
+    id 'multiloader-loader'
+    id 'fabric-loom'
+}
+
+// Use version-specific common for MC 1.20.x
+useCommonMc120()
+
+// Version-specific properties for MC 1.20.6
+def mcVersion = rootProject.mc_1206_version
+def fabricLoaderVersion = rootProject.mc_1206_fabric_loader
+def fabricApiVersion = rootProject.mc_1206_fabric_api
+
+repositories {
+    mavenLocal()
+    maven {
+        url 'https://maven.kosmx.dev/'
+    }
+    maven { url = "https://repo.redlance.org/public" }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${mcVersion}"
+    mappings loom.layered {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${mc_1206_parchment_mc}:${mc_1206_parchment}@zip")
+    }
+    modImplementation "net.fabricmc:fabric-loader:${fabricLoaderVersion}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}"
+
+    // Version-specific compat module
+    implementation project(':compat-mc120x')
+
+    compileOnly("io.github.kosmx.emotes:emotesAPI:${emotesAPI_version}") {
+        exclude group: 'com.google.guava', module: 'guava'
+    }
+    compileOnly("io.github.kosmx.emotes:emotesServer:${emotesAPI_version}") {
+        exclude group: 'com.google.guava', module: 'guava'
+    }
+    compileOnly("io.github.kosmx.emotes:emotesMc:${emotesAPI_version}") {
+        exclude group: 'com.google.guava', module: 'guava'
+    }
+    include(implementation "com.bladecoder.ink:blade-ink:${blade_ink_version}")
+}
+
+loom {
+    def aw = project(':common').file("src/main/resources/${mod_id}.accesswidener")
+    if (aw.exists()) {
+        accessWidenerPath.set(aw)
+    }
+    mixin {
+        defaultRefmapName.set("${mod_id}.refmap.json")
+    }
+    runs {
+        client {
+            client()
+            setConfigName('Fabric 1.20.6 Client')
+            ideConfigGenerated(true)
+            runDir('runs/client')
+        }
+        server {
+            server()
+            setConfigName('Fabric 1.20.6 Server')
+            ideConfigGenerated(true)
+            runDir('runs/server')
+        }
+    }
+}
+
+// Custom JAR naming for version identification
+tasks.named('jar') {
+    archiveBaseName = "${mod_id}-fabric-1.20.6"
+}
+
+tasks.named('remapJar') {
+    archiveBaseName = "${mod_id}-fabric-1.20.6"
+}

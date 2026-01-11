@@ -9,6 +9,25 @@ configurations {
     commonResources{
         canBeResolved = true
     }
+    // Optional version-specific common configurations
+    mc121Java {
+        canBeResolved = true
+    }
+    mc121Resources {
+        canBeResolved = true
+    }
+    mc120Java {
+        canBeResolved = true
+    }
+    mc120Resources {
+        canBeResolved = true
+    }
+    mc119Java {
+        canBeResolved = true
+    }
+    mc119Resources {
+        canBeResolved = true
+    }
 }
 
 dependencies {
@@ -21,24 +40,286 @@ dependencies {
     commonResources project(path: ':common', configuration: 'commonResources')
 }
 
-tasks.named('compileJava', JavaCompile) {
-    dependsOn(configurations.commonJava)
-    source(configurations.commonJava)
+// Flag to track if a version-specific extension was used
+ext.usingVersionSpecificCommon = false
+
+// Extension to configure version-specific common module for 1.21.x
+ext.useCommonMc121 = {
+    ext.usingVersionSpecificCommon = true
+
+    dependencies {
+        compileOnly project(':common-mc121')
+        mc121Java project(path: ':common-mc121', configuration: 'mc121Java')
+        mc121Resources project(path: ':common-mc121', configuration: 'mc121Resources')
+    }
+
+    // For 1.21.x: common + mc121 overlay
+    tasks.named('compileJava', JavaCompile) {
+        dependsOn(configurations.commonJava)
+        dependsOn(configurations.mc121Java)
+        source(configurations.commonJava)
+        source(configurations.mc121Java)
+    }
+
+    processResources {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        dependsOn(configurations.commonResources)
+        from(configurations.commonResources)
+        dependsOn(configurations.mc121Resources)
+        from(configurations.mc121Resources)
+    }
+
+    tasks.named('javadoc', Javadoc).configure {
+        dependsOn(configurations.commonJava)
+        dependsOn(configurations.mc121Java)
+        source(configurations.commonJava)
+        source(configurations.mc121Java)
+    }
+
+    tasks.named('sourcesJar', Jar) {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        dependsOn(configurations.commonJava)
+        from(configurations.commonJava)
+        dependsOn(configurations.commonResources)
+        from(configurations.commonResources)
+        dependsOn(configurations.mc121Java)
+        from(configurations.mc121Java)
+        dependsOn(configurations.mc121Resources)
+        from(configurations.mc121Resources)
+    }
 }
 
-processResources {
-    dependsOn(configurations.commonResources)
-    from(configurations.commonResources)
+// Extension to configure version-specific common module for 1.20.x
+ext.useCommonMc120 = {
+    ext.usingVersionSpecificCommon = true
+
+    // For 1.20.x, we use common as base + common-mc120 for version-specific overrides
+    // common-mc120 contains ONLY files that differ due to API changes (ResourceLocation vs Identifier, etc.)
+    // Files with same path in common-mc120 override those from common
+
+    dependencies {
+        compileOnly project(':common-mc120')
+        mc120Java project(path: ':common-mc120', configuration: 'mc120Java')
+        mc120Resources project(path: ':common-mc120', configuration: 'mc120Resources')
+    }
+
+    // Use common + mc120 overlay: filter out common files that are overridden by mc120
+    tasks.named('compileJava', JavaCompile) {
+        dependsOn(configurations.commonJava)
+        dependsOn(configurations.mc120Java)
+
+        // First add mc120 sources (override versions)
+        source(configurations.mc120Java)
+
+        // Get the relative paths of all mc120 java files
+        def mc120Files = configurations.mc120Java.files.collectMany { srcDir ->
+            if (srcDir.isDirectory()) {
+                project.fileTree(srcDir).matching { include '**/*.java' }.files.collect { file ->
+                    srcDir.toPath().relativize(file.toPath()).toString()
+                }
+            } else {
+                []
+            }
+        }.toSet()
+
+        // Add common sources, excluding files that exist in mc120
+        configurations.commonJava.files.each { srcDir ->
+            if (srcDir.isDirectory()) {
+                source(project.fileTree(srcDir).matching {
+                    include '**/*.java'
+                    exclude { element ->
+                        def relativePath = srcDir.toPath().relativize(element.file.toPath()).toString()
+                        mc120Files.contains(relativePath)
+                    }
+                })
+            }
+        }
+    }
+
+    processResources {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        dependsOn(configurations.commonResources)
+        from(configurations.commonResources)
+        dependsOn(configurations.mc120Resources)
+        from(configurations.mc120Resources)
+    }
+
+    tasks.named('javadoc', Javadoc).configure {
+        dependsOn(configurations.commonJava)
+        dependsOn(configurations.mc120Java)
+
+        // Same filtering as compileJava
+        source(configurations.mc120Java)
+
+        def mc120Files = configurations.mc120Java.files.collectMany { srcDir ->
+            if (srcDir.isDirectory()) {
+                project.fileTree(srcDir).matching { include '**/*.java' }.files.collect { file ->
+                    srcDir.toPath().relativize(file.toPath()).toString()
+                }
+            } else {
+                []
+            }
+        }.toSet()
+
+        configurations.commonJava.files.each { srcDir ->
+            if (srcDir.isDirectory()) {
+                source(project.fileTree(srcDir).matching {
+                    include '**/*.java'
+                    exclude { element ->
+                        def relativePath = srcDir.toPath().relativize(element.file.toPath()).toString()
+                        mc120Files.contains(relativePath)
+                    }
+                })
+            }
+        }
+    }
+
+    tasks.named('sourcesJar', Jar) {
+        // EXCLUDE strategy: first file wins, so put mc120 first to take precedence
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        dependsOn(configurations.mc120Java)
+        from(configurations.mc120Java)
+        dependsOn(configurations.mc120Resources)
+        from(configurations.mc120Resources)
+        dependsOn(configurations.commonJava)
+        from(configurations.commonJava)
+        dependsOn(configurations.commonResources)
+        from(configurations.commonResources)
+    }
 }
 
-tasks.named('javadoc', Javadoc).configure {
-    dependsOn(configurations.commonJava)
-    source(configurations.commonJava)
+// Extension to configure version-specific common module for 1.19.x
+ext.useCommonMc119 = {
+    ext.usingVersionSpecificCommon = true
+
+    // For 1.19.x, we use common as base + common-mc119 for version-specific overrides
+    // common-mc119 contains files that differ due to API changes (no GuiGraphics, different level(), etc.)
+    // Files with same path in common-mc119 override those from common
+
+    dependencies {
+        compileOnly project(':common-mc119')
+        mc119Java project(path: ':common-mc119', configuration: 'mc119Java')
+        mc119Resources project(path: ':common-mc119', configuration: 'mc119Resources')
+    }
+
+    // Use common + mc119 overlay: filter out common files that are overridden by mc119
+    tasks.named('compileJava', JavaCompile) {
+        dependsOn(configurations.commonJava)
+        dependsOn(configurations.mc119Java)
+
+        // First add mc119 sources (override versions)
+        source(configurations.mc119Java)
+
+        // Get the relative paths of all mc119 java files
+        def mc119Files = configurations.mc119Java.files.collectMany { srcDir ->
+            if (srcDir.isDirectory()) {
+                project.fileTree(srcDir).matching { include '**/*.java' }.files.collect { file ->
+                    srcDir.toPath().relativize(file.toPath()).toString()
+                }
+            } else {
+                []
+            }
+        }.toSet()
+
+        // Add common sources, excluding files that exist in mc119
+        configurations.commonJava.files.each { srcDir ->
+            if (srcDir.isDirectory()) {
+                source(project.fileTree(srcDir).matching {
+                    include '**/*.java'
+                    exclude { element ->
+                        def relativePath = srcDir.toPath().relativize(element.file.toPath()).toString()
+                        mc119Files.contains(relativePath)
+                    }
+                })
+            }
+        }
+    }
+
+    processResources {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        dependsOn(configurations.commonResources)
+        from(configurations.commonResources)
+        dependsOn(configurations.mc119Resources)
+        from(configurations.mc119Resources)
+    }
+
+    tasks.named('javadoc', Javadoc).configure {
+        dependsOn(configurations.commonJava)
+        dependsOn(configurations.mc119Java)
+
+        // Same filtering as compileJava
+        source(configurations.mc119Java)
+
+        def mc119Files = configurations.mc119Java.files.collectMany { srcDir ->
+            if (srcDir.isDirectory()) {
+                project.fileTree(srcDir).matching { include '**/*.java' }.files.collect { file ->
+                    srcDir.toPath().relativize(file.toPath()).toString()
+                }
+            } else {
+                []
+            }
+        }.toSet()
+
+        configurations.commonJava.files.each { srcDir ->
+            if (srcDir.isDirectory()) {
+                source(project.fileTree(srcDir).matching {
+                    include '**/*.java'
+                    exclude { element ->
+                        def relativePath = srcDir.toPath().relativize(element.file.toPath()).toString()
+                        mc119Files.contains(relativePath)
+                    }
+                })
+            }
+        }
+    }
+
+    tasks.named('sourcesJar', Jar) {
+        // EXCLUDE strategy: first file wins, so put mc119 first to take precedence
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        dependsOn(configurations.mc119Java)
+        from(configurations.mc119Java)
+        dependsOn(configurations.mc119Resources)
+        from(configurations.mc119Resources)
+        dependsOn(configurations.commonJava)
+        from(configurations.commonJava)
+        dependsOn(configurations.commonResources)
+        from(configurations.commonResources)
+    }
 }
 
-tasks.named('sourcesJar', Jar) {
-    dependsOn(configurations.commonJava)
-    from(configurations.commonJava)
-    dependsOn(configurations.commonResources)
-    from(configurations.commonResources)
+// Extension to skip common sources (for loaders with incompatible mappings)
+ext.skipCommonSources = {
+    ext.usingVersionSpecificCommon = true
+    // Remove common sources from compilation - they'll come from version-specific module
+    tasks.named('compileJava', JavaCompile) {
+        source = source.filter { !it.path.contains(configurations.commonJava.files.first().path) }
+    }
+}
+
+// Default behavior: only runs if no version-specific extension was used
+// This is applied at evaluation time via afterEvaluate
+afterEvaluate {
+    if (!ext.usingVersionSpecificCommon) {
+        tasks.named('compileJava', JavaCompile) {
+            dependsOn(configurations.commonJava)
+            source(configurations.commonJava)
+        }
+
+        processResources {
+            dependsOn(configurations.commonResources)
+            from(configurations.commonResources)
+        }
+
+        tasks.named('javadoc', Javadoc).configure {
+            dependsOn(configurations.commonJava)
+            source(configurations.commonJava)
+        }
+
+        tasks.named('sourcesJar', Jar) {
+            dependsOn(configurations.commonJava)
+            from(configurations.commonJava)
+            dependsOn(configurations.commonResources)
+            from(configurations.commonResources)
+        }
+    }
 }

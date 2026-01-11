@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.screens.controller.cutscene;
 import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframe;
 import fr.loudo.narrativecraft.screens.components.ButtonListScreen;
 import fr.loudo.narrativecraft.util.Translation;
+import fr.loudo.narrativecraft.util.Util;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 
@@ -41,7 +42,8 @@ public class CutsceneKeyframeAdvancedSettings extends ButtonListScreen {
     @Override
     protected void addContents() {
         Button easingsButton = Button.builder(Translation.message("screen.keyframe_advanced.easings"), button -> {
-                    CutsceneKeyframeEasingsScreen screen = new CutsceneKeyframeEasingsScreen(this, keyframe);
+                    // Use factory to create version-specific screen
+                    Screen screen = (Screen) Util.createCutsceneEasingsScreen(this, keyframe);
                     this.minecraft.setScreen(screen);
                 })
                 .build();

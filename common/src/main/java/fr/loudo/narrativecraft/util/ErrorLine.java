@@ -71,7 +71,7 @@ public class ErrorLine {
             Chapter chapterToDisplay = scene != null ? scene.getChapter() : chapter;
             if (chapterToDisplay != null) {
                 result = result.copy()
-                        .append(Component.literal("Chapter: ")
+                        .append(Translation.message("error.chapter")
                                 .withStyle(ChatFormatting.RED)
                                 .withStyle(ChatFormatting.BOLD))
                         .append(Component.literal(String.valueOf(chapterToDisplay.getIndex()))
@@ -82,7 +82,7 @@ public class ErrorLine {
 
             if (scene != null) {
                 result = result.copy()
-                        .append(Component.literal("Scene: ")
+                        .append(Translation.message("error.scene")
                                 .withStyle(ChatFormatting.RED)
                                 .withStyle(ChatFormatting.BOLD))
                         .append(Component.literal(scene.getName() + " ")

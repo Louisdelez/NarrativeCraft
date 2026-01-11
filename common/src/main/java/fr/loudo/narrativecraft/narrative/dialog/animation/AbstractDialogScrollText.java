@@ -24,12 +24,13 @@
 package fr.loudo.narrativecraft.narrative.dialog.animation;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.compat.api.NcId;
+import fr.loudo.narrativecraft.compat.api.VersionAdapterLoader;
 import fr.loudo.narrativecraft.narrative.story.text.ParsedDialog;
 import fr.loudo.narrativecraft.narrative.story.text.TextEffectAnimation;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import org.joml.Vector2f;
 
@@ -44,8 +45,7 @@ public abstract class AbstractDialogScrollText {
     protected float currentX;
     protected float currentY;
     protected float tickAccumulator = 0.0f;
-    protected Identifier letterSound =
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sfx.dialog_sound");
+    protected NcId letterSound = NcId.of(NarrativeCraftMod.MOD_ID, "sfx.dialog_sound");
 
     protected int textColor = 0xFFFFFF;
     protected float textSpeed = 1.0f;
@@ -154,7 +154,7 @@ public abstract class AbstractDialogScrollText {
 
     protected void playLetterSound() {
         float pitch = 0.8F + new Random().nextFloat() * 0.4F;
-        SoundEvent soundEvent = SoundEvent.createVariableRangeEvent(letterSound);
+        SoundEvent soundEvent = (SoundEvent) VersionAdapterLoader.getAdapter().getUtilCompat().createSoundEvent(letterSound);
         minecraft.player.playSound(soundEvent, 1.0F, pitch);
     }
 
@@ -214,11 +214,11 @@ public abstract class AbstractDialogScrollText {
         this.muteSound = muteSound;
     }
 
-    public Identifier getLetterSound() {
+    public NcId getLetterSound() {
         return letterSound;
     }
 
-    public void setLetterSound(Identifier letterSound) {
+    public void setLetterSound(NcId letterSound) {
         this.letterSound = letterSound;
     }
 

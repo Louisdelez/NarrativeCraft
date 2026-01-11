@@ -23,59 +23,54 @@
 
 package fr.loudo.narrativecraft.util;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.serialization.DynamicOps;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
-import fr.loudo.narrativecraft.mixin.accessor.AvatarAccessor;
-import fr.loudo.narrativecraft.mixin.accessor.PlayerListAccessor;
-import fr.loudo.narrativecraft.mixin.accessor.StringSplitterAccessor;
-import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+import fr.loudo.narrativecraft.compat.api.IUtilCompat;
+import fr.loudo.narrativecraft.compat.api.VersionAdapterLoader;
 import fr.loudo.narrativecraft.platform.Services;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import javax.imageio.ImageIO;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.StringSplitter;
 import net.minecraft.client.gui.Font;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
-import net.minecraft.resources.Identifier;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.util.ProblemReporter;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.TagValueInput;
-import net.minecraft.world.level.storage.ValueInput;
 
+import fr.loudo.narrativecraft.narrative.character.CharacterStory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
+
+/**
+ * Core utility class with version-agnostic methods.
+ * For version-specific utilities, use {@link #getUtilCompat()}.
+ */
 public class Util {
 
     public static final String REGEX_FLOAT = "^-?\\d*(\\.\\d*)?$";
     public static final String REGEX_FLOAT_ONLY_POSITIVE = "^\\d*(\\.\\d*)?$";
     public static final String REGEX_INT = "^\\d*$";
     public static final String REGEX_NO_SPECIAL_CHARACTERS = "[a-zA-Z0-9 _-]*";
+
+    /**
+     * Get the version-specific utility compat layer.
+     * Use this for methods that differ between MC versions.
+     */
+    public static IUtilCompat getUtilCompat() {
+        return VersionAdapterLoader.getAdapter().getUtilCompat();
+    }
 
     public static String snakeCase(String value) {
         return String.join("_", value.toLowerCase().split(" "));
@@ -99,76 +94,6 @@ public class Util {
         }
     }
 
-    // https://github.com/mt1006/mc-mocap-mod/blob/1.21.1/common/src/main/java/net/mt1006/mocap/utils/Utils.java#L61
-    public static CompoundTag nbtFromString(String nbtString) throws CommandSyntaxException {
-        return TagParser.parseCompoundAsArgument(new StringReader(nbtString));
-    }
-
-    public static BlockState getBlockStateFromData(String data, RegistryAccess registry) {
-        try {
-            CompoundTag compoundTag = Util.nbtFromString(data);
-            return NbtUtils.readBlockState(registry.lookupOrThrow(Registries.BLOCK), compoundTag);
-        } catch (CommandSyntaxException ignored) {
-            return null;
-        }
-    }
-
-    public static ValueInput valueInputFromCompoundTag(RegistryAccess registryAccess, String nbtString)
-            throws CommandSyntaxException {
-        return TagValueInput.create(ProblemReporter.DISCARDING, registryAccess, nbtFromString(nbtString));
-    }
-
-    public static Tag getItemTag(ItemStack itemStack, RegistryAccess registryAccess) {
-        DynamicOps<Tag> ops = registryAccess.createSerializationContext(NbtOps.INSTANCE);
-        Tag tag;
-        try {
-            tag = ItemStack.CODEC.encodeStart(ops, itemStack).getOrThrow();
-        } catch (Exception exception) {
-            tag = new CompoundTag();
-        }
-        return tag;
-    }
-
-    public static CompoundTag tagFromIdAndComponents(Item item, String data) {
-        CompoundTag tag = new CompoundTag();
-
-        try {
-            tag.put("components", nbtFromString(data));
-        } catch (CommandSyntaxException e) {
-            return null;
-        }
-
-        tag.put("id", StringTag.valueOf(BuiltInRegistries.ITEM.getKey(item).toString()));
-        tag.put("count", IntTag.valueOf(1));
-        return tag;
-    }
-
-    public static ItemStack generateItemStackFromNBT(CompoundTag compoundTag, RegistryAccess registryAccess) {
-        DynamicOps<Tag> ops = registryAccess.createSerializationContext(NbtOps.INSTANCE);
-        if (compoundTag == null) {
-            return ItemStack.EMPTY;
-        }
-        try {
-            return ItemStack.CODEC.parse(ops, compoundTag).getOrThrow();
-        } catch (Exception e) {
-            return ItemStack.EMPTY;
-        }
-    }
-
-    public static void addFakePlayerUUID(FakePlayer fakePlayer) {
-        if (NarrativeCraftMod.server == null) return;
-        ((PlayerListAccessor) NarrativeCraftMod.server.getPlayerList())
-                .getPlayersByUUID()
-                .put(fakePlayer.getUUID(), fakePlayer);
-    }
-
-    public static void removeFakePlayerUUID(FakePlayer fakePlayer) {
-        if (NarrativeCraftMod.server == null) return;
-        ((PlayerListAccessor) NarrativeCraftMod.server.getPlayerList())
-                .getPlayersByUUID()
-                .remove(fakePlayer.getUUID());
-    }
-
     public static boolean isSameEntity(Entity entity1, Entity entity2) {
         if (entity1 == null || entity2 == null) return false;
         return entity1.getUUID().equals(entity2.getUUID());
@@ -179,83 +104,12 @@ public class Util {
         return player1.getUUID().equals(player2.getUUID());
     }
 
-    public static LivingEntity createEntityFromCharacter(CharacterStory characterStory, Level level) {
-        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), characterStory.getName());
-
-        LivingEntity entity;
-        if (BuiltInRegistries.ENTITY_TYPE.getId(characterStory.getEntityType())
-                == BuiltInRegistries.ENTITY_TYPE.getId(EntityType.PLAYER)) {
-            entity = new FakePlayer((ServerLevel) level, gameProfile);
-            entity.getEntityData().set(AvatarAccessor.getDATA_PLAYER_MODE_CUSTOMISATION(), (byte) 0b01111111);
-        } else {
-            entity = (LivingEntity) characterStory.getEntityType().create(level, EntitySpawnReason.MOB_SUMMONED);
-            if (entity != null) {
-                entity.setInvulnerable(true);
-            }
-            if (entity instanceof Mob mob) mob.setNoAi(true);
-        }
-        return entity;
-    }
-
-    public static void spawnEntity(Entity entity, Level level) {
-        if (entity instanceof FakePlayer fakePlayer) {
-            ((PlayerListAccessor) level.getServer().getPlayerList())
-                    .getPlayersByUUID()
-                    .put(fakePlayer.getUUID(), fakePlayer);
-            level.getServer()
-                    .getPlayerList()
-                    .broadcastAll(new ClientboundPlayerInfoUpdatePacket(
-                            ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
-            if (level instanceof ServerLevel serverLevel) {
-                serverLevel.addNewPlayer(fakePlayer);
-            }
-            addFakePlayerUUID(fakePlayer);
-        } else {
-            level.addFreshEntity(entity);
-        }
-    }
-
-    public static void disconnectPlayer(Minecraft minecraft) {
-        minecraft.disconnectFromWorld(Component.empty());
-    }
-
-    public static float getLetterWidth(int letterCode, Minecraft minecraft) {
-        Font font = minecraft.font;
-        StringSplitter splitter = font.getSplitter();
-        return ((StringSplitterAccessor) splitter).getWidthProvider().getWidth(letterCode, Style.EMPTY);
-    }
-
-    public static int[] getImageResolution(Identifier resourceLocation) {
-        ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
-
-        Optional<Resource> resource = resourceManager.getResource(resourceLocation);
-        if (resource.isPresent()) {
-            try (InputStream stream = resource.get().open()) {
-                BufferedImage image = ImageIO.read(stream);
-                int width = image.getWidth();
-                int height = image.getHeight();
-
-                return new int[] {width, height};
-            } catch (IOException ignored) {
-            }
-        }
-        return null;
-    }
-
     public static int getDynamicHeight(int[] resolution, int newWidth) {
         float ratio = (float) resolution[1] / resolution[0];
         return Math.round(ratio * newWidth);
     }
 
-    public static boolean resourceExists(Identifier resourceLocation) {
-        return Minecraft.getInstance()
-                .getResourceManager()
-                .getResource(resourceLocation)
-                .isPresent();
-    }
-
     public static List<String> splitText(String text, Font font, int width) {
-
         List<String> finalString = new ArrayList<>();
         List<FormattedCharSequence> charSequences = font.split(FormattedText.of(text), width);
         for (FormattedCharSequence chara : charSequences) {
@@ -273,15 +127,149 @@ public class Util {
         float longerSentenceWidth = 0;
         String longerText = "";
         for (String line : lines) {
-            float width = 0;
-            for (int i = 0; i < line.length(); i++) {
-                width += Util.getLetterWidth(line.codePointAt(i), minecraft);
-            }
+            float width = getLetterWidth(line, minecraft);
             if (width > longerSentenceWidth) {
                 longerSentenceWidth = width;
                 longerText = line;
             }
         }
         return longerText;
+    }
+
+    /**
+     * Get width of a string using the font.
+     */
+    public static float getLetterWidth(String text, Minecraft minecraft) {
+        return minecraft.font.width(text);
+    }
+
+    /**
+     * Get width of a single character using the compat layer.
+     */
+    public static float getLetterWidth(int letterCode, Minecraft minecraft) {
+        return getUtilCompat().getLetterWidth(letterCode, minecraft);
+    }
+
+    // ========== Version-specific delegate methods ==========
+    // These delegate to the compat layer for version-specific implementations
+
+    public static BlockState getBlockStateFromData(String data, RegistryAccess registry) {
+        Object result = getUtilCompat().getBlockStateFromData(data, registry);
+        return result != null ? (BlockState) result : null;
+    }
+
+    public static Object valueInputFromCompoundTag(RegistryAccess registryAccess, String nbtString, Entity entity) {
+        return getUtilCompat().createValueInputFromNbt(entity, nbtString);
+    }
+
+    public static Tag getItemTag(ItemStack itemStack, RegistryAccess registryAccess) {
+        return (Tag) getUtilCompat().getItemTag(itemStack, registryAccess);
+    }
+
+    public static LivingEntity createEntityFromCharacter(CharacterStory characterStory, Level level) {
+        com.mojang.authlib.GameProfile gameProfile = new com.mojang.authlib.GameProfile(
+                java.util.UUID.randomUUID(), characterStory.getName());
+
+        LivingEntity entity;
+        if (net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getId(characterStory.getEntityType())
+                == net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getId(net.minecraft.world.entity.EntityType.PLAYER)) {
+            entity = new FakePlayer((net.minecraft.server.level.ServerLevel) level, gameProfile);
+            // Set player skin layers - uses AvatarAccessor which is in common
+            entity.getEntityData().set(
+                    fr.loudo.narrativecraft.mixin.accessor.AvatarAccessor.getDATA_PLAYER_MODE_CUSTOMISATION(),
+                    (byte) 0b01111111);
+        } else {
+            // Use compat layer for entity creation (handles EntitySpawnReason differences)
+            entity = (LivingEntity) getUtilCompat().createEntityFromType(
+                    characterStory.getEntityType(), level);
+            if (entity != null) {
+                entity.setInvulnerable(true);
+            }
+            if (entity instanceof net.minecraft.world.entity.Mob mob) mob.setNoAi(true);
+        }
+        return entity;
+    }
+
+    public static void spawnEntity(Entity entity, Level level) {
+        if (entity instanceof FakePlayer fakePlayer) {
+            ((fr.loudo.narrativecraft.mixin.accessor.PlayerListAccessor) level.getServer().getPlayerList())
+                    .getPlayersByUUID()
+                    .put(fakePlayer.getUUID(), fakePlayer);
+            level.getServer()
+                    .getPlayerList()
+                    .broadcastAll(new net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket(
+                            net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, fakePlayer));
+            if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                serverLevel.addNewPlayer(fakePlayer);
+            }
+            addFakePlayerUUID(fakePlayer);
+        } else {
+            level.addFreshEntity(entity);
+        }
+    }
+
+    public static CompoundTag tagFromIdAndComponents(Item item, String data) {
+        Object result = getUtilCompat().tagFromIdAndComponents(item, data);
+        return result != null ? (CompoundTag) result : null;
+    }
+
+    public static ItemStack generateItemStackFromNBT(CompoundTag compoundTag, RegistryAccess registryAccess) {
+        Object result = getUtilCompat().generateItemStackFromNBT(compoundTag, registryAccess);
+        return result != null ? (ItemStack) result : ItemStack.EMPTY;
+    }
+
+    public static void disconnectPlayer(Minecraft minecraft) {
+        getUtilCompat().disconnectPlayer(minecraft);
+    }
+
+    public static int[] getImageResolution(Object resourceLocation) {
+        return getUtilCompat().getImageResolution(resourceLocation);
+    }
+
+    public static boolean resourceExists(Object resourceLocation) {
+        return getUtilCompat().resourceExists(resourceLocation);
+    }
+
+    public static void addFakePlayerUUID(FakePlayer fakePlayer) {
+        if (NarrativeCraftMod.server == null) return;
+        ((fr.loudo.narrativecraft.mixin.accessor.PlayerListAccessor) NarrativeCraftMod.server.getPlayerList())
+                .getPlayersByUUID()
+                .put(fakePlayer.getUUID(), fakePlayer);
+    }
+
+    public static void removeFakePlayerUUID(FakePlayer fakePlayer) {
+        if (NarrativeCraftMod.server == null) return;
+        ((fr.loudo.narrativecraft.mixin.accessor.PlayerListAccessor) NarrativeCraftMod.server.getPlayerList())
+                .getPlayersByUUID()
+                .remove(fakePlayer.getUUID());
+    }
+
+    // ========== Screen Factory Registration ==========
+    // Used for version-specific screens that can't be referenced from common
+
+    private static BiFunction<Object, Object, Object> cutsceneEasingsScreenFactory;
+
+    /**
+     * Register the factory for creating CutsceneKeyframeEasingsScreen.
+     * Called from version-specific modules during initialization.
+     *
+     * @param factory Function(parentScreen, cutsceneKeyframe) -> Screen
+     */
+    public static void registerCutsceneEasingsScreenFactory(BiFunction<Object, Object, Object> factory) {
+        cutsceneEasingsScreenFactory = factory;
+    }
+
+    /**
+     * Create a CutsceneKeyframeEasingsScreen using the registered factory.
+     *
+     * @param parentScreen The parent screen to return to
+     * @param keyframe The CutsceneKeyframe to configure
+     * @return The created Screen, cast from Object
+     */
+    public static Object createCutsceneEasingsScreen(Object parentScreen, Object keyframe) {
+        if (cutsceneEasingsScreenFactory == null) {
+            throw new IllegalStateException("CutsceneEasingsScreen factory not registered - version module not initialized?");
+        }
+        return cutsceneEasingsScreenFactory.apply(parentScreen, keyframe);
     }
 }

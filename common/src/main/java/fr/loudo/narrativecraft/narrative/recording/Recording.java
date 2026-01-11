@@ -32,9 +32,13 @@ import fr.loudo.narrativecraft.narrative.recording.actions.GameModeAction;
 import fr.loudo.narrativecraft.narrative.recording.actions.RidingAction;
 import fr.loudo.narrativecraft.narrative.recording.actions.modsListeners.ModsListenerImpl;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
+import fr.loudo.narrativecraft.util.NarrativeCraftConstants;
+import fr.loudo.narrativecraft.util.NarrativeProfiler;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import net.minecraft.server.level.ServerPlayer;
@@ -51,7 +55,10 @@ public class Recording {
 
     private final AtomicInteger ids = new AtomicInteger();
 
-    private final List<Entity> trackedEntities = new ArrayList<>();
+    // T095/T096: Changed from List to HashSet for O(1) contains() lookup
+    // Before: List<Entity> + stream().map().toList() each tick
+    // After: Set<UUID> - zero allocation lookup via contains()
+    private final Set<UUID> trackedEntityUUIDs = new HashSet<>(NarrativeCraftConstants.TRACKED_ENTITIES_INITIAL_CAPACITY);
     private final List<RecordingData> recordingDataList = new ArrayList<>();
     private final PlayerSession playerSession;
     private List<Subscene> subscenesPlaying = new ArrayList<>();
@@ -85,7 +92,7 @@ public class Recording {
         entityRecorderData.setSavingTrack(true);
         entityRecorderData.getActionsData().setEntityIdRecording(ids.incrementAndGet());
         recordingDataList.clear();
-        trackedEntities.clear();
+        trackedEntityUUIDs.clear();
         recordingDataList.add(entityRecorderData);
         isRecording = true;
         if (entityRecorderData.getEntity() instanceof ServerPlayer player) {
@@ -130,22 +137,27 @@ public class Recording {
     }
 
     public void tick() {
+        NarrativeProfiler.start(NarrativeProfiler.RECORDING);
 
-        List<UUID> trackedUUIDs = trackedEntities.stream().map(Entity::getUUID).toList();
+        // T095/T096: Removed stream().map().toList() allocation
+        // Before: List<UUID> trackedUUIDs = trackedEntities.stream().map(Entity::getUUID).toList();
+        // After: Direct HashSet lookup - O(1) instead of O(n) and zero allocations
 
         List<Entity> nearbyEntities = entityRecorderData
                 .getEntity()
                 .level()
                 .getEntities(
                         entityRecorderData.getEntity(),
-                        entityRecorderData.getEntity().getBoundingBox().inflate(30));
+                        entityRecorderData.getEntity().getBoundingBox().inflate(NarrativeCraftConstants.ENTITY_TRACKING_RADIUS));
 
         for (Entity entity : nearbyEntities) {
-            if (!trackedUUIDs.contains(entity.getUUID())
+            UUID entityUUID = entity.getUUID();
+            // T096: O(1) HashSet lookup instead of O(n) List.contains()
+            if (!trackedEntityUUIDs.contains(entityUUID)
                     && !(entity instanceof ProjectileItem)
                     && !(entity instanceof EyeOfEnder)
                     && !(entity instanceof ThrowableItemProjectile)) {
-                trackedEntities.add(entity);
+                trackedEntityUUIDs.add(entityUUID);
                 RecordingData recordingData = new RecordingData(entity, this);
                 recordingDataList.add(recordingData);
                 if (entity instanceof VehicleEntity
@@ -156,6 +168,18 @@ public class Recording {
             }
         }
 
+        // Handle first-tick vehicle detection BEFORE recording locations
+        // (fixes race condition where vehicle state was recorded after location)
+        if (tick == 0 && entityRecorderData.getEntity().getVehicle() != null) {
+            Entity vehicle = entityRecorderData.getEntity().getVehicle();
+            // Ensure vehicle is tracked before recording
+            ActionsData actionsData = getActionDataFromEntity(vehicle);
+            if (actionsData != null) {
+                RidingAction action = new RidingAction(0, actionsData.getEntityIdRecording());
+                entityRecorderData.getActionsData().addAction(action);
+            }
+        }
+
         for (RecordingData recordingData : recordingDataList) {
             if (playerSession.getPlaybackManager().entityInPlayback(recordingData.getEntity())) {
                 recordingData.setSavingTrack(false);
@@ -163,15 +187,8 @@ public class Recording {
             recordingData.getActionsData().addLocation();
             recordingData.getActionDifferenceListener().listenDifference();
         }
-        if (tick == 0 && entityRecorderData.getEntity().getVehicle() != null) {
-            ActionsData actionsData =
-                    getActionDataFromEntity(entityRecorderData.getEntity().getVehicle());
-            if (actionsData != null) {
-                RidingAction action = new RidingAction(0, actionsData.getEntityIdRecording());
-                entityRecorderData.getActionsData().addAction(action);
-            }
-        }
         tick++;
+        NarrativeProfiler.stop(NarrativeProfiler.RECORDING);
     }
 
     public ActionsData getActionDataFromEntity(Entity entity) {

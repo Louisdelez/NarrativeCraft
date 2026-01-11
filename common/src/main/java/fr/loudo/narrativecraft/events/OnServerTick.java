@@ -32,8 +32,8 @@ import fr.loudo.narrativecraft.narrative.chapter.scene.data.interaction.EntityIn
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
-import java.util.ArrayList;
-import java.util.List;
+import fr.loudo.narrativecraft.util.NarrativeProfiler;
+import java.util.Iterator;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -41,16 +41,30 @@ import net.minecraft.world.phys.Vec3;
 
 public class OnServerTick {
     public static void tick(MinecraftServer server) {
+        NarrativeProfiler.start(NarrativeProfiler.TICK_SERVER);
+        try {
+            tickInternal(server);
+        } finally {
+            NarrativeProfiler.stop(NarrativeProfiler.TICK_SERVER);
+        }
+    }
+
+    private static void tickInternal(MinecraftServer server) {
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             PlayerSession playerSession =
                     NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
-            List<InkAction> toRemove = new ArrayList<>();
-            List<InkAction> inkActionsServer = playerSession.getServerSideInkActions();
-            for (InkAction inkAction : inkActionsServer) {
-                if (!inkAction.isRunning()) toRemove.add(inkAction);
+
+            // T095: Use Iterator to avoid ArrayList allocation for removal
+            // Before: List<InkAction> toRemove = new ArrayList<>(); + removeAll()
+            // After: Iterator with remove() - zero allocations
+            Iterator<InkAction> iterator = playerSession.getServerSideInkActions().iterator();
+            while (iterator.hasNext()) {
+                InkAction inkAction = iterator.next();
                 inkAction.tick();
+                if (!inkAction.isRunning()) {
+                    iterator.remove();
+                }
             }
-            playerSession.getInkActions().removeAll(toRemove);
             StoryHandler storyHandler = playerSession.getStoryHandler();
 
             KeyframeLocation location = playerSession.getCurrentCamera();
@@ -85,12 +99,21 @@ public class OnServerTick {
             // Player enter the area trigger, trigger one time
             // Exit, and when enter the area trigger again if it's not unique, trigger again
             // This prevents infinite trigger when the player is inside the area trigger.
+            // IMPORTANT: Set lastAreaTriggerEntered BEFORE playStitch to prevent re-entrancy
+            // T056: Added debounce check to prevent rapid re-triggering
             if (areaTriggerInside != null && !areaTriggerInside.equals(playerSession.getLastAreaTriggerEntered())) {
                 if (areaTriggerInside.isUnique()
                         && playerSession.getAreaTriggersEntered().contains(areaTriggerInside)) continue;
-                storyHandler.playStitch(areaTriggerInside.getStitch());
+                // T056: Debounce - skip if story is already running (prevents rapid re-trigger)
+                if (storyHandler.isRunning()) continue;
+                // Set guard BEFORE playStitch to prevent re-entrancy during story execution
                 playerSession.addAreaTriggerEntered(areaTriggerInside);
                 playerSession.setLastAreaTriggerEntered(areaTriggerInside);
+                try {
+                    storyHandler.playStitch(areaTriggerInside.getStitch());
+                } catch (Exception e) {
+                    NarrativeCraftMod.LOGGER.error("Error in area trigger playStitch: {}", e.getMessage());
+                }
             } else if (areaTriggerInside == null && playerSession.getLastAreaTriggerEntered() != null) {
                 playerSession.setLastAreaTriggerEntered(null);
             }

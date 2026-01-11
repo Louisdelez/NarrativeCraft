@@ -23,6 +23,8 @@
 
 package fr.loudo.narrativecraft.narrative.story.inkAction.text;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.compat.api.VersionAdapterLoader;
 import fr.loudo.narrativecraft.gui.ICustomGuiRender;
 import fr.loudo.narrativecraft.narrative.dialog.animation.AbstractDialogScrollText;
 import fr.loudo.narrativecraft.util.Util;
@@ -32,8 +34,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FontDescription;
-import net.minecraft.util.ARGB;
+import net.minecraft.network.chat.Style;
 import org.joml.Matrix3x2fStack;
 import org.joml.Vector2f;
 
@@ -87,7 +88,8 @@ public class DialogScrollTextInkAction extends AbstractDialogScrollText {
 
         Component longerText = Component.literal(getLongerTextLine()).withStyle(style -> {
             if (attribute.getCustomFont() == null) return style;
-            return style.withFont(new FontDescription.Resource(attribute.getCustomFont()));
+            return (Style) VersionAdapterLoader.getAdapter().getUtilCompat()
+                    .withFont(style, attribute.getCustomFont());
         });
 
         int textWidth = font.width(longerText.getVisualOrderText());
@@ -190,7 +192,7 @@ public class DialogScrollTextInkAction extends AbstractDialogScrollText {
                             font,
                             x,
                             y,
-                            ARGB.color(
+                            NarrativeCraftMod.getColorCompat().color(
                                     (int) (opacity * 255.0),
                                     textInkAction.getAttribute().getColor()),
                             attribute.isDropShadow());

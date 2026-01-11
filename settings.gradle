@@ -40,6 +40,17 @@ pluginManagement {
 				includeGroupAndSubgroups('net.minecraftforge')
 			}
 		}
+		exclusiveContent {
+			forRepository {
+				maven {
+					name = 'NeoForge'
+					url = uri('https://maven.neoforged.net/releases')
+				}
+			}
+			filter {
+				includeGroupAndSubgroups('net.neoforged')
+			}
+		}
 	}
 }
 
@@ -49,6 +60,36 @@ plugins {
 
 // This should match the folder name of the project, or else IDEA may complain (see https://youtrack.jetbrains.com/issue/IDEA-317606)
 rootProject.name = 'NarrativeCraft'
+
+// ===== Common Module =====
 include('common')
+
+// ===== Version-Specific Common Modules =====
+// These contain code that depends on MC version-specific APIs
+include('common-mc121')  // 1.21.x-specific code (Permissions, KeyEvent, etc.)
+include('common-mc120')  // 1.20.x-specific code (alternative implementations)
+include('common-mc119')  // 1.19.x-specific code (no GuiGraphics, different APIs)
+
+// ===== Compatibility API Module (pure Java interfaces) =====
+include('compat-api')
+
+// ===== Compatibility Modules (version-specific implementations) =====
+include('compat-mc119x')
+include('compat-mc120x')
+include('compat-mc121x')
+
+// ===== Fabric Loader Modules =====
+include('fabric-1.19.4')
+include('fabric-1.20.6')
+include('fabric-1.21.11')
+
+// ===== NeoForge Loader Modules =====
+// Note: NeoForge didn't exist until MC 1.20.4, so no 1.19.x NeoForge module
+include('neoforge-1.20.6')
+include('neoforge-1.21.11')
+
+// ===== Legacy aliases (for backwards compatibility) =====
+// Map old module names to new version-specific modules
+// This allows existing code to continue working during migration
 include('fabric')
 include('neoforge')

@@ -50,7 +50,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
-import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
@@ -78,7 +77,7 @@ public class DialogCustomOptionsScreen extends Screen {
     private StringWidget errorWidget;
 
     public DialogCustomOptionsScreen(Screen lastScreen, PlayerSession playerSession) {
-        super(Component.literal("Character Custom Dialog Screen"));
+        super(Translation.message("screen.dialog_options.title"));
         this.lastScreen = lastScreen;
         this.playerSession = playerSession;
     }
@@ -154,7 +153,7 @@ public class DialogCustomOptionsScreen extends Screen {
         this.addRenderableWidget(errorWidget);
         currentY = this.height / 2 - ((labelHeight + gap) * 12) / 2;
         paddingXBox = new ScreenUtils.LabelBox(
-                Component.literal("Padding X"),
+                Translation.message("screen.dialog_options.padding_x"),
                 minecraft.font,
                 labelWidth,
                 labelHeight,
@@ -167,7 +166,7 @@ public class DialogCustomOptionsScreen extends Screen {
         currentY += paddingXBox.getEditBox().getHeight() + gap;
 
         paddingYBox = new ScreenUtils.LabelBox(
-                Component.literal("Padding Y"),
+                Translation.message("screen.dialog_options.padding_y"),
                 minecraft.font,
                 labelWidth,
                 labelHeight,
@@ -180,7 +179,7 @@ public class DialogCustomOptionsScreen extends Screen {
         currentY += paddingYBox.getEditBox().getHeight() + gap;
 
         scaleBox = new ScreenUtils.LabelBox(
-                Component.literal("Scale"),
+                Translation.message("screen.dialog_options.scale"),
                 minecraft.font,
                 labelWidth,
                 labelHeight,
@@ -193,7 +192,7 @@ public class DialogCustomOptionsScreen extends Screen {
         currentY += scaleBox.getEditBox().getHeight() + gap;
 
         letterSpacingBox = new ScreenUtils.LabelBox(
-                Component.literal("Letter Spacing"),
+                Translation.message("screen.dialog_options.letter_spacing"),
                 minecraft.font,
                 labelWidth,
                 labelHeight,
@@ -206,7 +205,7 @@ public class DialogCustomOptionsScreen extends Screen {
         currentY += letterSpacingBox.getEditBox().getHeight() + gap;
 
         gapBox = new ScreenUtils.LabelBox(
-                Component.literal("Gap"),
+                Translation.message("screen.dialog_options.gap"),
                 minecraft.font,
                 labelWidth,
                 labelHeight,
@@ -219,7 +218,7 @@ public class DialogCustomOptionsScreen extends Screen {
         currentY += gapBox.getEditBox().getHeight() + gap;
 
         widthBox = new ScreenUtils.LabelBox(
-                Component.literal("Width"),
+                Translation.message("screen.dialog_options.width"),
                 minecraft.font,
                 labelWidth,
                 labelHeight,
@@ -232,33 +231,33 @@ public class DialogCustomOptionsScreen extends Screen {
         currentY += widthBox.getEditBox().getHeight() + gap;
 
         bcColorBox = new ScreenUtils.LabelBox(
-                Component.literal("Background Color"),
+                Translation.message("screen.dialog_options.bg_color"),
                 minecraft.font,
                 labelWidth,
                 labelHeight,
                 startX,
                 currentY,
                 ScreenUtils.Align.HORIZONTAL);
-        bcColorBox.getEditBox().setValue(Integer.toHexString(ARGB.color(0, dialogData.getBackgroundColor())));
+        bcColorBox.getEditBox().setValue(Integer.toHexString(NarrativeCraftMod.getColorCompat().color(0, dialogData.getBackgroundColor())));
         this.addRenderableWidget(bcColorBox.getStringWidget());
         this.addRenderableWidget(bcColorBox.getEditBox());
         currentY += bcColorBox.getEditBox().getHeight() + gap;
 
         textColorBox = new ScreenUtils.LabelBox(
-                Component.literal("Text Color"),
+                Translation.message("screen.dialog_options.text_color"),
                 minecraft.font,
                 labelWidth,
                 labelHeight,
                 startX,
                 currentY,
                 ScreenUtils.Align.HORIZONTAL);
-        textColorBox.getEditBox().setValue(Integer.toHexString(ARGB.color(0, dialogData.getTextColor())));
+        textColorBox.getEditBox().setValue(Integer.toHexString(NarrativeCraftMod.getColorCompat().color(0, dialogData.getTextColor())));
         this.addRenderableWidget(textColorBox.getStringWidget());
         this.addRenderableWidget(textColorBox.getEditBox());
         currentY += textColorBox.getEditBox().getHeight() + gap;
 
         bobbingSpeed = new ScreenUtils.LabelBox(
-                Component.literal("Bobbing Speed"),
+                Translation.message("screen.dialog_options.bobbing_speed"),
                 minecraft.font,
                 labelWidth,
                 labelHeight,
@@ -271,7 +270,7 @@ public class DialogCustomOptionsScreen extends Screen {
         currentY += bobbingSpeed.getEditBox().getHeight() + gap;
 
         bobbingStrength = new ScreenUtils.LabelBox(
-                Component.literal("Bobbing Strength"),
+                Translation.message("screen.dialog_options.bobbing_strength"),
                 minecraft.font,
                 labelWidth,
                 labelHeight,
@@ -328,7 +327,7 @@ public class DialogCustomOptionsScreen extends Screen {
             dialogData.setGap(Float.parseFloat(gapBox.getEditBox().getValue()));
             dialogData.setWidth(Float.parseFloat(widthBox.getEditBox().getValue()));
             int backgroundColor = Integer.parseInt(bcColorBox.getEditBox().getValue(), 16);
-            dialogData.setBackgroundColor(ARGB.color(255, backgroundColor));
+            dialogData.setBackgroundColor(NarrativeCraftMod.getColorCompat().color(255, backgroundColor));
             dialogData.setTextColor(Integer.parseInt(textColorBox.getEditBox().getValue(), 16));
             dialogData.setNoiseShakeSpeed(
                     Float.parseFloat(bobbingSpeed.getEditBox().getValue()));

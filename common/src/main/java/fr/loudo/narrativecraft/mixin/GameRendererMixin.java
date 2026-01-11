@@ -43,7 +43,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class GameRendererMixin {
     @Inject(method = "getFov", at = @At("RETURN"), cancellable = true)
     public void narrativecraft$getZoomLevel(CallbackInfoReturnable<Float> callbackInfo) {
+        // T055: Null safety check for player (fixes audit issue GameRendererMixin:46)
         LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null) return;
+
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
         if (playerSession == null) return;
@@ -54,7 +57,10 @@ public class GameRendererMixin {
 
     @Inject(method = "bobHurt", at = @At("RETURN"))
     public void narrativecraft$applyInkShakeScreen(PoseStack poseStack, float partialTicks, CallbackInfo ci) {
+        // T055: Null safety check for player
         LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null) return;
+
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(player);
         if (playerSession == null) return;

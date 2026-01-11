@@ -23,6 +23,10 @@
 
 package fr.loudo.narrativecraft.screens.components;
 
+import fr.loudo.narrativecraft.compat.api.IGuiRenderCompat;
+import fr.loudo.narrativecraft.compat.api.NcId;
+import fr.loudo.narrativecraft.compat.api.VersionAdapterLoader;
+import fr.loudo.narrativecraft.util.Translation;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.gui.GuiGraphics;
@@ -30,16 +34,14 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 
 public abstract class AbstractTextBoxScreen extends Screen {
 
-    private static final Identifier WINDOW_LOCATION =
-            Identifier.withDefaultNamespace("textures/gui/advancements/window.png");
+    private static final NcId WINDOW_LOCATION =
+            NcId.of("minecraft", "textures/gui/advancements/window.png");
 
     protected final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
 
@@ -51,7 +53,7 @@ public abstract class AbstractTextBoxScreen extends Screen {
     protected void init() {
         LinearLayout linearLayout =
                 this.layout.addToFooter(LinearLayout.horizontal().spacing(4));
-        linearLayout.addChild(Button.builder(Component.literal("Done"), button -> onClose())
+        linearLayout.addChild(Button.builder(Translation.message("button.done"), button -> onClose())
                 .width(130)
                 .build());
         this.layout.visitWidgets(this::addRenderableWidget);
@@ -101,7 +103,8 @@ public abstract class AbstractTextBoxScreen extends Screen {
     }
 
     public void renderWindow(GuiGraphics guiGraphics, int offsetX, int offsetY) {
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, WINDOW_LOCATION, offsetX, offsetY, 0f, 0f, 252, 140, 256, 256);
+        IGuiRenderCompat guiCompat = VersionAdapterLoader.getAdapter().getGuiRenderCompat();
+        guiCompat.blitTexture(guiGraphics, WINDOW_LOCATION.toString(), offsetX, offsetY, 0f, 0f, 252, 140, 256, 256);
     }
 
     protected abstract List<String> renderContent();

@@ -43,7 +43,7 @@ public class CharacterChangePoseScreen extends Screen {
     private final CharacterStoryData characterStoryData;
 
     public CharacterChangePoseScreen(Screen lastScreen, CharacterStoryData characterStoryData) {
-        super(Component.literal("Change pose camera angle screen"));
+        super(Translation.message("screen.character_pose.title"));
         this.livingEntity = characterStoryData.getCharacterRuntime().getEntity();
         this.characterStoryData = characterStoryData;
         this.lastScreen = lastScreen;

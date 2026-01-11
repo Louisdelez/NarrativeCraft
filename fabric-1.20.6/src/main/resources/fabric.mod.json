@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "narrativecraft",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "${description}",
+  "authors": [
+    "${mod_author}"
+  ],
+  "contact": {
+    "homepage": "https://modrinth.com/project/narrativecraft",
+    "sources": "https://github.com/LOUDO56/NarrativeCraft",
+    "issues": "https://github.com/LOUDO56/NarrativeCraft/issues"
+  },
+  "license": "${license}",
+  "icon": "narrativecraft.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "fr.loudo.narrativecraft.NarrativeCraftFabric"
+    ]
+  },
+  "mixins": [
+    "narrativecraft.mixins.json",
+    "narrativecraft.fabric.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${fabric_loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}",
+    "java": ">=${java_version}"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

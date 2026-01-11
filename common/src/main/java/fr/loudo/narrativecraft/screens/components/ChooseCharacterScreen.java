@@ -27,6 +27,7 @@ import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.character.CharacterStory;
 import fr.loudo.narrativecraft.narrative.character.CharacterType;
+import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import java.util.function.Consumer;
 import net.minecraft.client.gui.components.Button;
@@ -71,7 +72,7 @@ public class ChooseCharacterScreen extends GenericSelectionScreen<CharacterStory
     protected void addCustomTitleButtons(LinearLayout layout) {
         if (scene == null) return;
         layout.addChild(Button.builder(
-                        characterType == CharacterType.NPC ? Component.literal("<- MAIN") : Component.literal("NPC ->"),
+                        characterType == CharacterType.NPC ? Translation.message("button.main") : Translation.message("button.npc"),
                         button -> {
                             Screen screen = new ChooseCharacterScreen(
                                     lastScreen,

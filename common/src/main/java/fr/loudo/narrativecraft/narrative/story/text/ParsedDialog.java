@@ -33,19 +33,27 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public record ParsedDialog(String cleanedText, List<TextEffect> effects) {
+
+    // T097: Pre-compiled regex patterns - moved from parse() method
+    // Before: Pattern.compile() called every parse() invocation
+    // After: Static final patterns - compiled once at class load
+    private static final Pattern DIALOG_PATTERN = Pattern.compile(StoryHandler.DIALOG_REGEX);
+    private static final Pattern EFFECT_PATTERN =
+            Pattern.compile("\\[(\\w+)((?:\\s+\\w+=[^\\]\\s]+)*?)\\](?:(.*?)\\[/\\1\\]|([^\\[]*))");
+
     public static ParsedDialog parse(String dialogContent) {
 
         List<TextEffect> effects = new ArrayList<>();
         StringBuilder cleanText = new StringBuilder();
 
-        Pattern patternDialog = Pattern.compile(StoryHandler.DIALOG_REGEX);
-        Matcher dialogMatcher = patternDialog.matcher(dialogContent);
+        // T097: Use pre-compiled pattern instead of Pattern.compile()
+        Matcher dialogMatcher = DIALOG_PATTERN.matcher(dialogContent);
         if (dialogMatcher.matches()) {
             dialogContent = dialogMatcher.group(2).trim();
         }
 
-        Pattern pattern = Pattern.compile("\\[(\\w+)((?:\\s+\\w+=[^\\]\\s]+)*?)\\](?:(.*?)\\[/\\1\\]|([^\\[]*))");
-        Matcher matcher = pattern.matcher(dialogContent);
+        // T097: Use pre-compiled pattern instead of Pattern.compile()
+        Matcher matcher = EFFECT_PATTERN.matcher(dialogContent);
 
         int currentIndex = 0;
 

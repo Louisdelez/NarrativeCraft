@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.hud;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
@@ -31,8 +32,6 @@ import java.util.Comparator;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.util.ARGB;
-
 public class StoryDebugHud {
 
     private final Minecraft minecraft = Minecraft.getInstance();
@@ -48,7 +47,7 @@ public class StoryDebugHud {
         List<InkAction> inkActions = new ArrayList<>(playerSession.getInkActions());
         int x = 5;
         int y = 5;
-        int color = ARGB.color(255, 255, 255, 255);
+        int color = NarrativeCraftMod.getColorCompat().color(255, 255, 255, 255);
 
         guiGraphics.drawString(minecraft.font, "Ink tag running:", x, y, color);
         y += minecraft.font.lineHeight + 5;

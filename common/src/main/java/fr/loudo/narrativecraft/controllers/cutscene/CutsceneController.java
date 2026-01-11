@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.controllers.cutscene;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.compat.api.RenderChannel;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.controllers.keyframe.AbstractKeyframeGroupsBase;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
@@ -51,7 +52,6 @@ import java.util.List;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
@@ -419,7 +419,7 @@ public class CutsceneController extends AbstractKeyframeGroupsBase<CutsceneKeyfr
 
         for (CutsceneKeyframeGroup keyframeGroup : keyframeGroups) {
             VertexConsumer vertexConsumer =
-                    client.renderBuffers().bufferSource().getBuffer(RenderTypes.lines());
+                    client.renderBuffers().bufferSource().getBuffer(NarrativeCraftMod.getRenderType(RenderChannel.DEBUG_LINES));
             for (int i = 0; i < keyframeGroup.getKeyframes().size() - 1; i++) {
                 CutsceneKeyframe firstKeyFrame = keyframeGroup.getKeyframes().get(i);
                 CutsceneKeyframe secondKeyFrame = keyframeGroup.getKeyframes().get(i + 1);

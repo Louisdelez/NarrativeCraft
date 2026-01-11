@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.story.inkAction;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
@@ -31,7 +32,6 @@ import fr.loudo.narrativecraft.util.FadeState;
 import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 
 public class FadeInkAction extends InkAction {
@@ -72,7 +72,7 @@ public class FadeInkAction extends InkAction {
         } else if (currentFadeState == FadeState.FADE_OUT) {
             opacity = (int) Mth.lerp(t, 255, 0);
         }
-        int newColor = ARGB.color(opacity, color);
+        int newColor = NarrativeCraftMod.getColorCompat().color(opacity, color);
         guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), newColor);
     }
 

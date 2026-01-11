@@ -38,7 +38,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.util.ARGB;
 import org.joml.Vector2f;
 
 public class DialogScrollTextDialog extends AbstractDialogScrollText {
@@ -101,7 +100,7 @@ public class DialogScrollTextDialog extends AbstractDialogScrollText {
                     String.valueOf(letter.letter()),
                     x,
                     y,
-                    ARGB.color(255, textColor),
+                    NarrativeCraftMod.getColorCompat().color(255, textColor),
                     false,
                     poseStack.last().pose(),
                     minecraft.renderBuffers().bufferSource(),
@@ -130,7 +129,7 @@ public class DialogScrollTextDialog extends AbstractDialogScrollText {
             }
             ((ICustomGuiRender) guiGraphics)
                     .narrativecraft$drawStringFloat(
-                            String.valueOf(letter.letter()), minecraft.font, x, y, ARGB.color(255, textColor), false);
+                            String.valueOf(letter.letter()), minecraft.font, x, y, NarrativeCraftMod.getColorCompat().color(255, textColor), false);
         }
     }
 }

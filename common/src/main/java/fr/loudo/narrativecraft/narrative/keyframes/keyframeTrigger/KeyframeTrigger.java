@@ -27,6 +27,7 @@ import com.mojang.datafixers.util.Pair;
 import fr.loudo.narrativecraft.items.CutsceneEditItems;
 import fr.loudo.narrativecraft.narrative.keyframes.Keyframe;
 import fr.loudo.narrativecraft.narrative.keyframes.KeyframeLocation;
+import fr.loudo.narrativecraft.util.Translation;
 import java.util.Arrays;
 import java.util.List;
 import net.minecraft.network.chat.Component;
@@ -51,7 +52,7 @@ public class KeyframeTrigger extends Keyframe {
         player.connection.send(new ClientboundSetEquipmentPacket(
                 camera.getId(), List.of(new Pair<>(EquipmentSlot.HEAD, CutsceneEditItems.trigger))));
         camera.setCustomNameVisible(true);
-        camera.setCustomName(Component.literal("Trigger"));
+        camera.setCustomName(Translation.message("entity.trigger"));
         updateEntityData(player);
     }
 

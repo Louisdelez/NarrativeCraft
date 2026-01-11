@@ -39,7 +39,7 @@ public class CrashScreen extends AbstractTextBoxScreen {
     private final PlayerSession playerSession;
 
     public CrashScreen(PlayerSession playerSession, String message) {
-        super(Component.literal("Crash Screen"));
+        super(Translation.message("screen.crash.title"));
         this.message = message;
         this.playerSession = playerSession;
     }

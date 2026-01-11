@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.screens.components;
 
 import fr.loudo.narrativecraft.util.ScreenUtils;
+import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
 import java.util.function.Consumer;
 import net.minecraft.client.gui.components.Button;
@@ -40,14 +41,14 @@ public class EntryBoxScreen extends Screen {
     private String defaultValue = "";
 
     public EntryBoxScreen(Screen lastScreen, Component label, Consumer<String> consumer) {
-        super(Component.literal("Entry box"));
+        super(Translation.message("screen.entry_box.title"));
         this.lastScreen = lastScreen;
         this.consumer = consumer;
         this.label = label;
     }
 
     public EntryBoxScreen(Screen lastScreen, Component label, String defaultValue, Consumer<String> consumer) {
-        super(Component.literal("Entry box"));
+        super(Translation.message("screen.entry_box.title"));
         this.lastScreen = lastScreen;
         this.consumer = consumer;
         this.label = label;

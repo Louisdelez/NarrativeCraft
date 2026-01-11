@@ -24,7 +24,7 @@
 package fr.loudo.narrativecraft.mixin;
 
 import fr.loudo.narrativecraft.audio.VolumeAudio;
-import fr.loudo.narrativecraft.narrative.story.inkAction.sound.SoundInkInstance;
+import fr.loudo.narrativecraft.compat.api.NarrativeSoundInstance;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -71,7 +71,7 @@ public abstract class SoundEngineMixin implements VolumeAudio {
             Map<SoundInstance, ChannelAccess.ChannelHandle> instance,
             BiConsumer<? super SoundInstance, ? super ChannelAccess.ChannelHandle> v) {
         instance.forEach((soundInstance, channelHandle) -> {
-            if (soundInstance instanceof SoundInkInstance) return;
+            if (soundInstance instanceof NarrativeSoundInstance) return;
             float f = this.calculateVolume(soundInstance);
             channelHandle.execute((channel) -> channel.setVolume(f));
         });

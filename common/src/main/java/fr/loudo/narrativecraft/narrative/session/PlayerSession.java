@@ -42,6 +42,7 @@ import fr.loudo.narrativecraft.narrative.story.StoryHandler;
 import fr.loudo.narrativecraft.narrative.story.inkAction.GameplayInkAction;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
@@ -50,7 +51,7 @@ public class PlayerSession {
 
     private final ServerPlayer player;
     private final PlaybackManager playbackManager = new PlaybackManager();
-    private final List<InkAction> inkActions = new ArrayList<>();
+    private final List<InkAction> inkActions = new CopyOnWriteArrayList<>();
     private final List<CharacterRuntime> characterRuntimes = new ArrayList<>();
     private final InkTagHandler inkTagHandler;
     private final StorySaveIconGui storySaveIconGui = new StorySaveIconGui(0.2, 0.9, 0.2);
@@ -122,26 +123,18 @@ public class PlayerSession {
         return inkActions;
     }
 
-    // I know this code sucks, but I don't know why it sometimes does ConcurrentModificationException bruh...
+    // Using CopyOnWriteArrayList for thread-safe iteration (fixes ConcurrentModificationException)
 
     public List<InkAction> getClientSideInkActions() {
-        try {
-            return inkActions.stream()
-                    .filter(inkAction -> inkAction.getSide() != null && inkAction.getSide() == InkAction.Side.CLIENT)
-                    .toList();
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
+        return inkActions.stream()
+                .filter(inkAction -> inkAction.getSide() != null && inkAction.getSide() == InkAction.Side.CLIENT)
+                .toList();
     }
 
     public List<InkAction> getServerSideInkActions() {
-        try {
-            return inkActions.stream()
-                    .filter(inkAction -> inkAction.getSide() != null && inkAction.getSide() == InkAction.Side.SERVER)
-                    .toList();
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
+        return inkActions.stream()
+                .filter(inkAction -> inkAction.getSide() != null && inkAction.getSide() == InkAction.Side.SERVER)
+                .toList();
     }
 
     public InkTagHandler getInkTagHandler() {

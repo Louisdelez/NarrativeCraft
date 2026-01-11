@@ -24,6 +24,7 @@
 package fr.loudo.narrativecraft.screens.components;
 
 import com.bladecoder.ink.runtime.Choice;
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.gui.ICustomGuiRender;
 import fr.loudo.narrativecraft.narrative.story.text.ParsedDialog;
 import fr.loudo.narrativecraft.narrative.story.text.TextEffectAnimation;
@@ -38,7 +39,6 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.ARGB;
 import org.joml.Vector2f;
 
 public class ChoiceButtonWidget extends AbstractButton {
@@ -140,9 +140,9 @@ public class ChoiceButtonWidget extends AbstractButton {
     }
 
     public void setOpacity(int opacity) {
-        backgroundColor = ARGB.color(opacity, backgroundColor);
-        textColor = ARGB.color(opacity, textColor);
-        hoverColor = ARGB.color(opacity, hoverColor);
+        backgroundColor = NarrativeCraftMod.getColorCompat().color(opacity, backgroundColor);
+        textColor = NarrativeCraftMod.getColorCompat().color(opacity, textColor);
+        hoverColor = NarrativeCraftMod.getColorCompat().color(opacity, hoverColor);
     }
 
     public boolean isCanPress() {

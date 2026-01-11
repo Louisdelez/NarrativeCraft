@@ -26,6 +26,8 @@ package fr.loudo.narrativecraft.narrative.character;
 import com.google.common.io.Files;
 import com.mojang.blaze3d.platform.NativeImage;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.compat.api.NcId;
+import fr.loudo.narrativecraft.compat.api.VersionAdapterLoader;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.util.Util;
@@ -35,7 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.resources.Identifier;
 
 public class CharacterSkinController {
 
@@ -86,9 +87,8 @@ public class CharacterSkinController {
                                     + characterRuntime.getCharacterStory().getName() + "_"
                                     + Util.snakeCase(skin.getName()) + "_skin_texture",
                             nativeImage);
-                    minecraft
-                            .getTextureManager()
-                            .register(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, path), texture);
+                    NcId ncId = NcId.of(NarrativeCraftMod.MOD_ID, path);
+                    VersionAdapterLoader.getAdapter().getUtilCompat().registerTexture(ncId, texture);
                 } catch (IOException ignored) {
                 }
             });
@@ -101,9 +101,8 @@ public class CharacterSkinController {
         Minecraft minecraft = Minecraft.getInstance();
         for (String path : cachedSkins) {
             minecraft.execute(() -> {
-                minecraft
-                        .getTextureManager()
-                        .release(Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, path));
+                NcId ncId = NcId.of(NarrativeCraftMod.MOD_ID, path);
+                VersionAdapterLoader.getAdapter().getUtilCompat().releaseTexture(ncId);
             });
         }
         cachedSkins.clear();

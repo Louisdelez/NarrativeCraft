@@ -26,6 +26,8 @@ package fr.loudo.narrativecraft.screens.story;
 import com.bladecoder.ink.runtime.Choice;
 import com.mojang.blaze3d.platform.InputConstants;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.compat.api.NcId;
+import fr.loudo.narrativecraft.compat.api.VersionAdapterLoader;
 import fr.loudo.narrativecraft.keys.ModKeys;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.narrative.story.StoryHandler;
@@ -37,10 +39,8 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 
 public class StoryChoicesScreen extends Screen {
@@ -58,7 +58,7 @@ public class StoryChoicesScreen extends Screen {
     private int currentTick;
 
     public StoryChoicesScreen(PlayerSession playerSession, boolean animate) {
-        super(Component.literal("Choice screen"));
+        super(Translation.message("screen.story_choices.title"));
         this.playerSession = playerSession;
         storyHandler = playerSession.getStoryHandler();
         List<Choice> choices = playerSession.getStoryHandler().getStory().getCurrentChoices();
@@ -69,7 +69,7 @@ public class StoryChoicesScreen extends Screen {
     }
 
     public StoryChoicesScreen(List<Choice> choiceList, boolean animate) {
-        super(Component.literal("Choice screen"));
+        super(Translation.message("screen.story_choices.title"));
         this.choiceList = choiceList.subList(0, Math.min(choiceList.size(), 4));
         this.animatedChoices = new ArrayList<>();
         initiated = !animate;
@@ -101,10 +101,10 @@ public class StoryChoicesScreen extends Screen {
     @Override
     protected void init() {
         if (!initiated) {
-            Identifier soundRes =
-                    Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "sfx.choice_appear");
-            SoundEvent sound = SoundEvent.createVariableRangeEvent(soundRes);
-            this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(sound, 1.0f, 1.0f));
+            NcId soundRes = NcId.of(NarrativeCraftMod.MOD_ID, "sfx.choice_appear");
+            SoundInstance sound = (SoundInstance) VersionAdapterLoader.getAdapter()
+                    .getUtilCompat().createSimpleSoundInstance(soundRes, 1.0f, 1.0f);
+            this.minecraft.getSoundManager().play(sound);
         }
         choiceButtonWidgetList.clear();
         for (Choice choice : choiceList) {

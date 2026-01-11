@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.narrative.dialog;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.compat.api.RenderChannel;
 import fr.loudo.narrativecraft.narrative.character.CharacterRuntime;
 import fr.loudo.narrativecraft.narrative.dialog.geometric.DialogTail;
 import fr.loudo.narrativecraft.util.Easing;
@@ -33,7 +34,6 @@ import fr.loudo.narrativecraft.util.Position2D;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.Direction;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
@@ -122,7 +122,7 @@ public class DialogRenderer3D extends DialogRenderer {
                     opacity = Mth.lerp(t, 1.0, 0.0);
                     position = getDialogInterpolatedDisappearPosition(t);
                 }
-                backgroundColor = ARGB.color((int) (opacity * 255.0), backgroundColor);
+                backgroundColor = NarrativeCraftMod.getColorCompat().color((int) (opacity * 255.0), backgroundColor);
             } else {
                 originalScale = (float) Mth.lerp(t, oldScale, scale);
             }
@@ -195,7 +195,7 @@ public class DialogRenderer3D extends DialogRenderer {
         }
 
         poseStack.popPose();
-        minecraft.renderBuffers().bufferSource().endBatch(NarrativeCraftMod.dialogBackgroundRenderType);
+        minecraft.renderBuffers().bufferSource().endBatch(NarrativeCraftMod.getRenderType(RenderChannel.DIALOG_BACKGROUND));
     }
 
     public void updateBobbing(float value1, float value2) {
@@ -225,7 +225,7 @@ public class DialogRenderer3D extends DialogRenderer {
 
     private void renderDialogBackground(PoseStack poseStack, float partialTick) {
         MultiBufferSource.BufferSource bufferSource = minecraft.renderBuffers().bufferSource();
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(NarrativeCraftMod.dialogBackgroundRenderType);
+        VertexConsumer vertexConsumer = bufferSource.getBuffer(NarrativeCraftMod.getRenderType(RenderChannel.DIALOG_BACKGROUND));
         Matrix4f matrix4f = poseStack.last().pose();
 
         Side side = dialogOffsetSide();

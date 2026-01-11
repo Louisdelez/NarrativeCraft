@@ -34,10 +34,13 @@ import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.phys.Vec3;
 
+/**
+ * Base keyframe class for camera positioning.
+ * This version uses compatible APIs that work across MC versions.
+ */
 public class Keyframe {
     protected transient ArmorStand camera;
     protected final int id;
@@ -79,10 +82,16 @@ public class Keyframe {
         camera.setXRot(keyframeLocation.getPitch());
         camera.setYRot(keyframeLocation.getYaw());
         camera.setYHeadRot(keyframeLocation.getYaw());
-        Vec3 playerCoordVec3 = new Vec3(keyframeLocation.getX(), keyframeLocation.getY() - 1, keyframeLocation.getZ());
-        PositionMoveRotation pos = new PositionMoveRotation(
-                playerCoordVec3, new Vec3(0, 0, 0), keyframeLocation.getYaw(), keyframeLocation.getPitch());
-        player.connection.send(new ClientboundEntityPositionSyncPacket(camera.getId(), pos, false));
+
+        // Position the entity - use teleportTo which is compatible across versions
+        camera.teleportTo(
+                keyframeLocation.getX(),
+                keyframeLocation.getY() - 1,
+                keyframeLocation.getZ());
+        camera.setYRot(keyframeLocation.getYaw());
+        camera.setXRot(keyframeLocation.getPitch());
+
+        // Send entity data update
         player.connection.send(new ClientboundSetEntityDataPacket(
                 camera.getId(), camera.getEntityData().getNonDefaultValues()));
     }

@@ -120,7 +120,7 @@ public class MainScreenOptionsScreen extends OptionsSubScreen {
 
         StoryHandler storyHandler = playerSession.getStoryHandler();
         if (storyHandler == null || !storyHandler.isRunning()) {
-            linearlayout.addChild(Button.builder(Component.literal("Credits"), button -> {
+            linearlayout.addChild(Button.builder(Translation.message("button.credits"), button -> {
                         CreditScreen creditScreen = new CreditScreen(playerSession, true, false);
                         minecraft.setScreen(creditScreen);
                     })

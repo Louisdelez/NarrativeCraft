@@ -50,7 +50,7 @@ public class MainScreenControllerScreen extends Screen {
     private final MainScreenController mainScreenController;
 
     public MainScreenControllerScreen(MainScreenController mainScreenController) {
-        super(Component.literal("Main Screen Controller Screen"));
+        super(Translation.message("screen.main_controller.title"));
         this.mainScreenController = mainScreenController;
     }
 

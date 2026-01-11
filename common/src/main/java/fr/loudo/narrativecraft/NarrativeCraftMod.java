@@ -23,14 +23,19 @@
 
 package fr.loudo.narrativecraft;
 
+import fr.loudo.narrativecraft.compat.api.IColorCompat;
+import fr.loudo.narrativecraft.compat.api.IResourceCompat;
+import fr.loudo.narrativecraft.compat.api.IUtilCompat;
+import fr.loudo.narrativecraft.compat.api.NcId;
+import fr.loudo.narrativecraft.compat.api.RenderChannel;
+import fr.loudo.narrativecraft.compat.api.VersionAdapterLoader;
 import fr.loudo.narrativecraft.managers.*;
+import fr.loudo.narrativecraft.narrative.state.NarrativeStateManager;
+import fr.loudo.narrativecraft.narrative.state.NarrativeStateManagerImpl;
 import fr.loudo.narrativecraft.options.NarrativeClientOption;
 import fr.loudo.narrativecraft.options.NarrativeWorldOption;
 import fr.loudo.narrativecraft.register.InkActionRegister;
 import fr.loudo.narrativecraft.screens.components.NarrativeCraftLogoRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,20 +45,67 @@ public class NarrativeCraftMod {
 
     public static final String MOD_ID = "narrativecraft";
     public static final String MOD_NAME = "NarrativeCraft";
-    public static final String MAJOR_VERSION = "1.0.0";
+    public static final String MAJOR_VERSION = "1.2.0";
+
+    /**
+     * Multi-version support marker. When present in all JARs, confirms
+     * that common/ code propagates correctly to all build targets.
+     * Added in v1.2.0 for cross-version compatibility validation.
+     */
+    public static final String MULTI_VERSION_BUILD = "5-target-v1.2.0";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
 
     public static boolean firstTime = false;
     public static MinecraftServer server;
-    public static RenderType dialogBackgroundRenderType = RenderTypes.textBackgroundSeeThrough();
+
+    /**
+     * Gets a render type for the specified channel.
+     * The returned object must be cast to the appropriate MC RenderType by the caller.
+     *
+     * @param channel The render channel
+     * @return the render type object (version-specific implementation)
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T getRenderType(RenderChannel channel) {
+        return (T) VersionAdapterLoader.getAdapter().getRenderType(channel);
+    }
+
+    /**
+     * Gets the color compatibility layer for ARGB operations.
+     * Use this instead of direct net.minecraft.util.ARGB calls for cross-version compatibility.
+     *
+     * @return the color compat implementation
+     */
+    public static IColorCompat getColorCompat() {
+        return VersionAdapterLoader.getAdapter().getColorCompat();
+    }
+
+    /**
+     * Gets the resource compatibility layer for Identifier/Identifier operations.
+     *
+     * @return the resource compat implementation
+     */
+    public static IResourceCompat getResourceCompat() {
+        return VersionAdapterLoader.getAdapter().getResourceCompat();
+    }
+
+    /**
+     * Gets the utility compatibility layer for version-specific utility methods.
+     *
+     * @return the util compat implementation
+     */
+    public static IUtilCompat getUtilCompat() {
+        return VersionAdapterLoader.getAdapter().getUtilCompat();
+    }
 
     private final CharacterManager characterManager = new CharacterManager();
     private final PlayerSessionManager playerSessionManager = new PlayerSessionManager();
     private final ChapterManager chapterManager = new ChapterManager();
     private final RecordingManager recordingManager = new RecordingManager();
     private final PlaybackManager playbackManager = new PlaybackManager();
+    private final NarrativeStateManagerImpl narrativeStateManager = new NarrativeStateManagerImpl();
     private final NarrativeCraftLogoRenderer narrativeCraftLogoRenderer = new NarrativeCraftLogoRenderer(
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/logo.png"));
+            NcId.of(NarrativeCraftMod.MOD_ID, "textures/logo.png"));
     private NarrativeClientOption narrativeClientOptions = new NarrativeClientOption();
     private NarrativeWorldOption narrativeWorldOption = new NarrativeWorldOption();
 
@@ -85,6 +137,16 @@ public class NarrativeCraftMod {
         return playbackManager;
     }
 
+    /**
+     * Returns the central state manager for the narrative system.
+     * Use this to manage state transitions and cleanup handlers.
+     *
+     * @return the narrative state manager
+     */
+    public NarrativeStateManager getNarrativeStateManager() {
+        return narrativeStateManager;
+    }
+
     public NarrativeCraftLogoRenderer getNarrativeCraftLogoRenderer() {
         return narrativeCraftLogoRenderer;
     }
@@ -106,6 +168,7 @@ public class NarrativeCraftMod {
     }
 
     public void clearManagers() {
+        narrativeStateManager.reset();
         chapterManager.getChapters().clear();
         playerSessionManager.getPlayerSessions().clear();
         characterManager.getCharacterStories().clear();

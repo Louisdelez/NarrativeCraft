@@ -30,6 +30,8 @@ import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.chapter.Chapter;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
+import fr.loudo.narrativecraft.narrative.validation.InkValidationService;
+import fr.loudo.narrativecraft.narrative.validation.ValidationError;
 import fr.loudo.narrativecraft.util.ErrorLine;
 import fr.loudo.narrativecraft.util.Translation;
 import java.io.File;
@@ -111,7 +113,28 @@ public class StoryValidation {
                 }
 
                 InkAction inkAction = InkActionRegistry.findByCommand(command);
-                if (inkAction == null) continue;
+
+                // T071: Enhanced validation for unknown tags with typo suggestions
+                if (inkAction == null) {
+                    // Use validation service to create helpful error for unknown tag
+                    InkValidationService validationService = InkValidationService.getInstance();
+                    String sceneName = scene != null ? scene.getName() : "unknown";
+                    String storyName = chapter != null ? "chapter_" + chapter.getIndex() : sceneName;
+                    ValidationError error = validationService.createUnknownTagError(
+                            command, storyName, sceneName, i + 1);
+                    String errorMessage = error.getReason();
+                    if (error.getSuggestion() != null) {
+                        errorMessage += " " + error.getSuggestion();
+                    }
+                    errorLines.add(new ErrorLine(
+                            i + 1,
+                            chapter,
+                            chapter == null ? scene : null,
+                            errorMessage,
+                            command,
+                            false));
+                    continue;
+                }
 
                 InkActionResult result = inkAction.validate(command, scene);
                 if (result.isError() || result.isWarn()) {

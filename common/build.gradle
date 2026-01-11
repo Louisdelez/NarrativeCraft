@@ -25,6 +25,14 @@ neoForge {
 }
 
 dependencies {
+    // Compat API interfaces (pure Java, shared across all versions)
+    api project(':compat-api')
+
+    // Test dependencies
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    testImplementation 'org.mockito:mockito-core:5.7.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.7.0'
+
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
     // fabric and neoforge both bundle mixinextras, so it is safe to use it in common
     compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
@@ -38,7 +46,7 @@ dependencies {
     compileOnly("io.github.kosmx.emotes:emotesMc:${emotesAPI_version}") {
         exclude group: 'com.google.guava', module: 'guava'
     }
-    implementation "com.bladecoder.ink:blade-ink:1.2.1+nc"
+    implementation "com.bladecoder.ink:blade-ink:${blade_ink_version}"
 }
 
 configurations {
@@ -55,5 +63,114 @@ configurations {
 artifacts {
     commonJava sourceSets.main.java.sourceDirectories.singleFile
     commonResources sourceSets.main.resources.sourceDirectories.singleFile
+}
+
+test {
+    useJUnitPlatform()
+}
+
+// ============================================
+// I18N Check Task - Validates language files
+// ============================================
+import groovy.json.JsonSlurper
+import groovy.json.JsonException
+
+task i18nCheck {
+    group = 'verification'
+    description = 'Validates language files for missing keys, placeholder consistency, and JSON syntax'
+
+    doLast {
+        def langDir = file('src/main/resources/assets/narrativecraft/lang')
+        def referenceLocale = 'en_us'
+        def errors = []
+        def warnings = []
+
+        if (!langDir.exists()) {
+            throw new GradleException("Language directory not found: ${langDir}")
+        }
+
+        // Parse reference file (en_us.json)
+        def referenceFile = new File(langDir, "${referenceLocale}.json")
+        if (!referenceFile.exists()) {
+            throw new GradleException("Reference language file not found: ${referenceFile}")
+        }
+
+        def jsonSlurper = new JsonSlurper()
+        Map<String, String> referenceKeys
+
+        try {
+            referenceKeys = jsonSlurper.parse(referenceFile) as Map<String, String>
+        } catch (JsonException e) {
+            throw new GradleException("Invalid JSON in ${referenceFile.name}: ${e.message}")
+        }
+
+        // Extract placeholders from reference keys
+        def placeholderPattern = ~/(%[sd]|%\d+\$[sd])/
+        def referencePlaceholders = referenceKeys.collectEntries { key, value ->
+            def placeholders = (value =~ placeholderPattern).findAll()
+            [(key): placeholders]
+        }
+
+        println "I18N Check: Reference file ${referenceLocale}.json has ${referenceKeys.size()} keys"
+        println "----------------------------------------"
+
+        // Check all language files
+        langDir.listFiles()?.findAll { it.name.endsWith('.json') }?.each { localeFile ->
+            def localeName = localeFile.name.replace('.json', '')
+            Map<String, String> localeKeys
+
+            // T038: Validate JSON syntax
+            try {
+                localeKeys = jsonSlurper.parse(localeFile) as Map<String, String>
+            } catch (JsonException e) {
+                errors << "[${localeName}] Invalid JSON syntax: ${e.message}"
+                return
+            }
+
+            // T036: Check for missing keys
+            def missingKeys = referenceKeys.keySet() - localeKeys.keySet()
+            missingKeys.findAll { !it.startsWith('_') }.each { key ->
+                errors << "[${localeName}] Missing key: ${key}"
+            }
+
+            // T041: Check for orphan/unused keys (optional warning)
+            def orphanKeys = localeKeys.keySet() - referenceKeys.keySet()
+            orphanKeys.findAll { !it.startsWith('_') }.each { key ->
+                warnings << "[${localeName}] Orphan key (not in ${referenceLocale}): ${key}"
+            }
+
+            // T037: Check placeholder consistency
+            localeKeys.each { key, value ->
+                if (referenceKeys.containsKey(key)) {
+                    def expectedPlaceholders = referencePlaceholders[key] ?: []
+                    def actualPlaceholders = (value =~ placeholderPattern).findAll()
+
+                    if (expectedPlaceholders.size() != actualPlaceholders.size()) {
+                        errors << "[${localeName}] Placeholder mismatch for '${key}': expected ${expectedPlaceholders.size()}, found ${actualPlaceholders.size()}"
+                    }
+                }
+            }
+
+            def coverage = localeKeys.size() * 100 / referenceKeys.size()
+            println "  ${localeName}: ${localeKeys.size()}/${referenceKeys.size()} keys (${String.format('%.1f', coverage)}% coverage)"
+        }
+
+        println "----------------------------------------"
+
+        // Report warnings
+        if (warnings) {
+            println "\nWarnings (${warnings.size()}):"
+            warnings.each { println "  WARNING: ${it}" }
+        }
+
+        // Report and fail on errors
+        if (errors) {
+            println "\nErrors (${errors.size()}):"
+            errors.each { println "  ERROR: ${it}" }
+            throw new GradleException("I18N validation failed with ${errors.size()} error(s)")
+        }
+
+        println "\nI18N Check PASSED - All language files are valid"
+    }
 }
 

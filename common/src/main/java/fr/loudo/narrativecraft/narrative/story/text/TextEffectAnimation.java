@@ -25,6 +25,7 @@ package fr.loudo.narrativecraft.narrative.story.text;
 
 import fr.loudo.narrativecraft.narrative.dialog.DialogAnimationType;
 import fr.loudo.narrativecraft.narrative.dialog.DialogLetterEffect;
+import fr.loudo.narrativecraft.util.NarrativeProfiler;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,9 +35,14 @@ import org.joml.Vector2f;
 
 public class TextEffectAnimation {
 
+    // T095: Reusable Vector2f for zero offset to avoid allocation
+    private static final Vector2f ZERO_OFFSET = new Vector2f(0, 0);
+
     private final List<DialogLetterEffect> dialogLetterEffectList;
     private final Map<Integer, Vector2f> letterOffsets = new HashMap<>();
     private final Map<Integer, Vector2f> oldLetterOffsets = new HashMap<>();
+    // T095: Reusable map for interpolation results to avoid HashMap allocation per getOffsets() call
+    private final Map<Integer, Vector2f> interpolatedCache = new HashMap<>();
     private int tickCounter;
 
     public TextEffectAnimation(ParsedDialog parsedDialog) {
@@ -44,14 +50,19 @@ public class TextEffectAnimation {
     }
 
     public void tick() {
+        NarrativeProfiler.start(NarrativeProfiler.TEXT_EFFECTS);
         tickCounter++;
 
         oldLetterOffsets.clear();
         oldLetterOffsets.putAll(letterOffsets);
 
-        for (DialogLetterEffect dialogLetterEffect : dialogLetterEffectList.stream()
-                .filter(dialogLetterEffect -> dialogLetterEffect.getAnimation() != DialogAnimationType.WAIT)
-                .toList()) {
+        // T098: Replace stream().filter().toList() with direct loop
+        // Before: dialogLetterEffectList.stream().filter(...).toList()
+        // After: Direct iteration with inline filter - zero allocations
+        for (DialogLetterEffect dialogLetterEffect : dialogLetterEffectList) {
+            if (dialogLetterEffect.getAnimation() == DialogAnimationType.WAIT) {
+                continue; // T098: Inline filter instead of stream filter
+            }
             dialogLetterEffect.tick();
             if (dialogLetterEffect.getAnimation() == DialogAnimationType.SHAKE) {
 
@@ -68,8 +79,11 @@ public class TextEffectAnimation {
                         offsetX = letterOffsets.get(j).x;
                         offsetY = letterOffsets.get(j).y;
                     }
-                    letterOffsets.put(j, new Vector2f(offsetX, offsetY));
-                    oldLetterOffsets.put(j, new Vector2f(offsetX, offsetY));
+                    // T095: Reuse Vector2f or update in place to reduce allocations
+                    Vector2f offset = letterOffsets.computeIfAbsent(j, k -> new Vector2f());
+                    offset.set(offsetX, offsetY);
+                    Vector2f oldOffset = oldLetterOffsets.computeIfAbsent(j, k -> new Vector2f());
+                    oldOffset.set(offsetX, offsetY);
                 }
 
             } else if (dialogLetterEffect.getAnimation() == DialogAnimationType.WAVE) {
@@ -78,16 +92,23 @@ public class TextEffectAnimation {
 
                 for (int j = dialogLetterEffect.getStartIndex(); j < dialogLetterEffect.getEndIndex(); j++) {
                     float offsetY = (float) (Math.sin(waveSpeed + j * waveSpacing) * dialogLetterEffect.getForce());
-                    letterOffsets.put(j, new Vector2f(0, offsetY));
+                    // T095: Reuse Vector2f instead of allocating new one each tick
+                    Vector2f offset = letterOffsets.computeIfAbsent(j, k -> new Vector2f());
+                    offset.set(0, offsetY);
                 }
             }
         }
+        NarrativeProfiler.stop(NarrativeProfiler.TEXT_EFFECTS);
     }
 
     public boolean canTick(int currentCharIndex) {
-        for (DialogLetterEffect dialogLetterEffect : dialogLetterEffectList.stream()
-                .filter(dialogLetterEffect -> dialogLetterEffect.getAnimation() == DialogAnimationType.WAIT)
-                .toList()) {
+        // T098: Replace stream().filter().toList() with direct loop
+        // Before: dialogLetterEffectList.stream().filter(...).toList()
+        // After: Direct iteration with inline filter - zero allocations
+        for (DialogLetterEffect dialogLetterEffect : dialogLetterEffectList) {
+            if (dialogLetterEffect.getAnimation() != DialogAnimationType.WAIT) {
+                continue; // T098: Inline filter instead of stream filter
+            }
             if (currentCharIndex < dialogLetterEffect.getStartIndex() - 1) continue;
             dialogLetterEffect.tick();
             return dialogLetterEffect.getCooldownTick() == 0;
@@ -96,18 +117,24 @@ public class TextEffectAnimation {
     }
 
     public Map<Integer, Vector2f> getOffsets(float partialTick) {
-        Map<Integer, Vector2f> interpolated = new HashMap<>();
+        // T095: Reuse cached map instead of allocating new HashMap each call
+        // Before: Map<Integer, Vector2f> interpolated = new HashMap<>();
+        // After: Clear and reuse interpolatedCache
+        interpolatedCache.clear();
 
         for (int j : letterOffsets.keySet()) {
-            Vector2f oldOffset = oldLetterOffsets.getOrDefault(j, new Vector2f(0, 0));
+            // T095: Use static ZERO_OFFSET instead of new Vector2f(0, 0)
+            Vector2f oldOffset = oldLetterOffsets.getOrDefault(j, ZERO_OFFSET);
             Vector2f newOffset = letterOffsets.get(j);
 
             float x = Mth.lerp(partialTick, oldOffset.x, newOffset.x);
             float y = Mth.lerp(partialTick, oldOffset.y, newOffset.y);
 
-            interpolated.put(j, new Vector2f(x, y));
+            // T095: Reuse Vector2f from cache or create once
+            Vector2f interpolatedOffset = interpolatedCache.computeIfAbsent(j, k -> new Vector2f());
+            interpolatedOffset.set(x, y);
         }
 
-        return interpolated;
+        return interpolatedCache;
     }
 }

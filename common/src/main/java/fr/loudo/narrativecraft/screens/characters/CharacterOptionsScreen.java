@@ -44,7 +44,7 @@ public class CharacterOptionsScreen extends ButtonListScreen {
     protected final CharacterStoryData characterStoryData;
 
     public CharacterOptionsScreen(Screen lastScreen, AbstractController controller, CharacterRuntime characterRuntime) {
-        super(lastScreen, Component.literal("Character options screen"));
+        super(lastScreen, Translation.message("screen.character_options.title"));
         this.controller = controller;
         this.characterRuntime = characterRuntime;
         characterStoryData = controller.getCharacterStoryDataFromEntity(characterRuntime.getEntity());

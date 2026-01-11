@@ -1,0 +1,136 @@
+# NarrativeCraft Release Pipeline
+# Triggered on version tags (v*.*.*)
+# Multi-version: releases artifacts for all 5 supported MC versions
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  # Build all versions in parallel
+  build:
+    name: Build ${{ matrix.loader }}-${{ matrix.mc_version }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - loader: fabric
+            mc_version: "1.19.4"
+            module: "fabric-1.19.4"
+          - loader: fabric
+            mc_version: "1.20.6"
+            module: "fabric-1.20.6"
+          - loader: fabric
+            mc_version: "1.21.11"
+            module: "fabric-1.21.11"
+          - loader: neoforge
+            mc_version: "1.20.6"
+            module: "neoforge-1.20.6"
+          - loader: neoforge
+            mc_version: "1.21.11"
+            module: "neoforge-1.21.11"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run common tests
+        run: ./gradlew --no-daemon :common:test
+
+      - name: Build ${{ matrix.module }}
+        run: ./gradlew --no-daemon :${{ matrix.module }}:build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.loader }}-${{ matrix.mc_version }}-release
+          path: ${{ matrix.module }}/build/libs/*[!-sources].jar
+          retention-days: 90
+          if-no-files-found: error
+
+  # Create release after all builds succeed
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: List artifacts
+        run: find artifacts -type f -name "*.jar" | head -20
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get commits since last tag
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -n "$PREV_TAG" ]; then
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" $PREV_TAG..HEAD)
+          else
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" -20)
+          fi
+
+          # Write to file for multiline output
+          cat > changelog.txt << 'EOF'
+          ## Changes
+          $CHANGELOG
+
+          ## Supported Versions
+          - Minecraft 1.19.4 (Fabric)
+          - Minecraft 1.20.6 (Fabric, NeoForge)
+          - Minecraft 1.21.11 (Fabric, NeoForge)
+
+          ## Installation
+          Download the JAR for your Minecraft version and place it in your `mods` folder.
+          Requires Fabric Loader 0.15+ and Fabric API for Fabric versions.
+          EOF
+
+          echo "$CHANGELOG" >> changelog.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: NarrativeCraft v${{ steps.version.outputs.VERSION }}
+          body_path: changelog.txt
+          draft: false
+          prerelease: ${{ contains(github.ref, '-alpha') || contains(github.ref, '-beta') || contains(github.ref, '-rc') }}
+          files: |
+            artifacts/**/*.jar
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

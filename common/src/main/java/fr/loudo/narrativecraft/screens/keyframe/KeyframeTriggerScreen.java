@@ -61,14 +61,14 @@ public class KeyframeTriggerScreen extends Screen {
 
     public KeyframeTriggerScreen(
             AbstractKeyframeController<? extends Keyframe> controller, KeyframeTrigger keyframeTrigger) {
-        super(Component.literal("Keyframe Trigger Screen"));
+        super(Translation.message("screen.keyframe_trigger.title"));
         this.controller = controller;
         this.keyframeTrigger = keyframeTrigger;
         this.defaultTick = keyframeTrigger.getTick();
     }
 
     public KeyframeTriggerScreen(AbstractKeyframeController<? extends Keyframe> controller, int defaultTick) {
-        super(Component.literal("Keyframe Trigger Screen"));
+        super(Translation.message("screen.keyframe_trigger.title"));
         this.controller = controller;
         this.defaultTick = defaultTick;
     }
@@ -96,7 +96,7 @@ public class KeyframeTriggerScreen extends Screen {
         int currentY = startY;
 
         tickBox = new ScreenUtils.LabelBox(
-                Component.literal("Tick"),
+                Translation.message("screen.keyframe_trigger.tick"),
                 minecraft.font,
                 tickBoxWidth,
                 tickBoxHeight,
@@ -110,7 +110,7 @@ public class KeyframeTriggerScreen extends Screen {
         currentY += tickBoxHeight + gap;
 
         commandBox = new ScreenUtils.MultilineLabelBox(
-                Component.literal("Tags"),
+                Translation.message("screen.keyframe_trigger.tags"),
                 minecraft.font,
                 globalWidth,
                 commandBoxHeight,

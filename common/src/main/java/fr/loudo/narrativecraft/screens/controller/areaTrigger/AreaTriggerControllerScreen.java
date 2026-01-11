@@ -48,14 +48,14 @@ public class AreaTriggerControllerScreen extends Screen {
     private final AreaTrigger areaTrigger;
 
     public AreaTriggerControllerScreen(InteractionController interactionController, AreaTrigger areaTrigger) {
-        super(Component.literal("Area Trigger Controller Screen"));
+        super(Translation.message("screen.area_trigger.title"));
         this.interactionController = interactionController;
         this.areaTrigger = areaTrigger;
     }
 
     public AreaTriggerControllerScreen(
             InteractionController interactionController, AreaTrigger areaTrigger, Vec3 oldLoc1, Vec3 oldLoc2) {
-        super(Component.literal("Area Trigger Controller Screen"));
+        super(Translation.message("screen.area_trigger.title"));
         this.interactionController = interactionController;
         this.areaTrigger = areaTrigger;
         AreaTriggerControllerScreen.oldLoc1 = oldLoc1;

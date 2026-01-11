@@ -29,6 +29,8 @@ import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
 import fr.loudo.narrativecraft.controllers.AbstractController;
 import fr.loudo.narrativecraft.controllers.interaction.InteractionController;
+import fr.loudo.narrativecraft.narrative.cleanup.NarrativeCleanupService;
+import fr.loudo.narrativecraft.narrative.state.NarrativeState;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.hud.StoryDebugHud;
 import fr.loudo.narrativecraft.narrative.Environment;
@@ -116,6 +118,12 @@ public class StoryHandler {
     }
 
     public void start() {
+        // Register cleanup handlers BEFORE any state modifications
+        // This ensures cleanup runs even if start() fails partway through
+        NarrativeCleanupService.registerAllHandlers(playerSession);
+        NarrativeCraftMod.getInstance().getNarrativeStateManager()
+                .enterState(NarrativeState.DIALOGUE, null);
+
         if (playerSession.getController() != null) {
             playerSession.getController().stopSession(false);
         }
@@ -149,35 +157,60 @@ public class StoryHandler {
     }
 
     public void stop() {
-        playerSession.getInkTagHandler().stopAll();
-        playerSession.setLastAreaTriggerEntered(null);
-        for (InkAction inkAction : playerSession.getInkActions()) {
-            inkAction.stop();
+        try {
+            playerSession.getInkTagHandler().stopAll();
+            playerSession.setLastAreaTriggerEntered(null);
+            for (InkAction inkAction : playerSession.getInkActions()) {
+                try {
+                    inkAction.stop();
+                } catch (Exception e) {
+                    NarrativeCraftMod.LOGGER.debug("Error stopping InkAction: {}", e.getMessage());
+                }
+            }
+            for (InteractionController interactionController : playerSession.getInteractionControllers()) {
+                try {
+                    interactionController.stopSession(false);
+                } catch (Exception e) {
+                    NarrativeCraftMod.LOGGER.debug("Error stopping InteractionController: {}", e.getMessage());
+                }
+            }
+            playerSession.getInkActions().clear();
+            for (Playback playback : playerSession.getPlaybackManager().getPlaybacks()) {
+                try {
+                    playback.stop(true);
+                } catch (Exception e) {
+                    NarrativeCraftMod.LOGGER.debug("Error stopping Playback: {}", e.getMessage());
+                }
+            }
+            for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
+                if (characterRuntime.getEntity() == null
+                        || characterRuntime.getEntity().isRemoved()) continue;
+                try {
+                    characterRuntime.getEntity().remove(Entity.RemovalReason.KILLED);
+                } catch (Exception e) {
+                    NarrativeCraftMod.LOGGER.debug("Error removing character entity: {}", e.getMessage());
+                }
+            }
+            AbstractController controller = playerSession.getController();
+            if (controller != null) {
+                try {
+                    controller.stopSession(false);
+                } catch (Exception e) {
+                    NarrativeCraftMod.LOGGER.debug("Error stopping controller: {}", e.getMessage());
+                }
+            }
+            playerSession.setCurrentCamera(null);
+            playerSession.setDialogRenderer(null);
+            playerSession.setStoryHandler(null);
+            playerSession.getCharacterRuntimes().clear();
+            playerSession.getAreaTriggersEntered().clear();
+            playerSession.setLastAreaTriggerEntered(null);
+            playerSession.getInteractionControllers().clear();
+            playerSession.getInkTagHandler().getTagsToExecute().clear();
+        } finally {
+            // GUARANTEE: State manager returns to GAMEPLAY regardless of errors
+            NarrativeCraftMod.getInstance().getNarrativeStateManager().exitToGameplay();
         }
-        for (InteractionController interactionController : playerSession.getInteractionControllers()) {
-            interactionController.stopSession(false);
-        }
-        playerSession.getInkActions().clear();
-        for (Playback playback : playerSession.getPlaybackManager().getPlaybacks()) {
-            playback.stop(true);
-        }
-        for (CharacterRuntime characterRuntime : playerSession.getCharacterRuntimes()) {
-            if (characterRuntime.getEntity() == null
-                    || characterRuntime.getEntity().isRemoved()) continue;
-            characterRuntime.getEntity().remove(Entity.RemovalReason.KILLED);
-        }
-        AbstractController controller = playerSession.getController();
-        if (controller != null) {
-            controller.stopSession(false);
-        }
-        playerSession.setCurrentCamera(null);
-        playerSession.setDialogRenderer(null);
-        playerSession.setStoryHandler(null);
-        playerSession.getCharacterRuntimes().clear();
-        playerSession.getAreaTriggersEntered().clear();
-        playerSession.setLastAreaTriggerEntered(null);
-        playerSession.getInteractionControllers().clear();
-        playerSession.getInkTagHandler().getTagsToExecute().clear();
     }
 
     public void stopAndFinishScreen() {

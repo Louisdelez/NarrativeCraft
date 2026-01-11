@@ -1,0 +1,156 @@
+name: Smoke Test Failure
+description: Report a failure found during smoke testing
+title: "[SMOKE] "
+labels: ["bug", "smoke-test", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a smoke test failure! Please fill out the information below to help us reproduce and fix the issue.
+
+  - type: dropdown
+    id: mc-version
+    attributes:
+      label: Minecraft Version
+      description: Which Minecraft version did this occur on?
+      options:
+        - "1.20.6 (Fabric)"
+        - "1.21.1 (Fabric)"
+        - "1.21.1 (NeoForge)"
+        - "Other (specify below)"
+    validations:
+      required: true
+
+  - type: input
+    id: mod-version
+    attributes:
+      label: NarrativeCraft Version
+      description: e.g., 1.0.0, 1.1.0-beta
+      placeholder: "1.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: loader-version
+    attributes:
+      label: Mod Loader Version
+      description: Fabric Loader / NeoForge version
+      placeholder: "Fabric Loader 0.16.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: test-category
+    attributes:
+      label: Smoke Test Category
+      description: Which smoke test category failed?
+      options:
+        - "1. Mod Loading"
+        - "2. Main Screen & UI"
+        - "3. Story Creation & Management"
+        - "4. Character System"
+        - "5. Recording & Playback"
+        - "6. Dialog System"
+        - "7. Cutscene System"
+        - "8. Sound System"
+        - "9. Commands"
+        - "10. Interaction System"
+    validations:
+      required: true
+
+  - type: input
+    id: test-step
+    attributes:
+      label: Specific Test Step
+      description: Which exact test step failed? (e.g., "2.3 - Navigate through menus")
+      placeholder: "2.3"
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Result
+      description: What should have happened?
+      placeholder: "All buttons should be clickable, text should be readable"
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Result
+      description: What actually happened?
+      placeholder: "Button X did not respond to clicks"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Detailed steps to reproduce the issue
+      placeholder: |
+        1. Launch game with NarrativeCraft
+        2. Press N to open main screen
+        3. Click on "Story Manager"
+        4. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: compat-log
+    attributes:
+      label: Compat Boot Log
+      description: |
+        Paste the NarrativeCraft boot log lines (search for "[NarrativeCraft/Compat]" in logs/latest.log)
+      placeholder: |
+        [NarrativeCraft/Compat] MC Version: 1.20.6
+        [NarrativeCraft/Compat] Loader: Fabric 0.16.0
+        [NarrativeCraft/Compat] Adapter: mc120x
+        [NarrativeCraft/Compat] Features: All supported
+      render: text
+    validations:
+      required: false
+
+  - type: textarea
+    id: crash-log
+    attributes:
+      label: Crash Report / Stack Trace
+      description: If there was a crash, paste the relevant portion here
+      placeholder: "Paste crash report or stack trace..."
+      render: text
+    validations:
+      required: false
+
+  - type: textarea
+    id: full-log
+    attributes:
+      label: Full Log (latest.log)
+      description: |
+        Attach or paste relevant portions of logs/latest.log
+        Focus on lines containing "narrativecraft" or errors/warnings around the failure time
+      placeholder: "Paste log excerpts..."
+      render: text
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: attachments
+    attributes:
+      label: Attachments Checklist
+      description: Please confirm you've attached the following (if applicable)
+      options:
+        - label: "logs/latest.log (or relevant excerpts)"
+        - label: "crash-reports/*.txt (if crash occurred)"
+        - label: "Screenshots or video of the issue"
+        - label: "Compat boot log lines"
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other information that might help debug this issue
+      placeholder: "Other mods installed, system specs, etc."
+    validations:
+      required: false

@@ -91,7 +91,7 @@ public class EditInfoScreen<T extends NarrativeEntry> extends Screen {
      * @param adapter        the adapter used to manage narrative data
      */
     public EditInfoScreen(Screen lastScreen, T narrativeEntry, EditScreenAdapter<T> adapter) {
-        super(Component.literal("Edit info"));
+        super(Translation.message("screen.edit_info.title"));
         this.name = narrativeEntry != null ? narrativeEntry.getName() : "";
         this.description = narrativeEntry != null ? narrativeEntry.getDescription() : "";
         this.lastScreen = lastScreen;

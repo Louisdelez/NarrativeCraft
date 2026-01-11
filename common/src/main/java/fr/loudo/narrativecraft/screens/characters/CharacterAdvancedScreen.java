@@ -43,7 +43,7 @@ public class CharacterAdvancedScreen extends Screen {
     private final CharacterStory characterStory;
 
     public CharacterAdvancedScreen(Screen lastScreen, CharacterStory characterStory) {
-        super(Component.literal("Character Advanced Screen"));
+        super(Translation.message("screen.character_advanced.title"));
         this.lastScreen = lastScreen;
         this.characterStory = characterStory;
         this.mainCharacterAttribute = characterStory.getMainCharacterAttribute();

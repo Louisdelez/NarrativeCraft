@@ -110,10 +110,16 @@ public class DialogRenderer {
         }
         if (dialogStopping) {
             if (currentTick >= totalTick) {
-                runDialogStopped.run();
+                // T049: Null check on callback (fixes audit issue DialogRenderer:113)
+                if (runDialogStopped != null) {
+                    runDialogStopped.run();
+                }
             }
         } else if (dialogAutoSkip && dialogAutoSkipping && currentTick >= totalTickAutoSkip) {
-            runDialogAutoSkipped.run();
+            // T049: Null check on callback (fixes audit issue DialogRenderer:116)
+            if (runDialogAutoSkipped != null) {
+                runDialogAutoSkipped.run();
+            }
         }
         dialogScrollTextDialog.tick();
         dialogArrowSkip.tick();

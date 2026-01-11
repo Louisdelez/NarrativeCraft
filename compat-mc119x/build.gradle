@@ -1,0 +1,55 @@
+/**
+ * Compatibility module for Minecraft 1.19.x
+ * Provides version-specific implementations of compat API interfaces.
+ * Uses Fabric Loom for Minecraft mappings (works with Fabric loader).
+ */
+plugins {
+    id 'java-library'
+    id 'fabric-loom'
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'Sponge'
+        url = 'https://repo.spongepowered.org/repository/maven-public'
+    }
+    maven {
+        name = 'ParchmentMC'
+        url = 'https://maven.parchmentmc.org/'
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${mc_1194_version}"
+    mappings loom.layered {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${mc_1194_parchment_mc}:${mc_1194_parchment}@zip")
+    }
+    // Compat API interfaces (pure Java)
+    api project(':compat-api')
+    compileOnly group: 'org.spongepowered', name: 'mixin', version: mixin_version
+}
+
+// Export sources for inclusion in loader modules
+configurations {
+    compatJava {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+    compatResources {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+}
+
+artifacts {
+    compatJava sourceSets.main.java.sourceDirectories.singleFile
+    compatResources sourceSets.main.resources.sourceDirectories.singleFile
+}

@@ -1,0 +1,111 @@
+/**
+ * Version Matrix Plugin for Multi-Version Minecraft Support
+ *
+ * Provides version-specific configuration for Minecraft mod builds.
+ * Each target (fabric-1.19.4, fabric-1.20.6, neoforge-1.20.6, etc.)
+ * gets properly configured dependencies and Java target versions.
+ *
+ * Usage in version-specific build.gradle:
+ *   plugins {
+ *       id 'version-matrix'
+ *   }
+ *   versionMatrix {
+ *       minecraftVersion = '1.20.6'
+ *       loader = 'fabric' // or 'neoforge'
+ *   }
+ */
+
+class VersionMatrixExtension {
+    String minecraftVersion
+    String loader // 'fabric' or 'neoforge'
+
+    // Computed properties
+    String getMcMajor() {
+        if (minecraftVersion.startsWith('1.19')) return '1.19'
+        if (minecraftVersion.startsWith('1.20')) return '1.20'
+        if (minecraftVersion.startsWith('1.21')) return '1.21'
+        return minecraftVersion
+    }
+
+    String getVersionPrefix() {
+        return minecraftVersion.replace('.', '')
+    }
+
+    boolean isFabric() {
+        return loader == 'fabric'
+    }
+
+    boolean isNeoForge() {
+        return loader == 'neoforge'
+    }
+}
+
+// Register extension
+project.extensions.create('versionMatrix', VersionMatrixExtension)
+
+// After evaluation, configure based on version matrix
+project.afterEvaluate {
+    def vm = project.versionMatrix
+
+    if (!vm.minecraftVersion || !vm.loader) {
+        throw new GradleException("versionMatrix.minecraftVersion and versionMatrix.loader must be set")
+    }
+
+    def prefix = "mc_${vm.versionPrefix}_"
+
+    // Get version-specific properties
+    def mcVersion = project.findProperty("${prefix}version") ?: vm.minecraftVersion
+    def mcVersionRange = project.findProperty("${prefix}version_range") ?: "[${mcVersion},)"
+    def javaTarget = project.findProperty("${prefix}java_target") ?: '21'
+    def parchmentMc = project.findProperty("${prefix}parchment_mc") ?: mcVersion
+    def parchmentVersion = project.findProperty("${prefix}parchment") ?: '2025.10.12'
+
+    // Expose computed properties to project
+    project.ext {
+        targetMinecraftVersion = mcVersion
+        targetMinecraftVersionRange = mcVersionRange
+        targetJavaVersion = javaTarget as int
+        targetParchmentMc = parchmentMc
+        targetParchmentVersion = parchmentVersion
+        targetMcMajor = vm.mcMajor
+    }
+
+    if (vm.isFabric()) {
+        project.ext {
+            targetFabricLoader = project.findProperty("${prefix}fabric_loader") ?: project.fabric_loader_version
+            targetFabricApi = project.findProperty("${prefix}fabric_api") ?: project.fabric_version
+        }
+    }
+
+    if (vm.isNeoForge()) {
+        project.ext {
+            targetNeoForgeVersion = project.findProperty("${prefix}neoforge") ?: project.neoforge_version
+            targetNeoForgeLoaderRange = project.findProperty("${prefix}neoforge_loader_range") ?: '[4,)'
+        }
+    }
+
+    // Configure Java toolchain for target version
+    project.java {
+        sourceCompatibility = JavaVersion.toVersion(javaTarget as int)
+        targetCompatibility = JavaVersion.toVersion(javaTarget as int)
+    }
+
+    // Configure archive naming
+    project.base {
+        archivesName = "${project.mod_id}-${project.version}-mc${mcVersion}-${vm.loader}"
+    }
+
+    // Log configuration
+    project.logger.lifecycle("Configured ${project.name} for MC ${mcVersion} (${vm.loader}, Java ${javaTarget})")
+}
+
+// Helper method to get compat module for this version
+ext.getCompatModule = { ->
+    def vm = project.versionMatrix
+    switch (vm.mcMajor) {
+        case '1.19': return ':compat-mc119x'
+        case '1.20': return ':compat-mc120x'
+        case '1.21': return ':compat-mc121x'
+        default: throw new GradleException("Unknown MC major version: ${vm.mcMajor}")
+    }
+}

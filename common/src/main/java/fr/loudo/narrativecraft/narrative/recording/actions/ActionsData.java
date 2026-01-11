@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.recording.actions;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.playback.PlaybackData;
 import fr.loudo.narrativecraft.narrative.recording.Location;
 import java.util.ArrayList;
@@ -31,12 +32,9 @@ import java.util.List;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.storage.TagValueOutput;
 
 public class ActionsData {
 
@@ -53,21 +51,11 @@ public class ActionsData {
         this.actions = new ArrayList<>();
         this.entity = entity;
         if (!(entity instanceof ServerPlayer)) {
-            nbtData = String.valueOf(serializeNBT());
+            nbtData = NarrativeCraftMod.getUtilCompat().serializeEntityToNbt(entity);
         }
         entityId = BuiltInRegistries.ENTITY_TYPE.getId(entity.getType());
         this.spawnTick = spawnTick;
         entityIdRecording = -1;
-    }
-
-    private CompoundTag serializeNBT() {
-        TagValueOutput nbt = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, entity.registryAccess());
-        entity.saveWithoutId(nbt);
-        CompoundTag compoundTag = nbt.buildResult();
-        compoundTag.remove("UUID");
-        compoundTag.remove("Pos");
-        compoundTag.remove("Motion");
-        return compoundTag;
     }
 
     public void addLocation() {

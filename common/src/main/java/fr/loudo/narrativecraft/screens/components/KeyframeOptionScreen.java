@@ -65,7 +65,7 @@ public class KeyframeOptionScreen<T extends Keyframe, E extends AbstractKeyframe
     protected boolean hide;
 
     public KeyframeOptionScreen(T keyframe, E keyframeController, PlayerSession playerSession, boolean hide) {
-        super(Component.literal("Keyframe Option"));
+        super(Translation.message("screen.keyframe_option.title"));
         this.keyframe = keyframe;
         this.player = playerSession.getPlayer();
         this.playerSession = playerSession;

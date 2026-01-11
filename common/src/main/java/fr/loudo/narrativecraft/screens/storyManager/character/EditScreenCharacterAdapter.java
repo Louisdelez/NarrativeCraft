@@ -64,20 +64,20 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
         if (scene == null) {
             LocalDate localDate = LocalDate.now();
             ScreenUtils.LabelBox dayLabelBox = new ScreenUtils.LabelBox(
-                    Component.literal("Day"), screen.getFont(), 20, 20, 0, 0, ScreenUtils.Align.HORIZONTAL);
+                    Translation.message("screen.character.day"), screen.getFont(), 20, 20, 0, 0, ScreenUtils.Align.HORIZONTAL);
             screen.extraFields.put("day", dayLabelBox);
             screen.extraFields.put("dayBox", dayLabelBox.getEditBox());
             dayLabelBox.getEditBox().setFilter(string -> string.matches(Util.REGEX_INT));
             dayLabelBox.getEditBox().setValue(String.valueOf(localDate.getDayOfMonth()));
 
             ScreenUtils.LabelBox monthLabelBox = new ScreenUtils.LabelBox(
-                    Component.literal("Month"), screen.getFont(), 20, 20, 0, 0, ScreenUtils.Align.HORIZONTAL);
+                    Translation.message("screen.character.month"), screen.getFont(), 20, 20, 0, 0, ScreenUtils.Align.HORIZONTAL);
             monthLabelBox.getEditBox().setFilter(string -> string.matches(Util.REGEX_INT));
             monthLabelBox.getEditBox().setValue(String.valueOf(localDate.getMonthValue()));
             screen.extraFields.put("month", monthLabelBox);
 
             ScreenUtils.LabelBox yearLabelBox = new ScreenUtils.LabelBox(
-                    Component.literal("Year"), screen.getFont(), 32, 20, 0, 0, ScreenUtils.Align.HORIZONTAL);
+                    Translation.message("screen.character.year"), screen.getFont(), 32, 20, 0, 0, ScreenUtils.Align.HORIZONTAL);
             yearLabelBox.getEditBox().setFilter(string -> string.matches(Util.REGEX_INT));
             yearLabelBox.getEditBox().setValue("2000");
             screen.extraFields.put("year", yearLabelBox);
@@ -151,7 +151,7 @@ public class EditScreenCharacterAdapter implements EditScreenAdapter<CharacterSt
         }
 
         Button modelButton = (Button) screen.extraFields.get("modelBtn");
-        Component label = Component.literal("Model");
+        Component label = Translation.message("screen.character.model");
         StringWidget modelText = ScreenUtils.text(
                 label, screen.getFont(), x, y + modelButton.getHeight() / 2 - screen.getFont().lineHeight / 2);
         screen.addRenderableWidget(modelText);

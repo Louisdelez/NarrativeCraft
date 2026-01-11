@@ -42,7 +42,7 @@ public class CutsceneChangeTimeSkipScreen extends Screen {
     private EditBox numberInput;
 
     public CutsceneChangeTimeSkipScreen(CutsceneController cutsceneController, Screen lastScreen) {
-        super(Component.literal("Change Time Skip Screen"));
+        super(Translation.message("screen.time_skip.title"));
         this.cutsceneController = cutsceneController;
         this.lastScreen = lastScreen;
     }
@@ -60,7 +60,7 @@ public class CutsceneChangeTimeSkipScreen extends Screen {
         int inputX = centerX - (INPUT_WIDTH + 5 + BUTTON_WIDTH) / 2;
 
         numberInput = new EditBox(
-                this.font, inputX, centerY - 20, INPUT_WIDTH + 20, BUTTON_HEIGHT, Component.literal("Number"));
+                this.font, inputX, centerY - 20, INPUT_WIDTH + 20, BUTTON_HEIGHT, Translation.message("screen.time_skip.number"));
         numberInput.setFilter(s -> s.matches("^\\d*(\\.\\d*)?$"));
         numberInput.setMaxLength(10);
         this.addRenderableWidget(numberInput);

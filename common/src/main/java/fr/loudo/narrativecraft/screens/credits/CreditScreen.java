@@ -25,34 +25,42 @@ package fr.loudo.narrativecraft.screens.credits;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.compat.api.IGuiRenderCompat;
+import fr.loudo.narrativecraft.compat.api.NcId;
+import fr.loudo.narrativecraft.compat.api.VersionAdapterLoader;
 import fr.loudo.narrativecraft.mixin.invoker.WinScreenInvoker;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.screens.mainScreen.MainScreen;
+import fr.loudo.narrativecraft.util.Translation;
 import fr.loudo.narrativecraft.util.Util;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.WinScreen;
 import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.util.ARGB;
-
 public class CreditScreen extends WinScreen {
 
-    public static final Identifier LOGO =
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/logo.png");
+    public static final NcId LOGO =
+            NcId.of(NarrativeCraftMod.MOD_ID, "textures/logo.png");
 
-    private static final Identifier BACKGROUND_IMAGE =
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/credits/background.png");
-    private static final Identifier MUSIC =
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "credits.music");
+    private static final NcId BACKGROUND_IMAGE =
+            NcId.of(NarrativeCraftMod.MOD_ID, "textures/credits/background.png");
+    private static final NcId MUSIC =
+            NcId.of(NarrativeCraftMod.MOD_ID, "credits.music");
 
-    public static final SimpleSoundInstance MUSIC_INSTANCE =
-            SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(MUSIC), 1, 1);
+    // Lazy initialization to use compat layer
+    private static SimpleSoundInstance MUSIC_INSTANCE;
+
+    public static SimpleSoundInstance getMusicInstance() {
+        if (MUSIC_INSTANCE == null) {
+            MUSIC_INSTANCE = (SimpleSoundInstance) VersionAdapterLoader.getAdapter()
+                    .getUtilCompat().createSimpleSoundInstance(MUSIC, 1, 1);
+        }
+        return MUSIC_INSTANCE;
+    }
 
     private boolean alreadyInit;
 
@@ -71,7 +79,7 @@ public class CreditScreen extends WinScreen {
     @Override
     public void onClose() {
         super.onClose();
-        minecraft.getSoundManager().stop(MUSIC_INSTANCE);
+        minecraft.getSoundManager().stop(getMusicInstance());
     }
 
     @Override
@@ -79,9 +87,9 @@ public class CreditScreen extends WinScreen {
         super.init();
         if (alreadyInit) return;
         alreadyInit = true;
-        minecraft.getSoundManager().play(MUSIC_INSTANCE);
+        minecraft.getSoundManager().play(getMusicInstance());
         ((WinScreenInvoker) this)
-                .callAddCreditsLine(Component.literal("Tool Used").withStyle(ChatFormatting.GRAY), false, false);
+                .callAddCreditsLine(Translation.message("credits.tool_used").copy().withStyle(ChatFormatting.GRAY), false, false);
         ((WinScreenInvoker) this)
                 .callAddCreditsLine(
                         Component.literal("           ")
@@ -118,9 +126,10 @@ public class CreditScreen extends WinScreen {
     @Override
     public void renderBackground(GuiGraphics p_282239_, int p_294762_, int p_295473_, float p_296441_) {
         if (Util.resourceExists(BACKGROUND_IMAGE)) {
-            p_282239_.blit(
-                    RenderPipelines.GUI_TEXTURED,
-                    BACKGROUND_IMAGE,
+            IGuiRenderCompat guiCompat = VersionAdapterLoader.getAdapter().getGuiRenderCompat();
+            guiCompat.blitTexture(
+                    p_282239_,
+                    BACKGROUND_IMAGE.toString(),
                     0,
                     0,
                     0,
@@ -128,10 +137,9 @@ public class CreditScreen extends WinScreen {
                     p_282239_.guiWidth(),
                     p_282239_.guiHeight(),
                     p_282239_.guiWidth(),
-                    p_282239_.guiHeight(),
-                    ARGB.colorFromFloat(1, 1, 1, 1));
+                    p_282239_.guiHeight());
         } else {
-            p_282239_.fill(0, 0, p_282239_.guiWidth(), p_282239_.guiHeight(), ARGB.colorFromFloat(1, 0, 0, 0));
+            p_282239_.fill(0, 0, p_282239_.guiWidth(), p_282239_.guiHeight(), NarrativeCraftMod.getColorCompat().colorFromFloat(1, 0, 0, 0));
         }
     }
 }

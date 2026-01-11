@@ -1,4 +1,7 @@
 # NarrativeCraft
+
+[![CI](https://github.com/LOUDO56/NarrativeCraft/actions/workflows/ci.yml/badge.svg)](https://github.com/LOUDO56/NarrativeCraft/actions/workflows/ci.yml)
+
 <div align="center">
     Create your own stories, easily and freely, in Minecraft.
 </div>
@@ -61,8 +64,62 @@ I'm glad you asked! I made a small showcase to demonstrate what this mod is capa
 <img src="https://github.com/user-attachments/assets/a1c5a664-dbf4-4782-aa4e-d18ca1462579"/>
 </a>
 
+## Installation
+
+### Supported Versions
+
+| Minecraft | Loader | Status | Java |
+|-----------|--------|--------|------|
+| 1.21.11 | Fabric 0.18.3+ | ✅ Full support | 21+ |
+| 1.21.11 | NeoForge 21.11+ | ✅ Full support | 21+ |
+| 1.20.6 | Fabric 0.15.11+ | ✅ Full support | 17+ |
+| 1.20.6 | NeoForge 20.6+ | ✅ Full support | 17+ |
+| 1.19.4 | Fabric 0.14.21+ | ✅ Full support | 17+ |
+
+### Requirements
+
+- **Java**: 17+ (MC 1.19.4/1.20.6) or 21+ (MC 1.21.11)
+- **Fabric API**: Required for Fabric versions
+
+### For Players
+
+1. Download the mod for your Minecraft version from [Releases](https://github.com/LOUDO56/NarrativeCraft/releases)
+2. Place the `.jar` file in your `mods` folder
+3. Install Fabric API (if using Fabric)
+4. Launch Minecraft
+
+### For Developers
+
+```bash
+# Clone the repository
+git clone https://github.com/LOUDO56/NarrativeCraft.git
+cd NarrativeCraft
+
+# Build all versions (requires Java 21)
+./gradlew :fabric-1.19.4:build :fabric-1.20.6:build :fabric-1.21.11:build :neoforge-1.20.6:build :neoforge-1.21.11:build
+
+# Build specific version
+./gradlew :fabric-1.19.4:build
+./gradlew :fabric-1.21.11:build
+./gradlew :neoforge-1.21.11:build
+
+# Run tests
+./gradlew :common:test
+```
+
+See [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for build issues.
+
+## Documentation
+
+- [INK_GUIDE.md](docs/INK_GUIDE.md) - Complete scripting tutorial
+- [TAG_REFERENCE.md](docs/TAG_REFERENCE.md) - All tags and parameters
+- [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) - Common issues and solutions
+- [Online Documentation](https://loudo56.github.io/NarrativeCraft-docs/)
+
 ## Contribution
 
 This mod is meant to be developed and used with the community. My goal is to make story creation easily accessible to as many people as possible.
 
 If you're experienced in Minecraft modding or Java in general, any suggestions to refactor or improve the code are greatly appreciated.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.

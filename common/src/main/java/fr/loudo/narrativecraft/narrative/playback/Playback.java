@@ -205,14 +205,22 @@ public class Playback {
     }
 
     public void killMasterEntity() {
+        // T052: Null safety check (fixes audit issue Playback:208)
+        if (entityPlaybacks.isEmpty() || masterEntity == null) {
+            return;
+        }
         PlaybackData playbackData = entityPlaybacks.getFirst();
         masterEntity.remove(Entity.RemovalReason.KILLED);
         if (masterEntity instanceof FakePlayer fakePlayer) {
-            ((PlayerListAccessor) level.getServer().getPlayerList())
-                    .getPlayersByUUID()
-                    .remove(fakePlayer.getUUID());
+            if (level != null && level.getServer() != null) {
+                ((PlayerListAccessor) level.getServer().getPlayerList())
+                        .getPlayersByUUID()
+                        .remove(fakePlayer.getUUID());
+            }
         }
-        playbackData.setEntity(null);
+        if (playbackData != null) {
+            playbackData.setEntity(null);
+        }
     }
 
     public void respawnMasterEntity(Location position) {

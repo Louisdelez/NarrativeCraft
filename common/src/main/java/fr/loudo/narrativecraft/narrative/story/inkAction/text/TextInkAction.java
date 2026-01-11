@@ -26,6 +26,7 @@ package fr.loudo.narrativecraft.narrative.story.inkAction.text;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.api.inkAction.InkActionUtil;
+import fr.loudo.narrativecraft.compat.api.NcId;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
 import fr.loudo.narrativecraft.util.Easing;
@@ -38,7 +39,6 @@ import java.util.function.BiConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 
 public class TextInkAction extends InkAction {
@@ -309,13 +309,13 @@ public class TextInkAction extends InkAction {
                 if (arguments.size() == 3) {
                     return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Font value"));
                 }
-                attribute.setCustomFont(Identifier.parse(arguments.get(3)));
+                attribute.setCustomFont(NcId.parse(arguments.get(3)));
             }
             case "sound" -> {
                 if (arguments.size() == 3) {
                     return InkActionResult.error(Translation.message(MISS_ARGUMENT_TEXT, "Sound value"));
                 }
-                attribute.setCustomLetterSound(Identifier.parse(arguments.get(3)));
+                attribute.setCustomLetterSound(NcId.parse(arguments.get(3)));
             }
             case "type" -> {
                 dialogScrollTextInkAction.setBlock(InkActionUtil.getOptionalArgument(command, "block"));
@@ -504,7 +504,7 @@ class Attribute {
     private final String id;
     private final Font font = Minecraft.getInstance().font;
     private String text;
-    private Identifier customFont, customLetterSound;
+    private NcId customFont, customLetterSound;
     private Position position = Position.MIDDLE;
     private FadeState fadeState;
     private float[] spacing;
@@ -537,19 +537,19 @@ class Attribute {
         return font;
     }
 
-    public Identifier getCustomFont() {
+    public NcId getCustomFont() {
         return customFont;
     }
 
-    public Identifier getCustomLetterSound() {
+    public NcId getCustomLetterSound() {
         return customLetterSound;
     }
 
-    public void setCustomLetterSound(Identifier customLetterSound) {
+    public void setCustomLetterSound(NcId customLetterSound) {
         this.customLetterSound = customLetterSound;
     }
 
-    public void setCustomFont(Identifier customFont) {
+    public void setCustomFont(NcId customFont) {
         this.customFont = customFont;
     }
 

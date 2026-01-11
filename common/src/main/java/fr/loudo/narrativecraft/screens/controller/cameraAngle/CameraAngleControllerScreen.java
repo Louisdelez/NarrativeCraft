@@ -50,7 +50,7 @@ public class CameraAngleControllerScreen extends Screen {
     private final CameraAngleController cameraAngleController;
 
     public CameraAngleControllerScreen(CameraAngleController cameraAngleController) {
-        super(Component.literal("Camera Angle Controller Screen"));
+        super(Translation.message("screen.camera_angle.title"));
         this.cameraAngleController = cameraAngleController;
     }
 

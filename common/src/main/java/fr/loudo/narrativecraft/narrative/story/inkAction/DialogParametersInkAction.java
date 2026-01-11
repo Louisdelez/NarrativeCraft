@@ -23,6 +23,7 @@
 
 package fr.loudo.narrativecraft.narrative.story.inkAction;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.api.inkAction.InkActionResult;
 import fr.loudo.narrativecraft.narrative.chapter.scene.Scene;
@@ -36,8 +37,6 @@ import fr.loudo.narrativecraft.util.Translation;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
-import net.minecraft.util.ARGB;
-
 public class DialogParametersInkAction extends InkAction {
 
     private static final Set<String> VALID_PARAMETERS = Set.of(
@@ -136,6 +135,7 @@ public class DialogParametersInkAction extends InkAction {
                     break;
                 case WIDTH:
                     value1 = Integer.parseInt(arguments.get(2));
+                    break;
                 case TEXT_COLOR:
                 case BACKGROUND_COLOR:
                     value1 = Integer.parseInt(arguments.get(2), 16);
@@ -191,21 +191,21 @@ public class DialogParametersInkAction extends InkAction {
                 break;
             case TEXT_COLOR:
                 executeIfRenderer(dialogRenderer, renderer -> {
-                    int color = ARGB.color(255, (int) value1);
+                    int color = NarrativeCraftMod.getColorCompat().color(255, (int) value1);
                     renderer.setTextColor(color);
                 });
                 executeDialogData(storyHandler, dialogData -> {
-                    int color = ARGB.color(255, (int) value1);
+                    int color = NarrativeCraftMod.getColorCompat().color(255, (int) value1);
                     dialogData.setTextColor(color);
                 });
                 break;
             case BACKGROUND_COLOR:
                 executeIfRenderer(dialogRenderer, renderer -> {
-                    int color = ARGB.color(255, (int) value1);
+                    int color = NarrativeCraftMod.getColorCompat().color(255, (int) value1);
                     renderer.setBackgroundColor(color);
                 });
                 executeDialogData(storyHandler, dialogData -> {
-                    int color = ARGB.color(255, (int) value1);
+                    int color = NarrativeCraftMod.getColorCompat().color(255, (int) value1);
                     dialogData.setBackgroundColor(color);
                 });
                 break;

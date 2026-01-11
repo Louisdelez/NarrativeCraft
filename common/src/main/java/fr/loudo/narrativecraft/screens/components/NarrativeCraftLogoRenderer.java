@@ -24,22 +24,22 @@
 package fr.loudo.narrativecraft.screens.components;
 
 import fr.loudo.narrativecraft.NarrativeCraftMod;
+import fr.loudo.narrativecraft.compat.api.IGuiRenderCompat;
+import fr.loudo.narrativecraft.compat.api.NcId;
+import fr.loudo.narrativecraft.compat.api.VersionAdapterLoader;
 import fr.loudo.narrativecraft.util.Util;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
 
 public class NarrativeCraftLogoRenderer {
 
-    public static final Identifier LOGO =
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/logo.png");
+    public static final NcId LOGO =
+            NcId.of(NarrativeCraftMod.MOD_ID, "textures/logo.png");
 
-    private final Identifier resourceLocation;
+    private final NcId resourceLocation;
     private int[] logoRes;
     private int imageHeight;
 
-    public NarrativeCraftLogoRenderer(Identifier resourceLocation) {
+    public NarrativeCraftLogoRenderer(NcId resourceLocation) {
         this.resourceLocation = resourceLocation;
     }
 
@@ -55,9 +55,10 @@ public class NarrativeCraftLogoRenderer {
     }
 
     public void render(GuiGraphics guiGraphics, int x, int y) {
-        guiGraphics.blit(
-                RenderPipelines.GUI_TEXTURED,
-                LOGO,
+        IGuiRenderCompat guiCompat = VersionAdapterLoader.getAdapter().getGuiRenderCompat();
+        guiCompat.blitTexture(
+                guiGraphics,
+                LOGO.toString(),
                 x,
                 y,
                 0,
@@ -65,8 +66,7 @@ public class NarrativeCraftLogoRenderer {
                 256,
                 imageHeight,
                 256,
-                imageHeight,
-                ARGB.colorFromFloat(1, 1, 1, 1));
+                imageHeight);
     }
 
     public int getImageHeight() {

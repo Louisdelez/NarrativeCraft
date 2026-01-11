@@ -31,6 +31,7 @@ import fr.loudo.narrativecraft.controllers.cutscene.CutscenePlayback;
 import fr.loudo.narrativecraft.controllers.mainScreen.MainScreenController;
 import fr.loudo.narrativecraft.files.NarrativeCraftFile;
 import fr.loudo.narrativecraft.narrative.Environment;
+import fr.loudo.narrativecraft.narrative.cleanup.NarrativeCleanupService;
 import fr.loudo.narrativecraft.narrative.data.MainScreenData;
 import fr.loudo.narrativecraft.narrative.keyframes.cutscene.CutsceneKeyframe;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
@@ -54,35 +55,33 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.renderer.RenderPipelines;
+import fr.loudo.narrativecraft.compat.api.IGuiRenderCompat;
+import fr.loudo.narrativecraft.compat.api.NcId;
+import fr.loudo.narrativecraft.compat.api.VersionAdapterLoader;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.ARGB;
-
 public class MainScreen extends Screen {
 
-    public static final Identifier BACKGROUND_IMAGE =
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "textures/main_screen/background.png");
-    public static final Identifier MUSIC =
-            Identifier.fromNamespaceAndPath(NarrativeCraftMod.MOD_ID, "main_screen.music");
+    public static final NcId BACKGROUND_IMAGE =
+            NcId.of(NarrativeCraftMod.MOD_ID, "textures/main_screen/background.png");
+    public static final NcId MUSIC =
+            NcId.of(NarrativeCraftMod.MOD_ID, "main_screen.music");
 
-    public static SimpleSoundInstance musicInstance = new SimpleSoundInstance(
-            MainScreen.MUSIC,
-            SoundSource.MASTER,
-            0.7f,
-            1,
-            SoundInstance.createUnseededRandom(),
-            true,
-            0,
-            SoundInstance.Attenuation.NONE,
-            0.0F,
-            0.0F,
-            0.0F,
-            true);
+    // Lazy initialization to use compat layer for cross-version support
+    private static SoundInstance musicInstance;
+
+    public static SoundInstance getMusicInstance() {
+        if (musicInstance == null) {
+            musicInstance = (SoundInstance) VersionAdapterLoader.getAdapter().getUtilCompat()
+                    .createSoundInstance(MUSIC, SoundSource.MASTER, 0.7f, 1,
+                            SoundInstance.createUnseededRandom(), true, 0, 0, // Attenuation.NONE = 0
+                            0.0, 0.0, 0.0, true);
+        }
+        return musicInstance;
+    }
 
     private final NarrativeCraftLogoRenderer narrativeCraftLogo =
             NarrativeCraftMod.getInstance().getNarrativeCraftLogoRenderer();
@@ -104,7 +103,7 @@ public class MainScreen extends Screen {
     private int userFloodedKeyboard;
 
     public MainScreen(PlayerSession playerSession, boolean finishedStory, boolean pause) {
-        super(Component.literal("Main screen"));
+        super(Translation.message("screen.main.title"));
         this.finishedStory = finishedStory;
         this.pause = pause;
         this.playerSession = playerSession;
@@ -114,7 +113,7 @@ public class MainScreen extends Screen {
     private void playStory() {
         this.onClose();
         StoryHandler storyHandler = new StoryHandler(playerSession);
-        minecraft.getSoundManager().stop(musicInstance);
+        minecraft.getSoundManager().stop(getMusicInstance());
         try {
             List<ErrorLine> errorLines = StoryValidation.validate();
             List<ErrorLine> warns =
@@ -159,13 +158,19 @@ public class MainScreen extends Screen {
 
     @Override
     public void onClose() {
-        super.onClose();
-        if (!pause) {
-            minecraft.getSoundManager().stop(musicInstance);
-            minecraft.options.hideGui = false;
-            if (playerSession.getController() != null) {
-                NarrativeCraftMod.server.execute(
-                        () -> playerSession.getController().stopSession(false));
+        try {
+            super.onClose();
+            if (!pause) {
+                minecraft.getSoundManager().stop(getMusicInstance());
+                if (playerSession.getController() != null) {
+                    NarrativeCraftMod.server.execute(
+                            () -> playerSession.getController().stopSession(false));
+                }
+            }
+        } finally {
+            // T048: GUARANTEE hideGui is restored even on exception
+            if (minecraft.options != null) {
+                minecraft.options.hideGui = false;
             }
         }
     }
@@ -194,7 +199,7 @@ public class MainScreen extends Screen {
         }
 
         if (!pause && !rendered) {
-            minecraft.getSoundManager().play(musicInstance);
+            minecraft.getSoundManager().play(getMusicInstance());
             rendered = true;
         }
 
@@ -385,7 +390,7 @@ public class MainScreen extends Screen {
             this.addRenderableWidget(quitButton);
         }
 
-        devButton = Button.builder(Component.literal("Dev Environment"), button -> {
+        devButton = Button.builder(Translation.message("button.dev_environment"), button -> {
                     minecraft.player.displayClientMessage(Translation.message("global.dev_env"), false);
                     this.onClose();
                 })
@@ -401,7 +406,7 @@ public class MainScreen extends Screen {
 
     private void reset() {
         rendered = false;
-        minecraft.getSoundManager().stop(musicInstance);
+        minecraft.getSoundManager().stop(getMusicInstance());
     }
 
     @Override
@@ -417,7 +422,7 @@ public class MainScreen extends Screen {
                     guiGraphics.guiWidth() / 2
                             - minecraft.font.width(Translation.message("screen.main_screen.dev_tip")) / 2,
                     20,
-                    ARGB.colorFromFloat(1, 1, 1, 1));
+                    NarrativeCraftMod.getColorCompat().colorFromFloat(1, 1, 1, 1));
         }
     }
 
@@ -429,9 +434,10 @@ public class MainScreen extends Screen {
         }
         if (playerSession.getController() != null) return;
         if (Util.resourceExists(BACKGROUND_IMAGE)) {
-            guiGraphics.blit(
-                    RenderPipelines.GUI_TEXTURED,
-                    BACKGROUND_IMAGE,
+            IGuiRenderCompat guiCompat = VersionAdapterLoader.getAdapter().getGuiRenderCompat();
+            guiCompat.blitTexture(
+                    guiGraphics,
+                    BACKGROUND_IMAGE.toString(),
                     0,
                     0,
                     0,
@@ -439,10 +445,9 @@ public class MainScreen extends Screen {
                     guiGraphics.guiWidth(),
                     guiGraphics.guiHeight(),
                     guiGraphics.guiWidth(),
-                    guiGraphics.guiHeight(),
-                    ARGB.colorFromFloat(1, 1, 1, 1));
+                    guiGraphics.guiHeight());
         } else {
-            guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), ARGB.colorFromFloat(1, 0, 0, 0));
+            guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), NarrativeCraftMod.getColorCompat().colorFromFloat(1, 0, 0, 0));
         }
     }
 

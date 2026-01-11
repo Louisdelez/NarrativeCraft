@@ -23,25 +23,26 @@
 
 package fr.loudo.narrativecraft.screens.components;
 
+import fr.loudo.narrativecraft.compat.api.IGuiRenderCompat;
+import fr.loudo.narrativecraft.compat.api.NcId;
+import fr.loudo.narrativecraft.compat.api.VersionAdapterLoader;
 import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 
 public class FinishedStoryScreen extends Screen {
 
-    private static final Identifier WINDOW_LOCATION =
-            Identifier.withDefaultNamespace("textures/gui/advancements/window.png");
+    private static final NcId WINDOW_LOCATION =
+            NcId.of("minecraft", "textures/gui/advancements/window.png");
     private final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
     private final Screen oldScreen;
 
     public FinishedStoryScreen(Screen oldScreen) {
-        super(Component.literal("Finished Story Screen"));
+        super(Translation.message("screen.finished_story.title"));
         this.oldScreen = oldScreen;
     }
 
@@ -92,8 +93,8 @@ public class FinishedStoryScreen extends Screen {
     }
 
     public void renderWindow(GuiGraphics guiGraphics, int offsetX, int offsetY) {
-        guiGraphics.blit(
-                RenderPipelines.GUI_TEXTURED, WINDOW_LOCATION, offsetX, offsetY, 0.0F, 0.0F, 252, 140, 256, 256);
+        IGuiRenderCompat guiCompat = VersionAdapterLoader.getAdapter().getGuiRenderCompat();
+        guiCompat.blitTexture(guiGraphics, WINDOW_LOCATION.toString(), offsetX, offsetY, 0.0F, 0.0F, 252, 140, 256, 256);
     }
 
     @Override

@@ -23,10 +23,10 @@
 
 package fr.loudo.narrativecraft.narrative.dialog;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.narrative.dialog.animation.DialogArrowSkip;
 import fr.loudo.narrativecraft.util.Easing;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import org.joml.Matrix3x2fStack;
 
@@ -90,7 +90,7 @@ public class DialogRenderer2D extends DialogRenderer {
                     originalScale = (float) Mth.lerp(t, scale, 0.8);
                     opacity = Mth.lerp(t, 0.8, 0.0);
                 }
-                backgroundColor = ARGB.color((int) (opacity * 255.0), backgroundColor);
+                backgroundColor = NarrativeCraftMod.getColorCompat().color((int) (opacity * 255.0), backgroundColor);
             }
         }
         if (currentTick == totalTick) {

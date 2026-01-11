@@ -53,7 +53,7 @@ public class InteractionControllerScreen extends Screen {
     private final InteractionController controller;
 
     public InteractionControllerScreen(InteractionController controller) {
-        super(Component.literal("Interaction Controller Screen"));
+        super(Translation.message("screen.interaction.title"));
         this.controller = controller;
     }
 

@@ -40,7 +40,7 @@ public class InteractionOptionScreen extends ButtonListScreen {
 
     public InteractionOptionScreen(
             Screen lastScreen, EntityInteraction entityInteraction, InteractionController controller) {
-        super(lastScreen, Component.literal("Interaction option screen"));
+        super(lastScreen, Translation.message("screen.interaction_option.title"));
         this.entityInteraction = entityInteraction;
         this.controller = controller;
     }

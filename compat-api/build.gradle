@@ -1,0 +1,37 @@
+/**
+ * Compatibility API module - contains version-agnostic interfaces.
+ * Compiled to Java 17 for maximum compatibility across MC versions.
+ * Uses only primitive types and Object to avoid Minecraft version dependencies.
+ */
+plugins {
+    id 'java-library'
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(17)
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    withSourcesJar()
+}
+
+repositories {
+    mavenCentral()
+}
+
+// Pure Java interfaces - no Minecraft dependencies
+dependencies {
+    // No dependencies - interfaces use Object for MC-specific types
+}
+
+jar {
+    manifest {
+        attributes([
+                'Specification-Title'   : "${mod_name} Compat API",
+                'Specification-Vendor'  : mod_author,
+                'Specification-Version' : version,
+                'Implementation-Title'  : project.name,
+                'Implementation-Version': version,
+                'Implementation-Vendor' : mod_author
+        ])
+    }
+}

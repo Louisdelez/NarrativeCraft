@@ -28,13 +28,22 @@ import fr.loudo.narrativecraft.api.inkAction.InkAction;
 import fr.loudo.narrativecraft.controllers.cutscene.CutsceneController;
 import fr.loudo.narrativecraft.narrative.interaction.InteractionEyeRenderer;
 import fr.loudo.narrativecraft.narrative.session.PlayerSession;
-import java.util.ArrayList;
-import java.util.List;
+import fr.loudo.narrativecraft.util.NarrativeProfiler;
+import java.util.Iterator;
 import net.minecraft.client.Minecraft;
 
 public class OnClientTick {
 
     public static void clientTick(Minecraft minecraft) {
+        NarrativeProfiler.start(NarrativeProfiler.TICK_CLIENT);
+        try {
+            clientTickInternal(minecraft);
+        } finally {
+            NarrativeProfiler.stop(NarrativeProfiler.TICK_CLIENT);
+        }
+    }
+
+    private static void clientTickInternal(Minecraft minecraft) {
         if (minecraft.isPaused() && minecraft.isSingleplayer()) return;
         PlayerSession playerSession =
                 NarrativeCraftMod.getInstance().getPlayerSessionManager().getSessionByPlayer(minecraft.player);
@@ -43,15 +52,24 @@ public class OnClientTick {
             controller.getCutscenePlayback().tick();
         }
         if (playerSession.getDialogRenderer() != null) {
+            NarrativeProfiler.start(NarrativeProfiler.DIALOG);
             playerSession.getDialogRenderer().tick();
+            NarrativeProfiler.stop(NarrativeProfiler.DIALOG);
         }
-        List<InkAction> toRemove = new ArrayList<>();
-        List<InkAction> inkActionsClient = playerSession.getClientSideInkActions();
-        for (InkAction inkAction : inkActionsClient) {
-            if (!inkAction.isRunning()) toRemove.add(inkAction);
+
+        // T095: Use Iterator to avoid ArrayList allocation for removal
+        // Before: List<InkAction> toRemove = new ArrayList<>(); + removeAll()
+        // After: Iterator with remove() - zero allocations
+        NarrativeProfiler.start(NarrativeProfiler.INK_ACTIONS);
+        Iterator<InkAction> iterator = playerSession.getClientSideInkActions().iterator();
+        while (iterator.hasNext()) {
+            InkAction inkAction = iterator.next();
             inkAction.tick();
+            if (!inkAction.isRunning()) {
+                iterator.remove();
+            }
         }
-        playerSession.getInkActions().removeAll(toRemove);
+        NarrativeProfiler.stop(NarrativeProfiler.INK_ACTIONS);
 
         // Renderer
         playerSession.getStorySaveIconGui().tick();

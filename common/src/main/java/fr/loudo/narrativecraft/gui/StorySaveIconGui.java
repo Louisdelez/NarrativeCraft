@@ -23,11 +23,12 @@
 
 package fr.loudo.narrativecraft.gui;
 
+import fr.loudo.narrativecraft.NarrativeCraftMod;
 import fr.loudo.narrativecraft.util.ImageFontConstants;
+import fr.loudo.narrativecraft.util.Translation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 
 public class StorySaveIconGui {
@@ -89,15 +90,15 @@ public class StorySaveIconGui {
 
         int x = width - logoWidth - 30;
         int y = height - 30;
-        guiGraphics.drawString(minecraft.font, logo, x, y, ARGB.color((int) (opacity * 255.0), 0xFFFFFF), false);
+        guiGraphics.drawString(minecraft.font, logo, x, y, NarrativeCraftMod.getColorCompat().color((int) (opacity * 255.0), 0xFFFFFF), false);
         if (debugMode) {
-            Component message = Component.literal("Fake save (debug)");
+            Component message = Translation.message("debug.fake_save");
             guiGraphics.drawString(
                     minecraft.font,
                     message,
                     x - minecraft.font.width(message) / 2 - 5,
                     y - minecraft.font.lineHeight - 10,
-                    ARGB.color((int) (opacity * 255.0), 0xFFFFFF),
+                    NarrativeCraftMod.getColorCompat().color((int) (opacity * 255.0), 0xFFFFFF),
                     false);
         }
     }
