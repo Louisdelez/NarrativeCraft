@@ -1,3 +1,4 @@
+### No, the mod isn't compatible with multiplayer, but it's in the work.
 # NarrativeCraft
 <div align="center">
     Create your own stories, easily and freely, in Minecraft.
