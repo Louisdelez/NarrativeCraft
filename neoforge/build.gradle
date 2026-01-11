@@ -38,6 +38,9 @@ neoForge {
 
 repositories {
     mavenLocal()
+    flatDir {
+        dirs "${rootProject.projectDir}/libs"
+    }
     maven {
         url 'https://maven.kosmx.dev/'
     }
@@ -45,12 +48,10 @@ repositories {
 }
 
 dependencies {
-    jarJar(implementation("com.bladecoder.ink:blade-ink")) {
-        version {
-            prefer blade_ink_version
-        }
-    }
-    implementation "com.bladecoder.ink:blade-ink:${blade_ink_version}"
+    // blade-ink included via jarJar from local libs folder
+    def bladeInkJar = files("${rootProject.projectDir}/libs/blade-ink-${blade_ink_version}.jar")
+    jarJar(bladeInkJar)
+    implementation(bladeInkJar)
     compileOnly("io.github.kosmx.emotes:emotesAPI:${emotesAPI_version}") {
         exclude group: 'com.google.guava', module: 'guava'
     }

@@ -45,7 +45,7 @@ dependencies {
     compileOnly project(':compat-api')
 
     // blade-ink for Story/InkAction classes
-    compileOnly "com.bladecoder.ink:blade-ink:${blade_ink_version}"
+    compileOnly files("${rootProject.projectDir}/libs/blade-ink-${blade_ink_version}.jar")
 
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
     compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
