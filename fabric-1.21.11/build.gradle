@@ -40,7 +40,8 @@ dependencies {
     compileOnly("io.github.kosmx.emotes:emotesMc:${emotesAPI_version}") {
         exclude group: 'com.google.guava', module: 'guava'
     }
-    include(implementation(files("${rootProject.projectDir}/libs/blade-ink-${blade_ink_version}.jar")))
+    // blade-ink from local libs folder
+    implementation files("${rootProject.projectDir}/libs/blade-ink-${blade_ink_version}.jar")
 }
 
 loom {
@@ -74,4 +75,10 @@ tasks.named('jar') {
 
 tasks.named('remapJar') {
     archiveBaseName = "${mod_id}-fabric-1.21.11"
+    // Include blade-ink JAR classes in the final mod jar
+    from(zipTree("${rootProject.projectDir}/libs/blade-ink-${blade_ink_version}.jar")) {
+        exclude 'META-INF/**'
+        exclude 'fabric.mod.json'
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
