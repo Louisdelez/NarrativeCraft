@@ -1,6 +1,8 @@
 # NarrativeCraft
 
 [![CI](https://github.com/LOUDO56/NarrativeCraft/actions/workflows/ci.yml/badge.svg)](https://github.com/LOUDO56/NarrativeCraft/actions/workflows/ci.yml)
+[![Minecraft](https://img.shields.io/badge/Minecraft-1.19.4%20%7C%201.20.6%20%7C%201.21.11-green)](https://github.com/LOUDO56/NarrativeCraft/releases)
+[![Languages](https://img.shields.io/badge/Languages-7-blue)](docs/I18N_RULES.md)
 
 <div align="center">
     Create your own stories, easily and freely, in Minecraft.
@@ -35,15 +37,45 @@ This mod is mainly written to be singleplayer-only, to create adventure maps. Mu
 
 ## Features
 
-- Ink integration
-- Support for custom triggers and commands
-- Made to be accessible to anybody
-- Organized structure
-- Customizable (main screen, credits, dialogues...)
-- All-in-one system (player recording, cutscenes, multiple recordings at the same time)
+### Core Features
+- **Ink integration** - Powerful narrative scripting with [Ink](https://www.inklestudios.com/ink/)
+- **All-in-one system** - Player recording, cutscenes, multiple recordings at the same time
+- **Customizable** - Main screen, credits, dialogues, and more
+- **Made to be accessible** - Designed for everyone, from beginners to advanced users
 
-## Mod compatibility
-- EmoteCraft: Emotes will be recorded, and you can play them from ink script.
+### Multi-Version Support
+- **5 build targets** - Fabric 1.19.4, Fabric 1.20.6, Fabric 1.21.11, NeoForge 1.20.6, NeoForge 1.21.11
+- **Single codebase** - Shared code with version-specific overrides
+- **Automated CI** - All versions tested on every commit
+
+### Internationalization (i18n)
+- **7 languages** - English, French, German, Spanish, Chinese, Russian, Arabic
+- **RTL support** - Full Arabic right-to-left text support
+- **122 translation keys** - Complete UI localization
+- **Automatic language detection** - Matches your Minecraft language setting
+
+### Production Quality
+- **Structured error messages** - Clear WHAT/WHERE/WHY/FIX format
+- **Ink script validation** - Catch errors before runtime
+- **Resource cleanup system** - Automatic cleanup of entities, blocks, and game state
+- **CI validation** - Automated checks for translations and code quality
+
+## Supported Languages
+
+| Language | Code | Status |
+|----------|------|--------|
+| English (US) | en_us | Source |
+| French | fr_fr | Complete |
+| German | de_de | Complete |
+| Spanish | es_es | Complete |
+| Chinese (Simplified) | zh_cn | Complete |
+| Russian | ru_ru | Complete |
+| Arabic (RTL) | ar_sa | Complete |
+
+Want to add a new language? See [ADDING_NEW_LANGUAGE.md](docs/ADDING_NEW_LANGUAGE.md).
+
+## Mod Compatibility
+- **EmoteCraft**: Emotes will be recorded, and you can play them from ink script.
 
 ## How does it work?
 
@@ -111,10 +143,16 @@ See [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for build issues.
 
 ## Documentation
 
+### User Guides
 - [INK_GUIDE.md](docs/INK_GUIDE.md) - Complete scripting tutorial
 - [TAG_REFERENCE.md](docs/TAG_REFERENCE.md) - All tags and parameters
 - [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) - Common issues and solutions
 - [Online Documentation](https://loudo56.github.io/NarrativeCraft-docs/)
+
+### Developer Guides
+- [MULTI_VERSION_ARCHITECTURE.md](docs/MULTI_VERSION_ARCHITECTURE.md) - How multi-version support works
+- [I18N_RULES.md](docs/I18N_RULES.md) - Translation guidelines and rules
+- [ADDING_NEW_LANGUAGE.md](docs/ADDING_NEW_LANGUAGE.md) - How to add a new language
 
 ## Contribution
 
